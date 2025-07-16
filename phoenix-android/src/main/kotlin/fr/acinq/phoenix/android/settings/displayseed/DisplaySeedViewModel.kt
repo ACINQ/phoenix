@@ -18,47 +18,57 @@ package fr.acinq.phoenix.android.settings.displayseed
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.SeedFileState
+import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.security.DecryptSeedResult
+import fr.acinq.phoenix.android.security.SeedManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
-class DisplaySeedViewModel : ViewModel() {
+class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
 
     sealed class ReadingSeedState() {
-        object Init : ReadingSeedState()
-        object ReadingSeed : ReadingSeedState()
+        data object Init : ReadingSeedState()
+        data object ReadingSeed : ReadingSeedState()
         data class Decrypted(val words: List<String>) : ReadingSeedState()
         data class Error(val message: String) : ReadingSeedState()
     }
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<ReadingSeedState>(ReadingSeedState.Init)
 
-    fun readSeed(seedFileState: SeedFileState) {
+    fun readActiveSeed(nodeId: String) {
         if (state.value == ReadingSeedState.ReadingSeed) return
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to read seed: ${e.message}")
             state.value = ReadingSeedState.Error(e.localizedMessage ?: "n/a")
         }) {
             state.value = ReadingSeedState.ReadingSeed
-            when {
-                seedFileState is SeedFileState.Present && seedFileState.encryptedSeed is EncryptedSeed.V2.SingleSeed -> {
-                    val words = EncryptedSeed.toMnemonics(seedFileState.encryptedSeed.decrypt())
+            when (val result = SeedManager.loadAndDecryptOneSeed(application.applicationContext, nodeId)) {
+                is DecryptSeedResult.Success -> {
                     delay(300)
-                    state.value = ReadingSeedState.Decrypted(words)
+                    state.value = ReadingSeedState.Decrypted(result.mnemonics)
                 }
-                seedFileState is SeedFileState.Error.Unreadable -> {
-                    state.value = ReadingSeedState.Error(seedFileState.message ?: "n/a")
-                }
-                else -> {
-                    log.warn("unable to read seed in state=$seedFileState")
-                    state.value = ReadingSeedState.Error("unhandled state=${seedFileState::class.simpleName}")
+                is DecryptSeedResult.Failure -> {
+                    log.error("unable to get active seed: {}", result)
+                    state.value = ReadingSeedState.Error(result.toString())
                 }
             }
+        }
+    }
+
+    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            @Suppress("UNCHECKED_CAST")
+            return DisplaySeedViewModel(application) as T
         }
     }
 }

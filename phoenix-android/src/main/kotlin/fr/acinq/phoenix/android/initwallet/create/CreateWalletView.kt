@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,8 +40,6 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.initwallet.WritingSeedState
-import fr.acinq.phoenix.android.security.SeedFileState
-import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.Initialization
@@ -58,9 +55,6 @@ fun CreateWalletView(
 
     val vm = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory())
 
-    val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
-        value = SeedManager.getSeedState(context)
-    }
 
     Column(
         modifier = Modifier
@@ -69,44 +63,32 @@ fun CreateWalletView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (val state = seedFileState.value) {
-            is SeedFileState.Absent -> {
-                Text(stringResource(id = R.string.autocreate_generating))
-                MVIView(CF::initialization) { model, postIntent ->
-                    when (model) {
-                        is Initialization.Model.Ready -> {
-                            val entropy = remember { Lightning.randomBytes(16) }
-                            LaunchedEffect(key1 = entropy) {
-                                log.debug("generating new wallet...")
-                                postIntent(Initialization.Intent.GenerateWallet(entropy, MnemonicLanguage.English))
-                            }
-                        }
-                        is Initialization.Model.GeneratedWallet -> {
-                            val writingState = vm.writingState
-                            if (writingState is WritingSeedState.Error) {
-                                ErrorMessage(
-                                    header = stringResource(id = R.string.autocreate_error),
-                                    details = when (writingState) {
-                                        is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
-                                        is WritingSeedState.Error.SeedAlreadyExist -> stringResource(R.string.autocreate_error_cannot_overwrite)
-                                    },
-                                    alignment = Alignment.CenterHorizontally,
-                                )
-                            }
-                            LaunchedEffect(true) {
-                                vm.writeSeed(context, model.mnemonics, isNewWallet = true, onSeedWritten)
-                            }
-                        }
+        Text(stringResource(id = R.string.autocreate_generating))
+        MVIView(CF::initialization) { model, postIntent ->
+            when (model) {
+                is Initialization.Model.Ready -> {
+                    val entropy = remember { Lightning.randomBytes(16) }
+                    LaunchedEffect(key1 = entropy) {
+                        log.debug("generating new wallet...")
+                        postIntent(Initialization.Intent.GenerateWallet(entropy, MnemonicLanguage.English))
                     }
                 }
-            }
-            SeedFileState.Unknown -> {
-                Text(stringResource(id = R.string.startup_preparing))
-            }
-            else -> {
-                // we should not be here
-                LaunchedEffect(true) {
-                    onSeedWritten()
+                is Initialization.Model.GeneratedWallet -> {
+                    val writingState = vm.writingState
+                    if (writingState is WritingSeedState.Error) {
+                        ErrorMessage(
+                            header = stringResource(id = R.string.autocreate_error),
+                            details = when (writingState) {
+                                is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
+                                is WritingSeedState.Error.SeedAlreadyExists -> stringResource(R.string.autocreate_error_already_exists)
+                                is WritingSeedState.Error.CannotLoadSeedMap -> stringResource(R.string.autocreate_error_cannot_load_existing)
+                            },
+                            alignment = Alignment.CenterHorizontally,
+                        )
+                    }
+                    LaunchedEffect(true) {
+                        vm.writeSeed(context, model.mnemonics, isNewWallet = true, onSeedWritten)
+                    }
                 }
             }
         }

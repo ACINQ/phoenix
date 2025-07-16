@@ -45,10 +45,11 @@ sealed class EncryptedSeed {
             fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
 
             companion object {
-                fun encrypt(seed: ByteArray): SingleSeed = tryWith(GeneralSecurityException()) {
-                    val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
-                    SingleSeed(cipher.iv, cipher.doFinal(seed))
-                }
+                // encrypt method has been removed, [SingleSeed] is replaced by [MultipleSeed].
+//                fun encrypt(seed: ByteArray): SingleSeed = tryWith(GeneralSecurityException()) {
+//                    val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
+//                    SingleSeed(cipher.iv, cipher.doFinal(seed))
+//                }
             }
         }
 
@@ -62,9 +63,14 @@ sealed class EncryptedSeed {
             }
 
             companion object {
-                fun encrypt(seed: ByteArray): SingleSeed = tryWith(GeneralSecurityException()) {
+                fun encrypt(seedMap: Map<String, List<String>>): MultipleSeed = tryWith(GeneralSecurityException()) {
+                    val json = Json.encodeToString(
+                        seedMap.map { (nodeId, words) ->
+                            nodeId to fromMnemonics(words)
+                        }.toMap()
+                    )
                     val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
-                    SingleSeed(cipher.iv, cipher.doFinal(seed))
+                    MultipleSeed(cipher.iv, cipher.doFinal(json.encodeToByteArray()))
                 }
             }
         }
@@ -80,7 +86,10 @@ sealed class EncryptedSeed {
             array.write(SEED_FILE_VERSION_2.toInt())
             array.write(
                 when (keyAlias) {
-                    KeystoreHelper.KEY_NO_AUTH -> SINGLE_SEED_VERSION
+                    KeystoreHelper.KEY_NO_AUTH -> when (this) {
+                        is SingleSeed -> SINGLE_SEED_VERSION
+                        is MultipleSeed -> MULTIPLE_SEED_VERSION
+                    }
                     else -> throw UnhandledEncryptionKeyAlias(keyAlias)
                 }.toInt()
             )
@@ -103,7 +112,7 @@ sealed class EncryptedSeed {
                 stream.read(cipherText, 0, stream.available())
                 return when (keyVersion) {
                     SINGLE_SEED_VERSION -> SingleSeed(iv, cipherText)
-                    MULTIPLE_SEED_VERSION -> SingleSeed(iv, cipherText)
+                    MULTIPLE_SEED_VERSION -> MultipleSeed(iv, cipherText)
                     else -> throw UnhandledEncryptionKeyVersion(keyVersion)
                 }
             }
@@ -128,7 +137,7 @@ sealed class EncryptedSeed {
         /** Returns a mnemonics from a byte array, or null if it's invalid. */
         fun toMnemonicsSafe(array: ByteArray): List<String>? {
             return try {
-                val mnemonics = EncryptedSeed.toMnemonics(array)
+                val mnemonics = toMnemonics(array)
                 MnemonicCode.validate(mnemonics = mnemonics, wordlist = MnemonicLanguage.English.wordlist())
                 mnemonics
             } catch (e: Exception) {

@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.initwallet
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,35 +29,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.buttons.BorderButton
-import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 
 
 @Composable
-fun InitWallet(
+fun InitNewWallet(
+    onSettingsClick: () -> Unit,
     onCreateWalletClick: () -> Unit,
     onRestoreWalletClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        FilledButton(
-            text = stringResource(id = R.string.initwallet_create),
-            icon = R.drawable.ic_fire,
-            onClick = onCreateWalletClick
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        HSeparator(width = 80.dp)
-        Spacer(modifier = Modifier.height(16.dp))
-        BorderButton(
-            text = stringResource(id = R.string.initwallet_restore),
-            icon = R.drawable.ic_restore,
-            onClick = onRestoreWalletClick
-        )
+    DefaultScreenLayout(isScrollable = false) {
+        Row {
+            Spacer(Modifier.weight(1f))
+            Button(
+                icon = R.drawable.ic_settings,
+                onClick = onSettingsClick
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            FilledButton(
+                text = stringResource(id = R.string.initwallet_create),
+                icon = R.drawable.ic_fire,
+                onClick = onCreateWalletClick
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            HSeparator(width = 80.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+            BorderButton(
+                text = stringResource(id = R.string.initwallet_restore),
+                icon = R.drawable.ic_restore,
+                onClick = onRestoreWalletClick
+            )
+        }
     }
 }

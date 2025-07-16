@@ -28,6 +28,8 @@ import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.logger
@@ -48,19 +50,22 @@ fun NavController.popToHome() {
  * to [route] once the business is started.
  *
  * @param deepLinkPrefix an optional prefix if this route supports deeplinks
+ * @content arguments contains the backstack entry just like the regular composable, but also the current node id and the business
  */
 fun NavGraphBuilder.businessComposable(
     route: String,
+    appViewModel: AppViewModel,
     deepLinkPrefix: String = "",
     arguments: List<NamedNavArgument> = emptyList(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
+    content: @Composable AnimatedContentScope.(NavBackStackEntry, String, PhoenixBusiness) -> Unit
 ) {
     composable(route = route, arguments = arguments, deepLinks = deepLinks) { entry ->
         val log = logger("Navigation")
-        val business by BusinessRepo.activeBusiness.collectAsState()
-
-        if (business == null) {
+        val activeWallet by appViewModel.activeWalletInUI.collectAsState()
+        val nodeId = activeWallet?.first
+        val business = activeWallet?.second
+        if (nodeId == null || business == null) {
 
             // in case it's a deeplink we need to look into the intent and apply some optional prefix
             // for example, when deep-linking to the send view, the link is "scanview:lnbc1....."
@@ -74,13 +79,13 @@ fun NavGraphBuilder.businessComposable(
                 intent?.data?.let { "$deepLinkPrefix${it.toString()}" } ?: route
             } else route
 
-            log.info("accessing route=$route but business not found, navigating to [startup] then to [${next ?: route}]")
+            log.info("accessing route=$route but business not found, navigating to [startup] then to [$next]")
             val navController = navController
             navController.navigate("${Screen.Startup.route}?next=${next.encodeURLParameter()}") {
                 popUpTo(navController.graph.id) { inclusive = true }
             }
         } else {
-            content(entry)
+            content(entry, nodeId, business)
         }
     }
 }

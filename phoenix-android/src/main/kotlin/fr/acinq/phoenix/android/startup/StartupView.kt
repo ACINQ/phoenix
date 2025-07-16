@@ -23,7 +23,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -39,24 +43,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.ListWalletState
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.wallet.AvailableWalletView
+import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.shareFile
 
 
 @Composable
 fun StartupView(
+    appViewModel: AppViewModel,
     startupViewModel: StartupViewModel,
     onShowIntro: () -> Unit,
     onSeedNotFound: () -> Unit,
@@ -76,55 +86,143 @@ fun StartupView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_phoenix),
-            contentDescription = "phoenix-icon",
-        )
 
-        when (val state = startupViewModel.state.value) {
-            is StartupViewState.Init -> {
-                Text(text = stringResource(id = R.string.startup_init))
+        when (val listWalletState = appViewModel.listWalletState.value) {
+            is ListWalletState.Init -> {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_phoenix),
+                    contentDescription = "phoenix-icon",
+                )
+                Text(text = stringResource(id = R.string.startup_loading_seed))
             }
-            StartupViewState.SeedNotFound -> {
-                Text(text = stringResource(R.string.startup_loading_seed))
-                LaunchedEffect(Unit) { onSeedNotFound() }
-            }
-            is StartupViewState.LoadingSeed -> {
-                Text(text = stringResource(R.string.startup_loading_seed))
-            }
-            is StartupViewState.StartingBusiness -> {
-                Text(text = stringResource(R.string.startup_starting))
-            }
+            is ListWalletState.Success -> {
 
-            is StartupViewState.BusinessActive -> {
-                Text(text = stringResource(R.string.startup_started))
-                LaunchedEffect(true) { onBusinessStarted() }
-            }
+                val defaultNodeId = globalPrefs.getDefaultNodeId.collectAsState(null)
+                val availableWallets by appViewModel.availableWallets.collectAsState()
 
-            is StartupViewState.Error -> {
-                StartupError(state = state, onFallbackClick = { startupViewModel.state.value = StartupViewState.SeedRecovery.Init })
-            }
+                // we may already have a desired node id and thus will not need user input to know which wallet to load
+                val desiredNodeIdFlow = appViewModel.desiredNodeId.collectAsState()
+                val businessMap by BusinessRepo.businessFlow.collectAsState()
 
-            is StartupViewState.SeedRecovery -> {
-                StartupRecoveryView(state = state, onRecoveryClick = startupViewModel::recoverSeed, onReset = { startupViewModel.state.value = StartupViewState.SeedRecovery.Init })
+                val desiredNodeId = desiredNodeIdFlow.value
+                val desiredBusiness = businessMap[desiredNodeId]
+                val desiredNodeWallet = availableWallets[desiredNodeId]
+
+                when {
+                    desiredBusiness != null -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_phoenix),
+                            contentDescription = "phoenix-icon",
+                        )
+                        Text(text = stringResource(R.string.startup_started))
+                        LaunchedEffect(Unit) { onBusinessStarted() }
+                    }
+                    desiredNodeId != null && desiredNodeWallet != null -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_phoenix),
+                            contentDescription = "phoenix-icon",
+                        )
+                        Text(text = stringResource(R.string.startup_starting))
+                        LaunchedEffect(Unit) {
+                            startupViewModel.startupNode(desiredNodeId, desiredNodeWallet.words, onStartupSuccess = {
+                                onBusinessStarted()
+                            })
+                        }
+                    }
+                    else -> {
+                        val availableWalletMetadata by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
+
+                        when {
+                            availableWallets.isEmpty() -> {
+                                LaunchedEffect(Unit) { onSeedNotFound() }
+                            }
+                            else -> {
+                                // TODO if default is set => launch default
+                                when (val startupState = startupViewModel.state.value) {
+                                    is StartupViewState.Init -> {
+                                        Text(text = "Select a wallet", style = MaterialTheme.typography.h4)
+                                        Spacer(Modifier.height(16.dp))
+                                        LazyColumn(modifier = Modifier.heightIn(max = 400.dp).padding(horizontal = 24.dp)) {
+                                            items(items = availableWallets.entries.toList()) { (nodeId, userWallet) ->
+                                                AvailableWalletView(
+                                                    nodeId = nodeId,
+                                                    walletMetadata = availableWalletMetadata[nodeId],
+                                                    isCurrent = false,
+                                                    isActive = false,
+                                                    onClick = {
+                                                        startupViewModel.startupNode(nodeId = nodeId, words = userWallet.words, onStartupSuccess = {
+                                                            appViewModel.updateDesiredNodeId(nodeId)
+                                                            onBusinessStarted()
+                                                        })
+                                                    }
+                                                )
+                                                Spacer(Modifier.height(8.dp))
+                                            }
+                                        }
+                                    }
+                                    is StartupViewState.StartingBusiness -> {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_phoenix),
+                                            contentDescription = "phoenix-icon",
+                                        )
+                                        Text(text = stringResource(R.string.startup_starting))
+                                    }
+                                    is StartupViewState.BusinessActive -> {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_phoenix),
+                                            contentDescription = "phoenix-icon",
+                                        )
+                                        Text(text = stringResource(R.string.startup_started))
+                                    }
+                                    is StartupViewState.Error -> {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_phoenix),
+                                            contentDescription = "phoenix-icon",
+                                        )
+                                        StartBusinessError(nodeId = startupState.nodeId, error = startupState)
+                                    }
+                                    is StartupViewState.SeedRecovery -> {
+                                        StartupRecoveryView(state = startupState, onRecoveryClick = startupViewModel::recoverSeed, onReset = { startupViewModel.state.value = StartupViewState.SeedRecovery.Init })
+                                        TODO("handle that in a separate screen/state")
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            is ListWalletState.Error -> {
+                ListWalletsError(state = listWalletState, onFallbackClick = { startupViewModel.state.value = StartupViewState.SeedRecovery.Init })
             }
         }
     }
 }
 
 @Composable
-private fun StartupError(state: StartupViewState.Error, onFallbackClick: () -> Unit) {
+private fun StartBusinessError(nodeId: String, error: StartupViewState.Error) {
+    ErrorMessage(
+        header= "The wallet could not start",
+        details = when (error) {
+            is StartupViewState.Error.Generic -> error.cause?.message
+        },
+        alignment = Alignment.CenterHorizontally,
+    )
+}
+
+@Composable
+private fun ListWalletsError(state: ListWalletState.Error, onFallbackClick: () -> Unit) {
     val context = LocalContext.current
     ErrorMessage(
         header = when (state) {
-            is StartupViewState.Error.Generic -> stringResource(id = R.string.startup_error_generic)
-            is StartupViewState.Error.DecryptionError.GeneralException -> stringResource(id = R.string.startup_error_decryption_general)
-            is StartupViewState.Error.DecryptionError.KeystoreFailure -> stringResource(id = R.string.startup_error_decryption_keystore)
+            is ListWalletState.Error.Generic -> stringResource(id = R.string.startup_error_generic)
+            is ListWalletState.Error.DecryptionError.GeneralException -> stringResource(id = R.string.startup_error_decryption_general)
+            is ListWalletState.Error.DecryptionError.KeystoreFailure -> stringResource(id = R.string.startup_error_decryption_keystore)
         },
         details = when (state) {
-            is StartupViewState.Error.Generic -> state.cause?.message
-            is StartupViewState.Error.DecryptionError.GeneralException -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}"
-            is StartupViewState.Error.DecryptionError.KeystoreFailure -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}" +
+            is ListWalletState.Error.Generic -> state.cause?.message
+            is ListWalletState.Error.DecryptionError.GeneralException -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}"
+            is ListWalletState.Error.DecryptionError.KeystoreFailure -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}" +
                     (state.cause.cause?.localizedMessage?.take(80) ?: "")
         },
         alignment = Alignment.CenterHorizontally,
@@ -132,40 +230,37 @@ private fun StartupError(state: StartupViewState.Error, onFallbackClick: () -> U
 
     HSeparator(width = 50.dp)
     Spacer(modifier = Modifier.height(16.dp))
-    if (state is StartupViewState.Error.DecryptionError) {
-        BorderButton(
-            text = stringResource(id = R.string.startup_error_recovery_button),
-            icon = R.drawable.ic_key,
-            onClick = onFallbackClick
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        val navController = navController
-        BorderButton(
-            text = stringResource(id = R.string.menu_settings),
-            icon = R.drawable.ic_settings,
-            onClick = { navController.navigate(Screen.Settings.route) }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }
-        Button(
-            text = stringResource(id = R.string.logs_share_button),
-            onClick = {
-                try {
-                    val logFile = Logging.exportLogFile(context)
-                    shareFile(
-                        context = context,
-                        data = FileProvider.getUriForFile(context, authority, logFile),
-                        subject = context.getString(R.string.logs_share_subject),
-                        chooserTitle = context.getString(R.string.logs_share_title)
-                    )
-                } catch (e: Exception) {
-                    Toast.makeText(context, "Failed to export logs...", Toast.LENGTH_SHORT).show()
-                }
-            },
-            textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.typography.subtitle2.color),
-            shape = CircleShape,
-        )
-    } else {
-        Text(text = stringResource(R.string.startup_error_try_again), textAlign = TextAlign.Center)
-    }
+    BorderButton(
+        text = stringResource(id = R.string.startup_error_recovery_button),
+        icon = R.drawable.ic_key,
+        onClick = onFallbackClick
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+
+    val navController = navController
+    BorderButton(
+        text = stringResource(id = R.string.menu_settings),
+        icon = R.drawable.ic_settings,
+        onClick = { navController.navigate(Screen.Settings.route) }
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }
+    Button(
+        text = stringResource(id = R.string.logs_share_button),
+        onClick = {
+            try {
+                val logFile = Logging.exportLogFile(context)
+                shareFile(
+                    context = context,
+                    data = FileProvider.getUriForFile(context, authority, logFile),
+                    subject = context.getString(R.string.logs_share_subject),
+                    chooserTitle = context.getString(R.string.logs_share_title)
+                )
+            } catch (e: Exception) {
+                Toast.makeText(context, "Failed to export logs...", Toast.LENGTH_SHORT).show()
+            }
+        },
+        textStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.typography.subtitle2.color),
+        shape = CircleShape,
+    )
 }

@@ -16,17 +16,28 @@
 
 package fr.acinq.phoenix.android.utils.datastore
 
+import androidx.compose.ui.graphics.Color
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.byteVector
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.lightning.utils.getValue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import kotlin.random.Random
 
 class GlobalPrefsRepository(private val data: DataStore<Preferences>) {
 
@@ -45,19 +56,52 @@ class GlobalPrefsRepository(private val data: DataStore<Preferences>) {
 
     private companion object {
         // tracks which wallet the app should try to load first, may be null
-        private val EXPECTED_NODE_ID_ON_START = stringPreferencesKey("EXPECTED_NODE_ID_ON_START")
+        private val DEFAULT_NODE_ID = stringPreferencesKey("DEFAULT_NODE_ID")
+        private val ACTIVE_NODE_ID = stringPreferencesKey("ACTIVE_NODE_ID")
+        private val AVAILABLE_WALLETS_META = stringPreferencesKey("AVAILABLE_WALLETS_META")
     }
 
-
-    val getExpectedNodeIdOnStart: Flow<PublicKey?> = safeData.map {
-        it[EXPECTED_NODE_ID_ON_START]?.let { id ->
+    /**
+     * Lists the metadata of known available wallets. Note that this is just metadata, not the actual wallets data like the seed.
+     *
+     * Specifically, the Phoenix SeedManager may be managing more or less seeds than this list contain ; if so the SeedManager is
+     * always right, that is, we should ignore the data returned by that list if they don't match the SeedManager. This should only
+     * happen if there's a syncing problem between the preferences and the seed file containing the map of seeds.
+     */
+    val getAvailableWalletsMeta: Flow<Map<String, UserWalletMetadata>> = safeData.map {
+        it[AVAILABLE_WALLETS_META]?.let { json ->
             try {
-                PublicKey.fromHex(id)
+                Json.decodeFromString<Map<String, UserWalletMetadata>>(json)
             } catch (e: Exception) {
-                log.error("failed to read EXPECTED_NODE_ID_ON_START=$id: ", e.message)
+                log.error("could not deserialize available_wallets=$json: ", e)
                 null
             }
-        }
+        } ?: emptyMap()
     }
-    suspend fun saveExpectedNodeIdOnStart(nodeId: PublicKey) = data.edit { it[EXPECTED_NODE_ID_ON_START] = nodeId.toHex() }
+
+    suspend fun saveAvailableWalletMeta(name: String?, nodeId: String) = data.edit {
+        val existingMap: Map<String, UserWalletMetadata> = getAvailableWalletsMeta.first()
+        val newMap = existingMap + (nodeId to UserWalletMetadata(name = name, nodeId = nodeId, createdAt = existingMap[nodeId]?.createdAt ?: currentTimestampMillis()))
+        it[AVAILABLE_WALLETS_META] = Json.encodeToString(newMap)
+    }
+
+    val getActiveNodeId: Flow<String?> = safeData.map { it[ACTIVE_NODE_ID] }
+    suspend fun saveActiveNodeId(nodeId: String) = data.edit { it[ACTIVE_NODE_ID] = nodeId }
+
+    val getDefaultNodeId: Flow<String?> = safeData.map { it[DEFAULT_NODE_ID] }
+    suspend fun saveDefaultNodeId(nodeId: String) = data.edit { it[DEFAULT_NODE_ID] = nodeId }
+}
+
+@Serializable
+data class UserWalletMetadata(val nodeId: String, val name: String?, val createdAt: Long?) {
+    val color: Color by lazy {
+        val randomSeed = java.util.UUID.nameUUIDFromBytes(ByteVector.fromHex(nodeId).sha256().toByteArray()).mostSignificantBits
+        val random = Random(randomSeed)
+
+        Color.hsv(
+            hue = random.nextInt(360).toFloat(),
+            saturation = 0.6f + random.nextFloat() * 0.4f,
+            value = 0.75f + random.nextFloat() * 0.1f
+        )
+    }
 }

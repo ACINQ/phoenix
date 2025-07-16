@@ -126,11 +126,12 @@ fun SurfaceFilledButton(
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
     space: Dp = 12.dp,
+    shape: Shape = RoundedCornerShape(12.dp),
     padding: PaddingValues = PaddingValues(12.dp),
     onClick: () -> Unit,
 ) {
     FilledButton(
-        shape = RoundedCornerShape(12.dp),
+        shape = shape,
         backgroundColor = MaterialTheme.colors.surface,
         textStyle = textStyle,
         iconTint = iconTint,

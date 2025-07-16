@@ -30,6 +30,7 @@ import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.security.DecryptSeedResult
+import fr.acinq.phoenix.android.security.DecryptSeedResult2
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeystoreHelper
 import fr.acinq.phoenix.android.security.SeedManager
@@ -42,6 +43,8 @@ import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
@@ -49,20 +52,12 @@ import org.slf4j.LoggerFactory
 
 sealed class StartupViewState {
     data object Init : StartupViewState()
-
-    data object LoadingSeed: StartupViewState()
-    data object SeedNotFound: StartupViewState()
     data object StartingBusiness : StartupViewState()
-
     data object BusinessActive: StartupViewState()
 
     sealed class Error: StartupViewState() {
-        data class Generic(val cause: Throwable?): Error()
-
-        sealed class DecryptionError : Error() {
-            data class GeneralException(val cause: Throwable): DecryptionError()
-            data class KeystoreFailure(val cause: Throwable): DecryptionError()
-        }
+        abstract val nodeId: String
+        data class Generic(override val nodeId: String, val cause: Throwable?): Error()
     }
 
     sealed class SeedRecovery : StartupViewState() {
@@ -86,65 +81,16 @@ class StartupViewModel(
 
     val state = mutableStateOf<StartupViewState>(StartupViewState.Init)
 
-    init {
-        initView()
-    }
-
-    private fun initView() {
-
+    fun startupNode(nodeId: String, words: List<String>, onStartupSuccess: () -> Unit) {
+        log.info("entering init-view")
         if (state.value !is StartupViewState.Init) {
             return
         }
 
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when initialising startup-view: ", e)
-            state.value = StartupViewState.Error.Generic(e)
+            state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = e)
         }) {
-
-            val activeBusiness = BusinessRepo.activeBusiness.value
-            if (activeBusiness != null) {
-                val (nodeId, business) = activeBusiness
-                log.info("business already available with id=$nodeId")
-                if (business.connectionsManager.connections.value.peer !is Connection.ESTABLISHED) {
-                    business.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
-                }
-                state.value = StartupViewState.BusinessActive
-                return@launch
-            }
-
-            state.value = StartupViewState.LoadingSeed
-            val words = when (val result = SeedManager.loadAndDecryptSeed(context = application.applicationContext, expectedNodeId = null)) {
-                is DecryptSeedResult.Failure.DecryptionError -> {
-                    log.error("cannot decrypt seed file: ", result.cause)
-                    state.value = StartupViewState.Error.DecryptionError.GeneralException(result.cause)
-                    return@launch
-                }
-                is DecryptSeedResult.Failure.KeyStoreFailure -> {
-                    log.error("key store failure: ", result.cause)
-                    state.value = StartupViewState.Error.DecryptionError.KeystoreFailure(result.cause)
-                    return@launch
-                }
-                is DecryptSeedResult.Failure.SeedFileUnreadable -> {
-                    log.error("aborting, unreadable seed file")
-                    state.value = StartupViewState.Error.Generic(null)
-                    return@launch
-                }
-                is DecryptSeedResult.Failure.SeedInvalid -> {
-                    log.error("aborting, seed is invalid")
-                    state.value = StartupViewState.Error.Generic(null)
-                    return@launch
-                }
-
-                is DecryptSeedResult.Failure.SeedNotFound -> {
-                    state.value = StartupViewState.SeedNotFound
-                    return@launch
-                }
-
-                is DecryptSeedResult.Success -> {
-                    result.mnemonics
-                }
-            }
-
             state.value = StartupViewState.StartingBusiness
             val startResult = withContext(Dispatchers.Default) {
                 BusinessRepo.startNewBusiness(words, isHeadless = false)
@@ -154,15 +100,16 @@ class StartupViewModel(
             ContactsPhotoCleaner.schedule(application.applicationContext)
 
             when (startResult) {
-                is StartBusinessResult.Success -> state.value = StartupViewState.BusinessActive
-                is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(startResult.cause)
-                is StartBusinessResult.Failure.LoadWalletError -> state.value = StartupViewState.Error.Generic(null)
+                is StartBusinessResult.Success -> {
+                    state.value = StartupViewState.BusinessActive
+                    launch(Dispatchers.Main) {
+                        onStartupSuccess()
+                    }
+                }
+                is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = startResult.cause)
+                is StartBusinessResult.Failure.LoadWalletError -> state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = null)
             }
         }
-    }
-
-    private suspend fun startBusiness(words: List<String>) {
-
     }
 
     /**
@@ -179,23 +126,23 @@ class StartupViewModel(
         }) {
             val seed = MnemonicCode.toSeed(mnemonics = words.joinToString(" "), passphrase = "").byteVector()
             val localKeyManager = LocalKeyManager(seed = seed, chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
+            val nodeId = localKeyManager.nodeKeys.nodeKey.publicKey.toHex()
             val nodeIdHash = localKeyManager.nodeIdHash()
 
             val channelsDbFile = context.getDatabasePath("channels-${NodeParamsManager.chain.phoenixName}-$nodeIdHash.sqlite")
             if (channelsDbFile.exists()) {
                 state.value = StartupViewState.SeedRecovery.Success.MatchingData
-                val encodedSeed = EncryptedSeed.fromMnemonics(words)
                 try {
                     KeystoreHelper.checkEncryptionCipherOrReset(KeystoreHelper.KEY_NO_AUTH)
                 } catch (e: Exception) {
                     state.value = StartupViewState.SeedRecovery.Error.SeedDoesNotMatch
                     return@launch
                 }
-                val encrypted = EncryptedSeed.V2.SingleSeed.encrypt(encodedSeed)
+                val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(mapOf(nodeId to words))
                 SeedManager.writeSeedToDisk(context, encrypted, overwrite = true)
                 delay(1000)
                 state.value = StartupViewState.Init
-                initView()
+                TODO("start recovered seed")
             } else {
                 state.value = StartupViewState.SeedRecovery.Error.SeedDoesNotMatch
             }

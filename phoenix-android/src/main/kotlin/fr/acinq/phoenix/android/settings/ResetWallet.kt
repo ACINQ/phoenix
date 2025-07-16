@@ -21,6 +21,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,12 +48,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -64,10 +67,12 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
+import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -91,11 +96,12 @@ sealed class ResetWalletStep {
         data object Success : Result()
         sealed class Failure : Result() {
             data class Error(val e: Throwable) : Failure()
+            data class FailedToDeleteFile(val fileName: String) : Failure()
         }
     }
 }
 
-class ResetWalletViewModel(val application: PhoenixApplication) : ViewModel() {
+class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: String) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
@@ -109,12 +115,11 @@ class ResetWalletViewModel(val application: PhoenixApplication) : ViewModel() {
             log.error("failed to reset wallet data: ", e)
         }) {
 
-
             delay(350)
-            val (activeNodeId, activeBusiness) = BusinessRepo.activeBusiness.filterNotNull().first()
-            val nodeIdHash = PublicKey.fromHex(activeNodeId).hash160().byteVector().toHex()
-            val chain = activeBusiness.chain
-            BusinessRepo.stopBusiness(activeNodeId)
+
+            val nodeIdHash = PublicKey.fromHex(nodeId).hash160().byteVector().toHex()
+            val chain = NodeParamsManager.chain
+            BusinessRepo.stopBusiness(nodeId)
             delay(250)
 
             state.value = ResetWalletStep.Deleting.Databases
@@ -136,31 +141,40 @@ class ResetWalletViewModel(val application: PhoenixApplication) : ViewModel() {
 
             state.value = ResetWalletStep.Deleting.Seed
             val datadir = SeedManager.getDatadir(context)
-            datadir.listFiles()?.forEach { it.delete() }
-            datadir.delete()
+            datadir.listFiles()?.forEach {
+                val delete = it.delete()
+                if (!delete) {
+                    state.value = ResetWalletStep.Result.Failure.FailedToDeleteFile(it.name)
+                    return@launch
+                }
+            }
+            val delete = datadir.delete()
+            if (!delete) {
+                state.value = ResetWalletStep.Result.Failure.FailedToDeleteFile("datadir")
+                return@launch
+            }
+
             delay(300)
 
             state.value = ResetWalletStep.Result.Success
         }
     }
 
-    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+    class Factory(val application: PhoenixApplication, val nodeId: String) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
-            return ResetWalletViewModel(application) as T
+            return ResetWalletViewModel(application, nodeId) as T
         }
     }
 }
 
 @Composable
 fun ResetWallet(
+    nodeId: String,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<ResetWalletViewModel>()
-
-    TODO("confirm the node id to delete the correct wallet and not just the active one.")
+    val vm = viewModel<ResetWalletViewModel>(factory = ResetWalletViewModel.Factory(application = application, nodeId = nodeId))
 
     DefaultScreenLayout {
         when (vm.state.value) {
@@ -180,7 +194,7 @@ fun ResetWallet(
 
         when (val state = vm.state.value) {
             ResetWalletStep.Init -> {
-                InitReset(onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
+                InitReset(nodeId = nodeId, onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
             }
             ResetWalletStep.Confirm -> {
                 ReviewReset(onConfirmClick = vm::deleteWalletData)
@@ -200,18 +214,30 @@ fun ResetWallet(
 
 @Composable
 private fun InitReset(
+    nodeId: String,
     onReviewClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Text(text = stringResource(id = R.string.reset_wallet_instructions_header))
+        Text(text = "Do you want to delete this wallet from your device ?")
         Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = stringResource(id = R.string.reset_wallet_instructions_details),
-            style = MaterialTheme.typography.subtitle2
-        )
+        Row {
+            val availableWallet by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
+            ActiveWalletView(nodeId, availableWallet[nodeId])
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = "All data for this wallet will be removed, including the payments history.")
+
+
+//        Text(text = stringResource(id = R.string.reset_wallet_instructions_header))
+//
+//        Spacer(modifier = Modifier.height(4.dp))
+//        Text(
+//            text = stringResource(id = R.string.reset_wallet_instructions_details),
+//            style = MaterialTheme.typography.subtitle2
+//        )
     }
 
     Card {
@@ -354,6 +380,7 @@ private fun DeletionFailed(
         header = stringResource(id = R.string.reset_wallet_failure_title),
         details = when (failure) {
             is ResetWalletStep.Result.Failure.Error -> failure.e.localizedMessage
+            is ResetWalletStep.Result.Failure.FailedToDeleteFile -> "could not delete file=${failure.fileName}"
         },
     )
 }

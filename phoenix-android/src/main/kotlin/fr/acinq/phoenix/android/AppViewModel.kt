@@ -25,11 +25,50 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.BusinessRepo.businessFlow
+import fr.acinq.phoenix.android.security.DecryptSeedResult2
+import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.data.ExchangeRate
+import fr.acinq.phoenix.data.FiatCurrency
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration
+
+
+sealed class ListWalletState {
+    data object Init: ListWalletState()
+    data object Success: ListWalletState()
+    sealed class Error: ListWalletState() {
+        data class Generic(val cause: Throwable?): Error()
+
+        sealed class DecryptionError : Error() {
+            data class GeneralException(val cause: Throwable): DecryptionError()
+            data class KeystoreFailure(val cause: Throwable): DecryptionError()
+        }
+    }
+}
+
+data class UserWallet(
+    val nodeId: String,
+    val words: List<String>,
+    val metadata: UserWalletMetadata?
+) {
+    override fun toString(): String = "UserWallet[ node_id=$nodeId, words=***, metadata=$metadata ]"
+}
 
 class AppViewModel(
     private val application: PhoenixApplication
@@ -43,9 +82,102 @@ class AppViewModel(
     private val autoLockHandler = Handler(Looper.getMainLooper())
     private val autoLockRunnable: Runnable = Runnable { lockScreen() }
 
+    val listWalletState = mutableStateOf<ListWalletState>(ListWalletState.Init)
+
+    private val _availableWallets = MutableStateFlow<Map<String, UserWallet>>(emptyMap())
+    val availableWallets = _availableWallets.asStateFlow()
+
+    private val _desiredNodeId = MutableStateFlow<String?>(null)
+    val desiredNodeId = _desiredNodeId.asStateFlow()
+
+    private val _activeWalletInUI = MutableStateFlow<Pair<String, PhoenixBusiness?>?>(null)
+    val activeWalletInUI = _activeWalletInUI.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val exchangeRates = activeWalletInUI.filterNotNull().mapLatest { it.second }.filterNotNull().flatMapLatest { it.currencyManager.ratesFlow }
+        .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val fiatRatesMap = exchangeRates.mapLatest { rates ->
+        val usdPriceRate = rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull { it.fiatCurrency == FiatCurrency.USD }
+        if (usdPriceRate != null) {
+            rates.associate { rate ->
+                rate.fiatCurrency to when (rate) {
+                    is ExchangeRate.BitcoinPriceRate -> rate
+                    is ExchangeRate.UsdPriceRate -> ExchangeRate.BitcoinPriceRate(
+                        fiatCurrency = rate.fiatCurrency,
+                        price = rate.price * usdPriceRate.price,
+                        source = rate.source,
+                        timestampMillis = rate.timestampMillis
+                    )
+                }
+            }
+        } else {
+            emptyMap()
+        }
+    }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
+
     init {
+        viewModelScope.launch {
+            val defaultNodeId = application.globalPrefs.getDefaultNodeId.first()
+            if (_desiredNodeId.value == null) {
+                _desiredNodeId.value = defaultNodeId
+            }
+        }
         monitorUserLockPrefs()
         scheduleAutoLock()
+        listAvailableWallets()
+        monitorActiveWallet()
+    }
+
+    fun updateDesiredNodeId(nodeId: String) {
+        _desiredNodeId.value = nodeId
+    }
+
+    private fun monitorActiveWallet() {
+        viewModelScope.launch {
+            combine(businessFlow, _desiredNodeId.filterNotNull()) { businessMap, activeNodeId ->
+                activeNodeId to businessMap[activeNodeId]
+            }.collect {
+                _activeWalletInUI.value = it
+            }
+        }
+    }
+
+    fun listAvailableWallets() {
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.error("error when initialising startup-view: ", e)
+            listWalletState.value = ListWalletState.Error.Generic(e)
+        }) {
+            when (val result = SeedManager.loadAndDecrypt(context = application.applicationContext)) {
+                is DecryptSeedResult2.Failure.DecryptionError -> {
+                    log.error("cannot decrypt seed file: ", result.cause)
+                    listWalletState.value = ListWalletState.Error.DecryptionError.GeneralException(result.cause)
+                }
+                is DecryptSeedResult2.Failure.KeyStoreFailure -> {
+                    log.error("key store failure: ", result.cause)
+                    listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause)
+                }
+                is DecryptSeedResult2.Failure.SeedFileUnreadable -> {
+                    log.error("aborting, unreadable seed file")
+                    listWalletState.value = ListWalletState.Error.Generic(null)
+                }
+                is DecryptSeedResult2.Failure.SeedInvalid -> {
+                    log.error("aborting, seed is invalid")
+                    listWalletState.value = ListWalletState.Error.Generic(null)
+                }
+
+                is DecryptSeedResult2.Failure.SeedFileNotFound -> {
+                    listWalletState.value = ListWalletState.Success
+                    _availableWallets.value = emptyMap()
+                }
+
+                is DecryptSeedResult2.Success -> {
+                    listWalletState.value = ListWalletState.Success
+                    _availableWallets.value = result.mnemonicsMap.map { it.key to UserWallet(nodeId = it.key, words = it.value, metadata = null) }.toMap()
+                }
+            }
+        }
     }
 
     fun scheduleAutoLock() {

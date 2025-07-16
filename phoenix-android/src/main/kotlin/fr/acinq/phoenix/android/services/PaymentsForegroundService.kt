@@ -89,7 +89,7 @@ class PaymentsForegroundService : Service() {
                     log.info("foreground start without providing a node_id...")
                 }
 
-                when (val result = SeedManager.loadAndDecryptSeed(applicationContext, expectedNodeId = null)) {
+                when (val result = SeedManager.loadAndDecryptOneSeed(applicationContext, expectedNodeId = null)) {
                     is DecryptSeedResult.Failure, is DecryptSeedResult.Success.Unexpected -> {
                         val reason = intent?.getStringExtra(EXTRA_REASON)
                         log.info("seed is unavailable, cannot handle FCM message for reason=$reason")

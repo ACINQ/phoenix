@@ -47,14 +47,15 @@ class PhoenixApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        BusinessRepo.initialize(applicationContext)
-        Logging.setupLogger(applicationContext)
-        log.info("creating app")
-        SystemNotificationHelper.registerNotificationChannels(applicationContext)
 
         internalDataRepository = InternalDataRepository(applicationContext.internalData)
         userPrefs = UserPrefsRepository(applicationContext.userPrefs)
         globalPrefs = GlobalPrefsRepository(applicationContext.globalPrefs)
-    }
 
+        BusinessRepo.initialize(applicationContext)
+
+        Logging.setupLogger(applicationContext)
+        log.info("creating app")
+        SystemNotificationHelper.registerNotificationChannels(applicationContext)
+    }
 }

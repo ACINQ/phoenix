@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
@@ -58,9 +59,10 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun DisplaySeedView() {
-    val nc = navController
-    val context = LocalContext.current
+fun DisplaySeedView(
+    onBackClick: () -> Unit,
+    nodeId: String
+) {
     val internalData = application.internalDataRepository
     val scope = rememberCoroutineScope()
 
@@ -68,10 +70,10 @@ fun DisplaySeedView() {
     val isDisclaimerRead by internalData.isSeedLossDisclaimerRead.collectAsState(initial = null)
     val showBackupNotice by internalData.showSeedBackupNotice.collectAsState(initial = false)
 
-    val vm = viewModel<DisplaySeedViewModel>()
+    val vm = viewModel<DisplaySeedViewModel>(factory = DisplaySeedViewModel.Factory(application))
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.displayseed_title))
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
         }
@@ -85,7 +87,7 @@ fun DisplaySeedView() {
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         enabled = true,
-                        onSpend = { vm.readSeed(SeedManager.getSeedState(context)) },
+                        onSpend = { vm.readActiveSeed(nodeId) },
                         prompt = { PinDialogTitle(text = stringResource(R.string.pincode_check_spending_displayseed_title)) },
                         ignoreChannelsState = true,
                     )

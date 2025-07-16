@@ -17,13 +17,16 @@
 package fr.acinq.phoenix.android.navigation
 
 import android.net.Uri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navOptions
-import fr.acinq.phoenix.android.initwallet.InitWallet
+import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.application
+import fr.acinq.phoenix.android.initwallet.InitNewWallet
 import fr.acinq.phoenix.android.initwallet.create.CreateWalletView
 import fr.acinq.phoenix.android.initwallet.restore.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
@@ -31,7 +34,7 @@ import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.startup.StartupViewModel
 import org.slf4j.LoggerFactory
 
-fun NavGraphBuilder.baseNavGraph(navController: NavController, startupViewModel: StartupViewModel) {
+fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: AppViewModel) {
     val log = LoggerFactory.getLogger("Navigation")
 
     // startup is the default navigation route
@@ -42,7 +45,9 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, startupViewModel:
         ),
     ) {
         val nextScreenLink = it.arguments?.getString("next")
+        val startupViewModel = viewModel<StartupViewModel>(viewModelStoreOwner = it, factory = StartupViewModel.Factory(application))
         StartupView(
+            appViewModel = appViewModel,
             startupViewModel = startupViewModel,
             onShowIntro = { navController.navigate(Screen.Intro.route) },
             onSeedNotFound = { navController.navigate(Screen.InitWallet.route) },
@@ -53,7 +58,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, startupViewModel:
                     log.debug("redirecting from startup to home")
                     navController.popToHome()
                 } else if (!navController.graph.hasDeepLink(next)) {
-                    log.debug("redirecting from startup to home, ignoring invalid next=$nextScreenLink")
+                    log.debug("redirecting from startup to home, ignoring invalid next=[$nextScreenLink]")
                     navController.popToHome()
                 } else {
                     log.debug("redirecting from startup to {}", next)
@@ -70,14 +75,18 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, startupViewModel:
     }
 
     composable(Screen.InitWallet.route) {
-        InitWallet(
+        InitNewWallet(
             onCreateWalletClick = { navController.navigate(Screen.CreateWallet.route) },
             onRestoreWalletClick = { navController.navigate(Screen.RestoreWallet.route) },
+            onSettingsClick = { navController.navigate(Screen.Settings.route) }
         )
     }
 
     composable(Screen.CreateWallet.route) {
-        CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
+        CreateWalletView(onSeedWritten = {
+            navController.navigate(Screen.Startup.route)
+            appViewModel.listAvailableWallets()
+        })
     }
 
     composable(Screen.RestoreWallet.route) {

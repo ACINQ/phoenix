@@ -27,9 +27,11 @@ import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.InflightPaymentsWatcher
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.StartupParams
@@ -51,7 +53,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -85,40 +86,13 @@ object BusinessRepo {
     private val userPrefs by lazy { application.userPrefs }
     private val internalPrefs by lazy { application.internalDataRepository }
 
+    /** A map of active businesses -- note that it may not contain the business of the wallet launched in the UI! */
     private val _businessFlow = MutableStateFlow<Map<String, PhoenixBusiness>>(emptyMap())
     val businessFlow = _businessFlow.asStateFlow()
 
     val receivedInTheBackground = mutableStateListOf<MilliSatoshi>()
     private var _isHeadless = MutableStateFlow(true)
     val isHeadless = _isHeadless.asStateFlow()
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val activeBusiness = businessFlow.filter { it.isNotEmpty() }.mapLatest { it.entries.first().toPair() }
-        .stateIn(scope, started = SharingStarted.Lazily, initialValue = null)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val exchangeRates = activeBusiness.filterNotNull().flatMapLatest { it.second.currencyManager.ratesFlow }
-        .stateIn(scope, started = SharingStarted.Lazily, initialValue = emptyList())
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val fiatRatesMap = exchangeRates.mapLatest { rates ->
-        val usdPriceRate = rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull { it.fiatCurrency == FiatCurrency.USD }
-        if (usdPriceRate != null) {
-            rates.associate { rate ->
-                rate.fiatCurrency to when (rate) {
-                    is ExchangeRate.BitcoinPriceRate -> rate
-                    is ExchangeRate.UsdPriceRate -> ExchangeRate.BitcoinPriceRate(
-                        fiatCurrency = rate.fiatCurrency,
-                        price = rate.price * usdPriceRate.price,
-                        source = rate.source,
-                        timestampMillis = rate.timestampMillis
-                    )
-                }
-            }
-        } else {
-            emptyMap()
-        }
-    }.stateIn(scope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     /** Mpa of jobs monitoring events/payments after business starts */
     private val eventsMonitoringJobs = mutableMapOf<String, List<Job>>()

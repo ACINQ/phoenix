@@ -20,15 +20,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.settings.MutualCloseView
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView
 import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
 import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddress
 
-fun NavGraphBuilder.channelsNavGraph(navController: NavController) {
+fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel: AppViewModel) {
 
-    businessComposable(Screen.Channels.route) {
+    businessComposable(Screen.Channels.route, appViewModel) { _, _ ,_ ->
         ChannelsView(
             onBackClick = {
                 navController.navigate(Screen.Settings.route) {
@@ -43,21 +44,22 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController) {
 
     businessComposable(
         route = "${Screen.ChannelDetails.route}?id={id}",
+        appViewModel = appViewModel,
         arguments = listOf(navArgument("id") { type = NavType.StringType })
-    ) {
-        val channelId = it.arguments?.getString("id")
+    ) { backStackEntry, _ ,_ ->
+        val channelId = backStackEntry.arguments?.getString("id")
         ChannelDetailsView(onBackClick = { navController.popBackStack() }, channelId = channelId)
     }
 
-    businessComposable(Screen.ImportChannelsData.route) {
+    businessComposable(Screen.ImportChannelsData.route, appViewModel) { _, _ ,_ ->
         ImportChannelsData(onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.SpendChannelAddress.route) {
+    businessComposable(Screen.SpendChannelAddress.route, appViewModel) { _, _ ,_ ->
         SpendFromChannelAddress(onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.MutualClose.route) {
+    businessComposable(Screen.MutualClose.route, appViewModel) { _, _ ,_ ->
         MutualCloseView(onBackClick = { navController.popBackStack() })
     }
 }

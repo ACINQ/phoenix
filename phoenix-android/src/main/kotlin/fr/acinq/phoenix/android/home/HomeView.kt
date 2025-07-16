@@ -44,6 +44,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import androidx.constraintlayout.compose.layoutId
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat

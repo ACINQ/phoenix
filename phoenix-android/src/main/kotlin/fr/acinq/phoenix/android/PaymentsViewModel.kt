@@ -102,6 +102,11 @@ class PaymentsViewModel(
         paymentsPageFetcher.subscribeToAll(offset, count)
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        log.info("cleared payments-view-model")
+    }
+
     class Factory(
         private val paymentsManager: PaymentsManager,
     ) : ViewModelProvider.Factory {

@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.UserTheme
+import fr.acinq.phoenix.android.utils.datastore.GlobalPrefsRepository
 import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
 import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
@@ -65,6 +66,10 @@ val internalData: InternalDataRepository
 val userPrefs: UserPrefsRepository
     @Composable
     get() = application.userPrefs
+
+val globalPrefs: GlobalPrefsRepository
+    @Composable
+    get() = application.globalPrefs
 
 val controllerFactory: ControllerFactory
     @Composable

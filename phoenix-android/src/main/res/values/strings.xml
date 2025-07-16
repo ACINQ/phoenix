@@ -41,7 +41,8 @@
 
     <string name="autocreate_generating">Creating your wallet…</string>
     <string name="autocreate_error">Wallet creation failed</string>
-    <string name="autocreate_error_cannot_overwrite">A wallet already exists</string>
+    <string name="autocreate_error_already_exists">This seed has already been imported</string>
+    <string name="autocreate_error_cannot_load_existing">The wallet could not be written at this time. Try again later.</string>
 
     <string name="restore_title">Restore my wallet</string>
     <string name="restore_disclaimer_next">Next</string>

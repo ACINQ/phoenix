@@ -38,6 +38,19 @@ sealed class SeedFileState {
     }
 }
 
+
+sealed class DecryptSeedResult2 {
+    data class Success(val mnemonicsMap: Map<String, List<String>>): DecryptSeedResult2()
+    sealed class Failure: DecryptSeedResult2() {
+        data object SeedFileNotFound: Failure()
+        data class KeyStoreFailure(val cause: KeyStoreException): Failure()
+        data class DecryptionError(val cause: Exception): Failure()
+        data object SeedFileUnreadable: Failure()
+        data object SeedInvalid: Failure()
+    }
+}
+
+
 sealed class DecryptSeedResult {
 
     sealed class Success: DecryptSeedResult() {
@@ -71,9 +84,11 @@ object SeedManager {
 
     /**
      * Decrypts the first available seed from the application folder.
+     *
      * If [expectedNodeId] is set, will try to return the seed that matches.
      */
-    fun loadAndDecryptSeed(context: Context, expectedNodeId: String?): DecryptSeedResult {
+    fun loadAndDecryptOneSeed(context: Context, expectedNodeId: String?): DecryptSeedResult {
+        // TODO("remove this method or rework it to force seed to match nodeId")
         val encryptedSeed = try {
             loadEncryptedSeedFromDisk(context)
         } catch (e: Exception) {
@@ -147,6 +162,74 @@ object SeedManager {
         }
     }
 
+    fun loadAndDecrypt(context: Context): DecryptSeedResult2 {
+        val encryptedSeed = try {
+            loadEncryptedSeedFromDisk(context)
+        } catch (e: Exception) {
+            log.error("could read seed file: ", e)
+            return DecryptSeedResult2.Failure.SeedFileUnreadable
+        }
+
+        return when (encryptedSeed) {
+            is EncryptedSeed.V2.SingleSeed -> {
+                log.info("decrypting [V2.SingleSeed]...")
+                val payload = try {
+                    encryptedSeed.decrypt()
+                } catch (e: Exception) {
+                    log.error("failed to decrypt [V2.SingleSeed]: ", e)
+                    return when (e) {
+                        is KeyStoreException -> DecryptSeedResult2.Failure.KeyStoreFailure(e)
+                        else -> DecryptSeedResult2.Failure.DecryptionError(e)
+                    }
+                }
+                val words = toMnemonicsSafe(payload) ?: return DecryptSeedResult2.Failure.SeedInvalid
+
+                val seed = MnemonicCode.toSeed(words, "").toByteVector()
+                val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
+                val nodeId = keyManager.nodeKeys.nodeKey.publicKey.toHex()
+
+                DecryptSeedResult2.Success(mnemonicsMap = mapOf(nodeId to words))
+            }
+
+            is EncryptedSeed.V2.MultipleSeed -> {
+                log.info("decrypting [V2.MultipleSeed]")
+                val seedMap = try {
+                    encryptedSeed.decryptAndGetSeedMap()
+                } catch (e: Exception) {
+                    log.error("failed to decrypt [V2.MultipleSeed]: ", e)
+                    return when (e) {
+                        is KeyStoreException -> DecryptSeedResult2.Failure.KeyStoreFailure(e)
+                        else -> DecryptSeedResult2.Failure.DecryptionError(e)
+                    }
+                }
+
+                return when {
+                    seedMap.isEmpty() -> DecryptSeedResult2.Failure.SeedFileNotFound
+                    else -> {
+                        try {
+                            val map = encryptedSeed.decryptAndGetSeedMap().map { (nodeId, seed) -> nodeId to toMnemonics(seed) }.toMap()
+                            DecryptSeedResult2.Success(map)
+                        } catch (e: Exception) {
+                            log.error("failed to decrypt [V2.MultipleSeed]: ", e)
+                            when (e) {
+                                is KeyStoreException -> DecryptSeedResult2.Failure.KeyStoreFailure(e)
+                                else -> DecryptSeedResult2.Failure.DecryptionError(e)
+                            }
+                        }
+                    }
+                }
+            }
+
+            null -> DecryptSeedResult2.Failure.SeedFileNotFound
+        }
+    }
+
+    /**
+     * Returns a map of (nodeId, words) of all the seed contained in the seed file.
+     * If the seed file does not exist yet, will return an empty map.
+     *
+     * Returns null if there was a problem when loading or decrypting the file.
+     */
     fun loadAndDecryptAll(context: Context): Map<String, List<String>>? {
         val encryptedSeed = try {
             loadEncryptedSeedFromDisk(context)
@@ -178,26 +261,14 @@ object SeedManager {
                     null
                 }
             }
-            null -> null
+            null -> emptyMap()
         }
     }
 
     /** Gets the encrypted seed from app private dir. */
     fun loadEncryptedSeedFromDisk(context: Context): EncryptedSeed? = loadSeedFromDir(getDatadir(context), SEED_FILE)
 
-    fun getSeedState(context: Context): SeedFileState = TODO("seed state should be handled in views...")
-//        try {
-//        when (val seed = loadEncryptedSeedFromDisk(context)) {
-//            null -> SeedFileState.Absent
-//            is EncryptedSeed.V2.SingleSeed -> SeedFileState.Present(seed)
-//            is EncryptedSeed.V2.MultipleSeed -> SeedFileState.Present(seed)
-//        }
-//    } catch (e: Exception) {
-//        log.error("failed to read seed: ", e)
-//        SeedFileState.Error.Unreadable(e.localizedMessage)
-//    }
-
-    /** Extracts an encrypted seed contained in a given file/folder. */
+    /** Extracts an encrypted seed contained in a given file/folder. Returns null if the file does not exist. */
     private fun loadSeedFromDir(dir: File, seedFileName: String): EncryptedSeed? {
         val seedFile = File(dir, seedFileName)
         return if (!seedFile.exists()) {
@@ -217,9 +288,9 @@ object SeedManager {
         }
     }
 
-    fun writeSeedToDisk(context: Context, seed: EncryptedSeed.V2, overwrite: Boolean = false) = writeSeedToDir(getDatadir(context), seed, overwrite)
+    fun writeSeedToDisk(context: Context, seed: EncryptedSeed.V2.MultipleSeed, overwrite: Boolean = false) = writeSeedToDir(getDatadir(context), seed, overwrite)
 
-    private fun writeSeedToDir(dir: File, seed: EncryptedSeed.V2, overwrite: Boolean) {
+    private fun writeSeedToDir(dir: File, seed: EncryptedSeed.V2.MultipleSeed, overwrite: Boolean) {
         // 1 - create dir
         if (!dir.exists()) {
             dir.mkdirs()
@@ -230,7 +301,7 @@ object SeedManager {
         temp.writeBytes(seed.serialize())
 
         // 3 - decrypt temp file and check validity; if correct, move temp file to final file
-        val checkSeed = loadSeedFromDir(dir, temp.name) as EncryptedSeed.V2
+        val checkSeed = loadSeedFromDir(dir, temp.name) as EncryptedSeed.V2.MultipleSeed
         if (!checkSeed.ciphertext.contentEquals(seed.ciphertext)) {
             log.warn("seed check do not match!")
 //            throw WriteErrorCheckDontMatch

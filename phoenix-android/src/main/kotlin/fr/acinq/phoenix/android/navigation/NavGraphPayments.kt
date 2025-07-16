@@ -18,12 +18,14 @@ package fr.acinq.phoenix.android.navigation
 
 import android.content.Intent
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.home.HomeView
@@ -32,8 +34,22 @@ import fr.acinq.phoenix.android.payments.receive.ReceiveView
 import fr.acinq.phoenix.android.payments.send.SendView
 import org.slf4j.LoggerFactory
 
-fun NavGraphBuilder.homeNavGraph(navController: NavController, paymentsViewModel: PaymentsViewModel, noticesViewModel: NoticesViewModel) {
-    businessComposable(Screen.Home.route) {
+fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: AppViewModel) {
+    businessComposable(Screen.Home.route, appViewModel) { backStackEntry, nodeId, business ->
+
+        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("main-$nodeId") }
+        val paymentsViewModel = viewModel<PaymentsViewModel>(viewModelStoreOwner = parentEntry, factory = PaymentsViewModel.Factory(business.paymentsManager))
+
+        val noticesViewModel = viewModel<NoticesViewModel>(
+            viewModelStoreOwner = parentEntry,
+            factory = NoticesViewModel.Factory(
+                appConfigurationManager = business.appConfigurationManager,
+                peerManager = business.peerManager,
+                connectionsManager = business.connectionsManager,
+            )
+        )
+        //?.also { monitorPermission(it) }
+
         HomeView(
             paymentsViewModel = paymentsViewModel,
             noticesViewModel = noticesViewModel,
@@ -52,10 +68,10 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, paymentsViewModel
     }
 }
 
-fun NavGraphBuilder.paymentsNavGraph(navController: NavController) {
+fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel: AppViewModel) {
     val log = LoggerFactory.getLogger("Navigation")
 
-    businessComposable(Screen.Receive.route) {
+    businessComposable(Screen.Receive.route, appViewModel) { _, _, _ ->
         ReceiveView(
             onBackClick = { navController.popBackStack() },
             onScanDataClick = { navController.navigate("${Screen.Send.route}?openScanner=true&forceNavOnBack=true") },
@@ -65,6 +81,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController) {
 
     businessComposable(
         route = "${Screen.PaymentDetails.route}?id={id}&fromEvent={fromEvent}",
+        appViewModel = appViewModel,
         //deepLinkPrefix = "phoenix:payments/",
         arguments = listOf(
             navArgument("id") { type = NavType.StringType },
@@ -74,17 +91,17 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController) {
             }
         ),
         deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{id}" })
-    ) {
+    ) { backstackEntry, _, _ ->
         val paymentId = remember {
             try {
-                UUID.fromString(it.arguments!!.getString("id")!!)
+                UUID.fromString(backstackEntry.arguments!!.getString("id")!!)
             } catch (e: Exception) {
                 null
             }
         }
         if (paymentId != null) {
             log.debug("navigating to payment={}", paymentId)
-            val fromEvent = it.arguments?.getBoolean("fromEvent") ?: false
+            val fromEvent = backstackEntry.arguments?.getBoolean("fromEvent") ?: false
             PaymentDetailsView(
                 paymentId = paymentId,
                 onBackClick = {
@@ -104,6 +121,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController) {
 
     businessComposable(
         route = "${Screen.Send.route}?input={input}&openScanner={openScanner}&forceNavOnBack={forceNavOnBack}",
+        appViewModel = appViewModel,
         deepLinkPrefix = "scanview:",
         arguments = listOf(
             navArgument("input") { type = NavType.StringType ; nullable = true },
@@ -121,10 +139,10 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController) {
             navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
             navDeepLink { uriPattern = "scanview:{data}" },
         )
-    ) {
+    ) { backStackEntry, _, _ ->
         @Suppress("DEPRECATION")
         val intent = try {
-            it.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+            backStackEntry.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
         } catch (e: Exception) {
             null
         }
@@ -133,7 +151,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController) {
         val isIntentFromNavigation = intent?.dataString?.contains("androidx.navigation") ?: true
         log.debug("isIntentFromNavigation=$isIntentFromNavigation")
         val input = if (isIntentFromNavigation) {
-            it.arguments?.getString("input")
+            backStackEntry.arguments?.getString("input")
         } else {
             intent?.data?.toString()?.substringAfter("scanview:")
         }
@@ -142,8 +160,8 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController) {
         SendView(
             initialInput = input,
             fromDeepLink = !isIntentFromNavigation,
-            immediatelyOpenScanner = it.arguments?.getBoolean("openScanner") ?: false,
-            forceNavOnBack = it.arguments?.getBoolean("forceNavOnBack") ?: false,
+            immediatelyOpenScanner = backStackEntry.arguments?.getBoolean("openScanner") ?: false,
+            forceNavOnBack = backStackEntry.arguments?.getBoolean("forceNavOnBack") ?: false,
         )
     }
 }

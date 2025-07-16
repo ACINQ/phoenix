@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun tryReconnect() {
         lifecycleScope.launch {
-            BusinessRepo.activeBusiness.value?.let { (_, business) ->
+            appViewModel.activeWalletInUI.value?.second?.let { business ->
                 val daemon = business.appConnectionsDaemon ?: return@launch
                 val connections = business.connectionsManager.connections.value
                 if (connections.electrum !is Connection.ESTABLISHED) {

@@ -41,7 +41,6 @@
 
     <string name="autocreate_generating">Vytváření peněženky…</string>
     <string name="autocreate_error">Vytváření peněženky selhalo</string>
-    <string name="autocreate_error_cannot_overwrite">Peněženka již existuje</string>
 
     <string name="restore_title">Obnovit moji peněženku</string>
     <string name="restore_disclaimer_next">Další</string>

@@ -84,29 +84,14 @@ fun AppRoot(
     val log = logger("AppRoot")
     log.debug("entering app root")
 
-    val activeBusiness by BusinessRepo.activeBusiness.collectAsState(null)
-    val business = activeBusiness?.second
-    val fiatRatesMap by BusinessRepo.fiatRatesMap.collectAsState()
+    val activeWallet by appViewModel.activeWalletInUI.collectAsState(null)
+    val activeNodeId = activeWallet?.first
+    val business = activeWallet?.second
+    val fiatRatesMap by appViewModel.fiatRatesMap.collectAsState()
 
     val isAmountInFiat = userPrefs.getIsAmountInFiat.collectAsState(false)
     val bitcoinUnits = userPrefs.getBitcoinUnits.collectAsState(initial = PreferredBitcoinUnits(primary = BitcoinUnit.Sat))
     val fiatCurrencies = userPrefs.getFiatCurrencies.collectAsState(initial = AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))
-
-    val paymentsViewModel = business?.let {
-        viewModel<PaymentsViewModel>(factory = PaymentsViewModel.Factory(it.paymentsManager))
-    }
-
-    val noticesViewModel = business?.let {
-        viewModel<NoticesViewModel>(
-            factory = NoticesViewModel.Factory(
-                appConfigurationManager = it.appConfigurationManager,
-                peerManager = it.peerManager,
-                connectionsManager = it.connectionsManager,
-            )
-        )
-    }?.also { monitorPermission(it) }
-
-    val startupViewModel = viewModel<StartupViewModel>(factory = StartupViewModel.Factory(application))
 
     CompositionLocalProvider(
         LocalBusiness provides business,
@@ -130,19 +115,17 @@ fun AppRoot(
                     startDestination = "${Screen.Startup.route}?next={next}",
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None },
-                    route = "main" // works like an id, can be used to scope view models with `navController.getBackStackEntry("main")`
+                    route = "main-$activeNodeId" // works like an id, can be used to scope view models with `navController.getBackStackEntry("main")`
                 ) {
-                    baseNavGraph(navController, startupViewModel)
-                    baseSettingsNavGraph(navController, appViewModel, noticesViewModel, business)
+                    baseNavGraph(navController, appViewModel)
+                    baseSettingsNavGraph(navController, appViewModel, business)
 
-                    if (paymentsViewModel != null && noticesViewModel != null) {
-                        homeNavGraph(navController, paymentsViewModel, noticesViewModel)
-                        miscSettingsNavGraph(navController, paymentsViewModel, noticesViewModel)
-                    }
+                    homeNavGraph(navController, appViewModel)
+                    miscSettingsNavGraph(navController, appViewModel)
 
-                    paymentsNavGraph(navController)
-                    walletInfoNavGraph(navController)
-                    channelsNavGraph(navController)
+                    paymentsNavGraph(navController, appViewModel)
+                    walletInfoNavGraph(navController, appViewModel)
+                    channelsNavGraph(navController, appViewModel)
                 }
             }
 

@@ -94,6 +94,7 @@ class NoticesViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        log.info("cleared notices-view-model")
         application.applicationContext.unregisterReceiver(receiver)
     }
 
