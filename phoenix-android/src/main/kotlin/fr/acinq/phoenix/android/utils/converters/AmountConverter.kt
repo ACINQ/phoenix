@@ -62,8 +62,12 @@ object AmountConverter {
             return null
         }
 
-        val amount = input.toDoubleOrNull()
-        if (amount == null || amount <= 0.0) {
+        val amount = try {
+            // note: DecimalFormat.parse works somewhat, but can be confused when the input contains a mix of "." and "," and returns 0
+            // instead we used String.toDouble, which expects "." as decimal separator
+            input.replace(",", ".").toDouble()
+        } catch (e: Exception) {
+            log.debug("could not parse input=$input: ", e.localizedMessage)
             return AmountConversionResult.Error.InvalidInput
         }
 

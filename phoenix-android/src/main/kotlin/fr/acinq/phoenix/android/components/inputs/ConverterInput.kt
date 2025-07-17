@@ -66,6 +66,7 @@ fun ConverterInput(
     trailingContent: @Composable (() -> Unit)? = null,
     internalPaddingHorizontal: Dp = 10.dp,
     internalPaddingVertical: Dp = 10.dp,
+    limitDecimal: Boolean = false,
     enabled: Boolean = true,
     readonly: Boolean = false,
     value: String?,
@@ -86,7 +87,12 @@ fun ConverterInput(
             onValueChange = {
                 if (it.length > 12) return@BasicTextField
                 errorMessage = ""
-                if (it.isNotBlank() && it.toDoubleOrNull() == null) {
+                val saneInput = it.replace(",", ".")
+                // if the input already has 2 decimals, ignore change
+                if (limitDecimal && saneInput.contains(".") && saneInput.split(".").last().length > 2) {
+                    return@BasicTextField
+                }
+                if (it.isNotBlank() && saneInput.toDoubleOrNull() == null) {
                     errorMessage = context.getString(R.string.validation_invalid_number)
                 }
                 internalStringValue = it
@@ -155,7 +161,6 @@ fun ConverterInput(
         )
     }
 }
-
 
 @Composable
 fun RowScope.InlineNumberInput(

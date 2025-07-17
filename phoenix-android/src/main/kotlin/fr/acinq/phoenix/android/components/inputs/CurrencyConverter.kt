@@ -243,6 +243,7 @@ private fun FiatConverterInput(
                         null -> onAmountUpdate(null)
                     }
                 },
+                limitDecimal = true,
                 modifier = Modifier.weight(1f),
                 backgroundColor = MaterialTheme.colors.surface,
                 placeholder = { Text(text = stringResource(R.string.converter_placeholder_label, fiat.displayCode), style = MaterialTheme.typography.caption) },
