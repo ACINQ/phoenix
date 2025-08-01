@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.settings
+package fr.acinq.phoenix.android.settings.reset
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
@@ -40,134 +40,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.firebase.messaging.FirebaseMessaging
-import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.byteVector
-import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
-import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
-import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.buttons.Checkbox
-import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.wallet.ActiveWalletView
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.primaryFiatRate
-import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.managers.NodeParamsManager
-import fr.acinq.phoenix.utils.extensions.phoenixName
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
-
-sealed class ResetWalletStep {
-    data object Init : ResetWalletStep()
-    data object Confirm : ResetWalletStep()
-    sealed class Deleting : ResetWalletStep() {
-        data object Init: Deleting()
-        data object Databases: Deleting()
-        data object Prefs: Deleting()
-        data object Seed: Deleting()
-    }
-    sealed class Result : ResetWalletStep() {
-        data object Success : Result()
-        sealed class Failure : Result() {
-            data class Error(val e: Throwable) : Failure()
-            data class FailedToDeleteFile(val fileName: String) : Failure()
-        }
-    }
-}
-
-class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: String) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
-
-    val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
-
-    fun deleteWalletData() {
-        if (state.value != ResetWalletStep.Confirm) return
-        state.value = ResetWalletStep.Deleting.Init
-
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            state.value = ResetWalletStep.Result.Failure.Error(e)
-            log.error("failed to reset wallet data: ", e)
-        }) {
-
-            delay(350)
-
-            val nodeIdHash = PublicKey.fromHex(nodeId).hash160().byteVector().toHex()
-            val chain = NodeParamsManager.chain
-            BusinessRepo.stopBusiness(nodeId)
-            delay(250)
-
-            state.value = ResetWalletStep.Deleting.Databases
-            val context = application.applicationContext
-            context.deleteDatabase("appdb.sqlite")
-            context.deleteDatabase("payments-${chain.phoenixName}-$nodeIdHash.sqlite")
-            context.deleteDatabase("channels-${chain.phoenixName}-$nodeIdHash.sqlite")
-            delay(500)
-
-            state.value = ResetWalletStep.Deleting.Prefs
-            application.userPrefs.clear()
-            application.internalDataRepository.clear()
-            application.globalPrefs.clear()
-            FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
-                if (task.isSuccessful) BusinessRepo.refreshFcmToken()
-            }
-
-            delay(400)
-
-            state.value = ResetWalletStep.Deleting.Seed
-            val datadir = SeedManager.getDatadir(context)
-            datadir.listFiles()?.forEach {
-                val delete = it.delete()
-                if (!delete) {
-                    state.value = ResetWalletStep.Result.Failure.FailedToDeleteFile(it.name)
-                    return@launch
-                }
-            }
-            val delete = datadir.delete()
-            if (!delete) {
-                state.value = ResetWalletStep.Result.Failure.FailedToDeleteFile("datadir")
-                return@launch
-            }
-
-            delay(300)
-
-            state.value = ResetWalletStep.Result.Success
-        }
-    }
-
-    class Factory(val application: PhoenixApplication, val nodeId: String) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            @Suppress("UNCHECKED_CAST")
-            return ResetWalletViewModel(application, nodeId) as T
-        }
-    }
-}
 
 @Composable
 fun ResetWallet(
@@ -203,7 +99,7 @@ fun ResetWallet(
                 DeletingWallet(state)
             }
             ResetWalletStep.Result.Success -> {
-                WalletDeleted()
+                WalletDeleted(nodeId)
             }
             is ResetWalletStep.Result.Failure -> {
                 DeletionFailed(state)
@@ -225,11 +121,10 @@ private fun InitReset(
         Spacer(modifier = Modifier.height(4.dp))
         Row {
             val availableWallet by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
-            ActiveWalletView(nodeId, availableWallet[nodeId])
+            ActiveWalletView(nodeId, availableWallet[nodeId], onClick = {}, showMoreButton = false)
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "All data for this wallet will be removed, including the payments history.")
-
 
 //        Text(text = stringResource(id = R.string.reset_wallet_instructions_header))
 //
@@ -349,7 +244,7 @@ private fun DeletingWallet(state: ResetWalletStep.Deleting) {
 }
 
 @Composable
-private fun WalletDeleted() {
+private fun WalletDeleted(nodeId: String) {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
@@ -362,6 +257,7 @@ private fun WalletDeleted() {
             text = stringResource(id = R.string.btn_ok),
             icon = R.drawable.ic_check,
             onClick = {
+                BusinessRepo.stopBusiness(nodeId)
                 context.startActivity(
                     Intent(context, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -380,7 +276,8 @@ private fun DeletionFailed(
         header = stringResource(id = R.string.reset_wallet_failure_title),
         details = when (failure) {
             is ResetWalletStep.Result.Failure.Error -> failure.e.localizedMessage
-            is ResetWalletStep.Result.Failure.FailedToDeleteFile -> "could not delete file=${failure.fileName}"
+            is ResetWalletStep.Result.Failure.SeedFileAccess -> "Could not access seed file, try again"
+            is ResetWalletStep.Result.Failure.WriteNewSeed -> "Could not delete seed, try again"
         },
     )
 }

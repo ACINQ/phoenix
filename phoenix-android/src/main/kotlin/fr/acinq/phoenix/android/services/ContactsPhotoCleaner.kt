@@ -46,7 +46,7 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
             // get the active business map, or create it no business is active
             val businessMap = BusinessRepo.businessFlow.value.takeIf { it.isNotEmpty() }
                 ?: run {
-                    val seedMap = SeedManager.loadAndDecryptAll(applicationContext)
+                    val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
                     if (seedMap.isNullOrEmpty()) {
                         log.info("no seeds available, terminating $name")
                         return Result.success()

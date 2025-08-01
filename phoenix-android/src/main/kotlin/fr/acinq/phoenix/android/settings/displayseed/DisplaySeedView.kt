@@ -101,7 +101,10 @@ fun DisplaySeedView(
                 is DisplaySeedViewModel.ReadingSeedState.Error -> {
                     ErrorMessage(
                         header = stringResource(id = R.string.displayseed_error_details),
-                        details = state.message,
+                        details = when(state) {
+                            is DisplaySeedViewModel.ReadingSeedState.Error.CouldNotFindMatch -> "Seed is unavailable"
+                            is DisplaySeedViewModel.ReadingSeedState.Error.CouldNotReadSeedFile -> "Could not read seed file, try again"
+                        },
                         alignment = Alignment.CenterHorizontally,
                     )
                 }

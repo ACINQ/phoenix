@@ -25,26 +25,20 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
-import fr.acinq.phoenix.android.security.DecryptSeedResult
-import fr.acinq.phoenix.android.security.DecryptSeedResult2
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeystoreHelper
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.services.ContactsPhotoCleaner
-import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.nodeIdHash
 import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
@@ -151,9 +145,7 @@ class StartupViewModel(
 
     class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-            @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return StartupViewModel(application) as T
         }
     }

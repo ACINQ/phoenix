@@ -62,6 +62,7 @@ class PaymentsForegroundService : Service() {
         super.onStartCommand(intent, flags, startId)
         log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
 
+        val reason = intent?.getStringExtra(EXTRA_REASON)
         val nodeId = intent?.getStringExtra(EXTRA_NODE_ID)
 
         val businessMap = BusinessRepo.businessFlow.value
@@ -70,12 +71,12 @@ class PaymentsForegroundService : Service() {
         val notif = when {
 
             !BusinessRepo.isHeadless.value -> {
-                log.info("foreground start with the GUI active...")
+                log.info("app is not headless, ignoring background message (reason=$reason)")
                 SystemNotificationHelper.notifyRunningHeadless(applicationContext)
             }
 
             !nodeId.isNullOrBlank() && businessMap[nodeId] != null -> {
-                log.info("foreground start with active business found for node_id=$nodeId")
+                log.info("active business found for node_id=${nodeId.take(10)}..., ignoring background message (reason=$reason)")
                 businessMap[nodeId]?.let {
                     if (it.connectionsManager.connections.value.peer !is Connection.ESTABLISHED) {
                         it.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
@@ -84,34 +85,44 @@ class PaymentsForegroundService : Service() {
                 SystemNotificationHelper.notifyRunningHeadless(applicationContext)
             }
 
-            else -> {
-                if (nodeId.isNullOrBlank()) {
-                    log.info("foreground start without providing a node_id...")
-                }
+            nodeId.isNullOrBlank() -> {
+                log.info("no specific node_id provided, ignoring background message (reason=$reason)")
+                SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+            }
 
-                when (val result = SeedManager.loadAndDecryptOneSeed(applicationContext, expectedNodeId = null)) {
-                    is DecryptSeedResult.Failure, is DecryptSeedResult.Success.Unexpected -> {
-                        val reason = intent?.getStringExtra(EXTRA_REASON)
-                        log.info("seed is unavailable, cannot handle FCM message for reason=$reason")
+            else -> {
+                when (val result = SeedManager.loadAndDecrypt(applicationContext)) {
+                    is DecryptSeedResult.Failure.SeedFileNotFound -> {
+                        log.info("seed not found, ignoring background message (reason=$reason)")
+                        SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                    }
+                    is DecryptSeedResult.Failure -> {
+                        log.info("unable to read seed, ignoring background message (reason=$reason)")
                         when (reason) {
                             "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
                             "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
                             else -> SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                         }
                     }
-                    is DecryptSeedResult.Success.Nominal -> {
-                        val mnemonics = result.mnemonics
-                        serviceScope.launch(Dispatchers.Default) {
-                            when (val res = BusinessRepo.startNewBusiness(mnemonics, isHeadless = true)) {
-                                is StartBusinessResult.Failure -> {
-                                    log.error("error when starting business from foreground service: $res")
-                                    stopForeground(STOP_FOREGROUND_REMOVE)
-                                    stopSelf()
+                    is DecryptSeedResult.Success -> {
+                        val mnemonicsMap = result.mnemonicsMap
+                        val match = mnemonicsMap[nodeId]
+                        if (match.isNullOrEmpty()) {
+                            log.info("seed not found for node_id=${nodeId.take(10)}..., ignoring background message (reason=$reason)")
+                            SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                        } else {
+                            serviceScope.launch(Dispatchers.Default) {
+                                when (val res = BusinessRepo.startNewBusiness(match, isHeadless = true)) {
+                                    is StartBusinessResult.Failure -> {
+                                        log.error("error when starting node_id=${nodeId.take(10)}... from foreground service: $res")
+                                        stopForeground(STOP_FOREGROUND_REMOVE)
+                                        stopSelf()
+                                    }
+                                    is StartBusinessResult.Success -> Unit
                                 }
-                                is StartBusinessResult.Success -> Unit
                             }
+                            SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                         }
-                        SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                     }
                 }
             }

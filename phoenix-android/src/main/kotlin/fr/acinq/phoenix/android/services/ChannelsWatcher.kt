@@ -60,7 +60,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             return Result.success()
         }
 
-        val seedMap = SeedManager.loadAndDecryptAll(applicationContext)
+        val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
         if (seedMap.isNullOrEmpty()) {
             log.info("could not load any seed, aborting $name")
             internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))

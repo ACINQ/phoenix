@@ -27,7 +27,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessRepo.businessFlow
-import fr.acinq.phoenix.android.security.DecryptSeedResult2
+import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.data.ExchangeRate
@@ -150,29 +150,29 @@ class AppViewModel(
             listWalletState.value = ListWalletState.Error.Generic(e)
         }) {
             when (val result = SeedManager.loadAndDecrypt(context = application.applicationContext)) {
-                is DecryptSeedResult2.Failure.DecryptionError -> {
+                is DecryptSeedResult.Failure.DecryptionError -> {
                     log.error("cannot decrypt seed file: ", result.cause)
                     listWalletState.value = ListWalletState.Error.DecryptionError.GeneralException(result.cause)
                 }
-                is DecryptSeedResult2.Failure.KeyStoreFailure -> {
+                is DecryptSeedResult.Failure.KeyStoreFailure -> {
                     log.error("key store failure: ", result.cause)
                     listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause)
                 }
-                is DecryptSeedResult2.Failure.SeedFileUnreadable -> {
+                is DecryptSeedResult.Failure.SeedFileUnreadable -> {
                     log.error("aborting, unreadable seed file")
                     listWalletState.value = ListWalletState.Error.Generic(null)
                 }
-                is DecryptSeedResult2.Failure.SeedInvalid -> {
+                is DecryptSeedResult.Failure.SeedInvalid -> {
                     log.error("aborting, seed is invalid")
                     listWalletState.value = ListWalletState.Error.Generic(null)
                 }
 
-                is DecryptSeedResult2.Failure.SeedFileNotFound -> {
+                is DecryptSeedResult.Failure.SeedFileNotFound -> {
                     listWalletState.value = ListWalletState.Success
                     _availableWallets.value = emptyMap()
                 }
 
-                is DecryptSeedResult2.Success -> {
+                is DecryptSeedResult.Success -> {
                     listWalletState.value = ListWalletState.Success
                     _availableWallets.value = result.mnemonicsMap.map { it.key to UserWallet(nodeId = it.key, words = it.value, metadata = null) }.toMap()
                 }

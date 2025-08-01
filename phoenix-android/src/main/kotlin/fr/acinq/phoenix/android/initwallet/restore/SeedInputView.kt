@@ -69,7 +69,7 @@ import fr.acinq.phoenix.android.utils.negativeColor
 fun SeedInputView(
     state: RestoreWalletState.SeedInput,
     vm: RestoreWalletViewModel,
-    onRestoreDone: () -> Unit,
+    onRestoreDone: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -142,13 +142,13 @@ fun SeedInputView(
     if (state is RestoreWalletState.SeedInput.Valid) {
         RestorePaymentsDbButton(
             restorePaymentDbState = vm.restorePaymentsDbState,
-            onImportDbClick = { vm.loadPaymentsDb(context, it) },
+            onImportDbClick = { vm.loadPaymentsDb(it) },
         )
         Spacer(modifier = Modifier.height(16.dp))
         Clickable(
             onClick = {
                 focusManager.clearFocus()
-                vm.checkSeedAndWrite(context, onRestoreDone)
+                vm.checkSeedAndWrite(onRestoreDone)
             },
             modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),

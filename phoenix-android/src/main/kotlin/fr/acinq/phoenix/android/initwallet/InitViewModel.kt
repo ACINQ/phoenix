@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.initwallet
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,9 +25,9 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +49,7 @@ sealed class WritingSeedState {
 
 abstract class InitViewModel : ViewModel() {
 
-    abstract val internalDataRepository: InternalDataRepository
+    abstract val application: PhoenixApplication
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -63,10 +62,9 @@ abstract class InitViewModel : ViewModel() {
      * exists on disk, this method will put the [writingState] in error.
      */
     fun writeSeed(
-        context: Context,
         mnemonics: List<String>,
         isNewWallet: Boolean,
-        onSeedWritten: () -> Unit
+        onSeedWritten: (String) -> Unit
     ) {
         if (writingState !is WritingSeedState.Init) return
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
@@ -75,7 +73,7 @@ abstract class InitViewModel : ViewModel() {
         }) {
             log.debug("writing mnemonics to disk...")
             writingState = WritingSeedState.Writing(mnemonics)
-            val existingSeeds = SeedManager.loadAndDecryptAll(context)
+            val existingSeeds = SeedManager.loadAndDecryptOrNull(application.applicationContext)
 
             val seed = MnemonicCode.toSeed(mnemonics, "").toByteVector()
             val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
@@ -95,7 +93,7 @@ abstract class InitViewModel : ViewModel() {
                 else -> {
                     val newSeedMap = existingSeeds + (newNodeId to mnemonics)
                     val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(newSeedMap)
-                    SeedManager.writeSeedToDisk(context, encrypted, overwrite = true)
+                    SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
                     if (isNewWallet) {
                         log.info("wallet successfully created and written to disk")
@@ -106,9 +104,9 @@ abstract class InitViewModel : ViewModel() {
             }
 
             viewModelScope.launch(Dispatchers.Main) {
-                internalDataRepository.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
+                application.internalDataRepository.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
                 delay(1000)
-                onSeedWritten()
+                onSeedWritten(newNodeId)
             }
         }
     }

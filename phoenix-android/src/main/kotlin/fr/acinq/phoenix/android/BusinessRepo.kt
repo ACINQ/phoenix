@@ -86,7 +86,7 @@ object BusinessRepo {
     private val userPrefs by lazy { application.userPrefs }
     private val internalPrefs by lazy { application.internalDataRepository }
 
-    /** A map of active businesses -- note that it may not contain the business of the wallet launched in the UI! */
+    /** A map of active businesses */
     private val _businessFlow = MutableStateFlow<Map<String, PhoenixBusiness>>(emptyMap())
     val businessFlow = _businessFlow.asStateFlow()
 

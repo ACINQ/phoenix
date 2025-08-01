@@ -27,21 +27,9 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.security.KeyStoreException
 
-sealed class SeedFileState {
-    fun isReady() = this is Present
-
-    data object Unknown : SeedFileState()
-    data object Absent : SeedFileState()
-    data class Present(internal val encryptedSeed: EncryptedSeed.V2) : SeedFileState()
-    sealed class Error : SeedFileState() {
-        data class Unreadable(val message: String?) : Error()
-    }
-}
-
-
-sealed class DecryptSeedResult2 {
-    data class Success(val mnemonicsMap: Map<String, List<String>>): DecryptSeedResult2()
-    sealed class Failure: DecryptSeedResult2() {
+sealed class DecryptSeedResult {
+    data class Success(val mnemonicsMap: Map<String, List<String>>): DecryptSeedResult()
+    sealed class Failure: DecryptSeedResult() {
         data object SeedFileNotFound: Failure()
         data class KeyStoreFailure(val cause: KeyStoreException): Failure()
         data class DecryptionError(val cause: Exception): Failure()
@@ -50,31 +38,8 @@ sealed class DecryptSeedResult2 {
     }
 }
 
-
-sealed class DecryptSeedResult {
-
-    sealed class Success: DecryptSeedResult() {
-        abstract val mnemonics: List<String>
-        data class Nominal(override val mnemonics: List<String>): Success()
-        /**
-         * Edge case when you want to load a specific node id, but it's not available (e.g., the preference tracking the expected node
-         * id is not in sync with the actual data). In this case we return the mnemonics and the node id of the first available seed
-         * that could be found. This scenario may actually be interpreted as an error in the UI.
-         */
-        data class Unexpected(override val mnemonics: List<String>, val expectedNodeId: String, val actualNodeId: String): Success()
-    }
-
-    sealed class Failure: DecryptSeedResult() {
-        data object SeedNotFound: Failure()
-        data class KeyStoreFailure(val cause: KeyStoreException): Failure()
-        data class DecryptionError(val cause: Exception): Failure()
-        data object SeedFileUnreadable: Failure()
-        data object SeedInvalid: Failure()
-    }
-}
-
 object SeedManager {
-    private val BASE_DATADIR = "node-data"
+    private const val BASE_DATADIR = "node-data"
     private const val SEED_FILE = "seed.dat"
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -82,13 +47,7 @@ object SeedManager {
         return File(context.filesDir, BASE_DATADIR)
     }
 
-    /**
-     * Decrypts the first available seed from the application folder.
-     *
-     * If [expectedNodeId] is set, will try to return the seed that matches.
-     */
-    fun loadAndDecryptOneSeed(context: Context, expectedNodeId: String?): DecryptSeedResult {
-        // TODO("remove this method or rework it to force seed to match nodeId")
+    fun loadAndDecrypt(context: Context): DecryptSeedResult {
         val encryptedSeed = try {
             loadEncryptedSeedFromDisk(context)
         } catch (e: Exception) {
@@ -96,80 +55,6 @@ object SeedManager {
             return DecryptSeedResult.Failure.SeedFileUnreadable
         }
 
-        when (encryptedSeed) {
-            is EncryptedSeed.V2.SingleSeed -> {
-                log.info("decrypting [V2.SingleSeed]...")
-                val payload = try {
-                    encryptedSeed.decrypt()
-                } catch (e: Exception) {
-                    log.error("failed to decrypt [V2.SingleSeed]: ", e)
-                    return when (e) {
-                        is KeyStoreException -> DecryptSeedResult.Failure.KeyStoreFailure(e)
-                        else -> DecryptSeedResult.Failure.DecryptionError(e)
-                    }
-                }
-
-                val words = toMnemonicsSafe(payload) ?: return DecryptSeedResult.Failure.SeedInvalid
-
-                return if (expectedNodeId.isNullOrBlank()) {
-                    DecryptSeedResult.Success.Nominal(mnemonics = words)
-                } else {
-                    val seed = MnemonicCode.toSeed(words, "").toByteVector()
-                    val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
-                    val nodeId = keyManager.nodeKeys.nodeKey.publicKey.toHex()
-                    if (nodeId != expectedNodeId) {
-                        DecryptSeedResult.Success.Unexpected(mnemonics = words, expectedNodeId = expectedNodeId, actualNodeId = nodeId)
-                    } else {
-                        DecryptSeedResult.Success.Nominal(mnemonics = words)
-                    }
-                }
-            }
-            is EncryptedSeed.V2.MultipleSeed -> {
-                log.info("decrypting [V2.MultipleSeed]")
-                val seedMap = try {
-                    encryptedSeed.decryptAndGetSeedMap()
-                } catch (e: Exception) {
-                    log.error("failed to decrypt [V2.MultipleSeed]: ", e)
-                    return when (e) {
-                        is KeyStoreException -> DecryptSeedResult.Failure.KeyStoreFailure(e)
-                        else -> DecryptSeedResult.Failure.DecryptionError(e)
-                    }
-                }
-
-                return when {
-                    seedMap.isEmpty() -> DecryptSeedResult.Failure.SeedNotFound
-                    expectedNodeId.isNullOrBlank() -> {
-                        log.debug("loading first available seed in map")
-                        toMnemonicsSafe(seedMap.values.first())?.let { DecryptSeedResult.Success.Nominal(it) }
-                            ?: DecryptSeedResult.Failure.SeedInvalid
-                    }
-                    else -> {
-                        return when (val match = seedMap[expectedNodeId]) {
-                            null -> {
-                                val (nodeId, payload) = seedMap.entries.first()
-                                toMnemonicsSafe(payload)?.let { DecryptSeedResult.Success.Unexpected(mnemonics = it, expectedNodeId = expectedNodeId, actualNodeId = nodeId) }
-                                    ?: DecryptSeedResult.Failure.SeedInvalid
-                            }
-                            else -> {
-                                toMnemonicsSafe(match)?.let { DecryptSeedResult.Success.Nominal(it) }
-                                    ?: DecryptSeedResult.Failure.SeedInvalid
-                            }
-                        }
-                    }
-                }
-            }
-            null -> return DecryptSeedResult.Failure.SeedNotFound
-        }
-    }
-
-    fun loadAndDecrypt(context: Context): DecryptSeedResult2 {
-        val encryptedSeed = try {
-            loadEncryptedSeedFromDisk(context)
-        } catch (e: Exception) {
-            log.error("could read seed file: ", e)
-            return DecryptSeedResult2.Failure.SeedFileUnreadable
-        }
-
         return when (encryptedSeed) {
             is EncryptedSeed.V2.SingleSeed -> {
                 log.info("decrypting [V2.SingleSeed]...")
@@ -178,17 +63,17 @@ object SeedManager {
                 } catch (e: Exception) {
                     log.error("failed to decrypt [V2.SingleSeed]: ", e)
                     return when (e) {
-                        is KeyStoreException -> DecryptSeedResult2.Failure.KeyStoreFailure(e)
-                        else -> DecryptSeedResult2.Failure.DecryptionError(e)
+                        is KeyStoreException -> DecryptSeedResult.Failure.KeyStoreFailure(e)
+                        else -> DecryptSeedResult.Failure.DecryptionError(e)
                     }
                 }
-                val words = toMnemonicsSafe(payload) ?: return DecryptSeedResult2.Failure.SeedInvalid
+                val words = toMnemonicsSafe(payload) ?: return DecryptSeedResult.Failure.SeedInvalid
 
                 val seed = MnemonicCode.toSeed(words, "").toByteVector()
                 val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
                 val nodeId = keyManager.nodeKeys.nodeKey.publicKey.toHex()
 
-                DecryptSeedResult2.Success(mnemonicsMap = mapOf(nodeId to words))
+                DecryptSeedResult.Success(mnemonicsMap = mapOf(nodeId to words))
             }
 
             is EncryptedSeed.V2.MultipleSeed -> {
@@ -198,71 +83,34 @@ object SeedManager {
                 } catch (e: Exception) {
                     log.error("failed to decrypt [V2.MultipleSeed]: ", e)
                     return when (e) {
-                        is KeyStoreException -> DecryptSeedResult2.Failure.KeyStoreFailure(e)
-                        else -> DecryptSeedResult2.Failure.DecryptionError(e)
+                        is KeyStoreException -> DecryptSeedResult.Failure.KeyStoreFailure(e)
+                        else -> DecryptSeedResult.Failure.DecryptionError(e)
                     }
                 }
 
                 return when {
-                    seedMap.isEmpty() -> DecryptSeedResult2.Failure.SeedFileNotFound
+                    seedMap.isEmpty() -> DecryptSeedResult.Failure.SeedFileNotFound
                     else -> {
-                        try {
-                            val map = encryptedSeed.decryptAndGetSeedMap().map { (nodeId, seed) -> nodeId to toMnemonics(seed) }.toMap()
-                            DecryptSeedResult2.Success(map)
-                        } catch (e: Exception) {
-                            log.error("failed to decrypt [V2.MultipleSeed]: ", e)
-                            when (e) {
-                                is KeyStoreException -> DecryptSeedResult2.Failure.KeyStoreFailure(e)
-                                else -> DecryptSeedResult2.Failure.DecryptionError(e)
-                            }
+                        seedMap.map { (nodeId, seed) -> nodeId to toMnemonics(seed) }.toMap().let {
+                            DecryptSeedResult.Success(it)
                         }
                     }
                 }
             }
 
-            null -> DecryptSeedResult2.Failure.SeedFileNotFound
+            null -> DecryptSeedResult.Failure.SeedFileNotFound
         }
     }
 
     /**
-     * Returns a map of (nodeId, words) of all the seed contained in the seed file.
-     * If the seed file does not exist yet, will return an empty map.
-     *
-     * Returns null if there was a problem when loading or decrypting the file.
+     * Wrapper method for [loadAndDecrypt].
+     * Returns an empty map if the seed file does not exist yet.
+     * Returns null if there was a problem when loading or decrypting the seed file.
      */
-    fun loadAndDecryptAll(context: Context): Map<String, List<String>>? {
-        val encryptedSeed = try {
-            loadEncryptedSeedFromDisk(context)
-        } catch (e: Exception) {
-            log.error("could read seed file: ", e)
-            return null
-        }
-
-        return when (encryptedSeed) {
-            is EncryptedSeed.V2.SingleSeed -> {
-                log.info("(all) decrypting [V2.SingleSeed]...")
-                return try {
-                    val words = toMnemonics(encryptedSeed.decrypt())
-                    val seed = MnemonicCode.toSeed(words, "").toByteVector()
-                    val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
-                    val nodeId = keyManager.nodeKeys.nodeKey.publicKey.toHex()
-                    mapOf(nodeId to words)
-                } catch (e: Exception) {
-                    log.error("failed to decrypt [V2.SingleSeed]: ", e)
-                    null
-                }
-            }
-            is EncryptedSeed.V2.MultipleSeed -> {
-                log.info("(all) decrypting [V2.MultipleSeed]...")
-                try {
-                    encryptedSeed.decryptAndGetSeedMap().map { (nodeId, seed) -> nodeId to toMnemonics(seed) }.toMap()
-                } catch (e: Exception) {
-                    log.error("failed to decrypt [V2.MultipleSeed]: ", e)
-                    null
-                }
-            }
-            null -> emptyMap()
-        }
+    fun loadAndDecryptOrNull(context: Context): Map<String, List<String>>? = when (val res = loadAndDecrypt(context)) {
+        is DecryptSeedResult.Success -> res.mnemonicsMap
+        is DecryptSeedResult.Failure.SeedFileNotFound -> emptyMap()
+        is DecryptSeedResult.Failure -> null
     }
 
     /** Gets the encrypted seed from app private dir. */

@@ -18,90 +18,49 @@ package fr.acinq.phoenix.android.initwallet.create
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.lightning.Lightning
-import fr.acinq.phoenix.android.CF
-import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.initwallet.WritingSeedState
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.controllers.init.Initialization
-import fr.acinq.phoenix.utils.MnemonicLanguage
 
 
 @Composable
 fun CreateWalletView(
-    onSeedWritten: () -> Unit
+    onSeedWritten: (String) -> Unit
 ) {
-    val log = logger("CreateWallet")
-    val context = LocalContext.current
-
-    val vm = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory())
-
+    val vm = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory(application = application))
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(id = R.string.autocreate_generating))
-        MVIView(CF::initialization) { model, postIntent ->
-            when (model) {
-                is Initialization.Model.Ready -> {
-                    val entropy = remember { Lightning.randomBytes(16) }
-                    LaunchedEffect(key1 = entropy) {
-                        log.debug("generating new wallet...")
-                        postIntent(Initialization.Intent.GenerateWallet(entropy, MnemonicLanguage.English))
-                    }
-                }
-                is Initialization.Model.GeneratedWallet -> {
-                    val writingState = vm.writingState
-                    if (writingState is WritingSeedState.Error) {
-                        ErrorMessage(
-                            header = stringResource(id = R.string.autocreate_error),
-                            details = when (writingState) {
-                                is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
-                                is WritingSeedState.Error.SeedAlreadyExists -> stringResource(R.string.autocreate_error_already_exists)
-                                is WritingSeedState.Error.CannotLoadSeedMap -> stringResource(R.string.autocreate_error_cannot_load_existing)
-                            },
-                            alignment = Alignment.CenterHorizontally,
-                        )
-                    }
-                    LaunchedEffect(true) {
-                        vm.writeSeed(context, model.mnemonics, isNewWallet = true, onSeedWritten)
-                    }
-                }
-            }
+        LaunchedEffect(Unit) {
+            vm.createNewWallet(onSeedWritten = onSeedWritten)
         }
-    }
-}
-
-class CreateWalletViewModel(override val internalDataRepository: InternalDataRepository) : InitViewModel() {
-
-    class Factory : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-            @Suppress("UNCHECKED_CAST")
-            return CreateWalletViewModel(application.internalDataRepository) as T
+        when (val writingState = vm.writingState) {
+            is WritingSeedState.Init, is WritingSeedState.Writing, is WritingSeedState.WrittenToDisk -> {
+                Text(stringResource(id = R.string.autocreate_generating))
+            }
+            is WritingSeedState.Error -> {
+                ErrorMessage(
+                    header = stringResource(id = R.string.autocreate_error),
+                    details = when (writingState) {
+                        is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
+                        is WritingSeedState.Error.SeedAlreadyExists -> stringResource(R.string.autocreate_error_already_exists)
+                        is WritingSeedState.Error.CannotLoadSeedMap -> stringResource(R.string.autocreate_error_cannot_load_existing)
+                    },
+                    alignment = Alignment.CenterHorizontally,
+                )
+            }
         }
     }
 }

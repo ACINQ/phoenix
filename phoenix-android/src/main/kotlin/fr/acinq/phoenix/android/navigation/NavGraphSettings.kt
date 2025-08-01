@@ -40,7 +40,7 @@ import fr.acinq.phoenix.android.settings.ForceCloseView
 import fr.acinq.phoenix.android.settings.LogsView
 import fr.acinq.phoenix.android.settings.NotificationsView
 import fr.acinq.phoenix.android.settings.PaymentSettingsView
-import fr.acinq.phoenix.android.settings.ResetWallet
+import fr.acinq.phoenix.android.settings.reset.ResetWallet
 import fr.acinq.phoenix.android.settings.SettingsContactsView
 import fr.acinq.phoenix.android.settings.SettingsView
 import fr.acinq.phoenix.android.settings.TorConfigView

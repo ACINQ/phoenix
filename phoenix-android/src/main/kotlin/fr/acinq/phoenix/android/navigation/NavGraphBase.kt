@@ -83,13 +83,18 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
     }
 
     composable(Screen.CreateWallet.route) {
-        CreateWalletView(onSeedWritten = {
+        CreateWalletView(onSeedWritten = { nodeId ->
             navController.navigate(Screen.Startup.route)
             appViewModel.listAvailableWallets()
+            appViewModel.updateDesiredNodeId(nodeId = nodeId)
         })
     }
 
     composable(Screen.RestoreWallet.route) {
-        RestoreWalletView(onRestoreDone = { navController.navigate(Screen.Startup.route) })
+        RestoreWalletView(onRestoreDone = { nodeId ->
+            navController.navigate(Screen.Startup.route)
+            appViewModel.listAvailableWallets()
+            appViewModel.updateDesiredNodeId(nodeId = nodeId)
+        })
     }
 }

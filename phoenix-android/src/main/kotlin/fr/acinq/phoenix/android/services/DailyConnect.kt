@@ -58,7 +58,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
             return Result.success()
         }
 
-        val seedMap = SeedManager.loadAndDecryptAll(applicationContext)
+        val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
         if (seedMap.isNullOrEmpty()) {
             log.info("could not load any seed, aborting $name")
             return Result.success()

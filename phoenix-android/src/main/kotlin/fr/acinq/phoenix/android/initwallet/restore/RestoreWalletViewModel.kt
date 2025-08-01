@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.initwallet.restore
 
-import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.compose.runtime.getValue
@@ -25,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
@@ -33,7 +31,6 @@ import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.security.EncryptedData
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.utils.MnemonicLanguage
@@ -67,7 +64,7 @@ sealed class RestorePaymentsDbState {
     }
 }
 
-class RestoreWalletViewModel(override val internalDataRepository: InternalDataRepository) : InitViewModel() {
+class RestoreWalletViewModel(override val application: PhoenixApplication) : InitViewModel() {
 
     var state by mutableStateOf<RestoreWalletState>(RestoreWalletState.Disclaimer)
     var restorePaymentsDbState by mutableStateOf<RestorePaymentsDbState>(RestorePaymentsDbState.Init)
@@ -96,7 +93,7 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
         }
     }
 
-    fun checkSeedAndWrite(context: Context, onSeedWritten: () -> Unit) {
+    fun checkSeedAndWrite(onSeedWritten: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when checking seed and db files: ${e.message}")
             state = RestoreWalletState.SeedInput.Invalid
@@ -113,7 +110,7 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
                     val keyManager = LocalKeyManager(seed = seed.byteVector(), chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
                     val nodeId = keyManager.nodeKeys.nodeKey.publicKey
 
-                    restoreDbFile(context, DatabaseManager.paymentsDbName(NodeParamsManager.chain, nodeId), restoreDbState.decryptedDatabase.toByteArray(), canOverwrite = true)
+                    restoreDbFile(DatabaseManager.paymentsDbName(NodeParamsManager.chain, nodeId), restoreDbState.decryptedDatabase.toByteArray(), canOverwrite = true)
                     delay(200)
                     log.info("payments-db has been restored")
                 } catch (e: Exception) {
@@ -123,13 +120,13 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
                 }
             }
 
-            writeSeed(context, words, isNewWallet = false, onSeedWritten = onSeedWritten)
+            writeSeed(mnemonics = words, isNewWallet = false, onSeedWritten = onSeedWritten)
         }
     }
 
     /** Restore a database file to the app's database folder. If restoring a channels database, [canOverwrite] should ALWAYS be false. */
-    private fun restoreDbFile(context: Context, fileName: String, fileData: ByteArray, canOverwrite: Boolean) {
-        val dbFile = context.getDatabasePath(fileName)
+    private fun restoreDbFile(fileName: String, fileData: ByteArray, canOverwrite: Boolean) {
+        val dbFile = application.applicationContext.getDatabasePath(fileName)
         if (dbFile.exists() && !canOverwrite) {
             throw RuntimeException("cannot overwrite file=$fileName")
         } else {
@@ -140,7 +137,7 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
         }
     }
 
-    fun loadPaymentsDb(context: Context, uri: Uri) {
+    fun loadPaymentsDb(uri: Uri) {
         if (restorePaymentsDbState is RestorePaymentsDbState.Importing) return
 
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
@@ -157,7 +154,7 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
                 return@launch
             }
 
-            when (val result = resolveUriContent(context, uri)) {
+            when (val result = resolveUriContent(uri)) {
                 null -> {
                     delay(500)
                     log.info("payments-db file could not be resolved for uri=$uri")
@@ -181,8 +178,8 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
         }
     }
 
-    private fun resolveUriContent(context: Context, uri: Uri): Pair<String, ByteArray>? {
-        val resolver = context.contentResolver
+    private fun resolveUriContent(uri: Uri): Pair<String, ByteArray>? {
+        val resolver = application.applicationContext.contentResolver
         val fileName = resolver.query(uri,
             arrayOf(MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.DISPLAY_NAME,),
             null, null, null, null
@@ -198,11 +195,11 @@ class RestoreWalletViewModel(override val internalDataRepository: InternalDataRe
         return Pair(fileName, data)
     }
 
-    class Factory : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
+
+    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return RestoreWalletViewModel(application.internalDataRepository) as T
+            return RestoreWalletViewModel(application) as T
         }
     }
 }

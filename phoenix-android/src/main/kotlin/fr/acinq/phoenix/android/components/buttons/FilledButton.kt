@@ -76,12 +76,12 @@ fun MutedFilledButton(
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
     space: Dp = 12.dp,
+    shape: Shape = RoundedCornerShape(12.dp),
     padding: PaddingValues = PaddingValues(12.dp),
     onClick: () -> Unit,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
 ) {
     FilledButton(
-        shape = RoundedCornerShape(12.dp),
         backgroundColor = mutedBgColor,
         textStyle = MaterialTheme.typography.button,
         iconTint = iconTint,
@@ -102,11 +102,12 @@ fun TransparentFilledButton(
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
     space: Dp = 12.dp,
+    shape: Shape = RoundedCornerShape(12.dp),
     padding: PaddingValues = PaddingValues(12.dp),
     onClick: () -> Unit,
 ) {
     FilledButton(
-        shape = RoundedCornerShape(12.dp),
+        shape = shape,
         backgroundColor = Color.Transparent,
         textStyle = textStyle,
         iconTint = iconTint,

@@ -23,14 +23,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -55,12 +52,11 @@ import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.wallet.AvailableWalletView
+import fr.acinq.phoenix.android.components.wallet.AvailableWalletsView
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
-import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.shareFile
 
 
@@ -81,8 +77,8 @@ fun StartupView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .imePadding()
-            .verticalScroll(rememberScrollState()),
+            .imePadding(),
+            //.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -97,31 +93,24 @@ fun StartupView(
             }
             is ListWalletState.Success -> {
 
-                val defaultNodeId = globalPrefs.getDefaultNodeId.collectAsState(null)
                 val availableWallets by appViewModel.availableWallets.collectAsState()
 
-                // we may already have a desired node id and thus will not need user input to know which wallet to load
+                // we may already have a desired node id and thus may not need user input to know which wallet to load
                 val desiredNodeIdFlow = appViewModel.desiredNodeId.collectAsState()
-                val businessMap by BusinessRepo.businessFlow.collectAsState()
-
                 val desiredNodeId = desiredNodeIdFlow.value
+
+                val businessMap by BusinessRepo.businessFlow.collectAsState()
                 val desiredBusiness = businessMap[desiredNodeId]
                 val desiredNodeWallet = availableWallets[desiredNodeId]
 
                 when {
                     desiredBusiness != null -> {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_phoenix),
-                            contentDescription = "phoenix-icon",
-                        )
+                        PhoenixStartupIcon()
                         Text(text = stringResource(R.string.startup_started))
                         LaunchedEffect(Unit) { onBusinessStarted() }
                     }
                     desiredNodeId != null && desiredNodeWallet != null -> {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_phoenix),
-                            contentDescription = "phoenix-icon",
-                        )
+                        PhoenixStartupIcon()
                         Text(text = stringResource(R.string.startup_starting))
                         LaunchedEffect(Unit) {
                             startupViewModel.startupNode(desiredNodeId, desiredNodeWallet.words, onStartupSuccess = {
@@ -140,11 +129,14 @@ fun StartupView(
                                 // TODO if default is set => launch default
                                 when (val startupState = startupViewModel.state.value) {
                                     is StartupViewState.Init -> {
-                                        Text(text = "Select a wallet", style = MaterialTheme.typography.h4)
-                                        Spacer(Modifier.height(16.dp))
-                                        LazyColumn(modifier = Modifier.heightIn(max = 400.dp).padding(horizontal = 24.dp)) {
+                                        LazyColumn(modifier = Modifier.padding(horizontal = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                            item {
+                                                Spacer(Modifier.height(64.dp))
+                                                Text(text = "Select a wallet", style = MaterialTheme.typography.h4)
+                                                Spacer(Modifier.height(16.dp))
+                                            }
                                             items(items = availableWallets.entries.toList()) { (nodeId, userWallet) ->
-                                                AvailableWalletView(
+                                                AvailableWalletsView(
                                                     nodeId = nodeId,
                                                     walletMetadata = availableWalletMetadata[nodeId],
                                                     isCurrent = false,
@@ -158,27 +150,22 @@ fun StartupView(
                                                 )
                                                 Spacer(Modifier.height(8.dp))
                                             }
+                                            item {
+                                                Spacer(Modifier.height(128.dp))
+                                            }
                                         }
+
                                     }
                                     is StartupViewState.StartingBusiness -> {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_phoenix),
-                                            contentDescription = "phoenix-icon",
-                                        )
+                                        PhoenixStartupIcon()
                                         Text(text = stringResource(R.string.startup_starting))
                                     }
                                     is StartupViewState.BusinessActive -> {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_phoenix),
-                                            contentDescription = "phoenix-icon",
-                                        )
+                                        PhoenixStartupIcon()
                                         Text(text = stringResource(R.string.startup_started))
                                     }
                                     is StartupViewState.Error -> {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_phoenix),
-                                            contentDescription = "phoenix-icon",
-                                        )
+                                        PhoenixStartupIcon()
                                         StartBusinessError(nodeId = startupState.nodeId, error = startupState)
                                     }
                                     is StartupViewState.SeedRecovery -> {
@@ -186,7 +173,6 @@ fun StartupView(
                                         TODO("handle that in a separate screen/state")
                                     }
                                 }
-
                             }
                         }
                     }
@@ -197,6 +183,14 @@ fun StartupView(
             }
         }
     }
+}
+
+@Composable
+private fun PhoenixStartupIcon() {
+    Image(
+        painter = painterResource(id = R.drawable.ic_phoenix),
+        contentDescription = "phoenix-icon",
+    )
 }
 
 @Composable

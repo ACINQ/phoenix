@@ -21,14 +21,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -38,7 +35,10 @@ class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
         data object Init : ReadingSeedState()
         data object ReadingSeed : ReadingSeedState()
         data class Decrypted(val words: List<String>) : ReadingSeedState()
-        data class Error(val message: String) : ReadingSeedState()
+        sealed class Error : ReadingSeedState() {
+            data object CouldNotReadSeedFile: Error()
+            data object CouldNotFindMatch: Error()
+        }
     }
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -48,17 +48,23 @@ class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
         if (state.value == ReadingSeedState.ReadingSeed) return
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to read seed: ${e.message}")
-            state.value = ReadingSeedState.Error(e.localizedMessage ?: "n/a")
+            state.value = ReadingSeedState.Error.CouldNotReadSeedFile
         }) {
             state.value = ReadingSeedState.ReadingSeed
-            when (val result = SeedManager.loadAndDecryptOneSeed(application.applicationContext, nodeId)) {
+            when (val result = SeedManager.loadAndDecrypt(application.applicationContext)) {
                 is DecryptSeedResult.Success -> {
                     delay(300)
-                    state.value = ReadingSeedState.Decrypted(result.mnemonics)
+                    val match = result.mnemonicsMap[nodeId]
+                    if (!match.isNullOrEmpty()) {
+                        state.value = ReadingSeedState.Decrypted(match)
+                    } else {
+                        log.error("could not find mnemonics for node_id=$nodeId")
+                        state.value = ReadingSeedState.Error.CouldNotFindMatch
+                    }
                 }
                 is DecryptSeedResult.Failure -> {
                     log.error("unable to get active seed: {}", result)
-                    state.value = ReadingSeedState.Error(result.toString())
+                    state.value = ReadingSeedState.Error.CouldNotReadSeedFile
                 }
             }
         }
