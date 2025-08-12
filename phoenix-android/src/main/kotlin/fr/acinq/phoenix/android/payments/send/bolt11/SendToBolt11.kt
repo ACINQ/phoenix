@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
@@ -81,7 +82,7 @@ fun SendToBolt11View(
             else -> ""
         }
     }
-    val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
+    val isOverpaymentEnabled = LocalUserPrefs.current?.getIsOverpaymentEnabled?.collectAsState(initial = false)?.value ?: false
 
     SplashLayout(
         header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },

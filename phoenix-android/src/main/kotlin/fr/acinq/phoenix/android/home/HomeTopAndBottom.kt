@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -49,7 +50,6 @@ import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.VSeparator
 import fr.acinq.phoenix.android.components.buttons.openLink
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
@@ -123,7 +123,7 @@ private fun ConnectionBadge(
     connections: Connections,
     onTorClick: () -> Unit,
 ) {
-    val torEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null)
+    val torEnabled = LocalUserPrefs.current?.getIsTorEnabled?.collectAsState(initial = null)
     val connectionsTransition = rememberInfiniteTransition(label = "animateConnectionsBadge")
     val connectionsButtonAlpha by connectionsTransition.animateFloat(
         label = "animateConnectionsBadge",
@@ -139,7 +139,7 @@ private fun ConnectionBadge(
         connections.electrum !is Connection.ESTABLISHED -> {
             val electrumConnection = connections.electrum
             val isBadElectrumCert = electrumConnection is Connection.CLOSED && electrumConnection.isBadCertificate()
-            val customElectrumServer by userPrefs.getElectrumServer.collectAsState(initial = null)
+            val customElectrumServer = LocalUserPrefs.current?.getElectrumServer?.collectAsState(initial = null)?.value
 
             when {
                 isBadElectrumCert -> TopBadgeButton(
@@ -149,7 +149,7 @@ private fun ConnectionBadge(
                     onClick = onConnectionsStateButtonClick,
                     modifier = Modifier.alpha(connectionsButtonAlpha)
                 )
-                torEnabled.value == true && customElectrumServer?.server?.isOnion == false && customElectrumServer?.requireOnionIfTorEnabled == true -> TopBadgeButton(
+                torEnabled?.value == true && customElectrumServer?.server?.isOnion == false && customElectrumServer.requireOnionIfTorEnabled -> TopBadgeButton(
                     text = stringResource(id = R.string.home_connection_onion),
                     icon = R.drawable.ic_tor_shield,
                     iconTint = negativeColor,
@@ -182,7 +182,7 @@ private fun ConnectionBadge(
 //            onClick = onConnectionsStateButtonClick,
 //            modifier = Modifier.alpha(connectionsButtonAlpha)
 //        )
-        torEnabled.value == true -> {
+        torEnabled?.value == true -> {
             TopBadgeButton(
                 text = stringResource(id = R.string.home_connection_tor_active),
                 icon = R.drawable.ic_tor_shield_ok,

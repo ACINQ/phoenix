@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -85,7 +86,6 @@ import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
 import fr.acinq.phoenix.android.components.dialogs.IconTextPopup
 import fr.acinq.phoenix.android.components.nfc.HceMonitorDialog
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.safeLet
@@ -161,8 +161,8 @@ private fun ReceiveViewPages(
                     Spacer(Modifier.height(topPadding))
                     when (index) {
                         0 -> {
-                            val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
-                            val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
+                            val defaultInvoiceExpiry = LocalUserPrefs.current?.getInvoiceDefaultExpiry?.collectAsState(null)?.value
+                            val defaultInvoiceDesc = LocalUserPrefs.current?.getInvoiceDefaultDesc?.collectAsState(null)?.value
                             safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
                                 LightningInvoiceView(
                                     vm = vm, onFeeManagementClick = onFeeManagementClick,

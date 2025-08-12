@@ -37,6 +37,7 @@ typealias CF = ControllerFactory
 
 val LocalTheme = staticCompositionLocalOf { UserTheme.SYSTEM }
 val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
+val LocalUserPrefs = staticCompositionLocalOf<UserPrefsRepository?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
 val LocalNavController = staticCompositionLocalOf<NavController?> { null }
 val LocalBitcoinUnits = compositionLocalOf { PreferredBitcoinUnits(primary = BitcoinUnit.Sat) }
@@ -62,10 +63,6 @@ val primaryFiatRate: ExchangeRate.BitcoinPriceRate?
 val internalData: InternalDataRepository
     @Composable
     get() = application.internalDataRepository
-
-val userPrefs: UserPrefsRepository
-    @Composable
-    get() = application.userPrefs
 
 val globalPrefs: GlobalPrefsRepository
     @Composable

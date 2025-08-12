@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.internalData
-import fr.acinq.phoenix.android.userPrefs
 import kotlinx.coroutines.launch
 
 
@@ -45,8 +45,7 @@ fun ReleaseNoteDialog(sinceCode: Int) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val internalData = internalData
-    val userPrefs = userPrefs
-    val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(null)
+    val isTorEnabled = LocalUserPrefs.current?.getIsTorEnabled?.collectAsState(null)?.value
 
     val codes by produceState<List<Int>>(emptyList(), sinceCode, isTorEnabled) {
         if (sinceCode <= 98 && isTorEnabled == true) {

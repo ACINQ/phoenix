@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -66,14 +65,12 @@ import fr.acinq.phoenix.android.navigation.miscSettingsNavGraph
 import fr.acinq.phoenix.android.navigation.navigateToPaymentDetails
 import fr.acinq.phoenix.android.navigation.paymentsNavGraph
 import fr.acinq.phoenix.android.navigation.walletInfoNavGraph
-import fr.acinq.phoenix.android.startup.StartupViewModel
 import fr.acinq.phoenix.android.utils.appBackground
-import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
+import fr.acinq.phoenix.android.utils.datastore.getBitcoinUnits
+import fr.acinq.phoenix.android.utils.datastore.getFiatCurrencies
+import fr.acinq.phoenix.android.utils.datastore.getIsAmountInFiat
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.flow.first
 
 @Composable
@@ -85,16 +82,18 @@ fun AppRoot(
     log.debug("entering app root")
 
     val activeWallet by appViewModel.activeWalletInUI.collectAsState(null)
-    val activeNodeId = activeWallet?.first
-    val business = activeWallet?.second
+    val activeNodeId = activeWallet?.nodeId
+    val business = activeWallet?.business
+    val activeUserPrefs = activeWallet?.userPrefs
     val fiatRatesMap by appViewModel.fiatRatesMap.collectAsState()
 
-    val isAmountInFiat = userPrefs.getIsAmountInFiat.collectAsState(false)
-    val bitcoinUnits = userPrefs.getBitcoinUnits.collectAsState(initial = PreferredBitcoinUnits(primary = BitcoinUnit.Sat))
-    val fiatCurrencies = userPrefs.getFiatCurrencies.collectAsState(initial = AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))
+    val isAmountInFiat = activeUserPrefs.getIsAmountInFiat()
+    val bitcoinUnits = activeUserPrefs.getBitcoinUnits()
+    val fiatCurrencies = activeUserPrefs.getFiatCurrencies()
 
     CompositionLocalProvider(
         LocalBusiness provides business,
+        LocalUserPrefs provides activeUserPrefs,
         LocalControllerFactory provides business?.controllers,
         LocalNavController provides navController,
         LocalExchangeRatesMap provides fiatRatesMap,
@@ -131,10 +130,10 @@ fun AppRoot(
 
             val context = LocalContext.current
             val isScreenLocked by appViewModel.isScreenLocked
-            val isBiometricLockEnabled by userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(initial = null)
-            val isCustomPinLockEnabled by userPrefs.getIsScreenLockPinEnabled.collectAsState(initial = null)
+            val biometricLockState = activeUserPrefs?.getIsScreenLockBiometricsEnabled?.collectAsState(initial = null)
+            val customPinLockState = activeUserPrefs?.getIsScreenLockPinEnabled?.collectAsState(initial = null)
 
-            if ((isBiometricLockEnabled == true || isCustomPinLockEnabled == true) && isScreenLocked) {
+            if ((biometricLockState?.value == true || customPinLockState?.value == true) && isScreenLocked) {
                 BackHandler {
                     // back button minimises the app
                     context.findActivitySafe()?.moveTaskToBack(false)
@@ -169,19 +168,19 @@ fun AppRoot(
 @Composable
 private fun monitorPermission(noticesViewModel: NoticesViewModel) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        val userPrefs = userPrefs
+        val userPrefs = LocalUserPrefs.current
         val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
         if (!notificationPermission.status.isGranted) {
             LaunchedEffect(Unit) {
-                if (userPrefs.getShowNotificationPermissionReminder.first()) {
+                if (userPrefs?.getShowNotificationPermissionReminder?.first() == true) {
                     noticesViewModel.addNotice(Notice.NotificationPermission)
                 }
             }
         } else {
             noticesViewModel.removeNotice<Notice.NotificationPermission>()
         }
-        LaunchedEffect(Unit) {
-            userPrefs.getShowNotificationPermissionReminder.collect {
+        LaunchedEffect(userPrefs) {
+            userPrefs?.getShowNotificationPermissionReminder?.collect {
                 if (it && !notificationPermission.status.isGranted) {
                     noticesViewModel.addNotice(Notice.NotificationPermission)
                 } else {

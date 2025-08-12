@@ -161,13 +161,13 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
     val activeWalletInUI by appViewModel.activeWalletInUI.collectAsState()
     val availableWallets by appViewModel.availableWallets.collectAsState()
 
-    val activeNodeId = activeWalletInUI?.first ?: return
+    val activeNodeId = activeWalletInUI?.nodeId ?: return
 
     var showAvailableWalletsDialog by remember { mutableStateOf(false) }
     val metadata by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
 
     ActiveWalletView(
-        nodeId = activeWalletInUI!!.first,
+        nodeId = activeNodeId,
         walletMetadata = metadata[activeNodeId],
         onClick = { showAvailableWalletsDialog = true },
         showMoreButton = true,

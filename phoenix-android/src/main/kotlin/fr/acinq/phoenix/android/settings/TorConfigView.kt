@@ -41,9 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.buttons.Checkbox
@@ -52,19 +53,20 @@ import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedBgColor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun TorConfigView(
+    nodeId: String,
     onBackClick: () -> Unit,
     onBusinessTeardown: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val business = business
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current ?: return
     val torEnabledState = userPrefs.getIsTorEnabled.collectAsState(initial = null)
 
     var showConfirmTorDialog by remember { mutableStateOf(false) }
@@ -143,19 +145,14 @@ fun TorConfigView(
                         icon = R.drawable.ic_check_circle,
                         onClick = {
                             log.info("shutting down app")
-                            TODO("restart business.....")
-//                            val service = appViewModel.service ?: return@Button
-//                            scope.launch {
-//                                isTearingDownBusiness = true
-//                                service.shutdown()
-//                                application.shutdownBusiness()
-//                                business.appConfigurationManager.updateTorUsage(!isTorEnabled)
-//                                userPrefs.saveIsTorEnabled(!isTorEnabled)
-//                                application.resetBusiness()
-//                                delay(500)
-//                                showConfirmTorDialog = false
-//                                onBusinessTeardown()
-//                            }
+                            scope.launch {
+                                isTearingDownBusiness = true
+                                BusinessRepo.stopBusiness(nodeId = nodeId)
+                                userPrefs.saveIsTorEnabled(!isTorEnabled)
+                                delay(500)
+                                showConfirmTorDialog = false
+                                onBusinessTeardown()
+                            }
                         },
                         enabled = isTorEnabled || hasReadMessage,
                         shape = RoundedCornerShape(16.dp)

@@ -58,7 +58,7 @@ fun AmountView(
     onClick: (suspend (UserPrefsRepository, Boolean) -> Unit)? = { userPrefs, inFiat -> userPrefs.saveIsAmountInFiat(!inFiat) }
 ) {
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
         LocalFiatCurrencies.current.primary
     } else {
@@ -74,7 +74,7 @@ fun AmountView(
                 interactionSource = interactionSource,
                 indication = null,
                 role = Role.Button,
-                onClick = { scope.launch { onClick(userPrefs, inFiat) } }
+                onClick = { userPrefs?.let { scope.launch { onClick(userPrefs, inFiat) } } }
             ) else Modifier)
     ) {
         if (!isRedacted && prefix != null && amount > MilliSatoshi(0)) {

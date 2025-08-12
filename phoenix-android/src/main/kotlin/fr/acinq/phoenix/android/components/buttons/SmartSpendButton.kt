@@ -30,12 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
-import fr.acinq.phoenix.android.userPrefs
 import kotlinx.coroutines.launch
 
 /**
@@ -55,8 +55,8 @@ fun SmartSpendButton(
     prompt: @Composable () -> Unit = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_spending_payment_title)) }
 ) {
     val scope = rememberCoroutineScope()
-    val needPinCodeToPayFlow = userPrefs.getIsSpendingPinEnabled.collectAsState(null)
-    val needPinCodeToPay = needPinCodeToPayFlow.value
+    val needPinCodeToPayFlow = LocalUserPrefs.current?.getIsSpendingPinEnabled?.collectAsState(null)
+    val needPinCodeToPay = needPinCodeToPayFlow?.value
     val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
 
     var showSendingPinCheck by remember { mutableStateOf(false) }

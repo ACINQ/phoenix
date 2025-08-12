@@ -29,7 +29,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessRepo.businessFlow
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -65,10 +66,15 @@ sealed class ListWalletState {
 data class UserWallet(
     val nodeId: String,
     val words: List<String>,
-    val metadata: UserWalletMetadata?
 ) {
-    override fun toString(): String = "UserWallet[ node_id=$nodeId, words=***, metadata=$metadata ]"
+    override fun toString(): String = "UserWallet[ node_id=$nodeId, words=*** ]"
 }
+
+data class ActiveWallet(
+    val nodeId: String,
+    val business: PhoenixBusiness?,
+    val userPrefs: UserPrefsRepository,
+)
 
 class AppViewModel(
     private val application: PhoenixApplication
@@ -90,11 +96,11 @@ class AppViewModel(
     private val _desiredNodeId = MutableStateFlow<String?>(null)
     val desiredNodeId = _desiredNodeId.asStateFlow()
 
-    private val _activeWalletInUI = MutableStateFlow<Pair<String, PhoenixBusiness?>?>(null)
+    private val _activeWalletInUI = MutableStateFlow<ActiveWallet?>(null)
     val activeWalletInUI = _activeWalletInUI.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val exchangeRates = activeWalletInUI.filterNotNull().mapLatest { it.second }.filterNotNull().flatMapLatest { it.currencyManager.ratesFlow }
+    val exchangeRates = activeWalletInUI.filterNotNull().mapLatest { it.business }.filterNotNull().flatMapLatest { it.currencyManager.ratesFlow }
         .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -138,8 +144,9 @@ class AppViewModel(
         viewModelScope.launch {
             combine(businessFlow, _desiredNodeId.filterNotNull()) { businessMap, activeNodeId ->
                 activeNodeId to businessMap[activeNodeId]
-            }.collect {
-                _activeWalletInUI.value = it
+            }.collect { (nodeId, business) ->
+                val userPrefs = DataStoreManager.loadPrefsForNodeId(application.applicationContext, nodeId = nodeId)
+                _activeWalletInUI.value = ActiveWallet(nodeId = nodeId, business = business, userPrefs = userPrefs)
             }
         }
     }
@@ -174,7 +181,9 @@ class AppViewModel(
 
                 is DecryptSeedResult.Success -> {
                     listWalletState.value = ListWalletState.Success
-                    _availableWallets.value = result.mnemonicsMap.map { it.key to UserWallet(nodeId = it.key, words = it.value, metadata = null) }.toMap()
+                    _availableWallets.value = result.mnemonicsMap.map {
+                        it.key to UserWallet(nodeId = it.key, words = it.value)
+                    }.toMap()
                 }
             }
         }

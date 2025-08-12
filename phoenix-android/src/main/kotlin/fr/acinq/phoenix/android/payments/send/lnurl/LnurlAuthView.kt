@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -52,7 +53,7 @@ fun LnurlAuthView(
     onAuthDone: () -> Unit,
 ) {
     var showHowItWorks by remember { mutableStateOf(false) }
-    val prefAuthScheme by userPrefs.getLnurlAuthScheme.collectAsState(initial = null)
+    val prefAuthScheme = LocalUserPrefs.current?.getLnurlAuthScheme?.collectAsState(initial = null)?.value
     val isLegacyDomain = remember(auth) { LnurlAuth.LegacyDomain.isEligible(auth.initialUrl) }
     val vm = viewModel<LnurlAuthViewModel>(factory = LnurlAuthViewModel.Factory(business.sendManager))
 

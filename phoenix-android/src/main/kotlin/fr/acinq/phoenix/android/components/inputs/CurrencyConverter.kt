@@ -45,6 +45,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.LocalFiatCurrencies
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Clickable
@@ -53,7 +54,6 @@ import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.dialogs.PopupDialog
 import fr.acinq.phoenix.android.components.prefs.CurrenciesPickerDialog
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.converters.AmountConverter.toFiat
 import fr.acinq.phoenix.android.utils.converters.AmountConverter.toUnit
 import fr.acinq.phoenix.android.utils.converters.AmountConversionResult
@@ -78,7 +78,7 @@ fun CurrencyConverter(
     onDone: (ComplexAmount?, CurrencyUnit) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current ?: return
     val appConfigManager = business.appConfigurationManager
 
     val primaryBtcUnit = LocalBitcoinUnits.current.primary

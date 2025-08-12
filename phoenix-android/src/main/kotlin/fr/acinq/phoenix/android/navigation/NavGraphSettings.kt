@@ -60,8 +60,8 @@ fun NavGraphBuilder.baseSettingsNavGraph(navController: NavController, appViewMo
         ElectrumView(onBackClick = { navController.popBackStack() })
     }
 
-    composable(Screen.TorConfig.route) {
-        TorConfigView(onBackClick = { navController.popBackStack() }, onBusinessTeardown = { navController.popToHome() })
+    businessComposable(Screen.TorConfig.route, appViewModel) { _, nodeId, _ ->
+        TorConfigView(nodeId = nodeId, onBackClick = { navController.popBackStack() }, onBusinessTeardown = { navController.popToHome() })
     }
 
     composable(Screen.DisplayPrefs.route) {

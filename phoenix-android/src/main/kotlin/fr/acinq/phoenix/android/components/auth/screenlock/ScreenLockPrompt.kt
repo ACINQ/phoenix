@@ -47,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.ProgressView
@@ -68,7 +69,8 @@ fun ScreenLockPrompt(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current ?: return
+
     val isBiometricLockEnabledState by userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(initial = null)
     val isCustomPinLockEnabledState by userPrefs.getIsScreenLockPinEnabled.collectAsState(initial = null)
     var showPinLockDialog by rememberSaveable { mutableStateOf(false) }

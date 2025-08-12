@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.TextWithIcon
@@ -53,16 +54,18 @@ import java.util.Locale
 @Composable
 fun DisplayPrefsView() {
     val nc = navController
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current
     val scope = rememberCoroutineScope()
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
-        Card {
-            BitcoinUnitPreference(userPrefs = userPrefs, scope = scope)
-            FiatCurrencyPreference(userPrefs = userPrefs, scope = scope)
-            UserThemePreference(userPrefs = userPrefs, scope = scope)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                AppLocaleSetting()
+        if (userPrefs != null) {
+            Card {
+                BitcoinUnitPreference(userPrefs = userPrefs, scope = scope)
+                FiatCurrencyPreference(userPrefs = userPrefs, scope = scope)
+                UserThemePreference(userPrefs = userPrefs, scope = scope)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    AppLocaleSetting()
+                }
             }
         }
     }

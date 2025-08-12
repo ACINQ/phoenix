@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
@@ -46,7 +47,6 @@ import fr.acinq.phoenix.android.components.prefs.ListPreferenceButton
 import fr.acinq.phoenix.android.components.prefs.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import kotlinx.coroutines.launch
@@ -60,8 +60,9 @@ fun AppAccessSettings(
     onScheduleAutoLock: () -> Unit,
 ) {
     val context = LocalContext.current
+    val userPrefs = LocalUserPrefs.current ?: return
+
     val biometricAuthStatus = BiometricsHelper.authStatus(context)
-    val userPrefs = userPrefs
     val isBiometricLockEnabled by userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(null)
     val isCustomPinLockEnabled by userPrefs.getIsScreenLockPinEnabled.collectAsState(null)
     val autoLockDelay by userPrefs.getAutoLockDelay.collectAsState(null)
@@ -198,9 +199,9 @@ private fun ScreenLockCustomPinView(
     isCustomPinLockEnabled: Boolean,
 ) {
     val context = LocalContext.current
+    val userPrefs = LocalUserPrefs.current ?: return
     var errorMessage by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
 
     var isInNewPinFlow by rememberSaveable { mutableStateOf(false) }
     var isInDisablingCustomPinFlow by rememberSaveable { mutableStateOf(false) }
@@ -261,8 +262,8 @@ private fun ScreenLockCustomPinView(
 @Composable
 private fun SpendLockCustomPinView(isSpendingPinEnabled: Boolean) {
     val context = LocalContext.current
+    val userPrefs = LocalUserPrefs.current ?: return
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
     var errorMessage by remember { mutableStateOf("") }
 
     var isNewPinFlow by rememberSaveable { mutableStateOf(false) }

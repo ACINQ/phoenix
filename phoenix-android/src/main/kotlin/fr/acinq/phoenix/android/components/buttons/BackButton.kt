@@ -41,11 +41,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
+import fr.acinq.phoenix.android.utils.datastore.getHomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -82,7 +84,7 @@ fun BackButtonWithBalance(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
+        val balanceDisplayMode by  LocalUserPrefs.current.getHomeAmountDisplayMode()
 
         BackButton(onClick = onBackClick)
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {

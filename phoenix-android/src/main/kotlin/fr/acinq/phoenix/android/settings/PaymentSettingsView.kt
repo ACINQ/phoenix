@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.dialogs.Dialog
@@ -45,7 +46,6 @@ import fr.acinq.phoenix.android.components.prefs.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import kotlinx.coroutines.launch
@@ -59,7 +59,7 @@ fun PaymentSettingsView(
 ) {
     val nc = navController
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current ?: return
 
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -188,7 +188,7 @@ fun PaymentSettingsView(
 @Composable
 private fun Bolt11ExpiryPreference() {
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current
     val preferences = listOf(
         PreferenceItem(item = 1.hours.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_one_hour)),
         PreferenceItem(item = 1.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_one_day)),
@@ -196,8 +196,8 @@ private fun Bolt11ExpiryPreference() {
         PreferenceItem(item = 14.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_two_weeks)),
         PreferenceItem(item = 21.days.inWholeSeconds, title = stringResource(id = R.string.paymentsettings_expiry_three_weeks)),
     )
-    val expiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(initial = null)
-    expiry?.let {
+    val expiry = userPrefs?.getInvoiceDefaultExpiry?.collectAsState(initial = null)
+    expiry?.value?.let {
         ListPreferenceButton(
             title = stringResource(id = R.string.paymentsettings_expiry_title),
             subtitle = {

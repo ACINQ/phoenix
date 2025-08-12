@@ -58,6 +58,7 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountInput
@@ -77,7 +78,6 @@ import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.internalData
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -432,9 +432,9 @@ fun EvaluateLiquidityIssuesForPayment(
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val swapFee = remember(mempoolFeerate, amount) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
-    val liquidityPolicyPrefs = userPrefs.getLiquidityPolicy.collectAsState(null)
+    val liquidityPolicyPrefs = LocalUserPrefs.current?.getLiquidityPolicy?.collectAsState(null)
 
-    when (val liquidityPolicy = liquidityPolicyPrefs.value) {
+    when (val liquidityPolicy = liquidityPolicyPrefs?.value) {
         null -> {}
         // when fee policy is disabled, we are more aggressive with the warning (dialog is shown immediately)
         is LiquidityPolicy.Disable -> {
@@ -627,7 +627,7 @@ private fun IncomingLiquidityWarning(
 
 @Composable
 private fun TorWarning() {
-    val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
+    val isTorEnabled = LocalUserPrefs.current?.getIsTorEnabled?.collectAsState(initial = null)?.value
 
     if (isTorEnabled == true) {
 

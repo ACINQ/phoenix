@@ -63,8 +63,8 @@ fun NavGraphBuilder.businessComposable(
     composable(route = route, arguments = arguments, deepLinks = deepLinks) { entry ->
         val log = logger("Navigation")
         val activeWallet by appViewModel.activeWalletInUI.collectAsState()
-        val nodeId = activeWallet?.first
-        val business = activeWallet?.second
+        val nodeId = activeWallet?.nodeId
+        val business = activeWallet?.business
         if (nodeId == null || business == null) {
 
             // in case it's a deeplink we need to look into the intent and apply some optional prefix

@@ -50,6 +50,7 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
@@ -60,7 +61,6 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.mutedBgColor
@@ -152,7 +152,7 @@ private fun OnChainBalance(
                 )
 
                 if (showOnchainDialog) {
-                    val liquidityPolicyInPrefs by userPrefs.getLiquidityPolicy.collectAsState(null)
+                    val liquidityPolicyInPrefs = LocalUserPrefs.current?.getLiquidityPolicy?.collectAsState(null)?.value
                     val bitcoinUnit = LocalBitcoinUnits.current.primary
                     Dialog(
                         onDismiss = { showOnchainDialog = false },

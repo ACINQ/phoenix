@@ -25,14 +25,13 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.Button
-import fr.acinq.phoenix.android.userPrefs
 
 @Composable
 fun PinKeyboard(
@@ -41,9 +40,9 @@ fun PinKeyboard(
     onDeleteLAst: () -> Unit,
     isEnabled: Boolean,
 ) {
-    val isPinShuffled by userPrefs.getIsPinKeyboardShuffled.collectAsState(null)
+    val isPinShuffled = LocalUserPrefs.current?.getIsPinKeyboardShuffled?.collectAsState(null)
     val pins = remember { arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0) }
-    if (isPinShuffled == true) {
+    if (isPinShuffled?.value == true) {
         pins.shuffle()
     }
 
