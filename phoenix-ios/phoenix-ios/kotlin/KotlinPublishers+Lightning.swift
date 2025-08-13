@@ -53,7 +53,28 @@ extension Lightning_kmpElectrumClient {
 	}
 }
 
-// MARK: -
+extension Lightning_kmpElectrumMiniWallet {
+	
+	fileprivate struct _Key {
+		static var walletStatePublisher = 0
+	}
+	
+	func walletStatePublisher() -> AnyPublisher<Lightning_kmpWalletState, Never> {
+		
+		self.getSetAssociatedObject(storageKey: &_Key.walletStatePublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `walletStateFlow: StateFlow<WalletState>`
+			///
+			KotlinCurrentValueSubject<Lightning_kmpWalletState>(
+				self.walletStateFlow
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
 extension Lightning_kmpElectrumWatcher {
 	
 	fileprivate struct _Key {
@@ -76,7 +97,6 @@ extension Lightning_kmpElectrumWatcher {
 	}
 }
 
-// MARK: -
 extension Lightning_kmpNodeParams {
 	
 	fileprivate struct _Key {
