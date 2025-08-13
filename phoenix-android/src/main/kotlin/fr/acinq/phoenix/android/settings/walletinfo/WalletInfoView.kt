@@ -143,7 +143,7 @@ private fun SwapInWalletView(
         }
         MenuButton(
             text = stringResource(id = R.string.walletinfo_swapin_addresses),
-            icon = R.drawable.ic_list,
+            textStyle = MaterialTheme.typography.body2,
             onClick = onSwapInWalletInfoClick
         )
     }
