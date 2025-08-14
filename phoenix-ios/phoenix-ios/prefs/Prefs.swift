@@ -31,7 +31,7 @@ class Prefs {
 	}
 	
 	static func wallet(_ walletId: WalletIdentifier) -> Prefs_Wallet {
-		return wallet(walletId.prefsKeyId)
+		return wallet(walletId.standardKeyId)
 	}
 	
 	static func wallet(_ id: String) -> Prefs_Wallet {
@@ -127,6 +127,30 @@ class Prefs {
 				d.removeObject(forKey: oldKey)
 			}
 		}
+		
+		let everything = d.dictionaryRepresentation()
+		for specialKey in Key.specialMigrations() {
+			
+			let tuple = everything.first { (key: String, _) in
+				key.hasPrefix("\(specialKey.prefix)-")
+			}
+			
+			if let tuple {
+				let oldKey = tuple.key
+				let value = tuple.value
+				
+				let newId = (specialKey.group == .global) ? PREFS_GLOBAL_ID : PREFS_DEFAULT_ID
+				let newKey = specialKey.value(newId)
+				if d.object(forKey: newKey) == nil {
+					log.debug("move: \(oldKey) > \(newKey)")
+					d.set(value, forKey: newKey)
+				} else {
+					log.debug("delete: \(oldKey)")
+				}
+				
+				d.removeObject(forKey: oldKey)
+			}
+		}
 	}
 	
 	// --------------------------------------------------
@@ -156,7 +180,7 @@ class Prefs {
 		
 		let d = self.defaults
 		let oldId = PREFS_DEFAULT_ID
-		let newId = walletId.prefsKeyId
+		let newId = walletId.standardKeyId
 		
 		for key in Key.allCases {
 			let oldKey = key.value(oldId)

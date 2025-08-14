@@ -13,7 +13,7 @@ extension Keychain {
 	
 	#if DEBUG
 	static func printKeysAndValues(_ walletId: WalletIdentifier) {
-		printKeysAndValues(walletId.keychainKeyId)
+		printKeysAndValues(walletId.standardKeyId)
 	}
 	
 	static func printKeysAndValues(_ id: String?) {

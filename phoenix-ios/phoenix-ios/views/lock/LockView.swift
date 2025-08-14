@@ -441,7 +441,7 @@ struct LockView: View {
 				var result = [String: [WalletMetadata]]()
 				
 				for hiddenWallet in hiddenWallets {
-					let id = hiddenWallet.keychainKeyId
+					let id = hiddenWallet.standardKeyId
 					if let lockPin = Keychain.wallet(id).getLockPin() {
 						
 						if let existing = result[lockPin] {
@@ -524,7 +524,7 @@ struct LockView: View {
 			return nil
 		}
 		
-		return Keychain.wallet(selectedWallet.keychainKeyId)
+		return Keychain.wallet(selectedWallet.standardKeyId)
 	}
 	
 	func refreshBiometricsSupport() {
@@ -694,7 +694,7 @@ struct LockView: View {
 			
 			if hiddenWalletMatches.count == 1 {
 				let hiddenWallet = hiddenWalletMatches[0]
-				let hiddenWalletKeychain = Keychain.wallet(hiddenWallet.keychainKeyId)
+				let hiddenWalletKeychain = Keychain.wallet(hiddenWallet.standardKeyId)
 		
 				tryUnlockKeychain(hiddenWalletKeychain)
 				handleCorrectPin(hiddenWalletKeychain, isHiddenWallet: true)

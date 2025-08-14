@@ -70,10 +70,6 @@ struct WalletInfoSend: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func currentWalletMetadata() -> WalletMetadata {
-		return SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
-	}
-	
 	func walletBalanceValues() -> (FormattedAmount, FormattedAmount) {
 		
 		let msats = channels.map { channel in

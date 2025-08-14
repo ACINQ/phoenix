@@ -88,13 +88,13 @@ class SecurityFile {
 		}
 		
 		init(wallet: Wallet, id: WalletIdentifier) {
-			let key = id.keychainKeyId
+			let key = id.standardKeyId
 			self.wallets = [key: wallet]
 			self.defaultKey = key
 		}
 		
 		func getWallet(_ id: WalletIdentifier) -> Wallet? {
-			return wallets[id.keychainKeyId]
+			return wallets[id.standardKeyId]
 		}
 		
 		func allKeys() -> [KeyInfo] {
@@ -105,27 +105,27 @@ class SecurityFile {
 		
 		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifier) -> V1 {
 			var newWallets = self.wallets
-			newWallets[id.keychainKeyId] = wallet
+			newWallets[id.standardKeyId] = wallet
 			
 			return V1(wallets: newWallets, defaultKey: self.defaultKey)
 		}
 		
 		func copyRemovingWallet(_ id: WalletIdentifier) -> V1 {
 			var newWallets = self.wallets
-			newWallets.removeValue(forKey: id.keychainKeyId)
+			newWallets.removeValue(forKey: id.standardKeyId)
 			
-			let newDefaultKey: String? = if (defaultKey == id.keychainKeyId) { nil } else { defaultKey }
+			let newDefaultKey: String? = if (defaultKey == id.standardKeyId) { nil } else { defaultKey }
 			
 			return V1(wallets: newWallets, defaultKey: newDefaultKey)
 		}
 		
 		func copyWithDefaultWalletId(_ id: WalletIdentifier?) -> V1 {
 			
-			return V1(wallets: self.wallets, defaultKey: id?.keychainKeyId)
+			return V1(wallets: self.wallets, defaultKey: id?.standardKeyId)
 		}
 		
 		func isDefaultWalletId(_ id: WalletIdentifier) -> Bool {
-			return id.keychainKeyId == self.defaultKey
+			return id.standardKeyId == self.defaultKey
 		}
 		
 		func defaultKeyInfo() -> KeyInfo? {
@@ -144,14 +144,14 @@ class SecurityFile {
 		
 		struct KeyInfo {
 			let chain: Bitcoin_kmpChain
-			let nodeId: String
+			let nodeIdHash: String
 			
-			// Mirrors functionality of `WalletIdentifier.keychainKeyId`
-			var keychainKeyId: String {
+			// Mirrors functionality of `WalletIdentifier.standardKeyId`
+			var standardKeyId: String {
 				if chain.isMainnet() {
-					return nodeId
+					return nodeIdHash
 				} else {
-					return "\(nodeId)-\(chain.phoenixName)"
+					return "\(nodeIdHash)-\(chain.phoenixName)"
 				}
 			}
 			
@@ -159,14 +159,14 @@ class SecurityFile {
 				
 				let comps = id.split(separator: "-")
 				if comps.count == 1 {
-					return KeyInfo(chain: Bitcoin_kmpChain.Mainnet(), nodeId: id)
+					return KeyInfo(chain: Bitcoin_kmpChain.Mainnet(), nodeIdHash: id)
 					
 				} else if comps.count == 2 {
 					let chainName = String(comps[1])
 					guard let chain = Bitcoin_kmpChain.fromString(chainName) else {
 						return nil
 					}
-					return KeyInfo(chain: chain, nodeId: String(comps[0]))
+					return KeyInfo(chain: chain, nodeIdHash: String(comps[0]))
 					
 				} else {
 					return nil

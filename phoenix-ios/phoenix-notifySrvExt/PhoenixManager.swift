@@ -152,11 +152,11 @@ class PhoenixManager {
 					
 				case .v1(let v1):
 					if let target {
-						keyInfo = v1.wallets[target.keychainKeyId]?.keychain
-						id = target.keychainKeyId
+						keyInfo = v1.wallets[target.standardKeyId]?.keychain
+						id = target.standardKeyId
 					} else if let defaultTarget = v1.defaultKeyInfo() {
-						keyInfo = v1.wallets[defaultTarget.keychainKeyId]?.keychain
-						id = defaultTarget.keychainKeyId
+						keyInfo = v1.wallets[defaultTarget.standardKeyId]?.keychain
+						id = defaultTarget.standardKeyId
 					}
 				}
 				
@@ -214,8 +214,8 @@ class PhoenixManager {
 		walletId = wid
 		
 		if let target {
-			guard target.nodeId == wid.nodeId else {
-				log.warning("unlock(): ignoring: target.nodeId != unlocked.nodeId")
+			guard target.nodeIdHash == wid.nodeIdHash else {
+				log.warning("unlock(): ignoring: target.nodeIdHash != unlocked.nodeIdHash")
 				return
 			}
 			guard target.chain == wid.chain else {

@@ -397,7 +397,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	func selectWallet(_ wallet: WalletMetadata) {
 		log.trace(#function)
 		
-		tryWalletUnlock(wallet.keychainKeyId)
+		tryWalletUnlock(wallet.standardKeyId)
 	}
 	
 	func lockWallet() {

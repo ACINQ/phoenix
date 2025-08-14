@@ -119,6 +119,21 @@ enum PrefsKey: CaseIterable {
 	func value(_ suffix: String) -> String {
 		return "\(self.prefix)-\(suffix)"
 	}
+	
+	/// The unique set of keys that had a per-wallet design from the early days.
+	/// However, they used a different suffix than the standard used now.
+	///
+	static func specialMigrations() -> [PrefsKey] {
+		return [
+			PrefsKey.backupSeed_hasUploadedSeed,
+			PrefsKey.backupSeed_name,
+			PrefsKey.manualBackupDone,
+			PrefsKey.recordZoneCreated,
+			PrefsKey.hasDownloadedPayments,
+			PrefsKey.hasDownloadedContacts,
+			PrefsKey.hasReUploadedPayments
+		]
+	}
 }
 
 enum PrefsKeyDeprecated: String {

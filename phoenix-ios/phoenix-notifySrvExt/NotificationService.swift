@@ -210,34 +210,40 @@ class NotificationService: UNNotificationServiceExtension {
 		
 		log.debug("pushNotificationReason = \(pushNotificationReason)")
 		
-		var nodeId: String? = nil
+		let nodeId: String?
 		if let value = userInfo["nodeId"] as? String {
 			nodeId = value
 		} else if let value = userInfo["node"] as? String {
 			nodeId = value
 		} else if let value = userInfo["n"] as? String {
 			nodeId = value
+		} else {
+			nodeId = nil
 		}
 		log.debug("target.nodeId = \(nodeId ?? "<nil>")")
 		
-		var chainStr: String? = nil
+		let chainStr: String?
 		if let value = userInfo["chain"] as? String {
 			chainStr = value
 		} else if let value = userInfo["c"] as? String {
 			chainStr = value
+		} else {
+			chainStr = nil
 		}
 		log.debug("target.chain = \(chainStr ?? "<nil>")")
 		
-		if let nodeId {
-			var chain: Bitcoin_kmpChain? = Bitcoin_kmpChain.Mainnet()
-			if let chainStr {
-				chain = Bitcoin_kmpChain.fromString(chainStr)
-			}
-			if let chain {
-				target = SecurityFile.V1.KeyInfo(chain: chain, nodeId: nodeId)
-			} else {
-				log.warning("Invalid chain: \(chainStr ?? "<nil>")")
-			}
+		let nodeIdHash: String? = if let nodeId { hash160(nodeId) } else { nil }
+		
+		let chain: Bitcoin_kmpChain? = if let chainStr {
+			Bitcoin_kmpChain.fromString(chainStr)
+		} else {
+			Bitcoin_kmpChain.Mainnet()
+		}
+		
+		if let nodeIdHash, let chain {
+			target = SecurityFile.V1.KeyInfo(chain: chain, nodeIdHash: nodeIdHash)
+		} else if let chainStr, chain == nil {
+			log.warning("Invalid chain name: \(chainStr)")
 		}
 		
 		// Nothing else to do here.
@@ -251,23 +257,57 @@ class NotificationService: UNNotificationServiceExtension {
 		pushNotificationReason = .unknown
 		log.debug("pushNotificationReason = \(pushNotificationReason)")
 		
-		var nodeId: String? = nil
+		let nodeId: String?
 		if let value = userInfo["n"] as? String {
 			nodeId = value
+		} else {
+			nodeId = nil
 		}
 		log.debug("target.nodeId = \(nodeId ?? "<nil>")")
 		
-		var chainStr: String? = nil
+		let chainStr: String?
 		if let value = userInfo["c"] as? String {
 			chainStr = value
+		} else {
+			chainStr = nil
 		}
 		log.debug("target.chain = \(chainStr ?? "<nil>")")
 		
-		if let nodeId, let chainStr, let chain = Bitcoin_kmpChain.fromString(chainStr) {
-			target = SecurityFile.V1.KeyInfo(chain: chain, nodeId: nodeId)
+		let nodeIdHash: String? = if let nodeId { hash160(nodeId) } else { nil }
+		
+		let chain: Bitcoin_kmpChain? = if let chainStr {
+			Bitcoin_kmpChain.fromString(chainStr)
+		} else {
+			Bitcoin_kmpChain.Mainnet()
+		}
+		
+		if let nodeIdHash, let chain {
+			target = SecurityFile.V1.KeyInfo(chain: chain, nodeIdHash: nodeIdHash)
+		} else if let chainStr, chain == nil {
+			log.warning("Invalid chain name: \(chainStr)")
 		}
 		
 		return finish()
+	}
+	
+	func hash160(_ nodeId: String) -> String? {
+		
+		guard let data = Data(fromHex: nodeId) else {
+			log.warning("hash160(): nodeId is not valid hexadecimal")
+			return nil
+		}
+		guard data.count == 33 else {
+			log.warning("hash160(): nodeId.count != 33")
+			return nil
+		}
+		
+		let pubKey = Bitcoin_kmpPublicKey(data: data.toKotlinByteArray())
+		guard pubKey.isValid() else {
+			log.warning("hash160(): nodeId is not valid publicKey")
+			return nil
+		}
+		
+		return pubKey.hash160().toSwiftData().toHex(options: .lowerCase)
 	}
 	
 	// --------------------------------------------------

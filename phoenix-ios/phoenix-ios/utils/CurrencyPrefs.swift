@@ -16,7 +16,7 @@ class CurrencyPrefs: ObservableObject {
 	private static var last: CurrencyPrefs? = nil
 	
 	static var current: CurrencyPrefs {
-		let id = Biz.walletId?.prefsKeyId ?? PREFS_DEFAULT_ID
+		let id = Biz.walletId?.standardKeyId ?? PREFS_DEFAULT_ID
 		if let last, last.id == id {
 			return last
 		} else {

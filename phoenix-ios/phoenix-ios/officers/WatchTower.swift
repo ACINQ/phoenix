@@ -132,7 +132,7 @@ class WatchTower {
 		let currentWalletId = Biz.walletId
 		let allTargets: [WatchTowerTarget] = v1.allKeys().map { keyInfo in
 			
-			let prefs = Prefs_Wallet(id: keyInfo.keychainKeyId)
+			let prefs = Prefs_Wallet(id: keyInfo.standardKeyId)
 			
 			let lastAttemptDate = prefs.watchTower_lastAttemptDate
 			let lastAttemptFailed = prefs.watchTower_lastAttemptFailed
@@ -146,7 +146,7 @@ class WatchTower {
 			
 			var isCurrent: Bool = false
 			if let current = currentWalletId {
-				isCurrent = (current.nodeId == keyInfo.nodeId) && (current.chain == keyInfo.chain)
+				isCurrent = (current.nodeIdHash == keyInfo.nodeIdHash) && (current.chain == keyInfo.chain)
 			}
 			
 			return WatchTowerTarget(
@@ -252,7 +252,7 @@ class WatchTower {
 			
 		} else { // check the current wallet
 			if let walletId = Biz.walletId {
-				performTask(task, Biz.business, walletId.keychainKeyId)
+				performTask(task, Biz.business, walletId.standardKeyId)
 			} else {
 				completeTask(task, success: true)
 			}
@@ -262,7 +262,7 @@ class WatchTower {
 	private func performTask(_ task: BGAppRefreshTask, _ target: WatchTowerTarget) {
 		log.trace(#function)
 		
-		let id = target.keyInfo.keychainKeyId
+		let id = target.keyInfo.standardKeyId
 		let business = PhoenixBusiness(ctx: PlatformContext.default)
 
 		business.currencyManager.disableAutoRefresh()
