@@ -82,6 +82,8 @@ struct ValidateView: View {
 	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
+	@State var walletInfoPresented: Bool = false
+	
 	// For the cicular buttons: [metadata, tip, comment]
 	enum MaxButtonWidth: Preference {}
 	let maxButtonWidthReader = GeometryPreferenceReader(
@@ -106,6 +108,7 @@ struct ValidateView: View {
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	// --------------------------------------------------
 	// MARK: Init
@@ -130,6 +133,7 @@ struct ValidateView: View {
 					: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
 			)
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: walletIconButton())
 			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
 				navLinkView()
 			}
@@ -495,6 +499,40 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
+	func walletIconButton() -> some View {
+		
+		if #available(iOS 17, *) {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(isPresented: $walletInfoPresented) {
+				WalletInfoSend()
+					.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+					.presentationCompactAdaptation(.popover)
+			}
+			
+		} else {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(present: $walletInfoPresented) {
+				InfoPopoverWindow {
+					WalletInfoSend()
+						.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func navLinkView() -> some View {
 		
 		if let tag = self.navLinkTag {
@@ -690,6 +728,10 @@ struct ValidateView: View {
 			return String(localized: "connecting to electrum", comment: "button text")
 		}
 		return ""
+	}
+	
+	func currentWalletMetadata() -> WalletMetadata {
+		return SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
 	}
 	
 	// --------------------------------------------------

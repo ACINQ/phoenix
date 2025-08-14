@@ -50,6 +50,8 @@ struct SendView: View {
 	
 	@State var needsAcceptWarning = true
 	
+	@State var walletInfoPresented: Bool = false
+	
 	enum ActiveSheet {
 		case imagePicker
 		case qrCodeScanner
@@ -110,6 +112,7 @@ struct SendView: View {
 		layers()
 			.navigationTitle("Send")
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: walletIconButton())
 	}
 	
 	@ViewBuilder
@@ -703,6 +706,40 @@ struct SendView: View {
 	}
 	
 	@ViewBuilder
+	func walletIconButton() -> some View {
+		
+		if #available(iOS 17, *) {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(isPresented: $walletInfoPresented) {
+				WalletInfoSend()
+					.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+					.presentationCompactAdaptation(.popover)
+			}
+			
+		} else {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(present: $walletInfoPresented) {
+				InfoPopoverWindow {
+					WalletInfoSend()
+						.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func navLinkView() -> some View {
 		
 		if let tag = self.navLinkTag {
@@ -770,6 +807,10 @@ struct SendView: View {
 			get: { activeSheet != nil },
 			set: { if !$0 { activeSheet = nil }}
 		)
+	}
+	
+	func currentWalletMetadata() -> WalletMetadata {
+		return SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
 	}
 	
 	// --------------------------------------------------

@@ -18,6 +18,8 @@ struct LoginView: View {
 	@State var didLogIn = false
 	@State var loginError: SendManager.LnurlAuth_Error? = nil
 	
+	@State var walletInfoPresented: Bool = false
+	
 	enum MaxImageHeight: Preference {}
 	let maxImageHeightReader = GeometryPreferenceReader(
 		key: AppendValue<MaxImageHeight>.self,
@@ -28,6 +30,7 @@ struct LoginView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	let buttonFont: Font = .title3
 	let buttonImgScale: Image.Scale = .medium
@@ -42,6 +45,7 @@ struct LoginView: View {
 		layers()
 			.navigationTitle("lnurl-auth")
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: walletIconButton())
 	}
 	
 	@ViewBuilder
@@ -215,6 +219,40 @@ struct LoginView: View {
 		.opacity(didLogIn ? 1.0 : 0.0)
 	}
 	
+	@ViewBuilder
+	func walletIconButton() -> some View {
+		
+		if #available(iOS 17, *) {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(isPresented: $walletInfoPresented) {
+				WalletInfoSend()
+					.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+					.presentationCompactAdaptation(.popover)
+			}
+			
+		} else {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(present: $walletInfoPresented) {
+				InfoPopoverWindow {
+					WalletInfoSend()
+						.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+				}
+			}
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
@@ -259,6 +297,10 @@ struct LoginView: View {
 		} else {
 			return nil
 		}
+	}
+	
+	func currentWalletMetadata() -> WalletMetadata {
+		return SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
 	}
 	
 	// --------------------------------------------------
