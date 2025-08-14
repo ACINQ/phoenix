@@ -64,7 +64,7 @@ class DeviceInfo: ObservableObject {
 	}
 	
 	var isIPadLandscapeFullscreen: Bool {
-		if UIDevice.current.userInterfaceIdiom != .pad {
+		if !self.isIPad {
 			return false
 		}
 		if !self.isLandscape {

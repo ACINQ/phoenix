@@ -12,6 +12,29 @@ enum HeaderButtonHeight: Preference {}
 
 struct MainView: View {
 	
+	@ObservedObject var appState = AppState.shared
+	@State var unlockedOnce = false
+	
+	@ViewBuilder
+	var body: some View {
+		
+		GlobalEnvironmentView {
+			if appState.isUnlocked || unlockedOnce {
+				MainView_Wrapper()
+					.onAppear {
+						log.debug("unlockedOnce = true")
+						unlockedOnce = true
+					}
+
+			} else {
+				EmptyView()
+			}
+		}
+	}
+}
+
+struct MainView_Wrapper: View {
+	
 	static let idiom = UIDevice.current.userInterfaceIdiom
 	
 	@EnvironmentObject var popoverState: PopoverState
@@ -19,7 +42,7 @@ struct MainView: View {
 	@ViewBuilder
 	var body: some View {
 		Group {
-			if MainView.idiom == .pad {
+			if Self.idiom == .pad {
 				MainView_Big()
 			} else {
 				MainView_Small()

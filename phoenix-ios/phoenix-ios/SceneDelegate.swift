@@ -517,7 +517,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		
 		if mainWindow == nil {
 			
-			let view = ContentView()
+			let view = MainView()
 			
 			let controller = UIHostingController(rootView: view)
 			
