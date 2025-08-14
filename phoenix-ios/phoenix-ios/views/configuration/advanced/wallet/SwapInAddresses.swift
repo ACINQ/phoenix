@@ -10,10 +10,19 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct SwapInAddresses: View {
 	
-	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher()
-		.compactMap { $0.swapInWallet }
-		.flatMap { $0.swapInAddressPublisher() }
-	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
+	struct TaprootAddress: Comparable {
+		let address: String
+		let index: Int32
+		let state: Lightning_kmpWalletState.AddressState
+		let isCurrent: Bool
+		
+		static func < (lhs: SwapInAddresses.TaprootAddress, rhs: SwapInAddresses.TaprootAddress) -> Bool {
+			return lhs.index < rhs.index
+		}
+	}
+	
+	@State var taprootAddressList: [TaprootAddress] = []
+	@State var legacyAddress: String? = nil
 	
 	@StateObject var toast = Toast()
 	
@@ -26,12 +35,21 @@ struct SwapInAddresses: View {
 	@ViewBuilder
 	var body: some View {
 		
+		layers()
+			.navigationTitle("Swap-in addresses")
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
 			content()
 			toast.view()
 		}
-		.navigationTitle("Swap-in addresses")
-		.navigationBarTitleDisplayMode(.inline)
+		.task {
+			await monitorSwapAddresses()
+		}
 	}
 	
 	@ViewBuilder
@@ -39,13 +57,14 @@ struct SwapInAddresses: View {
 		
 		List {
 			section_taproot()
-			section_legacy()
+			
+			if let addr = legacyAddress {
+				section_legacy(addr)
+			}
+			
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(swapInAddressPublisher) {
-			swapInAddressChanged($0)
-		}
 	}
 	
 	@ViewBuilder
@@ -53,28 +72,36 @@ struct SwapInAddresses: View {
 		
 		Section {
 			
-			let count = taprootAddressCount()
+			let count = taprootAddressList.count
 			ForEach((0..<count).reversed(), id: \.self) { idx in
 				
-				let address = taprootAddress(idx)
+				let taprootAddr = taprootAddressList[idx]
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					
+					let color = getVerticalDividerColor(taprootAddr)
+					VerticalDivider(color: color, width: 3)
+						.padding(.vertical, 2)
+						.offset(x: -20)
+					
 					Text(verbatim: "#\(idx)")
 						.lineLimit(1)
 						.foregroundColor(.secondary)
 						.padding(.trailing, 6)
 					
-					Text(address)
+					Text(taprootAddr.address)
 						.lineLimit(1)
 						.truncationMode(.middle)
 					
 					Spacer(minLength: 6)
 					
 					Button {
-						copyAddressToPasteboard(address)
+						copyAddressToPasteboard(taprootAddr.address)
 					} label: {
 						Image(systemName: "square.on.square")
 					}
-				}
+					
+				} // </HStack>
+				.listRowInsets(EdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20))
 			}
 		} header: {
 			Text("Taproot")
@@ -82,11 +109,10 @@ struct SwapInAddresses: View {
 	}
 	
 	@ViewBuilder
-	func section_legacy() -> some View {
+	func section_legacy(_ address: String) -> some View {
 		
 		Section {
 			
-			let address = legacyAddress()
 			HStack(alignment: VerticalAlignment.center, spacing: 4) {
 				Text(address)
 					.lineLimit(1)
@@ -108,42 +134,61 @@ struct SwapInAddresses: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	func taprootAddressCount() -> Int {
+	func getVerticalDividerColor(_ taprootAddr: TaprootAddress) -> Color {
 		
-		let lastIndex = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
-		return lastIndex + 1
-	}
-	
-	func taprootAddress(_ index: Int) -> String {
-		
-		guard let keyManager = Biz.business.walletManager.keyManagerValue() else {
-			return "???"
+		if taprootAddr.state.alreadyUsed {
+			return Color(UIColor.systemGray5)
+		} else if taprootAddr.isCurrent {
+			return Color.appAccent
+		} else {
+			return Color.clear
 		}
-		
-		return keyManager.swapInOnChainWallet
-			.getSwapInProtocol(addressIndex: Int32(index))
-			.address(chain: Biz.business.chain)
-	}
-	
-	func legacyAddress() -> String {
-		
-		guard let keyManager = Biz.business.walletManager.keyManagerValue() else {
-			return "???"
-		}
-		
-		return keyManager.swapInOnChainWallet
-			.legacySwapInProtocol
-			.address(chain: Biz.business.chain)
 	}
 	
 	// --------------------------------------------------
-	// MARK: Notifications
+	// MARK: Tasks
 	// --------------------------------------------------
 	
-	func swapInAddressChanged(_ newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) {
-		log.trace("swapInAddressChanged()")
+	func monitorSwapAddresses() async {
+		log.trace(#function)
 		
-		self.swapInAddressInfo = newInfo
+		do {
+			let peer = try await Biz.business.peerManager.getPeer()
+			
+			for try await wallet in peer.phoenixSwapInWallet.wallet.walletStatePublisher().values {
+				
+				let legacyAddr: String? = wallet.addresses.first {
+					(address: String, state: Lightning_kmpWalletState.AddressState) in
+					
+					state.meta is Lightning_kmpWalletState.AddressMetaSingle
+				}?.key
+				
+				let currentTaprootAddr: String? = wallet.firstUnusedDerivedAddress?.first as? String
+				let taprootAddrList: [TaprootAddress] = wallet.addresses.compactMap {
+					(address: String, state: Lightning_kmpWalletState.AddressState) in
+					
+					if let meta = state.meta as? Lightning_kmpWalletState.AddressMetaDerived {
+						let isCurrent = if let currentTaprootAddr { address == currentTaprootAddr } else { false }
+						return TaprootAddress(
+							address   : address,
+							index     : meta.index,
+							state     : state,
+							isCurrent : isCurrent
+						)
+					} else {
+						return nil
+					}
+				}.sorted()
+				
+				self.legacyAddress = legacyAddr
+				self.taprootAddressList = taprootAddrList
+			}
+			
+		} catch {
+			log.error("monitorSwapAddresses(): \(error)")
+		}
+		
+		log.debug("monitorSwapAddresses(): terminated")
 	}
 	
 	// --------------------------------------------------
@@ -160,4 +205,20 @@ struct SwapInAddresses: View {
 			style: .chrome
 		)
 	}
+}
+
+struct VerticalDivider: View {
+	 
+	 let color: Color
+	 let width: CGFloat
+	 
+	 init(color: Color, width: CGFloat = 0.5) {
+		  self.color = color
+		  self.width = width
+	 }
+	 
+	 var body: some View {
+		  color
+				.frame(width: width)
+	 }
 }
