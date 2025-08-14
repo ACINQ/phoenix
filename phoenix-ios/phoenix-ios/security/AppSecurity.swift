@@ -79,7 +79,18 @@ class AppSecurity {
 			// They had to uninstall & reinstall the app.
 			// Which meant losing their transaction history (if iCloud backup was disabled).
 			// With this implementation, we can finally offer them a simple solution.
+			//
+			Keychain.wallet(walletId).resetWallet()
 			
+		} else {
+			
+			// Items stored in the iOS keychain remain persisted between iOS installs.
+			// So it's possible the associated wallet already has associated items in the keychain.
+			// So we should clear them here.
+			//
+			// Related issues:
+			// Issue #282 - Face ID remains enabled between app installs.
+			//
 			Keychain.wallet(walletId).resetWallet()
 		}
 		

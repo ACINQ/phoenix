@@ -319,13 +319,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		showIntroWindow(animateIn: false, isCancellable: false)
 		hideLoadingWindow()
 		
-		// Issue #282 - Face ID remains enabled between app installs.
 		// Items stored in the iOS keychain remain persisted between iOS installs.
-		// So we need to clear the flag here.
+		// So we should clear them here.
 		//
-		// We have the same problem with the Custom PIN.
-		// And all other values stored in the keychain.
-		// So we perform a keychain reset (which clears all values).
+		// Note that we're clearing the KEYCHAIN_DEFAULT_ID account.
+		// If we don't, then when the user creates/restores a wallet,
+		// these old default values will get copied into their new account.
+		//
+		// Related issues:
+		// Issue #282 - Face ID remains enabled between app installs.
+		// 
 		Keychain.current.resetWallet()
 	}
 	
