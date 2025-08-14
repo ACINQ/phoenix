@@ -21529,6 +21529,9 @@
         }
       }
     },
+    "Inbound liquidity" : {
+
+    },
     "Inbound Liquidity" : {
       "localizations" : {
         "ar" : {
@@ -34078,6 +34081,9 @@
           }
         }
       }
+    },
+    "Scan QR code" : {
+
     },
     "Scan QR Code" : {
       "localizations" : {

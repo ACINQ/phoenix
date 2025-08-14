@@ -226,6 +226,7 @@
 		DC5F970E2E293DD20052CDE6 /* LockContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F970D2E293DC40052CDE6 /* LockContainer.swift */; };
 		DC5F97102E2A94280052CDE6 /* WalletSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F970F2E2A94210052CDE6 /* WalletSelector.swift */; };
 		DC5F97122E2EA8790052CDE6 /* DuressPinOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97112E2EA8730052CDE6 /* DuressPinOption.swift */; };
+		DC5F97142E2FDBDA0052CDE6 /* WalletInfoReceive.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97132E2FDBD20052CDE6 /* WalletInfoReceive.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
 		DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */; };
@@ -699,6 +700,7 @@
 		DC5F970D2E293DC40052CDE6 /* LockContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockContainer.swift; sourceTree = "<group>"; };
 		DC5F970F2E2A94210052CDE6 /* WalletSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletSelector.swift; sourceTree = "<group>"; };
 		DC5F97112E2EA8730052CDE6 /* DuressPinOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuressPinOption.swift; sourceTree = "<group>"; };
+		DC5F97132E2FDBD20052CDE6 /* WalletInfoReceive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoReceive.swift; sourceTree = "<group>"; };
 		DC63A3752B965D54008E040E /* InboundFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeSheet.swift; sourceTree = "<group>"; };
 		DC63BDF329AE44380067A361 /* NotificationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -1208,17 +1210,18 @@
 		DC2F431227B696A40006FCC4 /* receive */ = {
 			isa = PBXGroup;
 			children = (
-				DC98D3972AF2AE41005BD177 /* ReceiveView.swift */,
-				DC3FDCAE2C3306AB002C5931 /* LightningDualView.swift */,
-				DC2F431327B6972C0006FCC4 /* SwapInView.swift */,
-				DC5631C92C597B8600DCB5BF /* SourceInfo.swift */,
-				DC2F431527B6983B0006FCC4 /* CopyShareOptionsSheet.swift */,
-				DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */,
+				DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */,
 				DC370A882B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift */,
-				DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */,
+				DC2F431527B6983B0006FCC4 /* CopyShareOptionsSheet.swift */,
 				DC63A3752B965D54008E040E /* InboundFeeSheet.swift */,
 				DC64F5B72C0FB5BD009D2B5F /* InboundFeeState.swift */,
-				DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */,
+				DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */,
+				DC3FDCAE2C3306AB002C5931 /* LightningDualView.swift */,
+				DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */,
+				DC98D3972AF2AE41005BD177 /* ReceiveView.swift */,
+				DC5631C92C597B8600DCB5BF /* SourceInfo.swift */,
+				DC2F431327B6972C0006FCC4 /* SwapInView.swift */,
+				DC5F97132E2FDBD20052CDE6 /* WalletInfoReceive.swift */,
 			);
 			path = receive;
 			sourceTree = "<group>";
@@ -2125,6 +2128,7 @@
 				DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */,
 				DC78A5FB2DF881FC003A7DD8 /* MultiBusinessManager.swift in Sources */,
 				DC4CBC7E2D650C5200129BDB /* DetailsInfoGrid.swift in Sources */,
+				DC5F97142E2FDBDA0052CDE6 /* WalletInfoReceive.swift in Sources */,
 				DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */,
 				DCDD9ED428637EBB001800A3 /* ToolsButton.swift in Sources */,
 				DCDD9ED0286377B7001800A3 /* MainView_Big.swift in Sources */,
