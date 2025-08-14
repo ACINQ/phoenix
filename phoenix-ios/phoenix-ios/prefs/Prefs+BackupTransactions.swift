@@ -1,64 +1,58 @@
 import Foundation
 import Combine
 
-/// The backup state, according to current values in Prefs.
-/// Used by `backupSeedStatePublisher`.
+fileprivate let filename = "Prefs+BackupTransactions"
+#if DEBUG && true
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
+#else
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+#endif
+
+fileprivate typealias Key = PrefsKey
+
+/// Standard app preferences, stored in the iOS UserDefaults system.
+/// 
+/// This set pertains to backing up payment history in the user's own iCloud account.
 ///
-enum BackupSeedState {
-	case notBackedUp
-	case backupInProgress
-	case safelyBackedUp
-}
-
-fileprivate enum Key: String {
-	case backupTransactions_enabled
-	case backupTransactions_useCellularData
-	case backupTransactions_useUploadDelay
-	case hasCKRecordZone_v2
-	case hasDownloadedPayments = "hasDownloadedCKRecords"
-	case hasDownloadedContacts_v2
-	case hasReUploadedPayments
-}
-
-fileprivate enum KeyDeprecated: String {
-	case hasDownloadedContacts_v1 = "hasDownloadedContacts"
-}
-
-/// Preferences pertaining to backing up payment history in the user's own iCloud account.
+/// - Note:
+/// The values here are NOT shared with other extensions bundled in the app, such as the
+/// notification-service-extension. For preferences shared with extensions, see `GroupPrefs`.
 ///
 class Prefs_BackupTransactions {
 	
-	private var defaults: UserDefaults {
-		return Prefs.shared.defaults
+	private static var defaults: UserDefaults {
+		return Prefs.defaults
 	}
 	
-	/// Updating publishers should always be done on the main thread.
-	/// Otherwise we risk updating UI components on a background thread, which is dangerous.
-	///
-	private func runOnMainThread(_ block: @escaping () -> Void) {
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
-		}
+	private let id: String
+	private let defaults: UserDefaults
+#if DEBUG
+	private let isDefault: Bool
+#endif
+	
+	init(id: String) {
+		self.id = id
+		self.defaults = Self.defaults
+	#if DEBUG
+		self.isDefault = (id == PREFS_DEFAULT_ID)
+	#endif
 	}
 	
-	lazy private(set) var isEnabledPublisher: CurrentValueSubject<Bool, Never> = {
-		return CurrentValueSubject<Bool, Never>(self.isEnabled)
+	// --------------------------------------------------
+	// MARK: User Options
+	// --------------------------------------------------
+	
+	lazy private(set) var isEnabledPublisher = {
+		CurrentValueSubject<Bool, Never>(self.isEnabled)
 	}()
 	
 	var isEnabled: Bool {
 		get {
-			let key = Key.backupTransactions_enabled.rawValue
-			if defaults.object(forKey: key) != nil {
-				return defaults.bool(forKey: key)
-			} else {
-				return true // default value
-			}
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.backupTxs_enabled.value(id), defaultValue: true)
 		}
 		set {
-			let key = Key.backupTransactions_enabled.rawValue
-			defaults.set(newValue, forKey: key)
+			defaults.set(newValue, forKey: Key.backupTxs_enabled.value(id))
 			runOnMainThread {
 				self.isEnabledPublisher.send(newValue)
 			}
@@ -67,102 +61,105 @@ class Prefs_BackupTransactions {
 	
 	var useCellular: Bool {
 		get {
-			let key = Key.backupTransactions_useCellularData.rawValue
-			if defaults.object(forKey: key) != nil {
-				return defaults.bool(forKey: key)
-			} else {
-				return true // default value
-			}
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.backupTxs_useCellularData.value(id), defaultValue: true)
 		}
 		set {
-			let key = Key.backupTransactions_useCellularData.rawValue
-			defaults.set(newValue, forKey: key)
+			defaults.set(newValue, forKey: Key.backupTxs_useCellularData.value(id))
 		}
 	}
 	
 	var useUploadDelay: Bool {
 		get {
-			let key = Key.backupTransactions_useUploadDelay.rawValue
-			if defaults.object(forKey: key) != nil {
-				return defaults.bool(forKey: key)
-			} else {
-				return false // default value
-			}
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.backupTxs_useUploadDelay.value(id), defaultValue: false)
 		}
 		set {
-			let key = Key.backupTransactions_useUploadDelay.rawValue
-			defaults.set(newValue, forKey: key)
+			defaults.set(newValue, forKey: Key.backupTxs_useUploadDelay.value(id))
 		}
 	}
 	
-	private func recordZoneCreatedKey(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.hasCKRecordZone_v2.rawValue)-\(walletId.prefsKeySuffix)"
-	}
-	
-	func recordZoneCreated(_ walletId: WalletIdentifier) -> Bool {
-		return defaults.bool(forKey: recordZoneCreatedKey(walletId))
-	}
-	
-	func setRecordZoneCreated(_ value: Bool, _ walletId: WalletIdentifier) {
-		let key = recordZoneCreatedKey(walletId)
-		if value == true {
-			defaults.setValue(value, forKey: key)
-		} else {
-			defaults.removeObject(forKey: key)
+	var recordZoneCreated: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.recordZoneCreated.value(id))
+		}
+		set {
+			defaults.set(newValue, forKey: Key.recordZoneCreated.value(id))
 		}
 	}
 	
-	private func hasDownloadedPaymentsKey(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.hasDownloadedPayments.rawValue)-\(walletId.prefsKeySuffix)"
-	}
-	
-	func hasDownloadedPayments(_ walletId: WalletIdentifier) -> Bool {
-		return defaults.bool(forKey: hasDownloadedPaymentsKey(walletId))
-	}
-	
-	func markHasDownloadedPayments(_ walletId: WalletIdentifier) {
-		defaults.setValue(true, forKey: hasDownloadedPaymentsKey(walletId))
-	}
-	
-	private func hasDownloadedContactsKey(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.hasDownloadedContacts_v2.rawValue)-\(walletId.prefsKeySuffix)"
-	}
-	
-	func hasDownloadedContacts(_ walletId: WalletIdentifier) -> Bool {
-		return defaults.bool(forKey: hasDownloadedContactsKey(walletId))
-	}
-	
-	func markHasDownloadedContacts(_ walletId: WalletIdentifier) {
-		defaults.setValue(true, forKey: hasDownloadedContactsKey(walletId))
-	}
-	
-	private func hasReUploadedPaymentsKey(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.hasReUploadedPayments.rawValue)-\(walletId.prefsKeySuffix)"
-	}
-	
-	func hasReUploadedPayments(_ walletId: WalletIdentifier) -> Bool {
-		return defaults.bool(forKey: hasReUploadedPaymentsKey(walletId))
-	}
-	
-	func markHasReUploadedPayments(_ walletId: WalletIdentifier) {
-		defaults.setValue(true, forKey: hasReUploadedPaymentsKey(walletId))
-	}
-	
-	func resetWallet(_ walletId: WalletIdentifier) {
-		
-		defaults.removeObject(forKey: recordZoneCreatedKey(walletId))
-		defaults.removeObject(forKey: hasDownloadedPaymentsKey(walletId))
-		defaults.removeObject(forKey: hasDownloadedContactsKey(walletId))
-		defaults.removeObject(forKey: hasReUploadedPaymentsKey(walletId))
-		defaults.removeObject(forKey: Key.backupTransactions_enabled.rawValue)
-		defaults.removeObject(forKey: Key.backupTransactions_useCellularData.rawValue)
-		defaults.removeObject(forKey: Key.backupTransactions_useUploadDelay.rawValue)
-		
-		defaults.removeObject(forKey: "\(KeyDeprecated.hasDownloadedContacts_v1.rawValue)-\(walletId.encryptedNodeId)")
-		
-		// Reset any publishers with stored state
-		runOnMainThread {
-			self.isEnabledPublisher.send(self.isEnabled)
+	var hasDownloadedPayments: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.hasDownloadedPayments.value(id))
+		}
+		set {
+			defaults.set(newValue, forKey: Key.hasDownloadedPayments.value(id))
 		}
 	}
+	
+	var hasDownloadedContacts: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.hasDownloadedContacts.value(id))
+		}
+		set {
+			defaults.set(newValue, forKey: Key.hasDownloadedContacts.value(id))
+		}
+	}
+	
+	var hasReUploadedPayments: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.hasReUploadedPayments.value(id))
+		}
+		set {
+			defaults.set(newValue, forKey: Key.hasReUploadedPayments.value(id))
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Debugging
+	// --------------------------------------------------
+	
+	@inline(__always)
+	func maybeLogDefaultAccess(_ functionName: String) {
+	#if DEBUG
+		if isDefault {
+			log.info("Default access: \(functionName)")
+		}
+	#endif
+	}
+	
+	#if DEBUG
+	static func valueDescription(_ prefix: String, _ value: Any) -> String? {
+		
+		switch prefix {
+		case Key.backupTxs_enabled.prefix:
+			return printBool(value)
+			
+		case Key.backupTxs_useCellularData.prefix:
+			return printBool(value)
+			
+		case Key.backupTxs_useUploadDelay.prefix:
+			return printBool(value)
+			
+		case Key.recordZoneCreated.prefix:
+			return printBool(value)
+			
+		case Key.hasDownloadedPayments.prefix:
+			return printBool(value)
+			
+		case Key.hasDownloadedContacts.prefix:
+			return printBool(value)
+			
+		case Key.hasReUploadedPayments.prefix:
+			return printBool(value)
+			
+		default:
+			return nil
+		}
+	}
+	#endif
 }

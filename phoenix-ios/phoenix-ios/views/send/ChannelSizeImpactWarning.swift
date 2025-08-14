@@ -98,7 +98,7 @@ struct ChannelSizeImpactWarning: View {
 		log.trace("close()")
 		
 		if doNotShowAgain {
-			Prefs.shared.doNotShowChannelImpactWarning = true
+			Prefs.current.doNotShowChannelImpactWarning = true
 		}
 		smartModalState.close()
 	}

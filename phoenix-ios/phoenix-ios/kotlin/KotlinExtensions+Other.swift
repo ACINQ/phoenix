@@ -21,6 +21,10 @@ extension WalletManager.WalletInfo {
 		// The cloudKeyHash is created via: Hash160(cloudKey)
 		return self.cloudKeyHash
 	}
+	
+	var nodeIdString: String {
+		return self.nodeId.toHex()
+	}
 }
 
 extension PhoenixShared.Notification {

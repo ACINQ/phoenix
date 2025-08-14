@@ -79,15 +79,14 @@ struct ReceiveView: MVIView {
 		}
 	}
 	
-	@StateObject var mvi = MVIState({ $0.receive() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.receive() })
 	
 	@State var selectedTab: Tab = .lightning
 	
 	@State var lightningInvoiceView_didAppear = false
 	@State var showSendView = false
+	
+	@State var walletInfoPresented: Bool = false
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -126,7 +125,7 @@ struct ReceiveView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -161,7 +160,7 @@ struct ReceiveView: MVIView {
 						removal: .opacity
 					)
 				)
-				.navigationBarItems(trailing: scanButton())
+				.navigationBarItems(trailing: walletIconButton())
 		}
 	}
 	
@@ -283,14 +282,36 @@ struct ReceiveView: MVIView {
 	}
 	
 	@ViewBuilder
-	func scanButton() -> some View {
+	func walletIconButton() -> some View {
 		
-		Button {
-			withAnimation {
-				showSendView = true
+		if #available(iOS 17, *) {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
 			}
-		} label: {
-			Image(systemName: "qrcode.viewfinder")
+			.popover(isPresented: $walletInfoPresented) {
+				WalletInfoReceive(didTapScanQrCodeButton: self.didTapScanQrCodeButton)
+					.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+					.presentationCompactAdaptation(.popover)
+			}
+			
+		} else {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(present: $walletInfoPresented) {
+				InfoPopoverWindow {
+					WalletInfoReceive(didTapScanQrCodeButton: self.didTapScanQrCodeButton)
+						.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+				}
+			}
 		}
 	}
 	
@@ -329,6 +350,10 @@ struct ReceiveView: MVIView {
 		)
 	}
 	
+	func currentWalletMetadata() -> WalletMetadata {
+		return SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -344,7 +369,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func moveToPreviousTab() {
-		log.trace("moveToPreviousTab()")
+		log.trace(#function)
 		
 		if let previousTag = selectedTab.previous() {
 			selectTabWithAnimation(previousTag)
@@ -352,7 +377,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func moveToNextTab() {
-		log.trace("moveToNextTab()")
+		log.trace(#function)
 		
 		if let nextTab = selectedTab.next() {
 			selectTabWithAnimation(nextTab)
@@ -364,6 +389,14 @@ struct ReceiveView: MVIView {
 		withAnimation {
 			selectedTab = tab
 			UIAccessibility.post(notification: .screenChanged, argument: nil)
+		}
+	}
+	
+	func didTapScanQrCodeButton() {
+		log.trace(#function)
+		
+		withAnimation {
+			showSendView = true
 		}
 	}
 	
