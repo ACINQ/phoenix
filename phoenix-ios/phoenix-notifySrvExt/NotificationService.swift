@@ -57,6 +57,7 @@ class NotificationService: UNNotificationServiceExtension {
 	
 	private var business: PhoenixBusiness? = nil
 	private var pushNotificationReason: PushNotificationReason = .unknown
+	private var target: SecurityFile.V1.KeyInfo? = nil
 	
 	private var isConnectedToPeer = false
 	private var receivedPayments: [Lightning_kmpIncomingPayment] = []
@@ -191,9 +192,14 @@ class NotificationService: UNNotificationServiceExtension {
 		if let reason = userInfo["reason"] as? String {
 			log.debug("userInfo.reason: '\(reason)'")
 			
+			// The server currently sends the string "IncomingOnionMessage$",
+			// which is a minor bug that will probably be fixed soon.
+			// So we support both the fixed & unfixed version.
+			
 			switch reason {
 				case "IncomingPayment"       : pushNotificationReason = .incomingPayment
 				case "IncomingOnionMessage$" : pushNotificationReason = .incomingOnionMessage
+				case "IncomingOnionMessage"  : pushNotificationReason = .incomingOnionMessage
 				case "PendingSettlement"     : pushNotificationReason = .pendingSettlement
 				default                      : pushNotificationReason = .unknown
 			}
@@ -203,6 +209,36 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 		
 		log.debug("pushNotificationReason = \(pushNotificationReason)")
+		
+		var nodeId: String? = nil
+		if let value = userInfo["nodeId"] as? String {
+			nodeId = value
+		} else if let value = userInfo["node"] as? String {
+			nodeId = value
+		} else if let value = userInfo["n"] as? String {
+			nodeId = value
+		}
+		log.debug("target.nodeId = \(nodeId ?? "<nil>")")
+		
+		var chainStr: String? = nil
+		if let value = userInfo["chain"] as? String {
+			chainStr = value
+		} else if let value = userInfo["c"] as? String {
+			chainStr = value
+		}
+		log.debug("target.chain = \(chainStr ?? "<nil>")")
+		
+		if let nodeId {
+			var chain: Bitcoin_kmpChain? = Bitcoin_kmpChain.Mainnet()
+			if let chainStr {
+				chain = Bitcoin_kmpChain.fromString(chainStr)
+			}
+			if let chain {
+				target = SecurityFile.V1.KeyInfo(chain: chain, nodeId: nodeId)
+			} else {
+				log.warning("Invalid chain: \(chainStr ?? "<nil>")")
+			}
+		}
 		
 		// Nothing else to do here.
 		// These types of requests are handled automatically by the Peer.
@@ -214,6 +250,22 @@ class NotificationService: UNNotificationServiceExtension {
 		
 		pushNotificationReason = .unknown
 		log.debug("pushNotificationReason = \(pushNotificationReason)")
+		
+		var nodeId: String? = nil
+		if let value = userInfo["n"] as? String {
+			nodeId = value
+		}
+		log.debug("target.nodeId = \(nodeId ?? "<nil>")")
+		
+		var chainStr: String? = nil
+		if let value = userInfo["c"] as? String {
+			chainStr = value
+		}
+		log.debug("target.chain = \(chainStr ?? "<nil>")")
+		
+		if let nodeId, let chainStr, let chain = Bitcoin_kmpChain.fromString(chainStr) {
+			target = SecurityFile.V1.KeyInfo(chain: chain, nodeId: nodeId)
+		}
 		
 		return finish()
 	}
@@ -395,7 +447,7 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 		phoenixStarted = true
 		
-		let newBusiness = PhoenixManager.shared.setupBusiness()
+		let newBusiness = PhoenixManager.shared.setupBusiness(target)
 		business = newBusiness
 		
 		newBusiness.connectionsManager.connectionsPublisher().sink {

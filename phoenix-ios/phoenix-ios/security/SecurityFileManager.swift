@@ -89,7 +89,7 @@ class SecurityFileManager {
 	
 		let defaultKey = v1.defaultKey
 		return v1.wallets.compactMap { key, wallet in
-			if let keyInfo = SecurityFile.V1.splitKey(key) {
+			if let keyInfo = SecurityFile.V1.KeyInfo.fromId(key) {
 				WalletMetadata(wallet: wallet, keyInfo: keyInfo, isDefault: (key == defaultKey))
 			} else {
 				nil
@@ -115,28 +115,8 @@ class SecurityFileManager {
 				return .success(cached)
 			}
 			
-			switch SharedSecurity.shared.readSecurityJsonFromDisk_V1() {
-			case .success(let v1):
-				let result = SecurityFile.Version.v1(file: v1)
-				cachedSecurityFile = result
-				return .success(result)
-				
-			case .failure(let reason):
-				switch reason {
-				case .errorReadingFile(_):
-					return .failure(reason)
-					
-				case .errorDecodingFile(_):
-					return .failure(reason)
-					
-				case .fileNotFound:
-					break
-				}
-			}
-			
-			switch SharedSecurity.shared.readSecurityJsonFromDisk_V0() {
-			case .success(let v0):
-				let result = SecurityFile.Version.v0(file: v0)
+			switch SharedSecurity.shared.readSecurityJsonFromDisk() {
+			case .success(let result):
 				cachedSecurityFile = result
 				return .success(result)
 				

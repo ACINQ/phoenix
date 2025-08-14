@@ -25,7 +25,7 @@ class SharedSecurity {
 	// MARK: Security JSON File
 	// --------------------------------------------------
 	
-	public lazy var groupDirectoryUrl: URL = {
+	private lazy var groupDirectoryUrl: URL = {
 		
 		let fm = FileManager.default
 		guard let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix") else {
@@ -47,7 +47,7 @@ class SharedSecurity {
 	
 	/// Performs disk IO - use in background thread.
 	///
-	public func readSecurityJsonFromDisk_V0() -> Result<SecurityFile.V0, ReadSecurityFileError> {
+	private func readSecurityJsonFromDisk_V0() -> Result<SecurityFile.V0, ReadSecurityFileError> {
 		
 		let fileUrl = self.securityJsonUrl_V0
 		
@@ -74,7 +74,7 @@ class SharedSecurity {
 		return .success(result)
 	}
 	
-	public func readSecurityJsonFromDisk_V1() -> Result<SecurityFile.V1, ReadSecurityFileError> {
+	private func readSecurityJsonFromDisk_V1() -> Result<SecurityFile.V1, ReadSecurityFileError> {
 		
 		let fileUrl = self.securityJsonUrl_V1
 		
@@ -99,6 +99,34 @@ class SharedSecurity {
 		}
 		
 		return .success(result)
+	}
+	
+	func readSecurityJsonFromDisk() -> Result<SecurityFile.Version, ReadSecurityFileError> {
+		
+		switch readSecurityJsonFromDisk_V1() {
+		case .success(let v1):
+			return .success(SecurityFile.Version.v1(file: v1))
+			
+		case .failure(let reason):
+			switch reason {
+			case .errorReadingFile(_):
+				return .failure(reason)
+				
+			case .errorDecodingFile(_):
+				return .failure(reason)
+				
+			case .fileNotFound:
+				break
+			}
+		}
+		
+		switch readSecurityJsonFromDisk_V0() {
+		case .success(let v0):
+			return .success(SecurityFile.Version.v0(file: v0))
+			
+		case .failure(let reason):
+			return .failure(reason)
+		}
 	}
 	
 	// --------------------------------------------------

@@ -126,7 +126,7 @@ class SecurityFile {
 			guard let defaultKey else {
 				return nil
 			}
-			return Self.splitKey(defaultKey)
+			return KeyInfo.fromId(defaultKey)
 		}
 		
 		func defaultWallet() -> Wallet? {
@@ -139,25 +139,32 @@ class SecurityFile {
 		struct KeyInfo {
 			let chain: Bitcoin_kmpChain
 			let nodeId: String
-		}
-		
-		static func splitKey(_ id: String) -> KeyInfo? {
 			
-			// See `WalletIdentifier.keychainKeyId` for string format
+			// Mirrors functionality of `WalletIdentifier.keychainKeyId`
+			var keychainKeyId: String {
+				if chain.isMainnet() {
+					return nodeId
+				} else {
+					return "\(nodeId)-\(chain.phoenixName)"
+				}
+			}
 			
-			let comps = id.split(separator: "-")
-			if comps.count == 1 {
-				return KeyInfo(chain: Bitcoin_kmpChain.Mainnet(), nodeId: id)
+			static func fromId(_ id: String) -> KeyInfo? {
 				
-			} else if comps.count == 2 {
-				let chainName = String(comps[1])
-				guard let chain = Bitcoin_kmpChain.fromString(chainName) else {
+				let comps = id.split(separator: "-")
+				if comps.count == 1 {
+					return KeyInfo(chain: Bitcoin_kmpChain.Mainnet(), nodeId: id)
+					
+				} else if comps.count == 2 {
+					let chainName = String(comps[1])
+					guard let chain = Bitcoin_kmpChain.fromString(chainName) else {
+						return nil
+					}
+					return KeyInfo(chain: chain, nodeId: String(comps[0]))
+					
+				} else {
 					return nil
 				}
-				return KeyInfo(chain: chain, nodeId: String(comps[0]))
-				
-			} else {
-				return nil
 			}
 		}
 	}

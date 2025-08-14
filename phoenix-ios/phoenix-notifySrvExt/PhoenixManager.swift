@@ -46,7 +46,7 @@ class PhoenixManager {
 	// MARK: Public Functions
 	// --------------------------------------------------
 	
-	public func setupBusiness() -> PhoenixBusiness {
+	public func setupBusiness(_ target: SecurityFile.V1.KeyInfo?) -> PhoenixBusiness {
 		log.trace("setupBusiness()")
 		assertMainThread()
 		
@@ -63,7 +63,7 @@ class PhoenixManager {
 		// Setup complete
 		business = newBusiness
 		
-		startAsyncUnlock()
+		startAsyncUnlock(target)
 		return newBusiness
 	}
 
@@ -121,12 +121,12 @@ class PhoenixManager {
 	// MARK: Flow
 	// --------------------------------------------------
 
-	private func startAsyncUnlock() {
+	private func startAsyncUnlock(_ target: SecurityFile.V1.KeyInfo?) {
 		log.trace("startAsyncUnlock()")
 		
 		let unlockWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
 			DispatchQueue.main.async {
-				self.unlock(recoveryPhrase)
+				self.unlock(recoveryPhrase, target)
 			}
 		}
 		
@@ -134,7 +134,7 @@ class PhoenixManager {
 		DispatchQueue.global().async {
 			
 			// Fetch the "security.json" file
-			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk_V0()
+			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk()
 			
 			switch diskResult {
 			case .failure(_):
@@ -142,12 +142,30 @@ class PhoenixManager {
 				
 			case .success(let securityFile):
 				
-				guard let keyInfo = securityFile.keychain else {
+				var keyInfo: KeyInfo_ChaChaPoly? = nil
+				var id: String? = nil
+				
+				switch securityFile {
+				case .v0(let v0):
+					keyInfo = v0.keychain
+					id = KEYCHAIN_DEFAULT_ID
+					
+				case .v1(let v1):
+					if let target {
+						keyInfo = v1.wallets[target.keychainKeyId]?.keychain
+						id = target.keychainKeyId
+					} else if let defaultTarget = v1.defaultKeyInfo() {
+						keyInfo = v1.wallets[defaultTarget.keychainKeyId]?.keychain
+						id = defaultTarget.keychainKeyId
+					}
+				}
+				
+				guard let keyInfo, let id else {
 					unlockWithRecoveryPhrase(nil)
 					return
 				}
 				
-				let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, keyInfo)
+				let keychainResult = SharedSecurity.shared.readKeychainEntry(id, keyInfo)
 				switch keychainResult {
 				case .failure(_):
 					unlockWithRecoveryPhrase(nil)
@@ -165,10 +183,10 @@ class PhoenixManager {
 					} // </switch decodeResult>
 				} // </switch keychainResult>
 			} // </switch diskResult>
-		}
+		} // </DispatchQueue.global().async>
 	}
 	
-	private func unlock(_ recoveryPhrase: RecoveryPhrase?) {
+	private func unlock(_ recoveryPhrase: RecoveryPhrase?, _ target: SecurityFile.V1.KeyInfo?) {
 		log.trace("unlock()")
 		assertMainThread()
 		
@@ -192,10 +210,21 @@ class PhoenixManager {
 		)
 		let walletInfo = business.walletManager.loadWallet(seed: seed)
 		
-		let _walletId = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
-		walletId = _walletId
+		let wid = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
+		walletId = wid
 		
-		let groupPrefs = GroupPrefs.wallet(_walletId)
+		if let target {
+			guard target.nodeId == wid.nodeId else {
+				log.warning("unlock(): ignoring: target.nodeId != unlocked.nodeId")
+				return
+			}
+			guard target.chain == wid.chain else {
+				log.warning("unlock(): ignoring: target.chain != unlocked.chain")
+				return
+			}
+		}
+		
+		let groupPrefs = GroupPrefs.wallet(wid)
 		
 		if let electrumConfigPrefs = groupPrefs.electrumConfig {
 			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
