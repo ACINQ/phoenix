@@ -9,23 +9,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+fileprivate typealias Key = GroupPrefsKey
+
 extension UserDefaults {
 	static var group: UserDefaults {
 		return UserDefaults(suiteName: "group.co.acinq.phoenix")!
 	}
-}
-
-fileprivate enum Key: String {
-	case currencyType
-	case fiatCurrency
-	case bitcoinUnit
-	case currencyConverterList
-	case electrumConfig
-	case isTorEnabled
-	case badgeCount
-	case discreetNotifications
-	case liquidityPolicy
-	case srvExtConnection
 }
 
 /// Group preferences, stored in the iOS UserDefaults system.
@@ -35,187 +24,35 @@ fileprivate enum Key: String {
 ///
 class GroupPrefs {
 	
-	public static let shared = GroupPrefs()
+	private static var instances: [String: GroupPrefs_Wallet] = [:]
 	
-	var defaults: UserDefaults {
+	static func wallet(_ walletId: WalletIdentifier) -> GroupPrefs_Wallet {
+		return wallet(walletId.prefsKeyId)
+	}
+	
+	static func wallet(_ id: String) -> GroupPrefs_Wallet {
+		if let instance = instances[id] {
+			return instance
+		} else {
+			let instance = GroupPrefs_Wallet(id: id)
+			instances[id] = instance
+			return instance
+		}
+	}
+	
+	static var global: GroupPrefs_Global {
+		return GroupPrefs_Global.shared
+	}
+	
+	static var defaults: UserDefaults {
 		return UserDefaults.group
 	}
 	
 	// --------------------------------------------------
-	// MARK: Currencies
-	// --------------------------------------------------
-	
-	var currencyType: CurrencyType {
-		get { defaults.currencyType?.jsonDecode() ?? .bitcoin }
-		set { defaults.currencyType = newValue.jsonEncode() }
-	}
-	
-	lazy private(set) var fiatCurrencyPublisher: AnyPublisher<FiatCurrency, Never> = {
-		defaults.publisher(for: \.fiatCurrency, options: [.initial, .new])
-			.map({ (str: String?) -> FiatCurrency in
-				FiatCurrency.deserialize(str) ?? self.defaultFiatCurrency()
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-
-	private func defaultFiatCurrency() -> FiatCurrency {
-		return FiatCurrency.localeDefault() ?? FiatCurrency.usd
-	}
-
-	var fiatCurrency: FiatCurrency {
-		get { FiatCurrency.deserialize(defaults.fiatCurrency) ?? defaultFiatCurrency() }
-		set { defaults.fiatCurrency = newValue.serialize() }
-	}
-	
-	lazy private(set) var bitcoinUnitPublisher: AnyPublisher<BitcoinUnit, Never> = {
-		defaults.publisher(for: \.bitcoinUnit, options: [.initial, .new])
-			.map({ (str: String?) -> BitcoinUnit in
-				BitcoinUnit.deserialize(str) ?? self.defaultBitcoinUnit
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-
-	private let defaultBitcoinUnit = BitcoinUnit.sat
-
-	var bitcoinUnit: BitcoinUnit {
-		get { BitcoinUnit.deserialize(defaults.bitcoinUnit) ?? defaultBitcoinUnit }
-		set { defaults.bitcoinUnit = newValue.serialize() }
-	}
-	
-	lazy private(set) var currencyConverterListPublisher: AnyPublisher<[Currency], Never> = {
-		defaults.publisher(for: \.currencyConverterList, options: [.initial, .new])
-			.map({ (str: String?) -> [Currency] in
-				Currency.deserializeList(str)
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var currencyConverterList: [Currency] {
-		get { Currency.deserializeList(defaults.currencyConverterList) }
-		set { defaults.currencyConverterList = Currency.serializeList(newValue) }
-	}
-	
-	var preferredFiatCurrencies: [FiatCurrency] {
-		get {
-			var resultArray = [self.fiatCurrency]
-			var resultSet = Set<FiatCurrency>(resultArray)
-			
-			for currency in self.currencyConverterList {
-				if case .fiat(let fiat) = currency {
-					let (inserted, _) = resultSet.insert(fiat)
-					if inserted {
-						resultArray.append(fiat)
-					}
-				}
-			}
-			
-			return resultArray
-		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: User Config
-	// --------------------------------------------------
-	
-	lazy private(set) var electrumConfigPublisher: AnyPublisher<ElectrumConfigPrefs?, Never> = {
-		defaults.publisher(for: \.electrumConfig, options: [.initial, .new])
-			.map({ (data: Data?) -> ElectrumConfigPrefs? in
-				data?.jsonDecode()
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-
-	var electrumConfig: ElectrumConfigPrefs? {
-		get { defaults.electrumConfig?.jsonDecode() }
-		set { defaults.electrumConfig = newValue?.jsonEncode() }
-	}
-
-	lazy private(set) var isTorEnabledPublisher: AnyPublisher<Bool, Never> = {
-		defaults.publisher(for: \.isTorEnabled, options: [.initial, .new])
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-
-	var isTorEnabled: Bool {
-		get { defaults.isTorEnabled }
-		set { defaults.isTorEnabled = newValue }
-	}
-	
-	lazy private(set) var liquidityPolicyPublisher: AnyPublisher<LiquidityPolicy, Never> = {
-		defaults.publisher(for: \.liquidityPolicy, options: [.initial, .new])
-			.map({ (data: Data?) -> LiquidityPolicy in
-				data?.jsonDecode() ?? LiquidityPolicy.defaultPolicy()
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var liquidityPolicy: LiquidityPolicy {
-		get { defaults.liquidityPolicy?.jsonDecode() ?? LiquidityPolicy.defaultPolicy() }
-		set { defaults.liquidityPolicy = newValue.jsonEncode() }
-	}
-	
-	lazy private(set) var srvExtConnectionPublisher: AnyPublisher<Date, Never> = {
-		defaults.publisher(for: \.srvExtConnection, options: [.initial, .new])
-			.map({ (timeInterval: Double) -> Date in
-				Date(timeIntervalSince1970: timeInterval)
-			})
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var srvExtConnection: Date {
-		get { Date(timeIntervalSince1970: defaults.srvExtConnection) }
-		set { defaults.srvExtConnection = newValue.timeIntervalSince1970 }
-	}
-	
-	// --------------------------------------------------
-	// MARK: Push Notifications
-	// --------------------------------------------------
-	
-	lazy private(set) var badgeCountPublisher: AnyPublisher<Int, Never> = {
-		defaults.publisher(for: \.badgeCount, options: [.initial, .new])
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}()
-	
-	var badgeCount: Int {
-		get { defaults.badgeCount }
-		set { defaults.badgeCount = newValue }
-	}
-	
-	var discreetNotifications: Bool {
-		get { defaults.discreetNotifications }
-		set { defaults.discreetNotifications = newValue }
-	}
-	
-	// --------------------------------------------------
-	// MARK: Reset Wallet
-	// --------------------------------------------------
-
-	func resetWallet() {
-
-		defaults.removeObject(forKey: Key.currencyType.rawValue)
-		defaults.removeObject(forKey: Key.fiatCurrency.rawValue)
-		defaults.removeObject(forKey: Key.bitcoinUnit.rawValue)
-		defaults.removeObject(forKey: Key.currencyConverterList.rawValue)
-		defaults.removeObject(forKey: Key.electrumConfig.rawValue)
-		defaults.removeObject(forKey: Key.isTorEnabled.rawValue)
-		defaults.removeObject(forKey: Key.badgeCount.rawValue)
-		defaults.removeObject(forKey: Key.discreetNotifications.rawValue)
-		defaults.removeObject(forKey: Key.liquidityPolicy.rawValue)
-		defaults.removeObject(forKey: Key.srvExtConnection.rawValue)
-	}
-
-	// --------------------------------------------------
 	// MARK: Migration
 	// --------------------------------------------------
 	
-	public func performMigration(
+	static func performMigration(
 		_ targetBuild: String,
 		_ completionPublisher: CurrentValueSubject<Int, Never>
 	) -> Void {
@@ -226,10 +63,16 @@ class GroupPrefs {
 		if targetBuild.isVersion(equalTo: "40") {
 			performMigration_toBuild40()
 		}
+		if targetBuild.isVersion(equalTo: "65") {
+			performMigration_toBuild65()
+		}
+		if targetBuild.isVersion(equalTo: "92") {
+			performMigration_toBuild92()
+		}
 	}
 	
-	private func performMigration_toBuild40() {
-		log.trace("performMigration_toBuild40()")
+	private static func performMigration_toBuild40() {
+		log.trace(#function)
 		
 		migrateToGroup(Key.currencyType)
 		migrateToGroup(Key.bitcoinUnit)
@@ -238,76 +81,117 @@ class GroupPrefs {
 		migrateToGroup(Key.electrumConfig)
 	}
 	
-	private func performMigration_toBuild65() {
-		log.trace("performMigration_toBuild65()")
+	private static func performMigration_toBuild65() {
+		log.trace(#function)
 		
 		migrateToGroup(Key.liquidityPolicy)
 	}
 	
-	private func migrateToGroup(_ key: Key) {
+	private static func migrateToGroup(_ key: Key) {
 		
-		let savedGrp = UserDefaults.group.value(forKey: key.rawValue)
+		let savedGrp = UserDefaults.group.value(forKey: key.deprecatedValue)
 		if savedGrp == nil {
 			
-			let savedStd = UserDefaults.standard.value(forKey: key.rawValue)
+			let savedStd = UserDefaults.standard.value(forKey: key.deprecatedValue)
 			if savedStd != nil {
 				
-				UserDefaults.group.set(savedStd, forKey: key.rawValue)
-				UserDefaults.standard.removeObject(forKey: key.rawValue)
+				UserDefaults.group.set(savedStd, forKey: key.deprecatedValue)
+				UserDefaults.standard.removeObject(forKey: key.deprecatedValue)
 			}
 		}
 	}
-}
-
-extension UserDefaults {
 	
-	@objc fileprivate var currencyType: Data? {
-		get { data(forKey: Key.currencyType.rawValue) }
-		set { set(newValue, forKey: Key.currencyType.rawValue) }
+	private static func performMigration_toBuild92() {
+		log.trace(#function)
+		
+		// Migration to a per-wallet design:
+		//
+		// The migration is split into 2 steps.
+		// Step 1 is performed here:
+		//
+		// - Move all keys from key "keyName" to "keyName-default"
+		//
+		// Note that step 1 is performed as soon as the app is launched,
+		// during the normal migration process.
+		// That is, before we've unlocked the wallet, and before we know the walletId.
+		//
+		// For step 2, see "loadWallet".
+		
+		let d = self.defaults
+		
+		for key in Key.allCases {
+			let oldKey = key.deprecatedValue
+			if let value = d.object(forKey: oldKey) {
+				
+				let newId = (key.group == .global) ? PREFS_GLOBAL_ID : PREFS_DEFAULT_ID
+				let newKey = key.value(newId)
+				if d.object(forKey: newKey) == nil {
+					log.debug("move: \(oldKey) > \(newKey)")
+					d.set(value, forKey: newKey)
+				} else {
+					log.debug("delete: \(oldKey)")
+				}
+				
+				d.removeObject(forKey: oldKey)
+			}
+		}
 	}
 	
-	@objc fileprivate var fiatCurrency: String? {
-		get { string(forKey: Key.fiatCurrency.rawValue) }
-		set { set(newValue, forKey: Key.fiatCurrency.rawValue) }
+	// --------------------------------------------------
+	// MARK: Load Wallet
+	// --------------------------------------------------
+	
+	static func didLoadWallet(_ walletId: WalletIdentifier) {
+		log.trace(#function)
+		
+		// Migration to a per-wallet design:
+		//
+		// In general, each pref should be keyed to the corresponding walletId.
+		// E.g. "foo-<walletId>" = "bar"
+		//
+		// However, there are also preferences that the user may want to configure
+		// BEFORE they've created/restored their wallet. For example:
+		// - tor settings
+		// - electrum settings
+		//
+		// We allow this by also having a "default" set of preferences.
+		// E.g. "foo-default" = "bar"
+		//
+		// And once the user loads a wallet, then we simply copy these "default" values
+		// into the corresponding wallet:
+		//
+		// COPY: "foo-default" => "foo-<walletId>"
+		
+		let d = Self.defaults
+		let oldId = PREFS_DEFAULT_ID
+		let newId = walletId.prefsKeyId
+		
+		for key in Key.allCases {
+			let oldKey = key.value(oldId)
+			if let value = d.object(forKey: oldKey) {
+				
+				let newKey = key.value(newId)
+				if d.object(forKey: newKey) == nil {
+					log.debug("move: \(oldKey) > \(newKey)")
+					d.set(value, forKey: newKey)
+				} else {
+					log.debug("delete: \(oldKey)")
+				}
+				
+				d.removeObject(forKey: oldKey)
+			}
+		}
 	}
 	
-	@objc fileprivate var bitcoinUnit: String? {
-		get { string(forKey: Key.bitcoinUnit.rawValue) }
-		set { set(newValue, forKey: Key.bitcoinUnit.rawValue) }
-	}
+	// --------------------------------------------------
+	// MARK: Reset Wallet
+	// --------------------------------------------------
 	
-	@objc fileprivate var currencyConverterList: String? {
-		get { string(forKey: Key.currencyConverterList.rawValue) }
-		set { set(newValue, forKey: Key.currencyConverterList.rawValue) }
-	}
-	
-	@objc fileprivate var electrumConfig: Data? {
-		get { data(forKey: Key.electrumConfig.rawValue) }
-		set { set(newValue, forKey: Key.electrumConfig.rawValue) }
-	}
-	
-	@objc fileprivate var isTorEnabled: Bool {
-		get { bool(forKey: Key.isTorEnabled.rawValue) }
-		set { set(newValue, forKey: Key.isTorEnabled.rawValue) }
-	}
-	
-	@objc fileprivate var badgeCount: Int {
-		get { integer(forKey: Key.badgeCount.rawValue) }
-		set { set(newValue, forKey: Key.badgeCount.rawValue) }
-	}
-	
-	@objc fileprivate var discreetNotifications: Bool {
-		get { bool(forKey: Key.discreetNotifications.rawValue) }
-		set { set(newValue, forKey: Key.discreetNotifications.rawValue) }
-	}
-	
-	@objc fileprivate var liquidityPolicy: Data? {
-		get { data(forKey: Key.liquidityPolicy.rawValue) }
-		set { set(newValue, forKey: Key.liquidityPolicy.rawValue) }
-	}
-	
-	@objc fileprivate var srvExtConnection: Double {
-		get { double(forKey: Key.srvExtConnection.rawValue) }
-		set { set(newValue, forKey: Key.srvExtConnection.rawValue) }
+	static func didResetWallet(_ id: String) {
+		log.trace(#function)
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+			instances.removeValue(forKey: id)
+		}
 	}
 }

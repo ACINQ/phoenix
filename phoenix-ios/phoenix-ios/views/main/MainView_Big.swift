@@ -623,6 +623,7 @@ struct MainView_Big: View {
 				case .forceCloseChannels : showSettings()
 				case .swapInWallet       : showSettings()
 				case .finalWallet        : showSettings()
+				case .appAccess          : showSettings()
 			}
 			
 			if #available(iOS 17, *) {
@@ -665,6 +666,10 @@ struct MainView_Big: View {
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletInfo)
 					navCoordinator_settings.path.append(WalletInfoView.NavLinkTag.FinalWalletDetails)
+					
+				case .appAccess:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.AppAccess)
 				}
 			}
 		}

@@ -90,11 +90,12 @@ class SyncBackupManager: @unchecked Sendable {
 		let _walletId = WalletIdentifier(chain: chain, walletInfo: walletInfo)
 		self.walletId = _walletId
 		
-		self.actor = SyncBackupManager_Actor(
-			isEnabled: Prefs.shared.backupTransactions.isEnabled,
-			recordZoneCreated: Prefs.shared.backupTransactions.recordZoneCreated(_walletId),
-			hasDownloadedPayments: Prefs.shared.backupTransactions.hasDownloadedPayments(_walletId),
-			hasDownloadedContacts: Prefs.shared.backupTransactions.hasDownloadedContacts(_walletId)
+		let prefs = Prefs.wallet(_walletId)
+		actor = SyncBackupManager_Actor(
+			isEnabled: prefs.backupTransactions.isEnabled,
+			recordZoneCreated: prefs.backupTransactions.recordZoneCreated,
+			hasDownloadedPayments: prefs.backupTransactions.hasDownloadedPayments,
+			hasDownloadedContacts: prefs.backupTransactions.hasDownloadedContacts
 		)
 		
 		waitForDatabases()
@@ -117,7 +118,7 @@ class SyncBackupManager: @unchecked Sendable {
 		log.trace("startPreferencesMonitor()")
 		
 		var isFirstFire = true
-		Prefs.shared.backupTransactions.isEnabledPublisher.sink {[weak self](shouldEnable: Bool) in
+		prefs.backupTransactions.isEnabledPublisher.sink {[weak self](shouldEnable: Bool) in
 			
 			if isFirstFire {
 				isFirstFire = false
@@ -127,7 +128,7 @@ class SyncBackupManager: @unchecked Sendable {
 				return
 			}
 			
-			log.debug("Prefs.shared.backupTransactions_isEnabled = \(shouldEnable ? "true" : "false")")
+			log.debug("prefs.backupTransactions.isEnabled = \(shouldEnable ? "true" : "false")")
 			
 			let delay = 30.seconds()
 			let pendingSettings = shouldEnable ?
@@ -151,13 +152,8 @@ class SyncBackupManager: @unchecked Sendable {
 		log.trace("publishNewState()")
 		
 		// Contract: Changes to this publisher will always occur on the main thread.
-		let block = {
+		runOnMainThread {
 			self.statePublisher.value = state
-		}
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
 		}
 	}
 	
@@ -165,13 +161,8 @@ class SyncBackupManager: @unchecked Sendable {
 		log.trace("publishPendingSettings()")
 		
 		// Contract: Changes to this publisher will always occur on the main thread.
-		let block = {
+		runOnMainThread {
 			self.pendingSettingsPublisher.value = pending
-		}
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
 		}
 	}
 	
@@ -217,12 +208,12 @@ class SyncBackupManager: @unchecked Sendable {
 						// We were going to enable cloud syncing.
 						// But the user just changed their mind, and cancelled it.
 						// So now we need to disable it again.
-						Prefs.shared.backupTransactions.isEnabled = false
+						prefs.backupTransactions.isEnabled = false
 					} else {
 						// We were going to disable cloud syncing.
 						// But the user just changed their mind, and cancelled it.
 						// So now we need to enable it again.
-						Prefs.shared.backupTransactions.isEnabled = true
+						prefs.backupTransactions.isEnabled = true
 					}
 				}
 			}
@@ -372,7 +363,7 @@ class SyncBackupManager: @unchecked Sendable {
 					
 					log.trace("createRecordZone(): perZoneResult: success")
 					
-					Prefs.shared.backupTransactions.setRecordZoneCreated(true, walletId)
+					prefs.backupTransactions.recordZoneCreated = true
 					self.consecutiveErrorCount = 0
 						
 					if let newState = await self.actor.didCreateRecordZone() {
@@ -441,7 +432,7 @@ class SyncBackupManager: @unchecked Sendable {
 					
 					// Done !
 					
-					Prefs.shared.backupTransactions.setRecordZoneCreated(false, walletId)
+					prefs.backupTransactions.recordZoneCreated = false
 					self.consecutiveErrorCount = 0
 					
 					if let newState = await self.actor.didDeleteRecordZone() {
@@ -515,6 +506,10 @@ class SyncBackupManager: @unchecked Sendable {
 			SecRandomCopyBytes(kSecRandomDefault, count, ptr.baseAddress!)
 		}
 		return data
+	}
+	
+	var prefs: Prefs_Wallet {
+		Prefs.wallet(walletId)
 	}
 	
 	// ----------------------------------------

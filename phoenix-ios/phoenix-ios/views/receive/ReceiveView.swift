@@ -79,10 +79,7 @@ struct ReceiveView: MVIView {
 		}
 	}
 	
-	@StateObject var mvi = MVIState({ $0.receive() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.receive() })
 	
 	@State var selectedTab: Tab = .lightning
 	
@@ -126,7 +123,7 @@ struct ReceiveView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar

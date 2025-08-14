@@ -264,7 +264,7 @@ struct PaymentDetails: View {
 	) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 4) {
-			ContactPhoto(fileName: contact.photoUri, size: 32)
+			ContactPhoto(filename: contact.photoUri, size: 32)
 			Text(contact.name)
 		} // <HStack>
 		.onTapGesture {

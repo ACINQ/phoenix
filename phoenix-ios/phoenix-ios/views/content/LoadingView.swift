@@ -9,7 +9,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct LoadingView: View {
 	
-	@ObservedObject var lockState = LockState.shared
+	@ObservedObject var appState = AppState.shared
 	
 	@ViewBuilder
 	var body: some View {
@@ -19,13 +19,13 @@ struct LoadingView: View {
 			Color.clear   // an additional layer
 				.zIndex(0) // for animation purposes
 			
-			if !lockState.isUnlocked {
+			if !appState.isUnlocked {
 				content()
 					.zIndex(1)
-					.transition(.asymmetric(
-						insertion : .identity,
-						removal   : .move(edge: .bottom)
-					))
+				//	.transition(.asymmetric(
+				//		insertion : .identity,
+				//		removal   : .move(edge: .bottom)
+				//	))
 			}
 		}
 	}
@@ -54,8 +54,11 @@ struct LoadingView: View {
 					.layoutPriority(-1)
 				
 				loadingContent()
+				
+				Spacer(minLength: 0)
+					.layoutPriority(-3)
 			}
-			.frame(maxWidth: .infinity)
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
 		}
 		.background(Color(UIColor.systemBackground))
 	}
@@ -65,7 +68,7 @@ struct LoadingView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			Image(logoImageName)
+			Image(Biz.isTestnet ? "logo_blue" : "logo_green")
 				.resizable()
 				.frame(width: 96, height: 96)
 
@@ -80,22 +83,13 @@ struct LoadingView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			if !lockState.migrationStepsCompleted {
+			if !appState.migrationStepsCompleted {
 				Text("Updating internals…")
-			} else if !lockState.protectedDataAvailable {
+			} else if !appState.protectedDataAvailable {
 				Text("Waiting for keychain…")
 			} else {
 				Text("Loading…")
 			}
 		}
 	}
-	
-	var logoImageName: String {
-		if BusinessManager.isTestnet {
-			return "logo_blue"
-		} else {
-			return "logo_green"
-		}
-	}
 }
-

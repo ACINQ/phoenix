@@ -18,19 +18,21 @@ enum DeepLink: Equatable, CustomStringConvertible {
 	case forceCloseChannels
 	case swapInWallet
 	case finalWallet
+	case appAccess
 	
 	var description: String {
-		switch self {
-			case .payment(let id)    : return "payment(\(id))"
-			case .paymentHistory     : return "paymentHistory"
-			case .backup             : return "backup"
-			case .drainWallet        : return "drainWallet"
-			case .electrum           : return "electrum"
-			case .backgroundPayments : return "backgroundPayments"
-			case .liquiditySettings  : return "liquiditySettings"
-			case .forceCloseChannels : return "forceCloseChannels"
-			case .swapInWallet       : return "swapInWallet"
-			case .finalWallet        : return "finalWallet"
+		return switch self {
+			case .payment(let id)    : "payment(\(id))"
+			case .paymentHistory     : "paymentHistory"
+			case .backup             : "backup"
+			case .drainWallet        : "drainWallet"
+			case .electrum           : "electrum"
+			case .backgroundPayments : "backgroundPayments"
+			case .liquiditySettings  : "liquiditySettings"
+			case .forceCloseChannels : "forceCloseChannels"
+			case .swapInWallet       : "swapInWallet"
+			case .finalWallet        : "finalWallet"
+			case .appAccess          : "appAccess"
 		}
 	}
 }

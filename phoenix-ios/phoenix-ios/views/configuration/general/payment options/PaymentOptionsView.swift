@@ -26,12 +26,12 @@ struct PaymentOptionsList: View {
 	
 	let scrollViewProxy: ScrollViewProxy
 	
-	@State var defaultPaymentDescription: String = Prefs.shared.defaultPaymentDescription ?? ""
+	@State var defaultPaymentDescription: String = Prefs.current.defaultPaymentDescription ?? ""
 	
-	@State var invoiceExpirationDays: Int = Prefs.shared.invoiceExpirationDays
+	@State var invoiceExpirationDays: Int = Prefs.current.invoiceExpirationDays
 	let invoiceExpirationDaysOptions = [7, 30, 60]
 
-	@State var allowOverpayment: Bool = Prefs.shared.allowOverpayment
+	@State var allowOverpayment: Bool = Prefs.current.allowOverpayment
 	
 	@State var notificationSettings = NotificationsManager.shared.settings.value
 	
@@ -273,7 +273,7 @@ struct PaymentOptionsList: View {
 					d[VerticalAlignment.center]
 				}
 				.onChange(of: allowOverpayment) { newValue in
-					Prefs.shared.allowOverpayment = newValue
+					Prefs.current.allowOverpayment = newValue
 				}
 			
 		} // </HStack>
@@ -330,13 +330,13 @@ struct PaymentOptionsList: View {
 	func defaultPaymentDescriptionChanged() {
 		log.trace("defaultPaymentDescriptionChanged(): \(defaultPaymentDescription)")
 		
-		Prefs.shared.defaultPaymentDescription = self.defaultPaymentDescription
+		Prefs.current.defaultPaymentDescription = self.defaultPaymentDescription
 	}
 	
 	func invoiceExpirationDaysChanged() {
 		log.trace("invoiceExpirationDaysChanged(): \(invoiceExpirationDays)")
 		
-		Prefs.shared.invoiceExpirationDays = self.invoiceExpirationDays
+		Prefs.current.invoiceExpirationDays = self.invoiceExpirationDays
 	}
 	
 	func openFaqButtonTapped() -> Void {
@@ -386,6 +386,7 @@ struct PaymentOptionsList: View {
 					case .forceCloseChannels : break
 					case .swapInWallet       : break
 					case .finalWallet        : break
+					case .appAccess          : break
 				}
 				
 				if let newNavLinkTag {

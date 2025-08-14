@@ -10,45 +10,45 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ContactPhoto: View {
 	
-	let fileName: String?
+	let filename: String?
 	let size: CGFloat
 	let useCache: Bool
 	
-	init(fileName: String?, size: CGFloat, useCache: Bool = true) {
-		self.fileName = fileName
+	init(filename: String?, size: CGFloat, useCache: Bool = true) {
+		self.filename = filename
 		self.size = size
 		self.useCache = useCache
 		
-		log.trace("[public] init(): \(fileName ?? "<nil>")")
+		log.trace("[public] init(): \(filename ?? "<nil>")")
 	}
 	
 	@ViewBuilder
 	var body: some View {
 		
-		_ContactPhoto(fileName: fileName, size: size, useCache: useCache)
+		_ContactPhoto(filename: filename, size: size, useCache: useCache)
 			.id(uniqueId) // <- required
 		
 		// Due to "structural identity" in SwiftUI:
-		// - even when `fileName` or `size` changes, it's still considered to be the "same" view
+		// - even when `filename` or `size` changes, it's still considered to be the "same" view
 		// - which means we don't receive a notification via `onAppear`
-		// - nor do our `.task` items re-fire
+		// - nor does our `.task` item re-fire
 		//
 		// In other words:
 		// - zero notifications
 		// - only a silent re-run of our ViewBuilder `body`
 		//
 		// To get around this, we use `.id` to force "explicit identity".
-		// So when `fileName` or `size` changes, it will be a new instance of `_ContactPhoto`.
+		// So when `filename` or `size` changes, it will be a new instance of `_ContactPhoto`.
 	}
 	
 	var uniqueId: String {
-		return "\(fileName ?? "<nil>")@\(size)|\(useCache)"
+		return "\(filename ?? "<nil>")@\(size)|\(useCache)"
 	}
 }
 
 fileprivate struct _ContactPhoto: View {
 	
-	let fileName: String?
+	let filename: String?
 	let size: CGFloat
 	let useCache: Bool
 	
@@ -56,12 +56,12 @@ fileprivate struct _ContactPhoto: View {
 	
 	@Environment(\.displayScale) var displayScale: CGFloat
 	
-	init(fileName: String?, size: CGFloat, useCache: Bool) {
-		self.fileName = fileName
+	init(filename: String?, size: CGFloat, useCache: Bool) {
+		self.filename = filename
 		self.size = size
 		self.useCache = useCache
 		
-		log.trace("[private] init(): \(fileName ?? "<nil>")")
+		log.trace("[private] init(): \(filename ?? "<nil>")")
 	}
 	
 	@ViewBuilder
@@ -72,6 +72,7 @@ fileprivate struct _ContactPhoto: View {
 				Image(uiImage: uiImage)
 					.resizable()
 					.aspectRatio(contentMode: .fill) // FILL !
+					
 			} else {
 				Image(systemName: "person.circle")
 					.resizable()
@@ -87,20 +88,20 @@ fileprivate struct _ContactPhoto: View {
 	}
 	
 	func loadImage() async {
-		log.trace("[private] loadImage(): \(fileName ?? "<nil>")")
+		log.trace("[private] loadImage(): \(filename ?? "<nil>")")
 
-		guard let fileName else {
+		guard let filename else {
 			return
 		}
 		
 		let targetSize = size * displayScale
 		let img = await PhotosManager.shared.readFromDisk(
-			fileName: fileName,
+			fileName: filename,
 			size: targetSize,
 			useCache: useCache
 		)
 		
-		log.trace("[private] loadImage(): \(fileName) => done")
+		log.trace("[private] loadImage(): \(filename) => done")
 		bgLoadedImage = img
 	}
 }

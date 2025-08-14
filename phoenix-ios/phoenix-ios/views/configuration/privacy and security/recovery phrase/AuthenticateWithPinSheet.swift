@@ -114,11 +114,11 @@ struct AuthenticateWithPinSheet: View {
 		// When we switch between the `prompt` and the `countdown`,
 		// we don't want the other UI components to change position.
 		// In other words, they shouldn't move up or down on the screen.
-		// To accomplish this, we make sure they both have the same height.
+		// To accomplish this, we put them both in a ZStack (where only one is visible).
 		
 		ZStack(alignment: Alignment.center) {
 			
-			let delay = retryDelay()
+			let delay = retryDelayString()
 			
 			countdown(delay ?? "1 second", invisible: delay == nil)
 			prompt(invisible: delay != nil)
@@ -198,7 +198,7 @@ struct AuthenticateWithPinSheet: View {
 		}
 	}
 	
-	func retryDelay() -> String? {
+	func retryDelayString() -> String? {
 		
 		guard let remaining = invalidPin.waitTimeFrom(currentDate)?.rounded() else {
 			return nil
@@ -221,7 +221,7 @@ struct AuthenticateWithPinSheet: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		invalidPin = AppSecurity.shared.getInvalidPin(type) ?? InvalidPin.none()
+		invalidPin = Keychain.current.getInvalidPin(type) ?? InvalidPin.none()
 		currentDate = Date.now
 		
 		if let delay = invalidPin.waitTimeFrom(currentDate) {
@@ -257,7 +257,7 @@ struct AuthenticateWithPinSheet: View {
 	func verifyPin() {
 		log.trace("verifyPin()")
 		
-		let correctPin = AppSecurity.shared.getPin(type)
+		let correctPin = Keychain.current.getPin(type)
 		if pin == correctPin {
 			handleCorrectPin()
 		} else {
@@ -268,7 +268,7 @@ struct AuthenticateWithPinSheet: View {
 	func handleCorrectPin() {
 		log.trace("handleCorrectPin()")
 		
-		AppSecurity.shared.setInvalidPin(nil, type) { _ in }
+		Keychain.current.setInvalidPin(nil, type) { _ in }
 		
 		isCorrectPin = true
 		numberPadDisabled = true
@@ -305,7 +305,7 @@ struct AuthenticateWithPinSheet: View {
 			newInvalidPin = invalidPin.increment()
 		}
 		
-		AppSecurity.shared.setInvalidPin(newInvalidPin, type) { _ in }
+		Keychain.current.setInvalidPin(newInvalidPin, type) { _ in }
 		invalidPin = newInvalidPin
 		currentDate = Date.now
 		

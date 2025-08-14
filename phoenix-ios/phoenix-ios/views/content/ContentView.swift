@@ -10,10 +10,8 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ContentView: View {
 	
-	@ObservedObject var lockState = LockState.shared
+	@ObservedObject var appState = AppState.shared
 	@State var unlockedOnce = false
-	
-	@State var hasMergedChannelsForSplicing = Prefs.shared.hasMergedChannelsForSplicing
 	
 	@EnvironmentObject var shortSheetState: ShortSheetState
 	@State var shortSheetItem: ShortSheetItem? = nil
@@ -26,11 +24,12 @@ struct ContentView: View {
 		
 		ZStack {
 			
-			if lockState.isUnlocked || unlockedOnce {
+			if appState.isUnlocked || unlockedOnce {
 				
 				primaryView()
 					.zIndex(0) // needed for proper animation
 					.onAppear {
+						log.debug("unlockedOnce = true")
 						unlockedOnce = true
 					}
 					.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)
@@ -60,12 +59,6 @@ struct ContentView: View {
 			}
 			
 		} // </ZStack>
-		.onChange(of: lockState.walletExistence) { (newValue: WalletExistence) in
-			walletExistenceChanged(newValue)
-		}
-		.onReceive(Prefs.shared.hasMergedChannelsForSplicingPublisher) { (newValue: Bool) in
-			hasMergedChannelsForSplicing = newValue
-		}
 		.onReceive(shortSheetState.itemPublisher) { (item: ShortSheetItem?) in
 			withAnimation {
 				shortSheetItem = item
@@ -81,37 +74,10 @@ struct ContentView: View {
 	@ViewBuilder
 	func primaryView() -> some View {
 
-		switch lockState.walletExistence {
-		case .exists:
-			if !hasMergedChannelsForSplicing {
-				MergeChannelsView(location: .standalone)
-			} else {
-				MainView()
-			}
-			
-		case .doesNotExist:
+		if appState.loadedWalletId == nil {
 			IntroContainer()
-			
-		case .unknown:
-			LoadingView()
+		} else {
+			MainView()
 		}
-	}
-	
-	// --------------------------------------------------
-	// MARK: Notifications
-	// --------------------------------------------------
-	
-	func walletExistenceChanged(_ value: WalletExistence) {
-		log.trace("walletExistenceChanged(value = \(value))")
-		
-		if value == .doesNotExist {
-			Prefs.shared.hasMergedChannelsForSplicing = true
-		}
-	}
-	
-	func hasMergedChannelsForSplicingChanged(_ value: Bool) {
-		log.trace("hasMergedChannelsForSplicingChanged(value = \(value))")
-		
-		hasMergedChannelsForSplicing = value
 	}
 }

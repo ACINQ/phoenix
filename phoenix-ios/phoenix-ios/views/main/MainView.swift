@@ -33,7 +33,7 @@ struct MainView: View {
 		log.trace("onAppear()")
 		
 		if AppMigration.shared.didUpdate && AppMigration.shared.currentBuildNumber == "85" {
-			if GroupPrefs.shared.isTorEnabled {
+			if GroupPrefs.current.isTorEnabled {
 				popoverState.display(dismissable: false) {
 					V85Popover()
 				}

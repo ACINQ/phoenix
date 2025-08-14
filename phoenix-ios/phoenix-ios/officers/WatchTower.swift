@@ -42,8 +42,7 @@ class WatchTower {
 		}.store(in: &appCancellables)
 	}
 	
-	func prepare() { // Stub function
-	}
+	func prepare() { /* Stub function */ }
 	
 	// --------------------------------------------------
 	// MARK: Notifications

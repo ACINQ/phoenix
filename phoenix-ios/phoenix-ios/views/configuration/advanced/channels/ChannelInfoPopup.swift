@@ -172,7 +172,7 @@ fileprivate struct ChannelInfoPopup_Summary: InfoGridView, ViewName {
 	
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	// --------------------------------------------------
 	// MARK: View Builders

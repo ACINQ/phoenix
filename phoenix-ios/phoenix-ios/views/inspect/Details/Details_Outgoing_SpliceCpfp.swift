@@ -19,7 +19,7 @@ struct Details_Outgoing_SpliceCpfp: DetailsInfoGrid {
 	@StateObject var infoGridState = InfoGridState()
 	@StateObject var detailsInfoGridState = DetailsInfoGridState()
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	// --------------------------------------------------
 	// MARK: View Builders

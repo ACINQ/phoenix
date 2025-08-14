@@ -26,7 +26,7 @@ struct AppAccessView : View {
 		}
 	}
 	
-	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	@State var biometricSupport = DeviceInfo.biometricSupport()
 	@State var biometricsEnabled: Bool = false
 	@State var passcodeFallbackEnabled: Bool = false
 	@State var lockPinEnabled: Bool = false
@@ -60,7 +60,7 @@ struct AppAccessView : View {
 	// --------------------------------------------------
 	
 	init() {
-		let enabledSecurity: EnabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let enabledSecurity: EnabledSecurity = Keychain.current.enabledSecurity
 		
 		_biometricsEnabled = State(initialValue: enabledSecurity.contains(.biometrics))
 		_passcodeFallbackEnabled = State(initialValue: enabledSecurity.contains(.passcodeFallback))
@@ -69,11 +69,7 @@ struct AppAccessView : View {
 		_spendingPinEnabled = State(initialValue: enabledSecurity.contains(.spendingPin))
 		_spendingPinSet = State(initialValue: enabledSecurity.contains(.spendingPin))
 		
-		if let walletId = Biz.walletId {
-			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(walletId)
-		} else {
-			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
-		}
+		backupSeedStatePublisher = Prefs.current.backupSeed.statePublisher()
 	}
 	
 	// --------------------------------------------------
@@ -448,7 +444,7 @@ struct AppAccessView : View {
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
-		log.debug("enabledSecurity = \(AppSecurity.shared.enabledSecurityPublisher.value)")
+		log.debug("enabledSecurity = \(Keychain.current.enabledSecurity)")
 	}
 	
 	func onWillEnterForeground() -> Void {
@@ -457,7 +453,7 @@ struct AppAccessView : View {
 		// When the app returns from being in the background, the biometric status may have changed.
 		// For example: .touchID_notEnrolled => .touchID_available
 		
-		self.biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+		self.biometricSupport = DeviceInfo.biometricSupport()
 	}
 	
 	func backupSeedStateChanged(_ newState: BackupSeedState) {
@@ -552,7 +548,7 @@ struct AppAccessView : View {
 		
 		if flag { // toggle => ON
 			
-			AppSecurity.shared.setSoftBiometrics(enabled: true) { (error: Error?) in
+			Keychain.current.setSoftBiometrics(enabled: true) { (error: Error?) in
 				if error != nil {
 					self.ignoreToggle_biometricsEnabled = true
 					self.biometricsEnabled = false // failed to enable == disabled
@@ -576,11 +572,11 @@ struct AppAccessView : View {
 			
 			let prompt = NSLocalizedString("Authenticate to disable biometrics.", comment: "User prompt")
 			
-			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.unlockWithBiometrics(prompt: prompt) { result in
 				
 				switch result {
 				case .success(_):
-					AppSecurity.shared.setSoftBiometrics(enabled: false) { (error: Error?) in
+					Keychain.current.setSoftBiometrics(enabled: false) { (error: Error?) in
 						if error != nil {
 							failedToDisable()
 						}
@@ -628,7 +624,7 @@ struct AppAccessView : View {
 			
 		} else if flag { // toggle => ON
 			
-			AppSecurity.shared.setPasscodeFallback(enabled: true) { (error: Error?) in
+			Keychain.current.setPasscodeFallback(enabled: true) { (error: Error?) in
 				if error != nil {
 					failedToEnable()
 				}
@@ -643,15 +639,15 @@ struct AppAccessView : View {
 			// - if FAILURE:
 			//   - switch changes back to enabled
 			
-			let prompt = NSLocalizedString("Authenticate to disable passcode fallback.", comment: "User prompt")
+			let prompt = String(localized: "Authenticate to disable passcode fallback.", comment: "User prompt")
 			
-			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.unlockWithBiometrics(prompt: prompt) { result in
 				
 				switch result {
 				case .failure(_):
 					failedToDisable()
 				case .success(_):
-					AppSecurity.shared.setPasscodeFallback(enabled: false) { (error: Error?) in
+					Keychain.current.setPasscodeFallback(enabled: false) { (error: Error?) in
 						if error != nil {
 							failedToDisable()
 						}

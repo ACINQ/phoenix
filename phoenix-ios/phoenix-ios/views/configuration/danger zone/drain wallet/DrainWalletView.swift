@@ -14,10 +14,7 @@ struct DrainWalletView: MVIView {
 		case ConfirmView
 	}
 	
-	@StateObject var mvi = MVIState({ $0.closeChannelsConfiguration() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.closeChannelsConfiguration() })
 	
 	let popTo: (PopToDestination) -> Void
 	
@@ -35,9 +32,10 @@ struct DrainWalletView: MVIView {
 	@State var popToDestination: PopToDestination? = nil
 	// </iOS_16_workarounds>
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var smartModalState: SmartModalState

@@ -270,11 +270,16 @@ struct RestoreView: View {
 			languageCode : seedBackup.language
 		)
 		
-		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
-			if error == nil {
+		let chain = Biz.business.chain
+		AppSecurity.shared.addWallet(chain: chain, recoveryPhrase: recoveryPhrase) { result in
+			switch result {
+			case .failure(let reason):
+				log.error("Error adding wallet: \(reason)")
+				
+			case .success():
 				Biz.loadWallet(
-					recoveryPhrase: recoveryPhrase,
-					walletRestoreType: .fromCloudBackup(name: seedBackup.name)
+					trigger: .restoreFromCloudBackup(name: seedBackup.name),
+					recoveryPhrase: recoveryPhrase
 				)
 			}
 		}

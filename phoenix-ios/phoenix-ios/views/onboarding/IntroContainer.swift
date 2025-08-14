@@ -29,7 +29,7 @@ struct IntroContainer: View {
 			
 			if introFinished {
 			
-				InitializationView()
+				InitializationView(location: .introContainer)
 					.zIndex(0)
 			
 			} else {

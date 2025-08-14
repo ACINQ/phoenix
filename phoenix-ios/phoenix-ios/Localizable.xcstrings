@@ -903,6 +903,9 @@
         }
       }
     },
+    "(The only way to access a hidden wallet is by typing in the Lock PIN)" : {
+
+    },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "localizations" : {
         "ar" : {
@@ -942,6 +945,9 @@
           }
         }
       }
+    },
+    "(This means it works as a duress PIN.)" : {
+
     },
     "(wait a few seconds and then retry)" : {
 
@@ -3989,6 +3995,9 @@
         }
       }
     },
+    "A hidden wallet requires a **Lock PIN** to be set." : {
+
+    },
     "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
       "localizations" : {
         "ar" : {
@@ -4471,6 +4480,9 @@
           }
         }
       }
+    },
+    "Access hidden wallet" : {
+
     },
     "active commitments" : {
       "localizations" : {
@@ -10788,6 +10800,9 @@
         }
       }
     },
+    "Configure Lock PIN" : {
+
+    },
     "Confirm" : {
       "localizations" : {
         "ar" : {
@@ -12692,6 +12707,9 @@
         }
       }
     },
+    "Current wallet" : {
+
+    },
     "Custom electrum server: bad certificate !" : {
       "localizations" : {
         "ar" : {
@@ -13255,6 +13273,9 @@
           }
         }
       }
+    },
+    "Default wallet" : {
+
     },
     "Delete" : {
       "localizations" : {
@@ -15356,6 +15377,9 @@
         }
       }
     },
+    "Duress PIN option" : {
+
+    },
     "edit" : {
       "comment" : "button label - try to make it short",
       "localizations" : {
@@ -16544,6 +16568,9 @@
           }
         }
       }
+    },
+    "Even when Phoenix is prompting you for the PIN for a different wallet." : {
+
     },
     "example payment" : {
       "localizations" : {
@@ -19333,6 +19360,9 @@
         }
       }
     },
+    "Go back to visible wallets list" : {
+
+    },
     "Good news! Your transaction has been mined!" : {
       "localizations" : {
         "ar" : {
@@ -19533,6 +19563,12 @@
           }
         }
       }
+    },
+    "Hidden wallet" : {
+
+    },
+    "Hidden wallet requirements" : {
+
     },
     "High Priority" : {
       "localizations" : {
@@ -20554,6 +20590,9 @@
           }
         }
       }
+    },
+    "If a default wallet is selected, it will automatically be opened on app launch." : {
+
     },
     "If done correctly, self-backup is the most secure option." : {
       "extractionState" : "manual",
@@ -25155,6 +25194,9 @@
           }
         }
       }
+    },
+    "Manage or switch wallets" : {
+
     },
     "Manual Backup" : {
       "comment" : "Navigation bar title",
@@ -34238,6 +34280,9 @@
         }
       }
     },
+    "Select built-in icon" : {
+
+    },
     "Select image" : {
       "localizations" : {
         "ar" : {
@@ -34317,6 +34362,9 @@
           }
         }
       }
+    },
+    "Select photo" : {
+
     },
     "Send" : {
       "localizations" : {
@@ -38145,6 +38193,9 @@
           }
         }
       }
+    },
+    "Switch to another wallet" : {
+
     },
     "System" : {
       "comment" : "App theme option",
@@ -44617,6 +44668,9 @@
         }
       }
     },
+    "Visible wallets" : {
+
+    },
     "Waiting For 3 Confirmations" : {
       "localizations" : {
         "ar" : {
@@ -45339,6 +45393,9 @@
         }
       }
     },
+    "Wallet Image" : {
+
+    },
     "Wallet info" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -45420,6 +45477,9 @@
           }
         }
       }
+    },
+    "Wallet will not be visible in selector screens. To access the wallet you must enter it's lock PIN." : {
+
     },
     "wallet: %@" : {
       "localizations" : {
@@ -46836,6 +46896,9 @@
           }
         }
       }
+    },
+    "You can enter the PIN for this wallet anytime in the lock screen, and Phoenix will **switch** to this wallet." : {
+
     },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
       "localizations" : {

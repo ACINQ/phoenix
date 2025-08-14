@@ -59,7 +59,7 @@ struct ValidateView: View {
 	@State var satsPerByte: String = ""
 	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
 	
-	@State var allowOverpayment = Prefs.shared.allowOverpayment
+	@State var allowOverpayment = Prefs.current.allowOverpayment
 	
 	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
 	
@@ -98,11 +98,12 @@ struct ValidateView: View {
 	@StateObject var toast = Toast()
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -144,7 +145,7 @@ struct ValidateView: View {
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
@@ -188,7 +189,7 @@ struct ValidateView: View {
 		.onChange(of: currencyPickerChoice) { _ in
 			currencyPickerDidChange()
 		}
-		.onReceive(Prefs.shared.allowOverpaymentPublisher) {
+		.onReceive(Prefs.current.allowOverpaymentPublisher) {
 			allowOverpayment = $0
 		}
 		.onReceive(balancePublisher) {
@@ -1541,7 +1542,7 @@ struct ValidateView: View {
 	func maybeShowCapacityImpactWarning() {
 		log.trace("maybeShowCapacityImpactWarning()")
 		
-		guard !Prefs.shared.doNotShowChannelImpactWarning else {
+		guard !Prefs.current.doNotShowChannelImpactWarning else {
 			log.debug("Prefs.shared.doNotShowChannelImpact = true")
 			return
 		}
@@ -1757,7 +1758,7 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let enabledSecurity = Keychain.current.enabledSecurity
 		if enabledSecurity.contains(.spendingPin) {
 			
 			smartModalState.display(dismissable: false) {
@@ -2117,7 +2118,7 @@ struct ValidateView: View {
 		
 		if let nums = paymentNumbers(), nums.tipMsat > 0 {
 			let tipPercent = Int(nums.tipPercent * 100.0)
-			Prefs.shared.addRecentTipPercent(tipPercent)
+			Prefs.current.addRecentTipPercent(tipPercent)
 		}
 	}
 	

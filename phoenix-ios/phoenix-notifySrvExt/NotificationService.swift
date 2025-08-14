@@ -262,9 +262,13 @@ class NotificationService: UNNotificationServiceExtension {
 			log.debug("startConnectionTimer(): ignoring: already started")
 			return
 		}
+		guard let groupPrefs = PhoenixManager.shared.groupPrefs() else {
+			log.debug("startConnectionTimer(): ignoring: groupPrefs is nil")
+			return
+		}
 		
-		log.debug("GroupPrefs.shared.srvExtConnection = now")
-		GroupPrefs.shared.srvExtConnection = Date.now
+		log.debug("GroupPrefs.current.srvExtConnection = now")
+		groupPrefs.srvExtConnection = Date.now
 		
 		connectionTimer = Timer.scheduledTimer(
 			withTimeInterval : 2.0,
@@ -273,8 +277,8 @@ class NotificationService: UNNotificationServiceExtension {
 		
 			if let _ = self {
 				log.debug("connectionsTimer.fire()")
-				log.debug("GroupPrefs.shared.srvExtConnection = now")
-				GroupPrefs.shared.srvExtConnection = Date.now
+				log.debug("GroupPrefs.current.srvExtConnection = now")
+				groupPrefs.srvExtConnection = Date.now
 			}
 		}
 	}
@@ -567,15 +571,17 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("updateNotificationContent_incomingPayment()")
 		
 		content.title = String(localized: "Received payment", comment: "Push notification title")
-			
-		if !GroupPrefs.shared.discreetNotifications {
+		
+		let groupPrefs = PhoenixManager.shared.groupPrefs()
+		
+		if let groupPrefs, !groupPrefs.discreetNotifications {
 			let paymentInfo = WalletPaymentInfo(
 				payment: payment,
 				metadata: WalletPaymentMetadata.empty(),
 				contact: nil
 			)
 			
-			let amountString = formatAmount(msat: payment.amount.msat)
+			let amountString = formatAmount(groupPrefs, msat: payment.amount.msat)
 			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
 				content.body = "\(amountString): \(desc)"
 			} else {
@@ -590,8 +596,8 @@ class NotificationService: UNNotificationServiceExtension {
 		// - badges
 		// So we may only be able to badge the app icon, and that's it.
 		
-		GroupPrefs.shared.badgeCount += 1
-		content.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
+		GroupPrefs.global.badgeCount += 1
+		content.badge = NSNumber(value: GroupPrefs.global.badgeCount)
 	}
 	
 	private func updateNotificationContent_missedPayment(
@@ -616,8 +622,11 @@ class NotificationService: UNNotificationServiceExtension {
 	) {
 		log.trace("updateNotificationContent_unknown()")
 		
-		let fiatCurrency = GroupPrefs.shared.fiatCurrency
-		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+		var exchangeRate: ExchangeRate.BitcoinPriceRate? = nil
+		if let groupPrefs = PhoenixManager.shared.groupPrefs() {
+			let fiatCurrency = groupPrefs.fiatCurrency
+			exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+		}
 		
 		if let exchangeRate {
 			let fiatAmt = Utils.formatFiat(amount: exchangeRate.price, fiatCurrency: exchangeRate.fiatCurrency)
@@ -644,10 +653,10 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 	}
 	
-	private func formatAmount(msat: Int64) -> String {
+	private func formatAmount(_ groupPrefs: GroupPrefs_Wallet, msat: Int64) -> String {
 		
-		let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-		let fiatCurrency = GroupPrefs.shared.fiatCurrency
+		let bitcoinUnit = groupPrefs.bitcoinUnit
+		let fiatCurrency = groupPrefs.fiatCurrency
 		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
 		
 		let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)

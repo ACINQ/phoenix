@@ -37,9 +37,10 @@ struct MergeChannelsView: View {
 	
 	@State var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject private var deviceInfo: DeviceInfo
 	
 	// --------------------------------------------------
@@ -605,7 +606,6 @@ struct MergeChannelsView: View {
 	func closeView() {
 		log.trace("closeView()")
 		
-		Prefs.shared.hasMergedChannelsForSplicing = true
 		if location == .sheet {
 			presentationMode.wrappedValue.dismiss()
 		}

@@ -32,6 +32,8 @@ class PhoenixManager {
 	
 	private var business: PhoenixBusiness? = nil
 	private var oldBusiness: PhoenixBusiness? = nil
+	
+	private var walletId: WalletIdentifier? = nil
 
 	private var cancellables = Set<AnyCancellable>()
 	private var oldCancellables = Set<AnyCancellable>()
@@ -58,37 +60,6 @@ class PhoenixManager {
 		newBusiness.networkMonitor.disable()
 		newBusiness.currencyManager.disableAutoRefresh()
 
-		if let electrumConfigPrefs = GroupPrefs.shared.electrumConfig {
-			newBusiness.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
-		} else {
-			newBusiness.appConfigurationManager.updateElectrumConfig(config: nil)
-		}
-		
-		let primaryFiatCurrency = GroupPrefs.shared.fiatCurrency
-		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
-			primary: primaryFiatCurrency,
-			others: GroupPrefs.shared.preferredFiatCurrencies
-		)
-		newBusiness.appConfigurationManager.updatePreferredFiatCurrencies(
-			current: preferredFiatCurrencies
-		)
-
-		let startupParams = StartupParams(
-			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin()
-		)
-		newBusiness.start(startupParams: startupParams)
-
-		newBusiness.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
-
-		newBusiness.currencyManager.ratesPubliser().sink {
-			[weak self](rates: [ExchangeRate]) in
-
-			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
-			self?.fiatExchangeRates = rates
-		}
-		.store(in: &cancellables)
-
 		// Setup complete
 		business = newBusiness
 		
@@ -113,6 +84,7 @@ class PhoenixManager {
 
 		oldBusiness = currentBusiness
 		business = nil
+		walletId = nil
 		cancellables.removeAll()
 
 		currentBusiness.connectionsManager.connectionsPublisher().sink {
@@ -131,6 +103,15 @@ class PhoenixManager {
 		oldConnectionsChanged(currentBusiness.connectionsManager.currentValue)
 	}
 	
+	public func groupPrefs() -> GroupPrefs_Wallet? {
+		
+		if let walletId {
+			return GroupPrefs.wallet(walletId)
+		} else {
+			return nil
+		}
+	}
+	
 	public func exchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
 		
 		return Utils.exchangeRate(for: fiatCurrency, fromRates: fiatExchangeRates)
@@ -143,9 +124,9 @@ class PhoenixManager {
 	private func startAsyncUnlock() {
 		log.trace("startAsyncUnlock()")
 		
-		let connectWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
+		let unlockWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
 			DispatchQueue.main.async {
-				self.connect(recoveryPhrase)
+				self.unlock(recoveryPhrase)
 			}
 		}
 		
@@ -153,28 +134,33 @@ class PhoenixManager {
 		DispatchQueue.global().async {
 			
 			// Fetch the "security.json" file
-			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk()
+			let diskResult = SharedSecurity.shared.readSecurityJsonFromDisk_V0()
 			
 			switch diskResult {
 			case .failure(_):
-				connectWithRecoveryPhrase(nil)
+				unlockWithRecoveryPhrase(nil)
 				
 			case .success(let securityFile):
 				
-				let keychainResult = SharedSecurity.shared.readKeychainEntry(securityFile)
+				guard let keyInfo = securityFile.keychain else {
+					unlockWithRecoveryPhrase(nil)
+					return
+				}
+				
+				let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, keyInfo)
 				switch keychainResult {
 				case .failure(_):
-					connectWithRecoveryPhrase(nil)
+					unlockWithRecoveryPhrase(nil)
 					
 				case .success(let cleartextData):
 					
 					let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
 					switch decodeResult {
 					case .failure(_):
-						connectWithRecoveryPhrase(nil)
+						unlockWithRecoveryPhrase(nil)
 						
 					case .success(let recoveryPhrase):
-						connectWithRecoveryPhrase(recoveryPhrase)
+						unlockWithRecoveryPhrase(recoveryPhrase)
 						
 					} // </switch decodeResult>
 				} // </switch keychainResult>
@@ -182,20 +168,20 @@ class PhoenixManager {
 		}
 	}
 	
-	private func connect(_ recoveryPhrase: RecoveryPhrase?) {
-		log.trace("connect()")
+	private func unlock(_ recoveryPhrase: RecoveryPhrase?) {
+		log.trace("unlock()")
 		assertMainThread()
 		
-		guard let recoveryPhrase = recoveryPhrase else {
-			log.warning("connect(): ignoring: recoveryPhrase == nil")
+		guard let recoveryPhrase else {
+			log.warning("unlock(): ignoring: recoveryPhrase == nil")
 			return
 		}
 		guard let language = recoveryPhrase.language else {
-			log.warning("connect(): ignoring: recoveryPhrase.language == nil")
+			log.warning("unlock(): ignoring: recoveryPhrase.language == nil")
 			return
 		}
-		guard let business = business else {
-			log.warning("connect(): ignoring: business == nil")
+		guard let business else {
+			log.warning("unlock(): ignoring: business == nil")
 			return
 		}
 
@@ -204,7 +190,42 @@ class PhoenixManager {
 			wordList: language.wordlist(),
 			passphrase: ""
 		)
-		business.walletManager.loadWallet(seed: seed)
+		let walletInfo = business.walletManager.loadWallet(seed: seed)
+		
+		let _walletId = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
+		walletId = _walletId
+		
+		let groupPrefs = GroupPrefs.wallet(_walletId)
+		
+		if let electrumConfigPrefs = groupPrefs.electrumConfig {
+			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
+		} else {
+			business.appConfigurationManager.updateElectrumConfig(config: nil)
+		}
+		
+		let primaryFiatCurrency = groupPrefs.fiatCurrency
+		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+			primary: primaryFiatCurrency,
+			others: groupPrefs.preferredFiatCurrencies
+		)
+		business.appConfigurationManager.updatePreferredFiatCurrencies(
+			current: preferredFiatCurrencies
+		)
+
+		let startupParams = StartupParams(
+			isTorEnabled: groupPrefs.isTorEnabled,
+			liquidityPolicy: groupPrefs.liquidityPolicy.toKotlin()
+		)
+		business.start(startupParams: startupParams)
+
+		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
+		business.currencyManager.ratesPubliser().sink {
+			[weak self](rates: [ExchangeRate]) in
+
+			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
+			self?.fiatExchangeRates = rates
+		}
+		.store(in: &cancellables)
 	}
 
 	// --------------------------------------------------

@@ -125,7 +125,7 @@ struct FiatCurrencySelector: View {
 		log.trace("didSelect(fiatCurrency = \(fiatCurrency.shortName)")
 		
 		selectedFiatCurrency = fiatCurrency
-		GroupPrefs.shared.fiatCurrency = fiatCurrency
+		GroupPrefs.current.fiatCurrency = fiatCurrency
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
 			presentationMode.wrappedValue.dismiss()
