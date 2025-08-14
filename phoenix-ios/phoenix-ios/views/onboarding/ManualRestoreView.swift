@@ -97,6 +97,8 @@ struct ManualRestoreView: MVIView {
 					recoveryPhrase: recoveryPhrase,
 					seed: model.seed
 				)
+				SceneDelegate.get().finishIntroWindow()
+				AppState.shared.isUnlocked = true
 			}
 		}
 	}

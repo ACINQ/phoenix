@@ -832,7 +832,7 @@ struct LockView: View {
 		log.trace(#function)
 		assertMainThread()
 		
-		Biz.loadWallet(trigger: .appUnlock, recoveryPhrase: recoveryPhrase)
+		Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
 		SceneDelegate.get().finishLockWindow()
 		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
 			withAnimation(.easeInOut) {

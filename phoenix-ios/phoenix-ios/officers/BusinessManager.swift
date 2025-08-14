@@ -12,16 +12,14 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 enum LoadWalletTrigger: CustomStringConvertible {
-	case appLaunch
-	case appUnlock
+	case walletUnlock
 	case newWallet
 	case restoreFromManualEntry
 	case restoreFromCloudBackup(name: String?)
 	
 	var description: String {
 		switch self {
-			case .appLaunch                 : return "appLaunch"
-			case .appUnlock                 : return "appUnlock"
+			case .walletUnlock              : return "walletUnlock"
 			case .newWallet                 : return "newWallet"
 			case .restoreFromManualEntry    : return "restoreFromManualEntry"
 			case .restoreFromCloudBackup(_) : return "restoreFromCloudBackup"
@@ -388,6 +386,7 @@ class BusinessManager {
 			log.debug("stop(): ignoring: already stopped")
 			return
 		}
+		wasStopped = true
 		
 		cancellables.removeAll()
 		appCancellables.removeAll()
@@ -400,7 +399,7 @@ class BusinessManager {
 	// --------------------------------------------------
 	
 	func applicationDidEnterBackground() {
-		log.trace("### applicationDidEnterBackground()")
+		log.trace(#function)
 		
 		if !isInBackground {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
@@ -411,7 +410,7 @@ class BusinessManager {
 	}
 	
 	func applicationWillEnterForeground() {
-		log.trace("### applicationWillEnterForeground()")
+		log.trace(#function)
 		
 		if isInBackground {
 			business.appConnectionsDaemon?.decrementDisconnectCount(
@@ -441,15 +440,12 @@ class BusinessManager {
 		log.trace("loadWallet(trigger: \(trigger))")
 		assertMainThread()
 		
-		if (business.walletManager.isLoaded()) {
+		guard !business.walletManager.isLoaded() else {
+			log.warning("loadWallet(): ignoring: already loaded")
 			return
 		}
-
-		guard walletInfo == nil else {
-			return
-		}
-		
 		guard let language = recoveryPhrase.language else {
+			log.warning("loadWallet(): cannot load wallet: missing recoveryPhrase.language")
 			return
 		}
 		
@@ -519,18 +515,6 @@ class BusinessManager {
 			recoveryPhrase: recoveryPhrase,
 			walletInfo: _walletInfo
 		)
-
-		withAnimation {
-			switch trigger {
-			case .appLaunch: break
-			case .appUnlock: break
-			case .newWallet: fallthrough
-			case .restoreFromManualEntry: fallthrough
-			case .restoreFromCloudBackup(_):
-				AppState.shared.isUnlocked = true
-				SceneDelegate.get().finishIntroWindow()
-			}
-		}
 	}
 	
 	/// The current walletIdentifier (from the current unlocked wallet).

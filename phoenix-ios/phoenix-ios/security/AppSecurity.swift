@@ -54,7 +54,7 @@ class AppSecurity {
 			securityFile = SecurityFile.V1()
 		}
 		
-		if let _ = securityFile.wallets[nodeId] {
+		if let _ = securityFile.getWallet(walletId) {
 			
 			// What do we do if the user is restoring a wallet that already exists on the system ?
 			//
@@ -115,7 +115,7 @@ class AppSecurity {
 		let photo = WalletIcon.random().filename
 		
 		let newWallet = SecurityFile.V1.Wallet(
-			keychain: KeyInfo_ChaChaPoly(sealedBox: sealedBox),
+			keychain: SealedBox_ChaChaPoly(sealedBox),
 			name: name,
 			photo: photo,
 			isHidden: false

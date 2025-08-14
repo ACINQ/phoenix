@@ -21,7 +21,7 @@ class SecurityFile {
 		static let filename = "security.json"
 		
 		/// The "keychain" option represents the default security.
-		let keychain: KeyInfo_ChaChaPoly?
+		let keychain: SealedBox_ChaChaPoly?
 		
 		/// In V0 we had a "biometrics" option, which represented advanced security.
 		///
@@ -32,14 +32,14 @@ class SecurityFile {
 		/// Support for this option was removed because it blocked Phoenix's ability to
 		/// properly accept payments in the background (via a notification-service-extension).
 		///
-		let biometrics: KeyInfo_ChaChaPoly?
+		let biometrics: SealedBox_ChaChaPoly?
 		
 		init() {
 			self.keychain = nil
 			self.biometrics = nil
 		}
 		
-		init(keychain: KeyInfo_ChaChaPoly) {
+		init(keychain: SealedBox_ChaChaPoly) {
 			self.keychain = keychain
 			self.biometrics = nil
 		}
@@ -49,7 +49,7 @@ class SecurityFile {
 		static let filename = "security.v1.json"
 		
 		struct Wallet: Codable {
-			let keychain: KeyInfo_ChaChaPoly
+			let keychain: SealedBox_ChaChaPoly
 			let name: String
 			let photo: String
 			
@@ -58,7 +58,7 @@ class SecurityFile {
 				return hidden ?? false
 			}
 			
-			init(keychain: KeyInfo_ChaChaPoly, name: String, photo: String, isHidden: Bool) {
+			init(keychain: SealedBox_ChaChaPoly, name: String, photo: String, isHidden: Bool) {
 				self.keychain = keychain
 				self.name = name
 				self.photo = photo
@@ -87,30 +87,30 @@ class SecurityFile {
 			self.defaultKey = nil
 		}
 		
-		init(wallet: Wallet, id: WalletIdentifier) {
+		init(wallet: Wallet, id: WalletIdentifiable) {
 			let key = id.standardKeyId
 			self.wallets = [key: wallet]
 			self.defaultKey = key
 		}
 		
-		func getWallet(_ id: WalletIdentifier) -> Wallet? {
+		func getWallet(_ id: WalletIdentifiable) -> Wallet? {
 			return wallets[id.standardKeyId]
 		}
 		
-		func allKeys() -> [KeyInfo] {
+		func allKeys() -> [KeyComponents] {
 			return wallets.compactMap { (id: String, _) in
-				KeyInfo.fromId(id)
+				KeyComponents.fromId(id)
 			}
 		}
 		
-		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifier) -> V1 {
+		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifiable) -> V1 {
 			var newWallets = self.wallets
 			newWallets[id.standardKeyId] = wallet
 			
 			return V1(wallets: newWallets, defaultKey: self.defaultKey)
 		}
 		
-		func copyRemovingWallet(_ id: WalletIdentifier) -> V1 {
+		func copyRemovingWallet(_ id: WalletIdentifiable) -> V1 {
 			var newWallets = self.wallets
 			newWallets.removeValue(forKey: id.standardKeyId)
 			
@@ -119,20 +119,20 @@ class SecurityFile {
 			return V1(wallets: newWallets, defaultKey: newDefaultKey)
 		}
 		
-		func copyWithDefaultWalletId(_ id: WalletIdentifier?) -> V1 {
+		func copyWithDefaultWalletId(_ id: WalletIdentifiable?) -> V1 {
 			
 			return V1(wallets: self.wallets, defaultKey: id?.standardKeyId)
 		}
 		
-		func isDefaultWalletId(_ id: WalletIdentifier) -> Bool {
+		func isDefaultWalletId(_ id: WalletIdentifiable) -> Bool {
 			return id.standardKeyId == self.defaultKey
 		}
 		
-		func defaultKeyInfo() -> KeyInfo? {
+		func defaultKeyComponents() -> KeyComponents? {
 			guard let defaultKey else {
 				return nil
 			}
-			return KeyInfo.fromId(defaultKey)
+			return KeyComponents.fromId(defaultKey)
 		}
 		
 		func defaultWallet() -> Wallet? {
@@ -142,31 +142,22 @@ class SecurityFile {
 			return wallets[defaultKey]
 		}
 		
-		struct KeyInfo {
+		struct KeyComponents: WalletIdentifiable {
 			let chain: Bitcoin_kmpChain
 			let nodeIdHash: String
 			
-			// Mirrors functionality of `WalletIdentifier.standardKeyId`
-			var standardKeyId: String {
-				if chain.isMainnet() {
-					return nodeIdHash
-				} else {
-					return "\(nodeIdHash)-\(chain.phoenixName)"
-				}
-			}
-			
-			static func fromId(_ id: String) -> KeyInfo? {
+			static func fromId(_ id: String) -> KeyComponents? {
 				
 				let comps = id.split(separator: "-")
 				if comps.count == 1 {
-					return KeyInfo(chain: Bitcoin_kmpChain.Mainnet(), nodeIdHash: id)
+					return KeyComponents(chain: Bitcoin_kmpChain.Mainnet(), nodeIdHash: id)
 					
 				} else if comps.count == 2 {
 					let chainName = String(comps[1])
 					guard let chain = Bitcoin_kmpChain.fromString(chainName) else {
 						return nil
 					}
-					return KeyInfo(chain: chain, nodeIdHash: String(comps[0]))
+					return KeyComponents(chain: chain, nodeIdHash: String(comps[0]))
 					
 				} else {
 					return nil
@@ -183,26 +174,26 @@ class SecurityFile {
 /// Generic typed container.
 /// Allows us to switch to alternative encryption schemes in the future, if needed.
 ///
-protocol KeyInfo: Codable {
+protocol SealedBox_Any: Codable {
 	var type: String { get }
 }
 
 /// ChaCha20-Poly1305 via Apple's CryptoKit
 ///
-struct KeyInfo_ChaChaPoly: KeyInfo, Codable {
+struct SealedBox_ChaChaPoly: SealedBox_Any, Codable {
 	let type: String // "ChaCha20-Poly1305"
 	let nonce: Data
 	let ciphertext: Data
 	let tag: Data
 	
-	init(sealedBox: ChaChaPoly.SealedBox) {
+	init(_ raw: ChaChaPoly.SealedBox) {
 		type = "ChaCha20-Poly1305"
-		nonce = sealedBox.nonce.dataRepresentation
-		ciphertext = sealedBox.ciphertext
-		tag = sealedBox.tag
+		nonce = raw.nonce.dataRepresentation
+		ciphertext = raw.ciphertext
+		tag = raw.tag
 	}
 	
-	func toSealedBox() throws -> ChaChaPoly.SealedBox {
+	func toRaw() throws -> ChaChaPoly.SealedBox {
 		return try ChaChaPoly.SealedBox(
 			nonce      : ChaChaPoly.Nonce(data: self.nonce),
 			ciphertext : self.ciphertext,

@@ -17,14 +17,14 @@ class DownloadMonitor: ObservableObject {
 	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
-		MBiz.currentBizPublisher.compactMap { biz in
-			biz.syncManager
-		}.flatMap { syncManager in
-			syncManager.syncBackupManager.statePublisher
-		}.sink {[weak self](state: SyncBackupManager_State) in
-			self?.update(state)
+		if let syncManager = Biz.syncManager {
+			let syncStatePublisher = syncManager.syncBackupManager.statePublisher
+			
+			syncStatePublisher.sink {[weak self](state: SyncBackupManager_State) in
+				self?.update(state)
+			}
+			.store(in: &cancellables)
 		}
-		.store(in: &cancellables)
 	}
 	
 	private func update(_ state: SyncBackupManager_State) {

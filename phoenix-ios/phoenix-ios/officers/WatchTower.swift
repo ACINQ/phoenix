@@ -130,9 +130,9 @@ class WatchTower {
 		}
 		
 		let currentWalletId = Biz.walletId
-		let allTargets: [WatchTowerTarget] = v1.allKeys().map { keyInfo in
+		let allTargets: [WatchTowerTarget] = v1.allKeys().map { keyComps in
 			
-			let prefs = Prefs_Wallet(id: keyInfo.standardKeyId)
+			let prefs = Prefs_Wallet(id: keyComps.standardKeyId)
 			
 			let lastAttemptDate = prefs.watchTower_lastAttemptDate
 			let lastAttemptFailed = prefs.watchTower_lastAttemptFailed
@@ -146,11 +146,11 @@ class WatchTower {
 			
 			var isCurrent: Bool = false
 			if let current = currentWalletId {
-				isCurrent = (current.nodeIdHash == keyInfo.nodeIdHash) && (current.chain == keyInfo.chain)
+				isCurrent = (current.nodeIdHash == keyComps.nodeIdHash) && (current.chain == keyComps.chain)
 			}
 			
 			return WatchTowerTarget(
-				keyInfo: keyInfo,
+				keyComps: keyComps,
 				nextAttemptDate: nextAttemptDate,
 				lastAttemptDate: lastAttemptDate,
 				lastAttemptFailed: lastAttemptFailed,
@@ -262,7 +262,7 @@ class WatchTower {
 	private func performTask(_ task: BGAppRefreshTask, _ target: WatchTowerTarget) {
 		log.trace(#function)
 		
-		let id = target.keyInfo.standardKeyId
+		let id = target.keyComps
 		let business = PhoenixBusiness(ctx: PlatformContext.default)
 
 		business.currencyManager.disableAutoRefresh()
@@ -275,12 +275,12 @@ class WatchTower {
 			log.warning("SecurityFile.current(): v0 found")
 			return completeTask(task, success: true)
 		}
-		guard let keyInfo = v1.wallets[id]?.keychain else {
+		guard let sealedBox = v1.getWallet(id)?.keychain else {
 			log.warning("SecurityFile.current().getWallet(): nil found")
 			return completeTask(task, success: true)
 		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(id, keyInfo)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(id.standardKeyId, sealedBox)
 		guard case .success(let cleartextData) = keychainResult else {
 			log.warning("readKeychainEntry(): failed")
 			return completeTask(task, success: true)
@@ -332,7 +332,7 @@ class WatchTower {
 		)
 		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
 		
-		performTask(task, business, id)
+		performTask(task, business, id.standardKeyId)
 	}
 	
 	private func performTask(_ task: BGAppRefreshTask, _ business: PhoenixBusiness, _ id: String) {
@@ -398,7 +398,7 @@ class WatchTower {
 			if didDecrement { // need to balance decrement call
 				if let daemon = appConnectionsDaemon {
 					log.error("appConnectionsDaemon.incrementDisconnectCount()....")
-					business.appConnectionsDaemon?.incrementDisconnectCount(target: target)
+					daemon.incrementDisconnectCount(target: target)
 				} else {
 					log.error("appConnectionsDaemon is nil !!!")
 				}
@@ -585,7 +585,7 @@ class WatchTower {
 			// - peer.channelsFlow is non-nil
 			//
 			log.debug("setupTask: waiting for channels...")
-			for try await value in business.peerManager.channelsPublisher().values {
+			for try await _ in business.peerManager.channelsPublisher().values {
 				break
 			}
 			
@@ -620,7 +620,7 @@ class WatchTower {
 }
 
 struct WatchTowerTarget {
-	let keyInfo: SecurityFile.V1.KeyInfo
+	let keyComps: SecurityFile.V1.KeyComponents
 	let nextAttemptDate: Date
 	let lastAttemptDate: Date
 	let lastAttemptFailed: Bool

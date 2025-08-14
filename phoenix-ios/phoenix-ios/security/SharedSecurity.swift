@@ -135,12 +135,12 @@ class SharedSecurity {
 	
 	public func readKeychainEntry(
 		_ id: String,
-		_ keyInfo: KeyInfo_ChaChaPoly
+		_ sealedBox: SealedBox_ChaChaPoly
 	) -> Result<Data, ReadKeychainError> {
 		
-		let sealedBox: ChaChaPoly.SealedBox
+		let rawSealedBox: ChaChaPoly.SealedBox
 		do {
-			sealedBox = try keyInfo.toSealedBox()
+			rawSealedBox = try sealedBox.toRaw()
 		} catch {
 			log.error("readKeychainEntry(): error: keychainBoxCorrupted: \(String(describing: error))")
 			return .failure(.keychainBoxCorrupted(underlying: error))
@@ -170,7 +170,7 @@ class SharedSecurity {
 		// Decrypt the databaseKey using the lockingKey
 		let cleartextData: Data
 		do {
-			cleartextData = try ChaChaPoly.open(sealedBox, using: lockingKey)
+			cleartextData = try ChaChaPoly.open(rawSealedBox, using: lockingKey)
 		} catch {
 			log.error("readKeychainEntry(): error: openingBox: \(String(describing: error))")
 			return .failure(.errorOpeningBox(underlying: error))

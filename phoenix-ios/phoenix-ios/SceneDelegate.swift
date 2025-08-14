@@ -343,7 +343,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				// The user has a wallet.
 				// Load it into memory immediately.
 				// The UI may or may not be locked.
-				Biz.loadWallet(trigger: .appLaunch, recoveryPhrase: recoveryPhrase)
+				Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
 			}
 		
 			if let error {
@@ -375,7 +375,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
 			self.lockWindow?.isUserInteractionEnabled = true
 			self.hideMainWindow()
-			MBiz.reset()
+			MBiz.resetCurrent()
 		}
 	}
 	
@@ -390,7 +390,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
 			self.introWindow?.isUserInteractionEnabled = true
 			self.hideMainWindow()
-			MBiz.reset()
+			MBiz.resetCurrent()
 		}
 	}
 	
@@ -722,7 +722,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			loadingWindow?.tintColor = UIColor.appAccent
 			loadingWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
 			loadingWindow?.windowLevel = loadingWindowLevel_A
-			log.debug("loadinloadingWindowLevel_A = \(loadingWindowLevel_A.rawValue)")
+			log.debug("loadingloadingWindowLevel_A = \(loadingWindowLevel_A.rawValue)")
 		}
 		
 		loadingWindow?.makeKeyAndVisible()

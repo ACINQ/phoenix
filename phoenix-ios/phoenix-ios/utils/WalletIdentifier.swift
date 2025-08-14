@@ -1,7 +1,12 @@
 import Foundation
 import PhoenixShared
 
-struct WalletIdentifier: Equatable {
+protocol WalletIdentifiable {
+	var chain: Bitcoin_kmpChain { get }
+	var nodeIdHash: String { get }
+}
+
+struct WalletIdentifier: WalletIdentifiable, Equatable {
 	let chain: Bitcoin_kmpChain
 	let nodeIdHash: String
 	let encryptedNodeId: String
@@ -12,19 +17,22 @@ struct WalletIdentifier: Equatable {
 		self.encryptedNodeId = walletInfo.encryptedNodeId
 	}
 	
-	var standardKeyId: String {
-		if chain.isMainnet() {
-			return nodeIdHash
-		} else {
-			return "\(nodeIdHash)-\(chain.phoenixName)"
-		}
-	}
-	
 	var deprecatedKeyId: String {
 		if chain.isMainnet() {
 			return encryptedNodeId
 		} else {
 			return "\(encryptedNodeId)-\(chain.phoenixName)"
+		}
+	}
+}
+
+extension WalletIdentifiable {
+	
+	var standardKeyId: String {
+		if chain.isMainnet() {
+			return nodeIdHash
+		} else {
+			return "\(nodeIdHash)-\(chain.phoenixName)"
 		}
 	}
 }

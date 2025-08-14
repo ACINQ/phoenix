@@ -46,7 +46,7 @@ class PhoenixManager {
 	// MARK: Public Functions
 	// --------------------------------------------------
 	
-	public func setupBusiness(_ target: SecurityFile.V1.KeyInfo?) -> PhoenixBusiness {
+	public func setupBusiness(_ target: SecurityFile.V1.KeyComponents?) -> PhoenixBusiness {
 		log.trace("setupBusiness()")
 		assertMainThread()
 		
@@ -121,7 +121,7 @@ class PhoenixManager {
 	// MARK: Flow
 	// --------------------------------------------------
 
-	private func startAsyncUnlock(_ target: SecurityFile.V1.KeyInfo?) {
+	private func startAsyncUnlock(_ target: SecurityFile.V1.KeyComponents?) {
 		log.trace("startAsyncUnlock()")
 		
 		let unlockWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
@@ -142,30 +142,30 @@ class PhoenixManager {
 				
 			case .success(let securityFile):
 				
-				var keyInfo: KeyInfo_ChaChaPoly? = nil
+				var sealedBox: SealedBox_ChaChaPoly? = nil
 				var id: String? = nil
 				
 				switch securityFile {
 				case .v0(let v0):
-					keyInfo = v0.keychain
+					sealedBox = v0.keychain
 					id = KEYCHAIN_DEFAULT_ID
 					
 				case .v1(let v1):
 					if let target {
-						keyInfo = v1.wallets[target.standardKeyId]?.keychain
+						sealedBox = v1.getWallet(target)?.keychain
 						id = target.standardKeyId
-					} else if let defaultTarget = v1.defaultKeyInfo() {
-						keyInfo = v1.wallets[defaultTarget.standardKeyId]?.keychain
+					} else if let defaultTarget = v1.defaultKeyComponents() {
+						sealedBox = v1.getWallet(defaultTarget)?.keychain
 						id = defaultTarget.standardKeyId
 					}
 				}
 				
-				guard let keyInfo, let id else {
+				guard let sealedBox, let id else {
 					unlockWithRecoveryPhrase(nil)
 					return
 				}
 				
-				let keychainResult = SharedSecurity.shared.readKeychainEntry(id, keyInfo)
+				let keychainResult = SharedSecurity.shared.readKeychainEntry(id, sealedBox)
 				switch keychainResult {
 				case .failure(_):
 					unlockWithRecoveryPhrase(nil)
@@ -186,7 +186,7 @@ class PhoenixManager {
 		} // </DispatchQueue.global().async>
 	}
 	
-	private func unlock(_ recoveryPhrase: RecoveryPhrase?, _ target: SecurityFile.V1.KeyInfo?) {
+	private func unlock(_ recoveryPhrase: RecoveryPhrase?, _ target: SecurityFile.V1.KeyComponents?) {
 		log.trace("unlock()")
 		assertMainThread()
 		

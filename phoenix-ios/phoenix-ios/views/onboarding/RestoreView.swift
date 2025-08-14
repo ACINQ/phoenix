@@ -281,6 +281,8 @@ struct RestoreView: View {
 					trigger: .restoreFromCloudBackup(name: seedBackup.name),
 					recoveryPhrase: recoveryPhrase
 				)
+				SceneDelegate.get().finishIntroWindow()
+				AppState.shared.isUnlocked = true
 			}
 		}
 	}

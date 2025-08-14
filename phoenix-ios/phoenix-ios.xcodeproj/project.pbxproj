@@ -371,6 +371,10 @@
 		DCC3E57F2D08A63900CCDA40 /* XPC+Foreground.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC3E57E2D08A63500CCDA40 /* XPC+Foreground.swift */; };
 		DCC3E5822D08A65400CCDA40 /* XPC+Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC3E5812D08A65000CCDA40 /* XPC+Background.swift */; };
 		DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DC72C31825A3CF87008A927A /* FirebaseMessaging */; };
+		DCC4F3092E4A8BFA00060704 /* Hash160.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC4F3082E4A8BF600060704 /* Hash160.swift */; };
+		DCC4F30A2E4A8D9600060704 /* Hash160.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC4F3082E4A8BF600060704 /* Hash160.swift */; };
+		DCC4F30E2E4B9DAD00060704 /* PushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC4F30D2E4B9DA900060704 /* PushNotification.swift */; };
+		DCC4F30F2E4B9E1500060704 /* PushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC4F30D2E4B9DA900060704 /* PushNotification.swift */; };
 		DCC753E32CB98221006F646B /* String+Email.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC753E22CB98221006F646B /* String+Email.swift */; };
 		DCC9D99A267BD28600EA36DD /* SyncBackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */; };
 		DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */; };
@@ -828,6 +832,8 @@
 		DCBDB8822BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCC3E57E2D08A63500CCDA40 /* XPC+Foreground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XPC+Foreground.swift"; sourceTree = "<group>"; };
 		DCC3E5812D08A65000CCDA40 /* XPC+Background.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XPC+Background.swift"; sourceTree = "<group>"; };
+		DCC4F3082E4A8BF600060704 /* Hash160.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hash160.swift; sourceTree = "<group>"; };
+		DCC4F30D2E4B9DA900060704 /* PushNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotification.swift; sourceTree = "<group>"; };
 		DCC753E22CB98221006F646B /* String+Email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Email.swift"; sourceTree = "<group>"; };
 		DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBackupManager.swift; sourceTree = "<group>"; };
 		DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -979,6 +985,7 @@
 				DCD777D126DE9FE800979A12 /* DelayedSave.swift */,
 				DCAEF8F627628BEB00015993 /* Either.swift */,
 				DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */,
+				DCC4F3082E4A8BF600060704 /* Hash160.swift */,
 				53BEFFB3CB63090BBCFF6A36 /* KeyWindow.swift */,
 				DC355E222A45FAF2008E8A8E /* NestedObservableObject.swift */,
 				DCDD9ECD28637474001800A3 /* Orientation.swift */,
@@ -1080,6 +1087,7 @@
 				DC46BAEC26CACCF700E760A6 /* kotlin */,
 				DC641C6F2820882E00862DCD /* prefs */,
 				53BEF1337AFCFF0AE82A46BD /* utils */,
+				DCC4F30C2E4B9D9A00060704 /* notifications */,
 				DCACF6EE2566D0A60009B01E /* extensions */,
 				DCA6DEC42829BD060073C658 /* xpc */,
 				DCD1BFD42CE775CE00C2B811 /* nfc */,
@@ -1680,6 +1688,14 @@
 				DCB5D2DE280879460020B8F5 /* DeviceInfo.swift */,
 			);
 			path = environment;
+			sourceTree = "<group>";
+		};
+		DCC4F30C2E4B9D9A00060704 /* notifications */ = {
+			isa = PBXGroup;
+			children = (
+				DCC4F30D2E4B9DA900060704 /* PushNotification.swift */,
+			);
+			path = notifications;
 			sourceTree = "<group>";
 		};
 		DCC9D998267BD26D00EA36DD /* sync */ = {
@@ -2307,6 +2323,7 @@
 				DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */,
 				DC46BAF526CACCF700E760A6 /* KotlinPublishers+Phoenix.swift in Sources */,
 				DC72CEFF2C9B2B3100C810A8 /* LoginView.swift in Sources */,
+				DCC4F30E2E4B9DAD00060704 /* PushNotification.swift in Sources */,
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				DCCD045F27EE0301007D57A5 /* SummaryView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
@@ -2437,6 +2454,7 @@
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,
 				DC5F96D52E0B0A970052CDE6 /* ColorScheme+Opposite.swift in Sources */,
 				DC5F96B72E0455760052CDE6 /* GroupPrefs+Global.swift in Sources */,
+				DCC4F3092E4A8BFA00060704 /* Hash160.swift in Sources */,
 				DCA125752A27EDDB00DA2F7F /* MempoolRecommendedResponse.swift in Sources */,
 				DCFBC5592AE2CFEF00E3A418 /* BizNotificationCell.swift in Sources */,
 				DC46CB1228D9AAB000C4EAC7 /* AppState.swift in Sources */,
@@ -2482,6 +2500,7 @@
 				DCB511CA281AED58001BC525 /* NotificationService.swift in Sources */,
 				DC5F96B52E04548F0052CDE6 /* GroupPrefs+Wallet.swift in Sources */,
 				DCCFE6A82B63083F002FFF11 /* UnfairLock.swift in Sources */,
+				DCC4F30A2E4A8D9600060704 /* Hash160.swift in Sources */,
 				DCA6DEC82829C3150073C658 /* SystemKeychain.swift in Sources */,
 				DCA6DECD282AB10C0073C658 /* SharedSecurity.swift in Sources */,
 				DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */,
@@ -2502,6 +2521,7 @@
 				DCCFE6BE2B713FB8002FFF11 /* LogFileInfo.swift in Sources */,
 				DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
 				DC5F96F82E1DA3D60052CDE6 /* PinType.swift in Sources */,
+				DCC4F30F2E4B9E1500060704 /* PushNotification.swift in Sources */,
 				DCBBEEA82D1314CA00B0A9EB /* CurrencyAmount.swift in Sources */,
 				DC6ACC592B10F4FE0079179B /* RecoveryPhrase.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* XPC.swift in Sources */,

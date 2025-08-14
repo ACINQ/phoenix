@@ -31,22 +31,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
  * - XPC.shared
  */
 class NotificationService: UNNotificationServiceExtension {
-
-	enum PushNotificationReason: CustomStringConvertible {
-		case incomingPayment
-		case incomingOnionMessage
-		case pendingSettlement
-		case unknown
-		
-		var description: String {
-			switch self {
-				case .incomingPayment      : return "incomingPayment"
-				case .incomingOnionMessage : return "incomingOnionMessage"
-				case .pendingSettlement    : return "pendingSettlement"
-				case .unknown              : return "unknown"
-			}
-		}
-	}
 	
 	private var contentHandler: ((UNNotificationContent) -> Void)?
 	private var remoteNotificationContent: UNMutableNotificationContent?
@@ -56,8 +40,8 @@ class NotificationService: UNNotificationServiceExtension {
 	private var srvExtDone: Bool = false
 	
 	private var business: PhoenixBusiness? = nil
-	private var pushNotificationReason: PushNotificationReason = .unknown
-	private var target: SecurityFile.V1.KeyInfo? = nil
+	private var pushNotificationReason: PushNotification.Reason = .unknown
+	private var target: SecurityFile.V1.KeyComponents? = nil
 	
 	private var isConnectedToPeer = false
 	private var receivedPayments: [Lightning_kmpIncomingPayment] = []
@@ -119,195 +103,24 @@ class NotificationService: UNNotificationServiceExtension {
 		// - Google's Firebase Cloud Messaging (FCM)
 		// - Amazon Web Services (AWS) (only used for debugging)
 		
-		if isFCM(userInfo) {
-			processNotification_fcm(userInfo)
-		} else {
-			processNotification_aws(userInfo)
+		let push = PushNotification.parse(userInfo)
+		
+		pushNotificationReason = push.reason
+		if let nodeIdHash = push.nodeIdHash, let chain = push.chain {
+			target = SecurityFile.V1.KeyComponents(chain: chain, nodeIdHash: nodeIdHash)
 		}
-	}
-	
-	private func isFCM(_ userInfo: [AnyHashable : Any]) -> Bool {
+		
+		switch push.source {
+		case .googleFCM:
+			// Nothing else to do here.
+			// These types of requests are handled automatically by the Peer.
+			break
 			
-		/* This could be a push notification coming from Google Firebase or from AWS.
-		 *
-		 * Example from Google FCM:
-		 * {
-		 *   "aps": {
-		 *     "alert": {
-		 *       "title": "foobar"
-		 *     }
-		 *     "mutable-content": 1
-		 *   },
-		 *   "reason": "IncomingPayment",
-		 *   "gcm.message_id": 1676919817341932,
-		 *   "google.c.a.e": 1,
-		 *   "google.c.fid": "f7Wfr_yqG00Gt6B9O7qI13",
-		 *   "google.c.sender.id": 358118532563
-		 * }
-		 *
-		 * Example from AWS:
-		 * {
-		 *   "aps": {
-		 *     "alert": {
-		 *       "title": "Missed incoming payment"
-		 *     }
-		 *     "mutable-content": 1
-		 *   },
-		 *   "acinq": {
-		 *     "amt": 120000,
-		 *     "h": "d48bf163c0e24d68567e80b10cc7dd583e2f44390c9592df56a61f79559611e6",
-		 *     "n": "02ed721545840184d1544328059e8b20c01965b73b301a7d03fc89d3d84aba0642",
-		 *     "t": "invoice",
-		 *     "ts": 1676920273561
-		 *   }
-		 * }
-		 */
-		
-		return userInfo["gcm.message_id"]     != nil ||
-		       userInfo["google.c.a.e"]       != nil ||
-		       userInfo["google.c.fid"]       != nil ||
-		       userInfo["google.c.sender.id"] != nil ||
-		       userInfo["reason"]             != nil // just in-case google changes format
-	}
-	
-	private func processNotification_fcm(_ userInfo: [AnyHashable : Any]) {
-		log.trace("processNotification_fcm()")
-		assertMainThread()
-		
-		// Example:
-		// {
-		//   "gcm.message_id": 1605136272123442,
-		//   "google.c.sender.id": 458618232423,
-		//   "google.c.a.e": 1,
-		//   "google.c.fid": "dRLLO-mxUxbDvmV1urj5Tt",
-		//   "reason": "IncomingPayment",
-		//   "aps": {
-		//     "alert": {
-		//       "title": "Missed incoming payment",
-		//     },
-		//     "mutable-content": 1
-		//   }
-		// }
-		
-		if let reason = userInfo["reason"] as? String {
-			log.debug("userInfo.reason: '\(reason)'")
-			
-			// The server currently sends the string "IncomingOnionMessage$",
-			// which is a minor bug that will probably be fixed soon.
-			// So we support both the fixed & unfixed version.
-			
-			switch reason {
-				case "IncomingPayment"       : pushNotificationReason = .incomingPayment
-				case "IncomingOnionMessage$" : pushNotificationReason = .incomingOnionMessage
-				case "IncomingOnionMessage"  : pushNotificationReason = .incomingOnionMessage
-				case "PendingSettlement"     : pushNotificationReason = .pendingSettlement
-				default                      : pushNotificationReason = .unknown
-			}
-		} else {
-			log.debug("userInfo.reason: !string")
-			pushNotificationReason = .unknown
+		case .aws:
+			// AWS only used for debugging (e.g. testing new features)
+			// Ignore the notification.
+			finish()
 		}
-		
-		log.debug("pushNotificationReason = \(pushNotificationReason)")
-		
-		let nodeId: String?
-		if let value = userInfo["nodeId"] as? String {
-			nodeId = value
-		} else if let value = userInfo["node"] as? String {
-			nodeId = value
-		} else if let value = userInfo["n"] as? String {
-			nodeId = value
-		} else {
-			nodeId = nil
-		}
-		log.debug("target.nodeId = \(nodeId ?? "<nil>")")
-		
-		let chainStr: String?
-		if let value = userInfo["chain"] as? String {
-			chainStr = value
-		} else if let value = userInfo["c"] as? String {
-			chainStr = value
-		} else {
-			chainStr = nil
-		}
-		log.debug("target.chain = \(chainStr ?? "<nil>")")
-		
-		let nodeIdHash: String? = if let nodeId { hash160(nodeId) } else { nil }
-		
-		let chain: Bitcoin_kmpChain? = if let chainStr {
-			Bitcoin_kmpChain.fromString(chainStr)
-		} else {
-			Bitcoin_kmpChain.Mainnet()
-		}
-		
-		if let nodeIdHash, let chain {
-			target = SecurityFile.V1.KeyInfo(chain: chain, nodeIdHash: nodeIdHash)
-		} else if let chainStr, chain == nil {
-			log.warning("Invalid chain name: \(chainStr)")
-		}
-		
-		// Nothing else to do here.
-		// These types of requests are handled automatically by the Peer.
-	}
-	
-	private func processNotification_aws(_ userInfo: [AnyHashable : Any]) {
-		log.trace("processNotification_aws()")
-		assertMainThread()
-		
-		pushNotificationReason = .unknown
-		log.debug("pushNotificationReason = \(pushNotificationReason)")
-		
-		let nodeId: String?
-		if let value = userInfo["n"] as? String {
-			nodeId = value
-		} else {
-			nodeId = nil
-		}
-		log.debug("target.nodeId = \(nodeId ?? "<nil>")")
-		
-		let chainStr: String?
-		if let value = userInfo["c"] as? String {
-			chainStr = value
-		} else {
-			chainStr = nil
-		}
-		log.debug("target.chain = \(chainStr ?? "<nil>")")
-		
-		let nodeIdHash: String? = if let nodeId { hash160(nodeId) } else { nil }
-		
-		let chain: Bitcoin_kmpChain? = if let chainStr {
-			Bitcoin_kmpChain.fromString(chainStr)
-		} else {
-			Bitcoin_kmpChain.Mainnet()
-		}
-		
-		if let nodeIdHash, let chain {
-			target = SecurityFile.V1.KeyInfo(chain: chain, nodeIdHash: nodeIdHash)
-		} else if let chainStr, chain == nil {
-			log.warning("Invalid chain name: \(chainStr)")
-		}
-		
-		return finish()
-	}
-	
-	func hash160(_ nodeId: String) -> String? {
-		
-		guard let data = Data(fromHex: nodeId) else {
-			log.warning("hash160(): nodeId is not valid hexadecimal")
-			return nil
-		}
-		guard data.count == 33 else {
-			log.warning("hash160(): nodeId.count != 33")
-			return nil
-		}
-		
-		let pubKey = Bitcoin_kmpPublicKey(data: data.toKotlinByteArray())
-		guard pubKey.isValid() else {
-			log.warning("hash160(): nodeId is not valid publicKey")
-			return nil
-		}
-		
-		return pubKey.hash160().toSwiftData().toHex(options: .lowerCase)
 	}
 	
 	// --------------------------------------------------

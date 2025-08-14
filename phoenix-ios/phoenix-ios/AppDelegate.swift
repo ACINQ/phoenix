@@ -63,9 +63,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		UINavigationBar.appearance().compactAppearance = navBarAppearance
 		UINavigationBar.appearance().standardAppearance = navBarAppearance
 
-		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
-			UIApplication.shared.registerForRemoteNotifications()
-		#endif
+		// Push notifictions now work on the iOS simulator.
+		// But only for:
+		// - Macs with Apple Silicon processor
+		// - Macs with Intel processor & the T2 security chip
+		//   https://support.apple.com/en-us/103265
+		//
+		UIApplication.shared.registerForRemoteNotifications()
 		
 		FirebaseApp.configure()
 		Messaging.messaging().delegate = self
@@ -230,6 +234,59 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		//
 		// If the app is in the background:
 		// - this notification was delivered to the notifySrvExt, which is in charge of processing it
+		
+	#if DEBUG
+		var push = PushNotification.parse(userInfo)
+		
+		// Still waiting for nodeId to be included in push notifications
+		if push.nodeId == nil || push.chain == nil {
+			let nodeId = "03a496f0414de4ed699d99a6e922da4e96e689a9312d2340bf85ff69688e6e4ef6"
+			push = PushNotification(
+				source: push.source,
+				reason: push.reason,
+				nodeId: nodeId,
+				nodeIdHash: hash160(nodeId: nodeId).successValue,
+				chain: Bitcoin_kmpChain.Testnet3()
+			)
+		}
+		
+	#else
+		let push = PushNotification.parse(userInfo)
+	#endif
+		
+		
+		switch push.source {
+		case .googleFCM:
+			log.debug("push.source == .googleFCM")
+			
+			// If we receive a push notification that's not for the current wallet,
+			// then we'll try to launch the associated `BusinessManager` in the background
+			// to process an incoming payment.
+			
+			if let nodeId = push.nodeId, let chain = push.chain {
+				
+				let pushTargetIsCurrentWallet: Bool
+				if let walletInfo = Biz.walletInfo, walletInfo.nodeIdString == nodeId,
+				   let walletId = Biz.walletId, walletId.chain == chain
+				{
+					pushTargetIsCurrentWallet = true
+				} else {
+					pushTargetIsCurrentWallet = false
+				}
+				log.debug("pushTargetIsCurrentWallet = \(pushTargetIsCurrentWallet)")
+				
+				if !pushTargetIsCurrentWallet && push.reason != .unknown {
+					MBiz.launchBackgroundBiz(push)
+				}
+			} else {
+				log.warning("push.nodeId or push.chain is nil")
+			}
+			
+		case .aws:
+			log.debug("push.source == .aws")
+			
+			// Ignore: only for debugging
+		}
 		
 		DispatchQueue.main.async {
 			completionHandler(.noData)

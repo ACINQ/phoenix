@@ -109,7 +109,9 @@ struct IntroContainer: View {
 		log.trace(#function)
 		
 		if appState.isUnlocked {
-			visible = false
+			withAnimation {
+				visible = false
+			}
 		}
 	}
 }

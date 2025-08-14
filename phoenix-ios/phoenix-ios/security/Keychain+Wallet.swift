@@ -72,7 +72,7 @@ class Keychain_Wallet {
 		#endif
 		
 		var enabledSecurity = EnabledSecurity.none
-		var keyInfo: KeyInfo_ChaChaPoly? = nil
+		var sealedBox: SealedBox_ChaChaPoly? = nil
 		
 		if let version = SecurityFileManager.shared.currentSecurityFile() {
 			switch version {
@@ -82,15 +82,15 @@ class Keychain_Wallet {
 					enabledSecurity.insert(.advancedSecurity)
 					
 				} else {
-					keyInfo = v0.keychain
+					sealedBox = v0.keychain
 				}
 				
 			case .v1(let v1):
-				keyInfo = v1.wallets[self.id]?.keychain
+				sealedBox = v1.wallets[self.id]?.keychain
 			}
 		}
 		
-		if keyInfo != nil {
+		if sealedBox != nil {
 			if self._getSoftBiometricsEnabled() {
 				enabledSecurity.insert(.biometrics)
 				
@@ -193,19 +193,19 @@ class Keychain_Wallet {
 			return .failure(.readSecurityFileError(underlying: .fileNotFound))
 		}
 		
-		var keyInfo: KeyInfo_ChaChaPoly?
+		var sealedBox: SealedBox_ChaChaPoly?
 		switch securityFile {
 		case .v0(let v0):
-			keyInfo = v0.keychain
+			sealedBox = v0.keychain
 		case .v1(let v1):
-			keyInfo = v1.wallets[self.id]?.keychain
+			sealedBox = v1.wallets[self.id]?.keychain
 		}
 		
-		guard let keyInfo else {
+		guard let sealedBox else {
 			return .success(nil)
 		}
 			
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(self.id, keyInfo)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(self.id, sealedBox)
 		switch keychainResult {
 		case .failure(let reason):
 			return .failure(.readKeychainError(underlying: reason))
@@ -886,7 +886,7 @@ class Keychain_Wallet {
 		// This function should only be called if the `biometrics` entry is present.
 		guard
 			let keyInfo_biometrics = securityFile.biometrics,
-			let sealedBox_biometrics = try? keyInfo_biometrics.toSealedBox()
+			let rawSealedBox = try? keyInfo_biometrics.toRaw()
 		else {
 			return fail(genericError(400, "SecurityFile.biometrics entry is corrupt"))
 		}
@@ -919,7 +919,7 @@ class Keychain_Wallet {
 		// Decrypt the databaseKey using the lockingKey
 		let cleartextData: Data
 		do {
-			cleartextData = try ChaChaPoly.open(sealedBox_biometrics, using: lockingKey)
+			cleartextData = try ChaChaPoly.open(rawSealedBox, using: lockingKey)
 		} catch {
 			return fail(error)
 		}
@@ -971,7 +971,7 @@ class Keychain_Wallet {
 	}
 	
 	private func unlockWithSoftBiometrics(
-		_ keyInfo    : KeyInfo_ChaChaPoly,
+		_ sealedBox  : SealedBox_ChaChaPoly,
 		_ prompt     : String? = nil,
 		_ completion : @escaping (_ result: Result<RecoveryPhrase, Error>) -> Void
 	) {
@@ -989,7 +989,7 @@ class Keychain_Wallet {
 			}
 		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, keyInfo)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, sealedBox)
 		switch keychainResult {
 		case .failure(let error):
 			fail(error)

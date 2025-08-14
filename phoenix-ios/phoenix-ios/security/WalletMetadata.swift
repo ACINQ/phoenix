@@ -1,7 +1,7 @@
 import Swift
 import PhoenixShared
 
-struct WalletMetadata: Comparable, Identifiable {
+struct WalletMetadata: WalletIdentifiable, Comparable, Identifiable {
 	
 	let chain: Bitcoin_kmpChain
 	let nodeIdHash: String
@@ -35,9 +35,9 @@ struct WalletMetadata: Comparable, Identifiable {
 		self.isDefault = isDefault
 	}
 	
-	init(wallet: SecurityFile.V1.Wallet, keyInfo: SecurityFile.V1.KeyInfo, isDefault: Bool) {
-		self.chain = keyInfo.chain
-		self.nodeIdHash = keyInfo.nodeIdHash
+	init(wallet: SecurityFile.V1.Wallet, keyComps: SecurityFile.V1.KeyComponents, isDefault: Bool) {
+		self.chain = keyComps.chain
+		self.nodeIdHash = keyComps.nodeIdHash
 		self.name = wallet.name
 		self.photo = wallet.photo
 		self.isHidden = wallet.isHidden
@@ -45,16 +45,7 @@ struct WalletMetadata: Comparable, Identifiable {
 	}
 	
 	var id: String {
-		return standardKeyId
-	}
-	
-	// Mirrors functionality of `WalletIdentifier.standardKeyId`
-	var standardKeyId: String {
-		if chain.isMainnet() {
-			return nodeIdHash
-		} else {
-			return "\(nodeIdHash)-\(chain.phoenixName)"
-		}
+		return standardKeyId // @see: WalletIdentifiable
 	}
 	
 	static func < (lhs: WalletMetadata, rhs: WalletMetadata) -> Bool {

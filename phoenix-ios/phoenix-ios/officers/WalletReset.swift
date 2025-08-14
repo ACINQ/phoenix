@@ -252,7 +252,7 @@ class WalletReset {
 		log.trace("step6()")
 		progress.send(.resettingBiz)
 		
-		MBiz.reset()
+		MBiz.resetCurrent()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.finish()
