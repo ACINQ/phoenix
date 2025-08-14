@@ -8814,6 +8814,9 @@
         }
       }
     },
+    "Change Hidden Wallet" : {
+
+    },
     "Change lock PIN" : {
 
     },
@@ -24755,6 +24758,9 @@
       }
     },
     "Lock PIN" : {
+
+    },
+    "Lock PIN Required" : {
 
     },
     "Logged In" : {
@@ -41644,6 +41650,9 @@
           }
         }
       }
+    },
+    "This wallet is **hidden**, and a hidden wallet requires a Lock PIN to be set." : {
+
     },
     "This will reset the app, as if you had just installed it." : {
       "localizations" : {

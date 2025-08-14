@@ -229,6 +229,7 @@
 		DC5F97162E2FEDA30052CDE6 /* WalletInfoSend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97152E2FED9F0052CDE6 /* WalletInfoSend.swift */; };
 		DC5F971A2E32E4930052CDE6 /* GlobalEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97192E32E48B0052CDE6 /* GlobalEnvironmentView.swift */; };
 		DC635AA42E4264BF0038ED92 /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
+		DC635AA62E429D8B0038ED92 /* LockPinRequired.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC635AA52E429D860038ED92 /* LockPinRequired.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
 		DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */; };
@@ -703,6 +704,7 @@
 		DC5F97132E2FDBD20052CDE6 /* WalletInfoReceive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoReceive.swift; sourceTree = "<group>"; };
 		DC5F97152E2FED9F0052CDE6 /* WalletInfoSend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoSend.swift; sourceTree = "<group>"; };
 		DC5F97192E32E48B0052CDE6 /* GlobalEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalEnvironmentView.swift; sourceTree = "<group>"; };
+		DC635AA52E429D860038ED92 /* LockPinRequired.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockPinRequired.swift; sourceTree = "<group>"; };
 		DC63A3752B965D54008E040E /* InboundFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeSheet.swift; sourceTree = "<group>"; };
 		DC63BDF329AE44380067A361 /* NotificationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -1326,10 +1328,11 @@
 			isa = PBXGroup;
 			children = (
 				DCACF7082566D0F00009B01E /* AppAccessView.swift */,
-				DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */,
-				DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */,
 				DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */,
+				DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */,
+				DC635AA52E429D860038ED92 /* LockPinRequired.swift */,
 				DC4CF3C32BE583A6003A957F /* NumberPadView.swift */,
+				DC4CF3C92BE91FED003A957F /* SetNewPinView.swift */,
 				DC0C52652BF3C31700143831 /* WhichPinSheet.swift */,
 			);
 			path = "app access";
@@ -2342,6 +2345,7 @@
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
 				DCA6DECC282AAA740073C658 /* SharedSecurity.swift in Sources */,
 				DC5F96E82E0F36240052CDE6 /* SecurityFileManager.swift in Sources */,
+				DC635AA62E429D8B0038ED92 /* LockPinRequired.swift in Sources */,
 				DC4CBC802D650FFC00129BDB /* DetailsRowWrapper.swift in Sources */,
 				DC5CA4EF28F842F10048A737 /* MVI+Extensions.swift in Sources */,
 				DC6ACC582B10F0220079179B /* RecoveryPhrase.swift in Sources */,

@@ -407,6 +407,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		showLockWindow(target: .automatic)
 	}
 	
+	func finishLockWindow() {
+		log.trace(#function)
+		
+		showMainWindow()
+	}
+	
 	func cancelIntroWindow() {
 		log.trace(#function)
 		

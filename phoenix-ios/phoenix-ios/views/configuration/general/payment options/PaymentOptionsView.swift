@@ -387,6 +387,7 @@ struct PaymentOptionsList: View {
 					case .swapInWallet       : break
 					case .finalWallet        : break
 					case .appAccess          : break
+					case .walletMetadata     : break
 				}
 				
 				if let newNavLinkTag {

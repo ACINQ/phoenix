@@ -432,6 +432,15 @@ struct AppAccessView : View {
 		}
 	}
 	
+	func isHiddenWallet() -> Bool {
+		
+		if let metadata = SecurityFileManager.shared.currentWallet() {
+			return metadata.isHidden
+		} else {
+			return false
+		}
+	}
+	
 	var isRecoveryPhrasedBackedUp: Bool {
 		
 		return backupSeedState == .safelyBackedUp
@@ -667,8 +676,8 @@ struct AppAccessView : View {
 		
 		if flag && passcodeFallbackEnabled {
 			
-			// User is trying to enable "system passcode fallback",
-			// but they already have the "lock pin" enabled.
+			// User is trying to enable the "lock pin"
+			// but they already have "system passcode fallback" enabled.
 			
 			smartModalState.display(dismissable: true) {
 				WhichPinSheet(currentChoice: .systemPasscode)
@@ -682,7 +691,17 @@ struct AppAccessView : View {
 			navigateTo(.SetPinView(type: .lockPin))
 			
 		} else { // toggle => OFF
-			navigateTo(.DisablePinView(type: .lockPin))
+			
+			if isHiddenWallet() {
+				smartModalState.display(dismissable: true) {
+					LockPinRequired()
+				} onWillDisappear: {
+					ignoreToggle_lockPinEnabled = true
+					lockPinEnabled = true
+				}
+			} else {
+				navigateTo(.DisablePinView(type: .lockPin))
+			}
 		}
 	}
 	

@@ -833,6 +833,7 @@ struct LockView: View {
 		assertMainThread()
 		
 		Biz.loadWallet(trigger: .appUnlock, recoveryPhrase: recoveryPhrase)
+		SceneDelegate.get().finishLockWindow()
 		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
 			withAnimation(.easeInOut) {
 				appState.isUnlocked = true

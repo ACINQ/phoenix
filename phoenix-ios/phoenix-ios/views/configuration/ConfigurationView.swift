@@ -639,6 +639,7 @@ struct ConfigurationList: View {
 					case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .appAccess          : newNavLinkTag = .AppAccess            ; delay *= 1
+					case .walletMetadata     : newNavLinkTag = .WalletMetadata            ; delay *= 1
 				}
 				
 				if let newNavLinkTag {
