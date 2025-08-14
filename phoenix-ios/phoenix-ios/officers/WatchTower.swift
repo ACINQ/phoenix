@@ -20,8 +20,6 @@ class WatchTower {
 	/// Singleton instance
 	public static let shared = WatchTower()
 	
-	private var lastTaskFailed = false
-	
 	private var appCancellables = Set<AnyCancellable>()
 	private var cancellables = Set<AnyCancellable>()
 	
@@ -49,28 +47,23 @@ class WatchTower {
 	// --------------------------------------------------
 	
 	func applicationDidFinishLaunching() {
-		log.trace("### applicationDidFinishLaunching()")
+		log.trace(#function)
 		
 		registerBackgroundTask()
 	}
 	
 	func applicationDidEnterBackground() {
-		log.trace("### applicationDidEnterBackground()")
+		log.trace(#function)
 		
 		scheduleBackgroundTask()
 	}
 	
 	// --------------------------------------------------
-	// MARK: Utilities
+	// MARK: Calculations
 	// --------------------------------------------------
 	
 	private func hasInFlightTransactions(_ channels: [LocalChannelInfo]) -> Bool {
 		return channels.contains(where: { $0.inFlightPaymentsCount > 0 })
-	}
-	
-	private func hasInFlightTransactions() -> Bool {
-		let channels = Biz.business.peerManager.channelsValue()
-		return hasInFlightTransactions(channels)
 	}
 	
 	private func calculateRevokedChannelIds(
@@ -90,7 +83,7 @@ class WatchTower {
 						oldClosing = oldChannel.asOffline()?.state.asClosing()
 					}
 
-					if let oldClosing = oldClosing {
+					if let oldClosing {
 						oldHasRevokedCommit = !oldClosing.revokedCommitPublished.isEmpty
 					}
 				}
@@ -117,11 +110,76 @@ class WatchTower {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Ordering
+	// --------------------------------------------------
+	
+	private func currentBizHasInFlightTransactions() -> Bool {
+		let channels = Biz.business.peerManager.channelsValue()
+		return hasInFlightTransactions(channels)
+	}
+	
+	private func nextWalletToCheck() -> WatchTowerTarget? {
+		
+		guard let securityFile = SecurityFileManager.shared.currentSecurityFile() else {
+			log.warning("SecurityFile.current(): nil found")
+			return nil
+		}
+		guard case .v1(let v1) = securityFile else {
+			log.warning("SecurityFile.current(): v0 found")
+			return nil
+		}
+		
+		let currentWalletId = Biz.walletId
+		let allTargets: [WatchTowerTarget] = v1.allKeys().map { keyInfo in
+			
+			let prefs = Prefs_Wallet(id: keyInfo.keychainKeyId)
+			
+			let lastAttemptDate = prefs.watchTower_lastAttemptDate
+			let lastAttemptFailed = prefs.watchTower_lastAttemptFailed
+			
+			let nextAttemptDate: Date
+			if lastAttemptFailed {
+				nextAttemptDate = lastAttemptDate.addingTimeInterval(2.hours())
+			} else {
+				nextAttemptDate = lastAttemptDate.addingTimeInterval(2.days())
+			}
+			
+			var isCurrent: Bool = false
+			if let current = currentWalletId {
+				isCurrent = (current.nodeId == keyInfo.nodeId) && (current.chain == keyInfo.chain)
+			}
+			
+			return WatchTowerTarget(
+				keyInfo: keyInfo,
+				nextAttemptDate: nextAttemptDate,
+				lastAttemptDate: lastAttemptDate,
+				lastAttemptFailed: lastAttemptFailed,
+				isCurrent: isCurrent
+			)
+		}
+		
+		let sortedTargets = allTargets.sorted { (targetA, targetB) in
+			
+			// Return true if the first argument should be ordered before the second argument.
+			// Otherwise, return false.
+			
+			return targetA.nextAttemptDate < targetB.nextAttemptDate
+		}
+		
+	#if DEBUG && true
+		// Test running WatchTower task on non-current wallet
+		return sortedTargets.filter { !$0.isCurrent }.first
+	#else
+		return sortedTargets.first
+	#endif
+	}
+	
+	// --------------------------------------------------
 	// MARK: Task Management
 	// --------------------------------------------------
 	
-	private func registerBackgroundTask() -> Void {
-		log.trace("registerBackgroundTask()")
+	private func registerBackgroundTask() {
+		log.trace(#function)
 		
 		BGTaskScheduler.shared.register(
 			forTaskWithIdentifier: taskId_watchTower,
@@ -137,6 +195,7 @@ class WatchTower {
 	}
 	
 	private func scheduleBackgroundTask() {
+		log.trace(#function)
 		
 		// As per the docs:
 		// > There can be a total of 1 refresh task and 10 processing tasks scheduled at any time.
@@ -144,18 +203,25 @@ class WatchTower {
 		
 		let task = BGAppRefreshTaskRequest(identifier: taskId_watchTower)
 		
-		if hasInFlightTransactions() {
-			task.earliestBeginDate = Date(timeIntervalSinceNow: (60 * 60 * 4)) // 2 hours
+		if currentBizHasInFlightTransactions() {
+			log.debug("currentBizHasInFlightTransactions: true")
+			task.earliestBeginDate = Date(timeIntervalSinceNow: 4.hours())
+			
+		} else if let target = nextWalletToCheck() {
+			log.debug("nextWalletToCheck(): non-nil")
+			
+			let earliestRequest = Date(timeIntervalSinceNow: 4.hours())
+			task.earliestBeginDate = max(earliestRequest, target.nextAttemptDate)
+			
+			log.debug("earliestRequest: \(earliestRequest)")
+			log.debug("target.nextAttemptDate: \(target.nextAttemptDate)")
 			
 		} else {
+			log.debug("nextWalletToCheck(): nil")
 			
-			if lastTaskFailed {
-				task.earliestBeginDate = Date(timeIntervalSinceNow: (60 * 60 * 4)) // 4 hours
-			} else {
-				// As per WWDC talk (https://developer.apple.com/videos/play/wwdc2019/707):
-				// It's recommended that this value be a week or less.
-				task.earliestBeginDate = Date(timeIntervalSinceNow: (60 * 60 * 24 * 2)) // 2 days
-			}
+			// As per WWDC talk (https://developer.apple.com/videos/play/wwdc2019/707):
+			// It's recommended that this value be a week or less.
+			task.earliestBeginDate = Date(timeIntervalSinceNow: 2.days())
 		}
 		
 	#if !targetEnvironment(simulator) // background tasks not available in simulator
@@ -175,11 +241,102 @@ class WatchTower {
 	/// How to debug this:
 	/// https://www.andyibanez.com/posts/modern-background-tasks-ios13/
 	///
-	private func performTask(_ task: BGAppRefreshTask) -> Void {
-		log.trace("performTask()")
+	private func performTask(_ task: BGAppRefreshTask) {
+		log.trace(#function)
 		
 		// Kotlin will crash below if we attempt to run this code on non-main thread
 		assertMainThread()
+		
+		if let target = nextWalletToCheck(), !target.isCurrent {
+			performTask(task, target)
+			
+		} else { // check the current wallet
+			if let walletId = Biz.walletId {
+				performTask(task, Biz.business, walletId.keychainKeyId)
+			} else {
+				completeTask(task, success: true)
+			}
+		}
+	}
+	
+	private func performTask(_ task: BGAppRefreshTask, _ target: WatchTowerTarget) {
+		log.trace(#function)
+		
+		let id = target.keyInfo.keychainKeyId
+		let business = PhoenixBusiness(ctx: PlatformContext.default)
+
+		business.currencyManager.disableAutoRefresh()
+		
+		guard let securityFile = SecurityFileManager.shared.currentSecurityFile() else {
+			log.warning("SecurityFile.current(): nil found")
+			return completeTask(task, success: true)
+		}
+		guard case .v1(let v1) = securityFile else {
+			log.warning("SecurityFile.current(): v0 found")
+			return completeTask(task, success: true)
+		}
+		guard let keyInfo = v1.wallets[id]?.keychain else {
+			log.warning("SecurityFile.current().getWallet(): nil found")
+			return completeTask(task, success: true)
+		}
+		
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(id, keyInfo)
+		guard case .success(let cleartextData) = keychainResult else {
+			log.warning("readKeychainEntry(): failed")
+			return completeTask(task, success: true)
+		}
+
+		let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
+		guard case .success(let recoveryPhrase) = decodeResult else {
+			log.warning("decodeRecoveryPhrase(): failed")
+			return completeTask(task, success: true)
+		}
+		guard let language = recoveryPhrase.language else {
+			log.warning("recoveryPhrase.language == nil")
+			return completeTask(task, success: true)
+		}
+
+		let seed = business.walletManager.mnemonicsToSeed(
+			mnemonics: recoveryPhrase.mnemonicsArray,
+			wordList: language.wordlist(),
+			passphrase: ""
+		)
+		let walletInfo = business.walletManager.loadWallet(seed: seed)
+		let wid = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
+		
+		let groupPrefs = GroupPrefs.wallet(wid)
+		
+		if let electrumConfigPrefs = groupPrefs.electrumConfig {
+			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
+		} else {
+			business.appConfigurationManager.updateElectrumConfig(config: nil)
+		}
+		
+		let primaryFiatCurrency = groupPrefs.fiatCurrency
+		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+			primary: primaryFiatCurrency,
+			others: groupPrefs.preferredFiatCurrencies
+		)
+		business.appConfigurationManager.updatePreferredFiatCurrencies(
+			current: preferredFiatCurrencies
+		)
+
+		let startupParams = StartupParams(
+			isTorEnabled: groupPrefs.isTorEnabled,
+			liquidityPolicy: groupPrefs.liquidityPolicy.toKotlin()
+		)
+		business.start(startupParams: startupParams)
+
+		business.appConnectionsDaemon?.incrementDisconnectCount(
+			target: AppConnectionsDaemon.ControlTarget.companion.All
+		)
+		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
+		
+		performTask(task, business, id)
+	}
+	
+	private func performTask(_ task: BGAppRefreshTask, _ business: PhoenixBusiness, _ id: String) {
+		log.trace(#function)
 		
 		// There are 2 tasks we may need to perform:
 		//
@@ -212,39 +369,51 @@ class WatchTower {
 	#else
 		let performWatchTowerTask = _true // always perform this task
 	#endif
-		let performPendingTxTask = hasInFlightTransactions()
-		let performBothTasks = performWatchTowerTask && performPendingTxTask
 		
-		let business = Biz.business
+		let channels = business.peerManager.channelsValue()
+		let performPendingTxTask = hasInFlightTransactions(channels)
+		
 		let appConnectionsDaemon = business.appConnectionsDaemon
 		
 		let target: AppConnectionsDaemon.ControlTarget
-		if (performBothTasks || !performWatchTowerTask) {
+		if performWatchTowerTask && performPendingTxTask {
 			target = AppConnectionsDaemon.ControlTarget.companion.All
-		} else if !performWatchTowerTask {
-			target = AppConnectionsDaemon.ControlTarget.companion.AllMinusElectrum
-		} else {
+		} else if performWatchTowerTask {
 			target = AppConnectionsDaemon.ControlTarget.companion.ElectrumPlusTor
+		} else {
+			target = AppConnectionsDaemon.ControlTarget.companion.AllMinusElectrum
 		}
 		
 		var didDecrement = false
-		var watchTowerListener: AnyCancellable? = nil
-		var pendingTxHandler: Task<Void, Error>? = nil
+		var setupTask: Task<Void, Error>? = nil
+		var watchTowerTask: Task<Void, Error>? = nil
+		var pendingTxTask: Task<Void, Error>? = nil
 		
 		var peer: Lightning_kmpPeer? = nil
 		var oldChannels = [Bitcoin_kmpByteVector32 : Lightning_kmpChannelState]()
 		
 		let cleanup = {(didTimeout: Bool) in
-			log.debug("cleanup()")
+			log.debug("cleanup(didTimeout: \(didTimeout))")
 			
 			if didDecrement { // need to balance decrement call
-				appConnectionsDaemon?.incrementDisconnectCount(target: target)
+				if let daemon = appConnectionsDaemon {
+					log.error("appConnectionsDaemon.incrementDisconnectCount()....")
+					business.appConnectionsDaemon?.incrementDisconnectCount(target: target)
+				} else {
+					log.error("appConnectionsDaemon is nil !!!")
+				}
+			} else {
+				log.debug("!didDecrement (disconnect count)")
 			}
 			
-			watchTowerListener?.cancel()
-			pendingTxHandler?.cancel()
+			setupTask?.cancel()
+			watchTowerTask?.cancel()
+			pendingTxTask?.cancel()
 
-			self.lastTaskFailed = didTimeout
+			let prefs = Prefs_Wallet(id: id)
+			prefs.watchTower_lastAttemptDate = Date.now
+			prefs.watchTower_lastAttemptFailed = didTimeout
+			
 			self.scheduleBackgroundTask()
 			
 			if performWatchTowerTask {
@@ -262,7 +431,7 @@ class WatchTower {
 					
 					let outcome = WatchTowerOutcome.RevokedFound(channels: revokedChannelIds)
 					business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
-						task.setTaskCompleted(success: true)
+						self.completeTask(task, success: true)
 					}
 					
 				} else if !didTimeout {
@@ -270,7 +439,7 @@ class WatchTower {
 					
 					let outcome = WatchTowerOutcome.Nominal(channelsWatchedCount: Int32(newChannels.count))
 					business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
-						task.setTaskCompleted(success: true)
+						self.completeTask(task, success: true)
 					}
 					
 				} else {
@@ -278,13 +447,17 @@ class WatchTower {
 					
 					let outcome = WatchTowerOutcome.Unknown()
 					business.notificationsManager.saveWatchTowerOutcome(outcome: outcome) { _ in
-						task.setTaskCompleted(success: false)
+						self.completeTask(task, success: false)
 					}
 				}
 				
 			} else {
 				
-				task.setTaskCompleted(success: !didTimeout)
+				self.completeTask(task, success: !didTimeout)
+			}
+			
+			if business != Biz.business {
+				business.stop(closeDatabases: true)
 			}
 		}
 		
@@ -292,6 +465,7 @@ class WatchTower {
 		var finishedPendingTxTask = performPendingTxTask ? false : true
 		
 		let maybeCleanup = {(didTimeout: Bool) in
+			log.debug("maybeCleanup(didTimeout: \(didTimeout))")
 			if (finishedWatchTowerTask && finishedPendingTxTask) {
 				cleanup(didTimeout)
 			}
@@ -301,7 +475,7 @@ class WatchTower {
 			DispatchQueue.main.async {
 				if !finishedWatchTowerTask {
 					finishedWatchTowerTask = true
-					log.debug("finishWatchTowerTask()")
+					log.debug("finishWatchTowerTask(didTimeout: \(didTimeout))")
 					maybeCleanup(didTimeout)
 				}
 			}
@@ -311,59 +485,55 @@ class WatchTower {
 			DispatchQueue.main.async {
 				if !finishedPendingTxTask {
 					finishedPendingTxTask = true
-					log.debug("finishPendingTxTask()")
+					log.debug("finishPendingTxTask(didTimeout: \(didTimeout)")
 					maybeCleanup(didTimeout)
 				}
 			}
 		}
 		
 		let abortTasks = {(didTimeout: Bool) in
+			log.debug("abortTasks(didTimeout: \(didTimeout)")
 			finishWatchTowerTask(didTimeout)
 			finishPendingTxTask(didTimeout)
 		}
 		
 		task.expirationHandler = {
+			log.debug("task.expirationHandler(): fired")
 			abortTasks(/* didTimeout: */ true)
 		}
 		
 		guard (performWatchTowerTask || performPendingTxTask) else {
+			log.debug("aborting: no tasks to perform")
 			return abortTasks(/* didTimeout: */ false)
 		}
 		
-		peer = business.peerManager.peerStateValue()
-		guard let _peer = peer else {
-			// If there's not a peer, then there's nothing to do
-			return abortTasks(/* didTimeout: */ false)
-		}
-		
-		oldChannels = _peer.channels
-		guard oldChannels.count > 0 else {
-			// If we don't have any channels, then there's nothing to do
-			return abortTasks(/* didTimeout: */ false)
-		}
-		
-		appConnectionsDaemon?.decrementDisconnectCount(target: target)
-		didDecrement = true
-		
-		if performWatchTowerTask {
-			// We setup a handler so we know when the WatchTower task has completed.
-			// I.e. when the channel subscriptions are considered up-to-date.
-			
-			let minMillis = Date.now.toMilliseconds()
-			watchTowerListener = Biz.business.electrumWatcher.upToDatePublisher().sink { (millis: Int64) in
-				// millis => timestamp of when electrum watch was marked up-to-date
-				if millis > minMillis {
-					finishWatchTowerTask(/* didTimeout: */ false)
+		let startWatchTowerTask = {
+			watchTowerTask = Task { @MainActor in
+				
+				// We setup a listener so we know when the WatchTower task has completed.
+				// I.e. when the channel subscriptions are considered up-to-date.
+				
+				let minMillis = Date.now.toMilliseconds()
+				
+				log.debug("watchTowerTask: waiting for electrum up-to-date signal...")
+				for try await millis in business.electrumWatcher.upToDatePublisher().values {
+					// millis => timestamp of when electrum watch was marked up-to-date
+					if millis > minMillis {
+						log.debug("watchTowerTask: done")
+						finishWatchTowerTask(/* didTimeout: */ false)
+					}
 				}
 			}
 		}
 		
-		if performPendingTxTask {
-			pendingTxHandler = Task { @MainActor in
+		let startPendingTxTask = {
+			pendingTxTask = Task { @MainActor in
 				
 				// Wait until we're connected
-				for try await connections in Biz.business.connectionsManager.asyncStream() {
+				log.debug("pendingTxTask: waiting for connections...")
+				for try await connections in business.connectionsManager.asyncStream() {
 					if connections.targetsEstablished(target) {
+						log.debug("pendingTxTask: connections established")
 						break
 					}
 				}
@@ -371,22 +541,88 @@ class WatchTower {
 				// Give the peer a max of 10 seconds to perform any needed tasks
 				async let subtask1 = Task { @MainActor in
 					try await Task.sleep(seconds: 10)
+					log.debug("pendingTxTask: timed out")
 					finishPendingTxTask(/* didTimeout: */ false)
 				}
 				
-				// Check to see if the peer clears its pending TX's
+				// Check to see if the peer clears its pending tx's
 				async let subtask2 = Task { @MainActor in
-					for try await channels in Biz.business.peerManager.channelsPublisher().values {
-						if !hasInFlightTransactions(channels) {
+					log.debug("pendingTxTask: waiting for pending tx's to clear...")
+					for try await channels in business.peerManager.channelsPublisher().values {
+						if !self.hasInFlightTransactions(channels) {
+							log.debug("pendingTxTask: pending tx's have cleared")
 							break
 						}
 					}
+					
+					log.debug("pendingTxTask: waiting 2 seconds for cleanup...")
 					try await Task.sleep(seconds: 2) // a bit of cleanup time
+					
+					log.debug("pendingTxTask: done")
 					finishPendingTxTask(/* didTimeout: */ false)
 				}
 				
 				let _ = await [subtask1, subtask2]
 			}
 		}
+		
+		setupTask = Task { @MainActor in
+			
+			log.debug("setupTask: waiting for peer...")
+			for try await value in business.peerManager.peerStatePublisher().values {
+				peer = value
+				break
+			}
+			
+			guard let peer else {
+				log.debug("aborting: peer is nil")
+				// If there's not a peer, then there's nothing to do
+				return abortTasks(/* didTimeout: */ false)
+			}
+			
+			// peerManager.channelsPublisher() will fire when either:
+			// - peer.bootChannelsFlow is non-nil
+			// - peer.channelsFlow is non-nil
+			//
+			log.debug("setupTask: waiting for channels...")
+			for try await value in business.peerManager.channelsPublisher().values {
+				break
+			}
+			
+			oldChannels = peer.channels
+			if oldChannels.isEmpty {
+				oldChannels = peer.bootChannelsFlowValue
+			}
+			
+			guard !oldChannels.isEmpty else {
+				log.debug("aborting: no channels")
+				// If we don't have any channels, then there's nothing to do
+				return abortTasks(/* didTimeout: */ false)
+			}
+			
+			appConnectionsDaemon?.decrementDisconnectCount(target: target)
+			didDecrement = true
+			
+			if performWatchTowerTask {
+				startWatchTowerTask()
+			}
+			if performPendingTxTask {
+				startPendingTxTask()
+			}
+		}
 	}
+	
+	private func completeTask(_ task: BGAppRefreshTask, success: Bool) {
+		log.trace("completeTask(_, success: \(success))")
+		
+		task.setTaskCompleted(success: success)
+	}
+}
+
+struct WatchTowerTarget {
+	let keyInfo: SecurityFile.V1.KeyInfo
+	let nextAttemptDate: Date
+	let lastAttemptDate: Date
+	let lastAttemptFailed: Bool
+	let isCurrent: Bool
 }

@@ -18,6 +18,14 @@ extension UserDefaults {
 		}
 	}
 	
+	func double(forKey key: String, defaultValue: Double) -> Double {
+		if object(forKey: key) == nil {
+			return defaultValue
+		} else {
+			return double(forKey: key)
+		}
+	}
+	
 	func number(forKey key: String) -> NSNumber? {
 		return object(forKey: key) as? NSNumber
 	}

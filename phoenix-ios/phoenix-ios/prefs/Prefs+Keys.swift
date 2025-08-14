@@ -16,6 +16,8 @@ enum PrefsKey: CaseIterable {
 	case serverMessageReadIndex
 	case allowOverpayment
 	case doNotShowChannelImpactWarning
+	case watchTower_lastAttemptDate
+	case watchTower_lastAttemptFailed
 //	BackupSeed:
 	case backupSeed_enabled
 	case backupSeed_hasUploadedSeed
@@ -50,6 +52,8 @@ enum PrefsKey: CaseIterable {
 		case .serverMessageReadIndex        : return "serverMessageReadIndex"
 		case .allowOverpayment              : return "allowOverpayment"
 		case .doNotShowChannelImpactWarning : return "doNotShowChannelImpactWarning"
+		case .watchTower_lastAttemptDate    : return "watchTower_lastAttemptDate"
+		case .watchTower_lastAttemptFailed  : return "watchTower_lastAttemptFailed"
 	// BackupSeed:
 		case .backupSeed_enabled            : return "backupSeed_enabled"
 		case .backupSeed_hasUploadedSeed    : return "backupSeed_hasUploadedSeed"
@@ -88,6 +92,8 @@ enum PrefsKey: CaseIterable {
 		case .serverMessageReadIndex        : return .wallet
 		case .allowOverpayment              : return .wallet
 		case .doNotShowChannelImpactWarning : return .wallet
+		case .watchTower_lastAttemptDate    : return .wallet
+		case .watchTower_lastAttemptFailed  : return .wallet
 	// BackupSeed:
 		case .backupSeed_enabled            : return .backupSeed
 		case .backupSeed_hasUploadedSeed    : return .backupSeed

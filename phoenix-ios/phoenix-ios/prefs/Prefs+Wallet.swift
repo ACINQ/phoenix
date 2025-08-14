@@ -168,6 +168,28 @@ class Prefs_Wallet {
 		}
 	}
 	
+	var watchTower_lastAttemptDate: Date {
+		get {
+			maybeLogDefaultAccess(#function)
+			let seconds: TimeInterval = defaults.double(forKey: Key.watchTower_lastAttemptDate.value(id))
+			return Date(timeIntervalSince1970: seconds)
+		}
+		set {
+			let seconds: TimeInterval = newValue.timeIntervalSince1970
+			defaults.set(seconds, forKey: Key.watchTower_lastAttemptDate.value(id))
+		}
+	}
+	
+	var watchTower_lastAttemptFailed: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.watchTower_lastAttemptFailed.value(id))
+		}
+		set {
+			defaults.set(newValue, forKey: Key.watchTower_lastAttemptFailed.value(id))
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------

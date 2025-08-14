@@ -97,6 +97,12 @@ class SecurityFile {
 			return wallets[id.keychainKeyId]
 		}
 		
+		func allKeys() -> [KeyInfo] {
+			return wallets.compactMap { (id: String, _) in
+				KeyInfo.fromId(id)
+			}
+		}
+		
 		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifier) -> V1 {
 			var newWallets = self.wallets
 			newWallets[id.keychainKeyId] = wallet
