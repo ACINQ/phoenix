@@ -293,7 +293,6 @@ fun SpliceOutCapacityDisclaimer(showCapacityDisclaimer: Boolean, onShowCapacityD
         text = stringResource(id = R.string.spliceout_capacity_disclaimer_checkbox),
         checked = !showCapacityDisclaimer,
         onCheckedChange = onShowCapacityDisclaimerChange,
-        modifier = Modifier.alpha(.3f),
         padding = PaddingValues(vertical = 8.dp)
     )
 }
