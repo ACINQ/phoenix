@@ -127,30 +127,6 @@ class Prefs {
 				d.removeObject(forKey: oldKey)
 			}
 		}
-		
-		let everything = d.dictionaryRepresentation()
-		for specialKey in Key.specialMigrations() {
-			
-			let tuple = everything.first { (key: String, _) in
-				key.hasPrefix("\(specialKey.prefix)-")
-			}
-			
-			if let tuple {
-				let oldKey = tuple.key
-				let value = tuple.value
-				
-				let newId = (specialKey.group == .global) ? PREFS_GLOBAL_ID : PREFS_DEFAULT_ID
-				let newKey = specialKey.value(newId)
-				if d.object(forKey: newKey) == nil {
-					log.debug("move: \(oldKey) > \(newKey)")
-					d.set(value, forKey: newKey)
-				} else {
-					log.debug("delete: \(oldKey)")
-				}
-				
-				d.removeObject(forKey: oldKey)
-			}
-		}
 	}
 	
 	// --------------------------------------------------
@@ -179,22 +155,46 @@ class Prefs {
 		// COPY: "foo-default" => "foo-<walletId>"
 		
 		let d = self.defaults
-		let oldId = PREFS_DEFAULT_ID
-		let newId = walletId.standardKeyId
-		
-		for key in Key.allCases {
-			let oldKey = key.value(oldId)
-			if let value = d.object(forKey: oldKey) {
-				
-				let newKey = key.value(newId)
-				if d.object(forKey: newKey) == nil {
-					log.debug("move: \(oldKey) > \(newKey)")
-					d.set(value, forKey: newKey)
-				} else {
-					log.debug("delete: \(oldKey)")
+		do {
+			let oldId = PREFS_DEFAULT_ID
+			let newId = walletId.standardKeyId
+			
+			for key in Key.allCases {
+				let oldKey = key.value(oldId)
+				if let value = d.object(forKey: oldKey) {
+					
+					let newKey = key.value(newId)
+					if d.object(forKey: newKey) == nil {
+						log.debug("move: \(oldKey) > \(newKey)")
+						d.set(value, forKey: newKey)
+					} else {
+						log.debug("delete: \(oldKey)")
+					}
+					
+					d.removeObject(forKey: oldKey)
 				}
-				
-				d.removeObject(forKey: oldKey)
+			}
+		}
+		
+		// Migration of special keys
+		do {
+			let oldId = walletId.deprecatedKeyId
+			let newId = walletId.standardKeyId
+			
+			for specialKey in Key.specialMigrations() {
+				let oldKey = specialKey.value(oldId)
+				if let value = d.object(forKey: oldKey) {
+					
+					let newKey = specialKey.value(newId)
+					if d.object(forKey: newKey) == nil {
+						log.debug("move: \(oldKey) > \(newKey)")
+						d.set(value, forKey: newKey)
+					} else {
+						log.debug("delete: \(oldKey)")
+					}
+					
+					d.removeObject(forKey: oldKey)
+				}
 			}
 		}
 	}
