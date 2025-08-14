@@ -224,7 +224,8 @@ class WalletReset {
 	
 	/**
 	 * Next we delete the wallet's recovery phrase.
-	 * This includes deleting the "security.json" file, and all the items stored in the keychain.
+	 * This includes all the items stored in the keychain (for this wallet),
+	 * and deleting the corresponding entry from the SecurityFile.
 	 */
 	private func step5() {
 		log.trace("step5()")
@@ -232,19 +233,26 @@ class WalletReset {
 		
 		Keychain.current.resetWallet()
 		
+		let walletId = Biz.walletId!
+		AppSecurity.shared.removeWallet(walletId: walletId) { result in
+			if case .failure(let error) = result {
+				log.warning("AppSecurity.removeWallet(): error: \(error)")
+			}
+		}
+		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step6()
 		}
 	}
 	
 	/**
-	 * Finally we reset the BusinessManager & GlobalEnvironment.
+	 * Finally we reset the BusinessManager instance.
 	 */
 	private func step6() {
 		log.trace("step6()")
 		progress.send(.resettingBiz)
 		
-		SceneDelegate.get().switchToAnotherWallet()
+		MBiz.reset()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.finish()

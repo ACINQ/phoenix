@@ -165,7 +165,7 @@ struct MainView_Small: View {
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
 			MergeChannelsView(location: .sheet)
-				.modifier(GlobalEnvironment.sheetInstance())
+				.environmentObject(GlobalEnvironment.deviceInfo)
 		}
 	}
 	

@@ -228,6 +228,7 @@
 		DC5F97122E2EA8790052CDE6 /* DuressPinOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97112E2EA8730052CDE6 /* DuressPinOption.swift */; };
 		DC5F97142E2FDBDA0052CDE6 /* WalletInfoReceive.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97132E2FDBD20052CDE6 /* WalletInfoReceive.swift */; };
 		DC5F97162E2FEDA30052CDE6 /* WalletInfoSend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97152E2FED9F0052CDE6 /* WalletInfoSend.swift */; };
+		DC5F971A2E32E4930052CDE6 /* GlobalEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97192E32E48B0052CDE6 /* GlobalEnvironmentView.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
 		DC63BDF729AEB30C0067A361 /* BackgroundPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */; };
@@ -373,7 +374,6 @@
 		DCC9D99A267BD28600EA36DD /* SyncBackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */; };
 		DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */; };
 		DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCC7FD426B0A006008ACD9B /* SquareSize.swift */; };
-		DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCCEAB428F6DA2A0047871A /* RootView.swift */; };
 		DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD045C27EE0173007D57A5 /* EditInfoView.swift */; };
 		DCCD045F27EE0301007D57A5 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD045E27EE0301007D57A5 /* SummaryView.swift */; };
 		DCCD046127EE045C007D57A5 /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD046027EE045C007D57A5 /* DetailsView.swift */; };
@@ -703,6 +703,7 @@
 		DC5F97112E2EA8730052CDE6 /* DuressPinOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuressPinOption.swift; sourceTree = "<group>"; };
 		DC5F97132E2FDBD20052CDE6 /* WalletInfoReceive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoReceive.swift; sourceTree = "<group>"; };
 		DC5F97152E2FED9F0052CDE6 /* WalletInfoSend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletInfoSend.swift; sourceTree = "<group>"; };
+		DC5F97192E32E48B0052CDE6 /* GlobalEnvironmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalEnvironmentView.swift; sourceTree = "<group>"; };
 		DC63A3752B965D54008E040E /* InboundFeeSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeSheet.swift; sourceTree = "<group>"; };
 		DC63BDF329AE44380067A361 /* NotificationsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsManager.swift; sourceTree = "<group>"; };
 		DC63BDF629AEB30C0067A361 /* BackgroundPaymentsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPaymentsConfig.swift; sourceTree = "<group>"; };
@@ -830,7 +831,6 @@
 		DCC9D999267BD28600EA36DD /* SyncBackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBackupManager.swift; sourceTree = "<group>"; };
 		DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		DCCC7FD426B0A006008ACD9B /* SquareSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareSize.swift; sourceTree = "<group>"; };
-		DCCCEAB428F6DA2A0047871A /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		DCCD045C27EE0173007D57A5 /* EditInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditInfoView.swift; sourceTree = "<group>"; };
 		DCCD045E27EE0301007D57A5 /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		DCCD046027EE045C007D57A5 /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
@@ -1269,9 +1269,9 @@
 		DC46CB1028D9AA8000C4EAC7 /* content */ = {
 			isa = PBXGroup;
 			children = (
+				DC5F97192E32E48B0052CDE6 /* GlobalEnvironmentView.swift */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				DC46CB1528D9F30500C4EAC7 /* LoadingView.swift */,
-				DCCCEAB428F6DA2A0047871A /* RootView.swift */,
 			);
 			path = content;
 			sourceTree = "<group>";
@@ -2397,6 +2397,7 @@
 				DC5F96FB2E1DB6620052CDE6 /* WalletIconPicker.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
 				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
+				DC5F971A2E32E4930052CDE6 /* GlobalEnvironmentView.swift in Sources */,
 				DCBA60CD2C909C7600878895 /* SendView.swift in Sources */,
 				DC5E28CA2C62D37A0037B3D3 /* NavigationCoordinator.swift in Sources */,
 				DCC753E32CB98221006F646B /* String+Email.swift in Sources */,
@@ -2410,7 +2411,6 @@
 				DC4CF3CA2BE91FED003A957F /* SetNewPinView.swift in Sources */,
 				DC39D4EF287497440030F18D /* SmartModal.swift in Sources */,
 				DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */,
-				DCCCEAB528F6DA2A0047871A /* RootView.swift in Sources */,
 				DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */,
 				DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */,
 				DC08FC6E2DA9ABE80003E88C /* Ndef.swift in Sources */,

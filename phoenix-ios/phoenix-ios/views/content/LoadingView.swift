@@ -1,11 +1,13 @@
 import SwiftUI
 
 fileprivate let filename = "LoadingView"
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
+
+let LOADING_VIEW_ANIMATION_DURATION: TimeInterval = 0.1
 
 struct LoadingView: View {
 	
@@ -14,18 +16,39 @@ struct LoadingView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		ZStack(alignment: Alignment.top) {
+		GeometryReader { geometry in
+			layers()
+				.frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+				.onAppear {
+					GlobalEnvironment.deviceInfo._windowSize = geometry.size
+					GlobalEnvironment.deviceInfo.windowSafeArea = geometry.safeAreaInsets
+				}
+				.onChange(of: geometry.size) { newSize in
+					log.debug("onChange(of: geometry.size): \(newSize)")
+					GlobalEnvironment.deviceInfo._windowSize = newSize
+				}
+				.onChange(of: geometry.safeAreaInsets) { newValue in
+					log.debug("onChange(of: geometry.safeAreaInsets): \(newValue)")
+					GlobalEnvironment.deviceInfo.windowSafeArea = newValue
+				}
+		} // </GeometryReader>
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
+		ZStack {
 			
 			Color.clear   // an additional layer
 				.zIndex(0) // for animation purposes
 			
-			if !appState.isUnlocked {
+			if appState.isLoading {
 				content()
 					.zIndex(1)
-				//	.transition(.asymmetric(
-				//		insertion : .identity,
-				//		removal   : .move(edge: .bottom)
-				//	))
+					.transition(.asymmetric(
+						insertion : .identity,
+						removal   : .opacity.animation(.linear(duration: LOADING_VIEW_ANIMATION_DURATION))
+					))
 			}
 		}
 	}

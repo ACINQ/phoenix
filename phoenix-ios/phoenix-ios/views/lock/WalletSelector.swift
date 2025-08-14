@@ -8,7 +8,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 fileprivate let GRID_HSPACING: CGFloat = 10
-fileprivate let GRID_VSPACING: CGFloat = 10
+fileprivate let GRID_VSPACING: CGFloat = 20
 fileprivate let IMG_SIZE: CGFloat = 64
 
 struct WalletSelector: View {

@@ -7,7 +7,14 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+enum LockViewTarget {
+	case automatic
+	case walletSelector
+}
+
 struct LockView: View {
+	
+	let target: LockViewTarget
 	
 	@ObservedObject var appState = AppState.shared
 	
@@ -37,10 +44,9 @@ struct LockView: View {
 		case accessOptions
 		case pinPrompt
 	}
-	@State var visibleContent: VisibleContent? = nil
+	@State var visibleContent: VisibleContent?
 	
 	@State var didAppear: Bool = false
-	@State var firstAppearance: Bool = true
 	
 	@State var hiddenWalletPins: [String: [WalletMetadata]] = [:]
 	
@@ -53,31 +59,21 @@ struct LockView: View {
 		UIApplication.willEnterForegroundNotification
 	)
 	
+	init(target: LockViewTarget) {
+		self.target = target
+		
+		switch target {
+			case .automatic      : self._visibleContent = State(initialValue: nil)
+			case .walletSelector : self._visibleContent = State(initialValue: .walletSelector)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
 	
 	@ViewBuilder
 	var body: some View {
-		
-		ZStack(alignment: Alignment.top) {
-			
-			Color.clear   // an additional layer
-				.zIndex(0) // for animation purposes
-			
-			if !appState.isUnlocked {
-				layers()
-					.zIndex(1)
-					.transition(.asymmetric(
-						insertion : .identity,
-						removal   : .move(edge: .bottom)
-					))
-			}
-		}
-	}
-	
-	@ViewBuilder
-	func layers() -> some View {
 		
 		ZStack(alignment: Alignment.top) {
 			
@@ -436,13 +432,9 @@ struct LockView: View {
 		refreshBiometricsSupport()
 		
 		let allWallets = SecurityFileManager.shared.sortedWallets()
-		
 		visibleWallets = allWallets.filter { !$0.isHidden }
-		selectedWallet = SecurityFileManager.shared.currentWallet()
 		
 		let hiddenWallets = allWallets.filter({ $0.isHidden })
-		log.debug("hiddenWallets.count = \(hiddenWallets.count)")
-				
 		if !hiddenWallets.isEmpty {
 			DispatchQueue.global(qos: .default).async {
 				
@@ -466,19 +458,16 @@ struct LockView: View {
 			}
 		}
 		
-		DispatchQueue.main.async {
-			performFirstAppearance()
+		if target == .automatic {
+			selectedWallet = SecurityFileManager.shared.currentWallet()
+			DispatchQueue.main.async {
+				autoShowContent()
+			}
 		}
 	}
 	
-	func performFirstAppearance() {
+	func autoShowContent() {
 		log.trace(#function)
-		
-		guard firstAppearance else {
-			log.warning("performFirstAppearance(): ignoring: not firstAppearance")
-			return
-		}
-		firstAppearance = false
 		
 		if selectedWallet == nil {
 			showContent(.walletSelector, fastAnimation: true)
@@ -809,7 +798,7 @@ struct LockView: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
-	
+
 	func tryBiometricsLogin() {
 		log.trace(#function)
 		

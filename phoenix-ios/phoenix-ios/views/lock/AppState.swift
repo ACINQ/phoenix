@@ -14,10 +14,10 @@ class AppState: ObservableObject {
 	///
 	@Published var protectedDataAvailable: Bool
 	
-	/// Indicates the general state of the wallet.
-	/// Note that this is unknown until after we've read the SecurityFile.
+	/// Indicates whether the app is still loading/booting.
+	/// When this is true, the LoadingView is still visible.
 	///
-	@Published var loadedWalletId: WalletIdentifier?
+	@Published var isLoading: Bool
 	
 	/// Indicates whether the app is locked or unlocked.
 	/// This will be set to true if app-lock is disabled, or if the user has authenticated using biometrics.
@@ -29,7 +29,7 @@ class AppState: ObservableObject {
 		
 		self.migrationStepsCompleted = false
 		self.protectedDataAvailable = false
-		self.loadedWalletId = nil
+		self.isLoading = true
 		self.isUnlocked = false
 	}
 }

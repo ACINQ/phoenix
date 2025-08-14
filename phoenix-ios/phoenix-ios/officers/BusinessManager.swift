@@ -1,8 +1,8 @@
 import UIKit
+import SwiftUI
 import PhoenixShared
 import BackgroundTasks
 import Combine
-
 
 fileprivate let filename = "BusinessManager"
 #if DEBUG && true
@@ -520,7 +520,17 @@ class BusinessManager {
 			walletInfo: _walletInfo
 		)
 
-		AppState.shared.loadedWalletId = walletId
+		withAnimation {
+			switch trigger {
+			case .appLaunch: break
+			case .appUnlock: break
+			case .newWallet: fallthrough
+			case .restoreFromManualEntry: fallthrough
+			case .restoreFromCloudBackup(_):
+				AppState.shared.isUnlocked = true
+				SceneDelegate.get().finishIntroWindow()
+			}
+		}
 	}
 	
 	/// The current walletIdentifier (from the current unlocked wallet).

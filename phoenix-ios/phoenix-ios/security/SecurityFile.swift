@@ -104,6 +104,15 @@ class SecurityFile {
 			return V1(wallets: newWallets, defaultKey: self.defaultKey)
 		}
 		
+		func copyRemovingWallet(_ id: WalletIdentifier) -> V1 {
+			var newWallets = self.wallets
+			newWallets.removeValue(forKey: id.keychainKeyId)
+			
+			let newDefaultKey: String? = if (defaultKey == id.keychainKeyId) { nil } else { defaultKey }
+			
+			return V1(wallets: newWallets, defaultKey: newDefaultKey)
+		}
+		
 		func copyWithDefaultWalletId(_ id: WalletIdentifier?) -> V1 {
 			
 			return V1(wallets: self.wallets, defaultKey: id?.keychainKeyId)

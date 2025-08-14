@@ -51,51 +51,15 @@ fileprivate struct PaymentViewSheet: View {
 	let location: PaymentView.Location
 	let paymentInfo: WalletPaymentInfo
 	
-	@EnvironmentObject var shortSheetState: ShortSheetState
-	@State var shortSheetItem: ShortSheetItem? = nil
-	
-	@EnvironmentObject var popoverState: PopoverState
-	@State var popoverItem: PopoverItem? = nil
-	
 	@StateObject var navCoordinator = NavigationCoordinator()
 	
 	@ViewBuilder
 	var body: some View {
 		
-		ZStack {
-			
-			NavigationStack(path: $navCoordinator.path) {
-				SummaryView(location: location, paymentInfo: paymentInfo)
-			}
-			.environmentObject(navCoordinator)
-			.edgesIgnoringSafeArea(.all)
-			.zIndex(0) // needed for proper animation
-			.accessibilityHidden(shortSheetItem != nil || popoverItem != nil)
-			
-			if let shortSheetItem = shortSheetItem {
-				ShortSheetWrapper(dismissable: shortSheetState.dismissable) {
-					shortSheetItem.view
-				}
-				.zIndex(1) // needed for proper animation
-			}
-			
-			if let popoverItem = popoverItem {
-				PopoverWrapper(dismissable: popoverState.dismissable) {
-					popoverItem.view
-				}
-				.zIndex(2) // needed for proper animation
-			}
-			
-		} // </ZStack>
-		.onReceive(shortSheetState.itemPublisher) { (item: ShortSheetItem?) in
-			withAnimation {
-				shortSheetItem = item
-			}
+		NavigationStack(path: $navCoordinator.path) {
+			SummaryView(location: location, paymentInfo: paymentInfo)
 		}
-		.onReceive(popoverState.itemPublisher) { (item: PopoverItem?) in
-			withAnimation {
-				popoverItem = item
-			}
-		}
+		.environmentObject(navCoordinator)
+		.edgesIgnoringSafeArea(.all)
 	}
 }

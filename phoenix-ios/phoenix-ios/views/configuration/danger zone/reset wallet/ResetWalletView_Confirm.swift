@@ -413,16 +413,11 @@ struct ResetWalletView_Confirm: MVISubView {
 	// --------------------------------------------------
 	
 	func deleteWallet() {
-		log.trace("deleteWallet()")
+		log.trace(#function)
 		
-		if let scene = UIApplication.shared.connectedScenes.first,
-			let sceneDelegate = scene.delegate as? UIWindowSceneDelegate,
-			let mySceneDelegate = sceneDelegate as? SceneDelegate
-		{
-			mySceneDelegate.transitionToResetWalletWindow(
-				deleteTransactionHistory: deleteTransactionHistory,
-				deleteSeedBackup: deleteSeedBackup
-			)
-		}
+		SceneDelegate.get().startResetWallet(ResetWalletOptions(
+			deleteTransactionHistory: deleteTransactionHistory,
+			deleteSeedBackup: deleteSeedBackup
+		))
 	}
 }

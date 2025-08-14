@@ -95,7 +95,7 @@ struct WalletMetadataView: View {
 		List {
 			section_metadata()
 			section_options()
-			section_switchWallet()
+			section_management()
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
@@ -263,22 +263,34 @@ struct WalletMetadataView: View {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Section: Switch Wallet
+	// MARK: Section: Management
 	// --------------------------------------------------
 	
 	@ViewBuilder
-	func section_switchWallet() -> some View {
+	func section_management() -> some View {
 		
 		Section {
 			
 			Button {
 				switchToAnotherWallet()
 			} label: {
-				HStack {
-					Spacer(minLength: 0)
-					Text("Switch to another wallet").font(.headline)
-					Spacer(minLength: 0)
+				Label {
+					Text("Switch to another wallet")
+				} icon: {
+					Image(systemName: "arrow.up.backward.circle")
 				}
+				.font(.headline)
+			}
+			
+			Button {
+				addAnotherWallet()
+			} label: {
+				Label {
+					Text("Add another wallet")
+				} icon: {
+					Image(systemName: "plus.circle")
+				}
+				.font(.headline)
 			}
 		}
 	}
@@ -464,6 +476,12 @@ struct WalletMetadataView: View {
 		log.trace(#function)
 		
 		SceneDelegate.get().switchToAnotherWallet()
+	}
+	
+	func addAnotherWallet() {
+		log.trace(#function)
+		
+		SceneDelegate.get().addAnotherWallet()
 	}
 	
 	// --------------------------------------------------

@@ -85,6 +85,20 @@ enum AddEntryError: Error, CustomStringConvertible {
 	}
 }
 
+enum RemoveEntryError: Error, CustomStringConvertible {
+	case existingSecurityFileV0
+	case errorWritingSecurityFile(underlying: WriteSecurityFileError)
+	
+	var description: String {
+		switch self {
+		case .existingSecurityFileV0:
+			"<RemoveEntryError: existingSecurityFileV0>"
+		case .errorWritingSecurityFile(let underlying):
+			"<RemoveEntryError: errorWritingSecurityFile: \(underlying)>"
+		}
+	}
+}
+
 enum UnlockError: Error, CustomStringConvertible {
 	case readSecurityFileError(underlying: ReadSecurityFileError)
 	case readKeychainError(underlying: ReadKeychainError)

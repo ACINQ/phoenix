@@ -1055,18 +1055,6 @@ class Keychain_Wallet {
 	public func resetWallet() {
 		log.trace(#function)
 		
-		let fm = FileManager.default
-		let securityJsonUrl = SharedSecurity.shared.securityJsonUrl_V0
-		
-		if fm.fileExists(atPath: securityJsonUrl.path) {
-			do {
-				try fm.removeItem(at: securityJsonUrl)
-				log.info("Deleted file security.json")
-			} catch {
-				log.error("Unable to delete security.json: \(error)")
-			}
-		}
-		
 		for key in Key.allCases {
 			do {
 				let result = try SystemKeychain.deleteItem(

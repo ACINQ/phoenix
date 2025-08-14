@@ -4524,6 +4524,9 @@
         }
       }
     },
+    "Add another wallet" : {
+
+    },
     "Add contact" : {
       "localizations" : {
         "ar" : {
@@ -45278,6 +45281,9 @@
           }
         }
       }
+    },
+    "Wallet %@" : {
+      "comment" : "Default wallet name"
     },
     "Wallet balance" : {
 

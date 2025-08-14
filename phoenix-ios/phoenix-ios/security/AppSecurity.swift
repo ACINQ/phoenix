@@ -16,6 +16,10 @@ class AppSecurity {
 	
 	private init() { /* must use shared instance */ }
 	
+	// --------------------------------------------------
+	// MARK: Add Wallet
+	// --------------------------------------------------
+	
 	public func addWallet(
 		chain: Bitcoin_kmpChain,
 		recoveryPhrase: RecoveryPhrase,
@@ -50,6 +54,35 @@ class AppSecurity {
 			securityFile = SecurityFile.V1()
 		}
 		
+		if let _ = securityFile.wallets[nodeId] {
+			
+			// What do we do if the user is restoring a wallet that already exists on the system ?
+			//
+			// - overwrite the existing value in the security.json file
+			// - remove any associated keychain entries
+			//
+			// And there's a very good reason to do it this way:
+			//
+			// We have received reports from users who have locked themselves out of their wallet,
+			// but they know their recovery phrase.
+			//
+			// Various examples include:
+			// - user had biometrics enabled, and faceId/touchId stopped working (hardware damage)
+			// - user enabled a lockPin and forgot the pin
+			// - user enabled a spendingPin and forgot the pin
+			//
+			// Now, since they know their recovery phrase, they haven't lost any funds.
+			// But they may have had iCloud backup disabled,
+			// and they don't want to lose their transaction history.
+			//
+			// In the past, there was no solution for them.
+			// They had to uninstall & reinstall the app.
+			// Which meant losing their transaction history (if iCloud backup was disabled).
+			// With this implementation, we can finally offer them a simple solution.
+			
+			Keychain.wallet(walletId).resetWallet()
+		}
+		
 		let lockingKey = SymmetricKey(size: .bits256)
 		
 		let sealedBox: ChaChaPoly.SealedBox
@@ -67,7 +100,7 @@ class AppSecurity {
 			break
 		}
 		
-		let name = UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(maxLength: 6)
+		let name = randomWalletName()
 		let photo = WalletIcon.random().filename
 		
 		let newWallet = SecurityFile.V1.Wallet(
@@ -76,35 +109,6 @@ class AppSecurity {
 			photo: photo,
 			isHidden: false
 		)
-		
-		if let _ = securityFile.wallets[nodeId] {
-			
-			// What do we do if the user is restoring a wallet that already exists on the system ?
-			//
-			// - overwrite the existing value in the security.json file
-			// - remove any associated keychain entries
-			//
-			// And there's a very good reason to do it this way:
-			//
-			// We have received reports from users who have locked themselves out of their wallet,
-			// but they know their recovery phrase.
-			//
-			// For example:
-			// - they had biometrics enabled, and faceId/touchId stopped working (hardware damage)
-			// - they enabled a lockPin and forgot the pin
-			// - they enabled a spendingPin and forgot the pin
-			//
-			// Now, since they know their recovery phrase, they haven't lost any funds.
-			// But they also had iCloud backup disabled,
-			// and they don't want to lose their transaction history.
-			//
-			// In the past, there was no solution for them. They had to uninstall & reinstall the app.
-			// With this implementation, we can finally offer them a simple solution.
-			
-			Keychain.wallet(walletId).resetWallet()
-		}
-		
-		var newSecurityFile = securityFile.copyWithWallet(newWallet, id: walletId)
 		
 		// Set this wallet as the default if:
 		// - there is no default wallet set
@@ -118,13 +122,17 @@ class AppSecurity {
 		// wallets loaded in the system. We don't want the attacker to have that tool.
 		// Thus, we only consider VISIBLE wallets in our calculation.
 		//
-		if newSecurityFile.defaultWallet() == nil {
-			
-			let numVisibleWallets = securityFile.wallets.values.filter { $0.isHidden }.count
+		var makeDefaultWallet = false
+		if securityFile.defaultWallet() == nil {
+			let numVisibleWallets = securityFile.wallets.values.filter { !$0.isHidden }.count
 			if numVisibleWallets == 0 {
-				
-				newSecurityFile = securityFile.copyWithDefaultWalletId(walletId)
+				makeDefaultWallet = true
 			}
+		}
+		
+		var newSecurityFile = securityFile.copyWithWallet(newWallet, id: walletId)
+		if makeDefaultWallet {
+			newSecurityFile = newSecurityFile.copyWithDefaultWalletId(walletId)
 		}
 		
 		switch SecurityFileManager.shared.writeToDisk(newSecurityFile) {
@@ -161,6 +169,65 @@ class AppSecurity {
 		)
 	}
 	
+	// --------------------------------------------------
+	// MARK: Remove Wallet
+	// --------------------------------------------------
+	
+	public func removeWallet(
+		walletId: WalletIdentifier,
+		completion: @escaping (Result<Void, RemoveEntryError>) -> Void
+	) {
+		
+		Task(priority: .userInitiated) {
+			let result = await self._removeWallet(walletId)
+			DispatchQueue.main.async { completion(result) }
+		}
+	}
+	
+	private func _removeWallet(
+		_ walletId: WalletIdentifier
+	) async -> Result<Void, RemoveEntryError> {
+		
+		let securityFile: SecurityFile.V1
+		
+		if let existingFile = SecurityFileManager.shared.currentSecurityFile() {
+			switch existingFile {
+				case .v0(_)      : return .failure(.existingSecurityFileV0)
+				case .v1(let v1) : securityFile = v1
+			}
+		} else {
+			securityFile = SecurityFile.V1()
+		}
+		
+		guard let metadata = securityFile.getWallet(walletId) else {
+			return .success
+		}
+		
+		let photo = metadata.photo
+		if !WalletIcon.isValidFilename(photo) {
+			await PhotosManager.shared.deleteFromDisk(fileName: photo)
+		}
+		
+		let newSecurityFile = securityFile.copyRemovingWallet(walletId)
+		
+		do throws(WriteSecurityFileError) {
+			try await SecurityFileManager.shared.asyncWriteToDisk(newSecurityFile)
+		} catch {
+			log.error("SecurityFile.write(): error: \(error)")
+			return .failure(.errorWritingSecurityFile(underlying: error))
+		}
+		
+		return .success
+	}
+	
+	// --------------------------------------------------
+	// MARK: Load Wallet
+	// --------------------------------------------------
+	
+	/// Hook function: Called after a wallet has been loaded.
+	/// We use this to upgrade the SecurityFile from V0 to V1 (if needed).
+	/// We also use this to perform the one-time keychain migration.
+	///
 	public func didLoadWallet(_ walletId: WalletIdentifier) {
 		log.trace(#function)
 		
@@ -188,7 +255,7 @@ class AppSecurity {
 		// Move all: "key-default" > "key-<walletId>"
 		Keychain.didLoadWallet(walletId)
 		
-		let name = UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(maxLength: 6)
+		let name = randomWalletName()
 		let photo = WalletIcon.random().filename
 		
 		let newWallet = SecurityFile.V1.Wallet(
@@ -209,5 +276,15 @@ class AppSecurity {
 				log.debug("Done")
 			}
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utilities
+	// --------------------------------------------------
+	
+	private func randomWalletName() -> String {
+		
+		let randomId = UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(maxLength: 6)
+		return String(localized: "Wallet \(randomId)", comment: "Default wallet name")
 	}
 }

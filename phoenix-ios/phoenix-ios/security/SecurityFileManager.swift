@@ -73,6 +73,14 @@ class SecurityFileManager {
 		return WalletMetadata(wallet: wallet, keyInfo: keyInfo, isDefault: true)
 	}
 	
+	func hasZeroWallets() -> Bool {
+		
+		guard case .v1(let v1) = self.currentSecurityFile() else {
+			return true
+		}
+		return v1.wallets.isEmpty
+	}
+	
 	func allWallets() -> [WalletMetadata] {
 		
 		guard case .v1(let v1) = self.currentSecurityFile() else {
@@ -98,7 +106,7 @@ class SecurityFileManager {
 	// MARK: Read
 	// --------------------------------------------------
 	
-	private func readFromDisk() -> Result<SecurityFile.Version, ReadSecurityFileError> {
+	func readFromDisk() -> Result<SecurityFile.Version, ReadSecurityFileError> {
 		log.trace(#function)
 		
 		return queue.sync {
@@ -235,7 +243,7 @@ class SecurityFileManager {
 	) {
 		log.trace(#function)
 		
-		DispatchQueue.global(qos: .userInitiated).async {
+		DispatchQueue.global(qos: qos).async {
 			let result = self.writeToDisk(securityFile)
 			DispatchQueue.main.async {
 				completion(result)

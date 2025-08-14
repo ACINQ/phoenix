@@ -17,6 +17,11 @@ fileprivate enum DeleteState {
 	case done
 }
 
+struct ResetWalletOptions {
+	let deleteTransactionHistory: Bool
+	let deleteSeedBackup: Bool
+}
+
 struct ResetWalletView_Action: View {
 	
 	let deleteTransactionHistory: Bool
@@ -42,7 +47,7 @@ struct ResetWalletView_Action: View {
 		
 		ZStack {
 			// An additional layer for animation purposes
-			Color.primaryBackground
+			Color.clear
 				.edgesIgnoringSafeArea(.all)
 				.zIndex(0)
 			
@@ -341,7 +346,7 @@ struct ResetWalletView_Action: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func onAppear(){
+	func onAppear() {
 		log.trace("onAppear()")
 		
 		guard !didAppear else {
@@ -401,7 +406,7 @@ struct ResetWalletView_Action: View {
 	}
 	
 	func syncSeed_stateChanged(_ state: SyncSeedManager_State) {
-		log.trace("syncSeed_stateChanged(\(state.description)")
+		log.trace("syncSeed_stateChanged(\(state.description))")
 		assertMainThread() // SyncSeedManager promises to always publish on the main thread
 		
 		guard deleteSeedBackup else {
@@ -476,15 +481,6 @@ struct ResetWalletView_Action: View {
 	func doneButtonTapped() {
 		log.trace("doneButtonTapped()")
 		
-		if let scene = UIApplication.shared.connectedScenes.first,
-			let sceneDelegate = scene.delegate as? UIWindowSceneDelegate,
-			let mySceneDelegate = sceneDelegate as? SceneDelegate
-		{
-			if mySceneDelegate.transitionBackToMainWindow() {
-				withAnimation {
-					visible = false
-				}
-			}
-		}
+		SceneDelegate.get().finishResetWallet()
 	}
 }

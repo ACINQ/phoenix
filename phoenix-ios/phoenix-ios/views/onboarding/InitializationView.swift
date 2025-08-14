@@ -11,16 +11,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct InitializationView: MVIView {
 	
-	enum Location {
-		case introContainer
-		case walletSelector
-	}
-	let location: Location
-	
 	enum NavLinkTag: String, Codable {
 		case Configuration
 		case RestoreView
 	}
+	
+	let isCancellable: Bool
 	
 	@StateObject var mvi = MVIState({ Biz.business.controllers.initialization() })
 
@@ -37,9 +33,11 @@ struct InitializationView: MVIView {
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
 	
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	
+	init(isCancellable: Bool) {
+		self.isCancellable = isCancellable
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -95,17 +93,6 @@ struct InitializationView: MVIView {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			HStack(alignment: VerticalAlignment.top, spacing: 0) {
-				
-				if location == .walletSelector {
-					Button {
-						navigateBack()
-					} label: {
-						Image(systemName: "chevron.backward")
-							.renderingMode(.template)
-							.imageScale(.large)
-					}
-				}
-				
 				Spacer()
 				
 				navLink(.Configuration) {
@@ -148,6 +135,11 @@ struct InitializationView: MVIView {
 			
 			Spacer() // 2 spacers at bottom
 			Spacer() // move center upwards; focus is buttons, not logo
+			
+			if isCancellable {
+				cancelButton()
+					.padding(.bottom, 10)
+			}
 
 		} // </VStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -171,6 +163,7 @@ struct InitializationView: MVIView {
 			.frame(width: buttonWidth)
 			.padding([.top, .bottom], 8)
 			.padding([.leading, .trailing], 16)
+			.contentShape(Rectangle()) // make Spacer area tappable
 		}
 		.buttonStyle(
 			ScaleButtonStyle(
@@ -195,12 +188,40 @@ struct InitializationView: MVIView {
 			.frame(width: buttonWidth)
 			.padding([.top, .bottom], 8)
 			.padding([.leading, .trailing], 16)
+			.contentShape(Rectangle()) // make Spacer area tappable
 		}
 		.buttonStyle(
 			ScaleButtonStyle(
 				cornerRadius: 100,
 				backgroundFill: Color.primaryBackground,
 				borderStroke: Color.appAccent
+			)
+		)
+	}
+	
+	@ViewBuilder
+	func cancelButton() -> some View {
+		
+		Button {
+			cancelNewWallet()
+		} label: {
+			HStack(alignment: VerticalAlignment.firstTextBaseline) {
+				Image(systemName: "x.circle")
+					.imageScale(.small)
+				Text("Cancel")
+			}
+			.foregroundColor(Color.primary)
+			.font(.title3)
+			.read(buttonWidthReader)
+			.frame(width: buttonWidth)
+			.padding([.top, .bottom], 8)
+			.padding([.leading, .trailing], 16)
+			.contentShape(Rectangle()) // make Spacer area tappable
+		}
+		.buttonStyle(
+			ScaleButtonStyle(
+				cornerRadius: 100,
+				borderStroke: Color.appNegative
 			)
 		)
 	}
@@ -301,12 +322,6 @@ struct InitializationView: MVIView {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func navigateBack() {
-		log.trace(#function)
-		
-		presentationMode.wrappedValue.dismiss()
-	}
-	
 	func createNewWallet() {
 		log.trace(#function)
 		
@@ -324,17 +339,10 @@ struct InitializationView: MVIView {
 		)
 		mvi.intent(intent)
 	}
-}
-
-/*
-struct MnemonicLanguageBindingKey: EnvironmentKey {
-	static var defaultValue: Binding<MnemonicLanguage> = .constant(MnemonicLanguage.french)
-}
-
-extension EnvironmentValues {
-	var mnemonicLanguageBinding: Binding<MnemonicLanguage> {
-		get { self[MnemonicLanguageBindingKey.self] }
-		set { self[MnemonicLanguageBindingKey.self] = newValue }
+	
+	func cancelNewWallet() {
+		log.trace(#function)
+		
+		SceneDelegate.get().cancelIntroWindow()
 	}
 }
-*/

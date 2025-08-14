@@ -14,8 +14,9 @@ struct UnlockErrorView: View {
 	@ViewBuilder
 	var body: some View {
 		
-		_UnlockErrorView(danger: danger)
-			.modifier(GlobalEnvironment.errorInstance())
+		GlobalEnvironmentView {
+			_UnlockErrorView(danger: danger)
+		}
 	}
 }
 
