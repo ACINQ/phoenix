@@ -24,18 +24,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.blockchain.electrum.WalletState
-import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.phoenixSwapInWallet
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 
+
 class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel() {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-    val taprootAddresses = mutableStateListOf<Pair<String, WalletState.AddressState>>()
+    val taprootAddresses = mutableStateListOf<TaprootAddress>()
     val legacyAddress = mutableStateOf<Pair<String, WalletState.AddressState>?>(null)
 
     init {
@@ -46,16 +46,14 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
     private fun monitorSwapAddresses() {
         viewModelScope.launch {
             peerManager.getPeer().phoenixSwapInWallet.wallet.walletStateFlow.collect { walletState ->
-                val newAddresses = walletState.addresses.toList().sortedByDescending {
-                    val meta = it.second.meta
-                    if (meta is WalletState.AddressMeta.Derived) {
-                        meta.index
-                    } else {
-                        -1 // legacy address goes to the bottom
+                val currentTaprootAddress = walletState.firstUnusedDerivedAddress
+                val addresses = walletState.addresses.toList()
+                val legacy = addresses.firstOrNull { it.second.meta is WalletState.AddressMeta.Single }
+                val taprootList = addresses.filter { it.second.meta is WalletState.AddressMeta.Derived }
+                    .sortedByDescending { it.second.meta.indexOrNull }
+                    .map {
+                        TaprootAddress(address = it.first, state = it.second, isCurrent = it.first == currentTaprootAddress?.first)
                     }
-                }
-                if (newAddresses.isEmpty()) return@collect
-                val (legacy, taprootList) = newAddresses.last() to newAddresses.dropLast(1)
                 log.info("swap-in taproot addresses update: ${taprootAddresses.size} -> ${taprootList.size}")
                 taprootAddresses.clear()
                 taprootAddresses.addAll(taprootList)
@@ -63,6 +61,8 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
             }
         }
     }
+
+    data class TaprootAddress(val address: String, val state: WalletState.AddressState, val isCurrent: Boolean)
 
     class Factory(
         private val peerManager: PeerManager,

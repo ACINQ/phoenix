@@ -254,6 +254,8 @@ val mutedBgColor @Composable get() = if (isDarkTheme) gray950 else gray30
 
 val borderColor @Composable get() = if (isDarkTheme) gray800 else gray50
 
+fun Color.darken(factor: Float = 0.8f): Color = Color(red = red * factor, green = green * factor, blue = blue * factor, alpha = alpha)
+
 /** top gradient is darker/lighter than the background, but not quite black/white */
 private val topGradientColor @Composable get() = if (isDarkTheme) gray1000 else gray10
 private val bottomGradientColor @Composable get() = MaterialTheme.colors.background

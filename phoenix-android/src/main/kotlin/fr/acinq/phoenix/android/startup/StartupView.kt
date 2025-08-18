@@ -78,7 +78,6 @@ fun StartupView(
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
-            //.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

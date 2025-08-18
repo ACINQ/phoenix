@@ -80,7 +80,7 @@ fun FinalWalletRefundView(
     val available = finalWallet?.confirmed?.filter { it.blockHeight > 0 }?.balance
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.swapinrefund_title))
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.finalwallet_refund_title))
         when (available) {
             null -> {
                 ProgressView(text = stringResource(id = R.string.utils_loading_data))

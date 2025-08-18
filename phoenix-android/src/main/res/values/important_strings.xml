@@ -468,7 +468,7 @@
 
     <string name="spliceout_capacity_disclaimer_title">Channel size impacted</string>
     <string name="spliceout_capacity_disclaimer_body1">Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains unchanged.</string>
-    <string name="spliceout_capacity_disclaimer_checkbox">Don\'t show that message again.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Don\'t show this message again.</string>
 
     <!-- Spend swap-in refund -->
 
