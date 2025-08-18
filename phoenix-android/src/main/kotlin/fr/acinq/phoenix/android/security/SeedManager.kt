@@ -22,6 +22,7 @@ import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.android.security.EncryptedSeed.Companion.toMnemonics
 import fr.acinq.phoenix.android.security.EncryptedSeed.Companion.toMnemonicsSafe
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -72,6 +73,8 @@ object SeedManager {
                 val seed = MnemonicCode.toSeed(words, "").toByteVector()
                 val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
                 val nodeId = keyManager.nodeKeys.nodeKey.publicKey.toHex()
+
+                DataStoreManager.migratePrefsNodeId(context, nodeId)
 
                 DecryptSeedResult.Success(mnemonicsMap = mapOf(nodeId to words))
             }

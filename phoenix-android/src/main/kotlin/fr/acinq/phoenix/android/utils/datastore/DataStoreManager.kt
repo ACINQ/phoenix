@@ -17,15 +17,19 @@
 package fr.acinq.phoenix.android.utils.datastore
 
 import android.content.Context
-import androidx.datastore.core.DataStore
+import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
+import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.byteVector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.slf4j.LoggerFactory
 import java.io.File
 
 object DataStoreManager {
+
+    val log = LoggerFactory.getLogger(this::class.java)
 
     // map of: node_id -> userPrefs for that node_id
     private val _userPrefsMapFlow = MutableStateFlow<Map<String, UserPrefsRepository>>(emptyMap())
@@ -36,7 +40,7 @@ object DataStoreManager {
         if (existingNodeUserPrefs != null) return existingNodeUserPrefs
 
         val newNodeUserPrefs = PreferenceDataStoreFactory.create {
-            File(context.filesDir, userPrefsFileName(nodeId))
+            userPrefsFile(context, nodeId)
         }.let { UserPrefsRepository(it) }
 
         val newUserPrefsMap = _userPrefsMapFlow.value.toMutableMap()
@@ -56,7 +60,7 @@ object DataStoreManager {
      * Deletes a user's DataStore file and removes it from the map.
      */
     fun deleteNodeUserPrefs(context: Context, nodeId: String): Boolean {
-        val file = File(context.filesDir, userPrefsFileName(nodeId))
+        val file = userPrefsFile(context, nodeId)
         val deleted = file.delete()
 
         if (deleted) {
@@ -66,6 +70,20 @@ object DataStoreManager {
         return deleted
     }
 
-    private fun userPrefsFileName(nodeId: String) = "userprefs_${nodeId}.preferences_pb"
-    private fun internalPrefsFileName(nodeId: String) = "internaldata_${nodeId}.preferences_pb"
+    fun migratePrefsNodeId(context: Context, nodeId: String) {
+        try {
+            val oldFile = context.dataStoreFile("userprefs.preferences_pb")
+            if (oldFile.exists()) {
+                log.info("migrating prefs: ${oldFile.name}")
+                val newFile = userPrefsFile(context, nodeId)
+                oldFile.copyTo(newFile, overwrite = true)
+                oldFile.delete()
+            }
+        } catch (e: Exception) {
+            log.error("error when migrating prefs for node_id=$nodeId")
+        }
+    }
+
+    private fun userPrefsFile(context: Context, nodeId: String): File = context.dataStoreFile("userprefs_${PublicKey.fromHex(nodeId).hash160().byteVector().toHex()}.preferences_pb")
+    private fun internalPrefsFile(context: Context, nodeId: String): File = context.dataStoreFile("internaldata_${PublicKey.fromHex(nodeId).hash160().byteVector().toHex()}.preferences_pb")
 }
