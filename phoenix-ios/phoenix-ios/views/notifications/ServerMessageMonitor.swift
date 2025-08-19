@@ -31,11 +31,11 @@ class ServerMessageMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
-		Biz.business.appConfigurationManager.walletNoticePublisher()
-			.sink {[weak self] (notice: WalletNotice) in
+		Task { @MainActor [weak self] in
+			for await notice in Biz.business.appConfigurationManager.walletNoticeSequence() {
 				self?.noticeDidChange(notice)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 	}
 	
 	private func readIndexDidChange(_ readIndex: Int?) {

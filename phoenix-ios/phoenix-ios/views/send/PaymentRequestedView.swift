@@ -23,8 +23,6 @@ struct PaymentRequestedView: View {
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	
-	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
-	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -36,8 +34,10 @@ struct PaymentRequestedView: View {
 			.navigationTitle(NSLocalizedString("Payment Requested", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden()
-			.onReceive(lastIncomingPaymentPublisher) {
-				lastIncomingPaymentChanged($0)
+			.task {
+				for await payment in Biz.business.paymentsManager.lastIncomingPaymentSequence() {
+					lastIncomingPaymentChanged(payment)
+				}
 			}
 	}
 	
@@ -123,7 +123,7 @@ struct PaymentRequestedView: View {
 	// --------------------------------------------------
 	
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
-		log.trace("lastIncomingPaymentChanged()")
+		log.trace(#function)
 		log.debug("lastIncomingPayment.paymentHash = \(lastIncomingPayment.id.description())")
 		
 		let paymentState = lastIncomingPayment.state()

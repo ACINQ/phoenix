@@ -15,8 +15,6 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	@State var sharing: String? = nil
-	
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
 	
 	enum CapacityHeight: Preference {}
@@ -68,8 +66,10 @@ struct ChannelsConfigurationView: View {
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.sharing($sharing)
-		.onReceive(channelsPublisher) {
-			channels = $0
+		.task {
+			for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+				channels = newChannels
+			}
 		}
 	}
 	

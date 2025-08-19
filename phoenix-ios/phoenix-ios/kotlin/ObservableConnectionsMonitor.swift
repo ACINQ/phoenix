@@ -24,9 +24,10 @@ class ObservableConnectionsMonitor: ObservableObject {
 		connections = currentConnections
 		connectionsChanged(currentConnections)
 		
-		connectionsManager.connectionsPublisher().sink {[weak self](newConnections: Connections) in
-			self?.connectionsChanged(newConnections)
-			
+		Task { @MainActor [weak self] in
+			for await newConnections in connectionsManager.connectionsSequence() {
+				self?.connectionsChanged(newConnections)
+			}
 		}.store(in: &cancellables)
 	}
 	

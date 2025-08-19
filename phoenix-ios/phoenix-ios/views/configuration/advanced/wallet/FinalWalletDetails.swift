@@ -15,7 +15,6 @@ struct FinalWalletDetails: View {
 	}
 	
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
-	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	@State var blockchainExplorerTxid: Bitcoin_kmpTxId? = nil
 	
@@ -50,8 +49,10 @@ struct FinalWalletDetails: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(finalWalletPublisher) {
-			finalWalletChanged($0)
+		.task {
+			for await finalWallet in Biz.business.peerManager.finalWalletSequence() {
+				finalWalletChanged(finalWallet)
+			}
 		}
 	}
 	

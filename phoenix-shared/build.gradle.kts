@@ -200,7 +200,7 @@ skie {
     }
     features {
         group {
-            FlowInterop.Enabled(false)
+            FlowInterop.Enabled(true)
             SuspendInterop.Enabled(false)
         }
     }
