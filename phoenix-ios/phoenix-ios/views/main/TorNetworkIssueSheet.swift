@@ -1,16 +1,17 @@
 import SwiftUI
 
-fileprivate let filename = "InboundFeeSheet"
+fileprivate let filename = "TorNetworkIssueSheet"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct Bolt12Sheet: View {
+struct TorNetworkIssueSheet: View {
 	
 	@Environment(\.openURL) var openURL
 	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	@ViewBuilder
@@ -26,7 +27,7 @@ struct Bolt12Sheet: View {
 	func header() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("Lightning Offers")
+			Text("No access to the Tor network")
 				.font(.title3)
 				.accessibilityAddTraits(.isHeader)
 				.accessibilitySortPriority(100)
@@ -53,9 +54,10 @@ struct Bolt12Sheet: View {
 	@ViewBuilder
 	func content() -> some View {
 		
-		VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			content_message()
-			content_button()
+				.padding(.bottom, 20)
+			content_buttons()
 		}
 		.padding(.all)
 	}
@@ -63,67 +65,58 @@ struct Bolt12Sheet: View {
 	@ViewBuilder
 	func content_message() -> some View {
 		
-		Text(
-			"""
-			**This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.**
-			
-			Unlike traditional Lightning invoices, it does not expire and can be reused.
-			
-			Share it widely : for donations, tips, or to get paid by your friends.
-			
-			🛟 **Who supports Bolt12?**
-			
-			For the moment, few services support Bolt12. If a service rejects this \
-			invoice, let them know they're missing out!
-			
-			🪫 **Restrictions**
-			
-			Your phone must be turned on and connected to the internet to receive a payment. \
-			Also enabling TOR in Phoenix may cause issues.
-			"""
-		)
-	}
-	
-	@ViewBuilder
-	func content_button() -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Spacer()
-			Button {
-				navigateToFAQ()
-			} label: {
-				Text("Learn more")
-			} // </Button>
-		} // </HStack>
+		VStack(alignment: HorizontalAlignment.leading, spacing: 15) {
+			Text("Phoenix needs access to Tor to function properly.")
+			Text("Make sure your Tor Proxy VPN app is up and running, and that it's connected to Tor.")
+			Text("If you don't have a Tor VPN app, install one. We recommend Orbot.")
+		}
+		.font(.callout)
 	}
 	
 	@ViewBuilder
 	func content_buttons() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Spacer()
+		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
 			Button {
-				navigateToFAQ()
+				openTorSettings()
 			} label: {
-				Text("Learn more")
-			} // </Button>
-		} // </HStack>
+				Label("Open Tor settings", systemImage: "gearshape.fill")
+					.frame(maxWidth: .infinity)
+			}
+			.buttonStyle(.borderedProminent)
+			
+			Button {
+				openOrbotWebsite()
+			} label: {
+				Label("Open Orbot website", systemImage: "link")
+					.frame(maxWidth: .infinity)
+			}
+			.buttonStyle(.bordered)
+			
+		}
 	}
 	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func navigateToFAQ() {
-		log.trace("navigateToFAQ()")
+	func openTorSettings() {
+		log.trace(#function)
 		
-		if let url = URL(string: "https://phoenix.acinq.co/faq") {
+		smartModalState.close()
+		deepLinkManager.broadcast(DeepLink.torSettings)
+	}
+	
+	func openOrbotWebsite() {
+		log.trace(#function)
+		
+		if let url = URL(string: "https://orbot.app/") {
 			openURL(url)
 		}
 	}
 	
 	func closeSheet() {
-		log.trace("closeSheet()")
+		log.trace(#function)
 		
 		smartModalState.close()
 	}

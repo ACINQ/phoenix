@@ -15,6 +15,7 @@ enum DeepLink: Equatable, CustomStringConvertible {
 	case electrum
 	case backgroundPayments
 	case liquiditySettings
+	case torSettings
 	case forceCloseChannels
 	case swapInWallet
 	case finalWallet
@@ -30,6 +31,7 @@ enum DeepLink: Equatable, CustomStringConvertible {
 			case .electrum           : "electrum"
 			case .backgroundPayments : "backgroundPayments"
 			case .liquiditySettings  : "liquiditySettings"
+			case .torSettings        : "torSettings"
 			case .forceCloseChannels : "forceCloseChannels"
 			case .swapInWallet       : "swapInWallet"
 			case .finalWallet        : "finalWallet"
