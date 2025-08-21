@@ -63,60 +63,81 @@ class Keychain {
 		return mixins
 	}
 	
-	private static func migrateKey(oldAccount: String, newAccount: String, accessGroup: String) {
-		
+	private static func migrateKey(
+		oldAccount     : String,
+		oldAccessGroup : String,
+		newAccount     : String,
+		newAccessGroup : String
+	) {
 		let mixins = commonMixins()
 		
+		// Step 1 of 4:
+		// - Read the OLD keychain item.
+		// - If it exists, then we need to migrate it to the new location.
 		var value: Data? = nil
 		do {
 			value = try SystemKeychain.readItem(
 				account     : oldAccount,
-				accessGroup : accessGroup,
+				accessGroup : oldAccessGroup,
 				mixins      : mixins
 			)
 		} catch {
-			log.error("keychain.readItem(acct: \(oldAccount), grp: \(accessGroup)): error: \(error)")
-			return
+			log.error("keychain.read(acct: \(oldAccount), grp: \(oldAccessGroup)): error: \(error)")
 		}
 		
 		guard let value else {
+			// Nothing to migrate
 			return
 		}
 		
-		var dstExists = false
+		// Step 2 of 4:
+		// - Delete the NEW keychain item.
+		// - It shouldn't exist, but if it does it will cause an error on the next step.
+		//
+		// Important:
+		//   Keychain items do NOT get cleared when an app is deleted on iOS.
+		//   So it's possible, for example, that the lockingKey still exists from a previous install.
+		//   If we don't overwrite this old value, then it will be out-of-sync with the SecurityFile.
 		do {
-			dstExists = try SystemKeychain.itemExists(
+			try SystemKeychain.deleteItem(
 				account     : newAccount,
-				accessGroup : accessGroup,
+				accessGroup : newAccessGroup
+			)
+		} catch {
+			log.error("keychain.delete(acct: \(newAccount), grp: \(newAccessGroup)): error: \(error)")
+		}
+		
+		if oldAccessGroup == newAccessGroup {
+			log.debug("keychain.move: \(oldAccount) => \(newAccount)")
+		} else {
+			log.debug("keychain.move: (\(oldAccount), \(oldAccessGroup) => (\(newAccount), \(newAccessGroup))")
+		}
+		
+		do {
+			// Step 3 of 4:
+			// - Copy the OLD keychain item to the NEW location.
+			// - If this step fails, we do NOT advance to step 4.
+			try SystemKeychain.addItem(
+				value       : value,
+				account     : newAccount,
+				accessGroup : newAccessGroup,
 				mixins      : mixins
 			)
 		} catch {
-			log.error("keychain.exists(acct: \(newAccount), grp: \(accessGroup)): error: \(error)")
-			return
+			log.error("keychain.add(acct: \(newAccount), grp: \(newAccessGroup)): error: \(error)")
+			return // <- important safety mechanism
 		}
 		
-		if dstExists {
-			log.debug("keychain.delete: \(oldAccount)")
-		} else {
-			log.debug("keychain.move: \(oldAccount) => \(newAccount)")
-			
-			do {
-				try SystemKeychain.addItem(
-					value       : value,
-					account     : newAccount,
-					accessGroup : accessGroup,
-					mixins      : mixins
-				)
-			} catch {
-				log.error("keychain.add(acct: \(newAccount), grp: \(accessGroup)): error: \(error)")
-				return
-			}
-		}
-		
+		// Step 4 of 4:
+		// - Delete the OLD keychain item.
+		// - This prevents any duplicate migration attempts in the future.
 		do {
-			try SystemKeychain.deleteItem(account: oldAccount, accessGroup: accessGroup)
+			try SystemKeychain.deleteItem(
+				account     : oldAccount,
+				accessGroup : oldAccessGroup
+			)
 		} catch {
-			log.error("keychain.delete(acct: \(oldAccount), grp: \(accessGroup)): error: \(error)")
+			log.error("keychain.delete(acct: \(oldAccount), grp: \(oldAccessGroup)): error: \(error)")
 		}
 	}
 	
@@ -198,66 +219,12 @@ class Keychain {
 		let oldAccessGroup = AccessGroup.appOnly.value
 		let newAccessGroup = AccessGroup.appAndExtensions.value
 		
-		var mixins = [String: Any]()
-		mixins[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-		
-		// Step 1 of 4:
-		// - Read the OLD keychain item.
-		// - If it exists, then we need to migrate it to the new location.
-		var savedKey: SymmetricKey? = nil
-		do {
-			savedKey = try SystemKeychain.readItem(
-				account     : account,
-				accessGroup : oldAccessGroup, // <- old location
-				mixins      : mixins
-			)
-		} catch {
-			log.error("keychain.read(account: keychain, group: nil): error: \(error)")
-		}
-		
-		if let lockingKey = savedKey {
-			// The OLD keychain item exists, so we're going to migrate it.
-			
-			var migrated = false
-			do {
-				// Step 2 of 4:
-				// - Delete the NEW keychain item.
-				// - It shouldn't exist, but if it does it will cause an error on the next step.
-				try SystemKeychain.deleteItem(
-					account     : account,
-					accessGroup : newAccessGroup // <- new location
-				)
-			} catch {
-				log.error("keychain.delete(account: keychain, group: shared): error: \(error)")
-			}
-			do {
-				// Step 3 of 4:
-				// - Copy the OLD keychain item to the NEW location.
-				// - If this step fails, an exception is thrown, and we do NOT advance to step 4.
-				try SystemKeychain.storeItem(
-					value       : lockingKey,
-					account     : account,
-					accessGroup : newAccessGroup, // <- new location
-					mixins      : mixins
-				)
-				migrated = true
-				
-				// Step 4 of 4:
-				// - Finally, delete the OLD keychain item.
-				// - This prevents any duplicate migration attempts in the future.
-				try SystemKeychain.deleteItem(
-					account     : account,
-					accessGroup : oldAccessGroup // <- old location
-				)
-				
-			} catch {
-				if !migrated {
-					log.error("keychain.store(account: keychain, group: shared): error: \(error)")
-				} else {
-					log.error("keychain.delete(account: keychain, group: private): error: \(error)")
-				}
-			}
-		}
+		migrateKey(
+			oldAccount: account,
+			oldAccessGroup: oldAccessGroup,
+			newAccount: account,
+			newAccessGroup: newAccessGroup
+		)
 	}
 	
 	private static func performMigration_toBuild92(
@@ -281,10 +248,12 @@ class Keychain {
 		runWhenProtectedDataAvailable(completionPublisher) {
 			
 			for key in Key.allCases {
+				let accessGroup = key.accessGroup.value
 				self.migrateKey(
-					oldAccount  : key.deprecatedValue,
-					newAccount  : key.account(KEYCHAIN_DEFAULT_ID),
-					accessGroup : key.accessGroup.value
+					oldAccount     : key.deprecatedValue,
+					oldAccessGroup : accessGroup,
+					newAccount     : key.account(KEYCHAIN_DEFAULT_ID),
+					newAccessGroup : accessGroup
 				)
 			}
 		}
@@ -332,10 +301,12 @@ class Keychain {
 		let newId = walletId.standardKeyId
 		
 		for key in Key.allCases {
+			let accessGroup = key.accessGroup.value
 			migrateKey(
-				oldAccount  : key.account(oldId),
-				newAccount  : key.account(newId),
-				accessGroup : key.accessGroup.value
+				oldAccount     : key.account(oldId),
+				oldAccessGroup : accessGroup,
+				newAccount     : key.account(newId),
+				newAccessGroup : accessGroup
 			)
 		}
 	}
