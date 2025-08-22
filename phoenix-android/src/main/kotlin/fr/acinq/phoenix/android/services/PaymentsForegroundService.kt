@@ -11,7 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
@@ -46,14 +46,14 @@ class PaymentsForegroundService : Service() {
 
     private val shutdownHandler = Handler(Looper.getMainLooper())
     private val shutdownRunnable: Runnable = Runnable {
-        if (BusinessRepo.isHeadless.value) {
+        if (BusinessManager.isHeadless.value) {
             log.debug("reached scheduled shutdown while headless")
-            if (BusinessRepo.receivedInTheBackground.isEmpty()) {
+            if (BusinessManager.receivedInTheBackground.isEmpty()) {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             } else {
                 stopForeground(STOP_FOREGROUND_DETACH)
             }
-            BusinessRepo.stopAllBusinesses()
+            BusinessManager.stopAllBusinesses()
         }
         stopSelf()
     }
@@ -65,12 +65,12 @@ class PaymentsForegroundService : Service() {
         val reason = intent?.getStringExtra(EXTRA_REASON)
         val nodeId = intent?.getStringExtra(EXTRA_NODE_ID)
 
-        val businessMap = BusinessRepo.businessFlow.value
+        val businessMap = BusinessManager.businessFlow.value
 
         // the notification for the foreground service depends on whether the business is started or not.
         val notif = when {
 
-            !BusinessRepo.isHeadless.value -> {
+            !BusinessManager.isHeadless.value -> {
                 log.info("app is not headless, ignoring background message (reason=$reason)")
                 SystemNotificationHelper.notifyRunningHeadless(applicationContext)
             }
@@ -112,7 +112,7 @@ class PaymentsForegroundService : Service() {
                             SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                         } else {
                             serviceScope.launch(Dispatchers.Default) {
-                                when (val res = BusinessRepo.startNewBusiness(match, isHeadless = true)) {
+                                when (val res = BusinessManager.startNewBusiness(match, isHeadless = true)) {
                                     is StartBusinessResult.Failure -> {
                                         log.error("error when starting node_id=${nodeId.take(10)}... from foreground service: $res")
                                         stopForeground(STOP_FOREGROUND_REMOVE)

@@ -16,19 +16,22 @@
 
 package fr.acinq.phoenix.android.utils.datastore
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.byteVector
-import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.getValue
+import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.wallet.WalletAvatar
+import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -39,7 +42,7 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import kotlin.random.Random
 
-class GlobalPrefsRepository(private val data: DataStore<Preferences>) {
+class GlobalPrefs(private val data: DataStore<Preferences>) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -57,8 +60,14 @@ class GlobalPrefsRepository(private val data: DataStore<Preferences>) {
     private companion object {
         // tracks which wallet the app should try to load first, may be null
         private val DEFAULT_NODE_ID = stringPreferencesKey("DEFAULT_NODE_ID")
-        private val ACTIVE_NODE_ID = stringPreferencesKey("ACTIVE_NODE_ID")
         private val AVAILABLE_WALLETS_META = stringPreferencesKey("AVAILABLE_WALLETS_META")
+
+        // the FCM token is global for the application and is shared across node_ids
+        private val FCM_TOKEN = stringPreferencesKey("FCM_TOKEN")
+
+        private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
+        private val LAST_USED_APP_CODE = intPreferencesKey("LAST_USED_APP_CODE")
+        private val SHOW_RELEASE_NOTES_SINCE = intPreferencesKey("SHOW_RELEASE_NOTES_SINCE")
     }
 
     /**
@@ -79,29 +88,50 @@ class GlobalPrefsRepository(private val data: DataStore<Preferences>) {
         } ?: emptyMap()
     }
 
-    suspend fun saveAvailableWalletMeta(name: String?, nodeId: String) = data.edit {
+    suspend fun saveAvailableWalletMeta(nodeId: String, name: String?, avatar: String) = data.edit {
         val existingMap: Map<String, UserWalletMetadata> = getAvailableWalletsMeta.first()
-        val newMap = existingMap + (nodeId to UserWalletMetadata(name = name, nodeId = nodeId, createdAt = existingMap[nodeId]?.createdAt ?: currentTimestampMillis()))
+        val newMap = existingMap + (nodeId to UserWalletMetadata(nodeId = nodeId, name = name, _avatar = avatar, createdAt = existingMap[nodeId]?.createdAt ?: currentTimestampMillis()))
         it[AVAILABLE_WALLETS_META] = Json.encodeToString(newMap)
     }
 
-    val getActiveNodeId: Flow<String?> = safeData.map { it[ACTIVE_NODE_ID] }
-    suspend fun saveActiveNodeId(nodeId: String) = data.edit { it[ACTIVE_NODE_ID] = nodeId }
-
     val getDefaultNodeId: Flow<String?> = safeData.map { it[DEFAULT_NODE_ID] }
     suspend fun saveDefaultNodeId(nodeId: String) = data.edit { it[DEFAULT_NODE_ID] = nodeId }
+    suspend fun clearDefaultNodeId() = data.edit { it.remove(DEFAULT_NODE_ID) }
+
+    /** Returns the Firebase Cloud Messaging token. */
+    val getFcmToken: Flow<String?> = safeData.map { it[FCM_TOKEN] }
+    suspend fun saveFcmToken(token: String) = data.edit { it[FCM_TOKEN] = token }
+
+    /** True if the intro screen must be shown. True by default. */
+    val getShowIntro: Flow<Boolean> = safeData.map { it[SHOW_INTRO] ?: true }
+    suspend fun saveShowIntro(showIntro: Boolean) = data.edit { it[SHOW_INTRO] = showIntro }
+
+    /** Returns the build code of the last Phoenix instance that has been run on the device. Used for migration purposes. */
+    val getLastUsedAppCode: Flow<Int?> = safeData.map { it[LAST_USED_APP_CODE] }
+    suspend fun saveLastUsedAppCode(code: Int) = data.edit { it[LAST_USED_APP_CODE] = code }
+
+    /** For some versions, we want to show a release note when opening the Home screen. This preference tracks from which code notes should be shown. If null, show nothing. */
+    val showReleaseNoteSinceCode: Flow<Int?> = safeData.map { it[SHOW_RELEASE_NOTES_SINCE] }
+    suspend fun saveShowReleaseNoteSinceCode(code: Int?) = data.edit {
+        if (code == null) it.remove(SHOW_RELEASE_NOTES_SINCE) else it[SHOW_RELEASE_NOTES_SINCE] = code
+    }
 }
 
 @Serializable
-data class UserWalletMetadata(val nodeId: String, val name: String?, val createdAt: Long?) {
-    val color: Color by lazy {
-        val randomSeed = java.util.UUID.nameUUIDFromBytes(ByteVector.fromHex(nodeId).sha256().toByteArray()).mostSignificantBits
-        val random = Random(randomSeed)
+data class UserWalletMetadata(val nodeId: String, val name: String?, private val _avatar: String? = null, val createdAt: Long?) {
 
-        Color.hsv(
-            hue = random.nextInt(360).toFloat(),
-            saturation = 0.6f + random.nextFloat() * 0.4f,
-            value = 0.75f + random.nextFloat() * 0.1f
-        )
+    /** Repeatable random number generator. */
+    private val random: Random by lazy {
+        val randomSeed = java.util.UUID.nameUUIDFromBytes(ByteVector.fromHex(nodeId).sha256().toByteArray()).mostSignificantBits
+        Random(randomSeed)
     }
+
+    // use a fixed list size in case more elements are added to the avatars list
+    val avatar = _avatar ?: WalletAvatars.list.take(116).random(random)
+
+    @Composable
+    fun name() = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.wallet_name_default, nodeId.take(8))
 }
+
+/** Helper method that finds the wallet metadata matching the node id in the map, or returns a default value if absent. */
+fun Map<String, UserWalletMetadata>.getByNodeId(nodeId: String): UserWalletMetadata = this[nodeId] ?: UserWalletMetadata(nodeId = nodeId, name = null, createdAt = null)

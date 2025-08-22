@@ -104,7 +104,7 @@ abstract class InitViewModel : ViewModel() {
             }
 
             viewModelScope.launch(Dispatchers.Main) {
-                application.internalDataRepository.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
+                application.globalPrefs.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
                 delay(1000)
                 onSeedWritten(newNodeId)
             }

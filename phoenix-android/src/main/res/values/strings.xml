@@ -62,6 +62,7 @@
     <!-- Lock prompt -->
 
     <string name="lockprompt_title">Unlock to continue</string>
+    <string name="lockprompt_title2">Unlock %1$s</string>
     <string name="lockprompt_pin_button">PIN code</string>
     <string name="lockprompt_biometrics_button">System lock</string>
 
@@ -1005,5 +1006,11 @@
     <string name="unitdropdown_more">Other…</string>
     <string name="currencypicker_title">Select a currency</string>
     <string name="currencypicker_no_match">No match found…</string>
+
+    <!-- user wallet -->
+
+    <string name="wallet_name_default">Wallet</string>
+    <string name="wallet_add_new">Add new wallet</string>
+    <string name="wallet_lock">Lock</string>
 
 </resources>

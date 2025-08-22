@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.components.auth.spendinglock
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
 
 @Composable
@@ -26,6 +27,7 @@ fun CheckSpendingPinFlow(
     onPinValid: () -> Unit,
     prompt: @Composable () -> Unit,
 ) {
-    val vm = viewModel<CheckSpendingPinViewModel>(factory = CheckSpendingPinViewModel.Factory)
+    val userPrefs = LocalUserPrefs.current!!
+    val vm = viewModel<CheckSpendingPinViewModel>(factory = CheckSpendingPinViewModel.Factory(userPrefs = userPrefs))
     CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt)
 }

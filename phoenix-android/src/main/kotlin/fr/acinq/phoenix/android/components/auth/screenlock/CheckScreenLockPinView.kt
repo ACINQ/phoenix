@@ -22,13 +22,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 
 @Composable
 fun CheckScreenLockPinFlow(
+    userPrefs: UserPrefs,
     onCancel: () -> Unit,
     onPinValid: () -> Unit,
     prompt: @Composable () -> Unit = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_screenlock_title)) }
 ) {
-    val vm = viewModel<CheckScreenLockPinViewModel>(factory = CheckScreenLockPinViewModel.Factory)
+    val vm = viewModel<CheckScreenLockPinViewModel>(factory = CheckScreenLockPinViewModel.Factory(userPrefs))
     CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt)
 }

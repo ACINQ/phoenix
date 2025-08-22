@@ -34,8 +34,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.LocalUserPrefs
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.internalData
 import kotlinx.coroutines.launch
 
 
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 fun ReleaseNoteDialog(sinceCode: Int) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val internalData = internalData
+    val globalPrefs = application.globalPrefs
     val isTorEnabled = LocalUserPrefs.current?.getIsTorEnabled?.collectAsState(null)?.value
 
     val codes by produceState<List<Int>>(emptyList(), sinceCode, isTorEnabled) {
@@ -55,7 +55,7 @@ fun ReleaseNoteDialog(sinceCode: Int) {
 
     if (codes.isNotEmpty()) {
         Dialog(onDismiss = {
-            scope.launch { internalData.saveShowReleaseNoteSinceCode(null) }
+            scope.launch { globalPrefs.saveShowReleaseNoteSinceCode(null) }
         }) {
             Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 codes.forEach { code ->

@@ -238,6 +238,7 @@ private fun ScreenLockCustomPinView(
 
     if (isInDisablingCustomPinFlow) {
         CheckScreenLockPinFlow(
+            userPrefs = userPrefs,
             onCancel = { isInDisablingCustomPinFlow = false },
             onPinValid = {
                 scope.launch {

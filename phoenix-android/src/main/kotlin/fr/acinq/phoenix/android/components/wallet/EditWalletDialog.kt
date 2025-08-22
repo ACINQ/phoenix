@@ -16,13 +16,16 @@
 
 package fr.acinq.phoenix.android.components.wallet
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,11 +38,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.buttons.SwitchView
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,42 +62,67 @@ fun EditWalletDialog(
     ) {
         val scope = rememberCoroutineScope()
         val globalPrefs = globalPrefs
-        var nameInput by remember { mutableStateOf(metadata.name ?: "") }
 
-        Card(internalPadding = PaddingValues(16.dp)) {
-            Text(text = "Wallet Details", style = MaterialTheme.typography.h4, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+        var nameInput by remember { mutableStateOf(metadata.name ?: "") }
+        var avatarInput by remember { mutableStateOf(metadata.avatar) }
+        val defaultWalletPref by globalPrefs.getDefaultNodeId.collectAsState(null)
+        var isDefaultWalletInput by remember { mutableStateOf(defaultWalletPref == nodeId) }
+
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+            AvatarPicker(
+                avatar = avatarInput,
+                onAvatarChange = { avatarInput = it },
+            )
             Spacer(Modifier.height(16.dp))
             TextInput(
                 text = nameInput,
-                onTextChange = { nameInput = it },
-                maxLines = 1,
-                singleLine = true,
-                placeholder = { Text(text = "Enter a name for your wallet", style = MaterialTheme.typography.caption) },
-                staticLabel = "Name"
+                onTextChange = { nameInput = it.take(48) /* stealthy max chars */ },
+                textStyle = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center),
+                placeholder = { Text(text = stringResource(R.string.contact_name_hint), style = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center, color = mutedTextColor), modifier = Modifier.fillMaxWidth()) },
+                staticLabel = null,
+                showResetButton = true,
             )
-            Spacer(Modifier.height(16.dp))
-            TextInput(
-                text = nodeId,
-                onTextChange = { },
-                maxLines = 4,
-                enabled = false,
-                enabledEffect = false,
-                staticLabel = "NodeId",
-                textStyle = MaterialTheme.typography.caption,
-                showResetButton = false
+        }
+        Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+            SwitchView(
+                text = "Default Wallet",
+                description ="If a default wallet is selected, it will be automatically opened on app launch.",
+                checked = isDefaultWalletInput,
+                onCheckedChange = { isDefaultWalletInput = it }
             )
-            Spacer(Modifier.height(24.dp))
+        }
+        Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+            SwitchView(
+                text = "Hidden Wallet (WIP)",
+                description = "Wallet will not be visible in selector screens. To access the wallet, you must enter its lock PIN.",
+                checked = false,
+                onCheckedChange = { }
+            )
+        }
+        Column(modifier = Modifier.padding(24.dp).align(Alignment.End)) {
             FilledButton(
                 text = stringResource(R.string.btn_save),
                 icon = R.drawable.ic_check,
                 onClick = {
                     scope.launch {
-                        globalPrefs.saveAvailableWalletMeta(name = nameInput.takeIf { it.isNotBlank() }, nodeId = nodeId)
+                        globalPrefs.saveAvailableWalletMeta(nodeId = nodeId, name = nameInput.takeIf { it.isNotBlank() }, avatar = avatarInput)
+                        when {
+                            // we only update the default preferences when relevant: goes from default to not ; or goes from not default to default wallet.
+                            defaultWalletPref == nodeId && !isDefaultWalletInput -> globalPrefs.clearDefaultNodeId()
+                            isDefaultWalletInput -> globalPrefs.saveDefaultNodeId(nodeId)
+                        }
                         onDismiss()
                     }
                 },
-                modifier = Modifier.align(Alignment.End)
             )
+
+            Spacer(Modifier.height(16.dp))
+            TransparentFilledButton(
+                text = stringResource(R.string.btn_cancel),
+                icon = R.drawable.ic_cross,
+                onClick = onDismiss,
+            )
+            Spacer(Modifier.height(24.dp))
         }
     }
 }

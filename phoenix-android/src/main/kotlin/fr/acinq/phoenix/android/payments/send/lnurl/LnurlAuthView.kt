@@ -41,7 +41,6 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.HSeparator
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.managers.SendManager
 

@@ -58,6 +58,7 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
@@ -77,7 +78,6 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.buttons.openLink
-import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -100,7 +100,8 @@ fun ColumnScope.LightningInvoiceView(
     var isReusable by remember { mutableStateOf(false) }
     var feeWarningDialogShownTimestamp by remember { mutableLongStateOf(0L) }
 
-    val bip353Address by internalData.getBip353Address.collectAsState(initial = null)
+    val bip353AddressState = LocalInternalPrefs.current?.getBip353Address?.collectAsState(initial = null)
+    val bip353Address = bip353AddressState?.value
 
     var showEditInvoiceDialog by remember { mutableStateOf(false) }
     var showCopyDialog by remember { mutableStateOf(false) }

@@ -35,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.components.nfc.NfcState
 import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
+import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.HceService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     private val screenStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_SCREEN_OFF -> appViewModel.lockScreen()
+                Intent.ACTION_SCREEN_OFF -> appViewModel.resetActiveWallet()
                 else -> Unit
             }
         }
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                             log.info("handling deeplink=$intent")
                             navController?.handleDeepLink(intent)
                         } else {
-                            log.warn(">>> navigation controller is not initialized, ignoring deeplink=$intent")
+                            log.warn("navigation controller is not initialized, ignoring deeplink=$intent")
                         }
                     }
                 } catch (e: Exception) {

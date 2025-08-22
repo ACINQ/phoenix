@@ -23,16 +23,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.GlobalPrefsRepository
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.GlobalPrefs
 import org.slf4j.LoggerFactory
 
-/** This datastore persists user's preferences (theme, currencies, ...). */
-val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "userprefs")
-
-/** This datastore persists miscellaneous internal data representing various states of the app. */
-val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
 
 /** This datastore persists preferences across node ids. */
 val Context.globalPrefs: DataStore<Preferences> by preferencesDataStore(name = "globalprefs")
@@ -41,18 +34,13 @@ class PhoenixApplication : Application() {
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    lateinit var internalDataRepository: InternalDataRepository
-    lateinit var userPrefs: UserPrefsRepository
-    lateinit var globalPrefs: GlobalPrefsRepository
+    lateinit var globalPrefs: GlobalPrefs
 
     override fun onCreate() {
         super.onCreate()
 
-        internalDataRepository = InternalDataRepository(applicationContext.internalData)
-        userPrefs = UserPrefsRepository(applicationContext.userPrefs)
-        globalPrefs = GlobalPrefsRepository(applicationContext.globalPrefs)
-
-        BusinessRepo.initialize(applicationContext)
+        globalPrefs = GlobalPrefs(applicationContext.globalPrefs)
+        BusinessManager.initialize(applicationContext)
 
         Logging.setupLogger(applicationContext)
         log.info("creating app")

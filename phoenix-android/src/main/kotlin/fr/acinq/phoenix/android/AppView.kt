@@ -19,7 +19,6 @@ package fr.acinq.phoenix.android
 import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -53,9 +51,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import fr.acinq.phoenix.android.components.buttons.Button
-import fr.acinq.phoenix.android.components.auth.screenlock.ScreenLockPrompt
-import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.buttons.openLink
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.navigation.baseNavGraph
 import fr.acinq.phoenix.android.navigation.baseSettingsNavGraph
@@ -69,7 +66,6 @@ import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.getBitcoinUnits
 import fr.acinq.phoenix.android.utils.datastore.getFiatCurrencies
 import fr.acinq.phoenix.android.utils.datastore.getIsAmountInFiat
-import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.flow.first
 
@@ -85,6 +81,7 @@ fun AppRoot(
     val activeNodeId = activeWallet?.nodeId
     val business = activeWallet?.business
     val activeUserPrefs = activeWallet?.userPrefs
+    val activeInternalPrefs = activeWallet?.internalPrefs
     val fiatRatesMap by appViewModel.fiatRatesMap.collectAsState()
 
     val isAmountInFiat = activeUserPrefs.getIsAmountInFiat()
@@ -94,6 +91,7 @@ fun AppRoot(
     CompositionLocalProvider(
         LocalBusiness provides business,
         LocalUserPrefs provides activeUserPrefs,
+        LocalInternalPrefs provides activeInternalPrefs,
         LocalControllerFactory provides business?.controllers,
         LocalNavController provides navController,
         LocalExchangeRatesMap provides fiatRatesMap,
@@ -103,10 +101,9 @@ fun AppRoot(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                Modifier
+                modifier = Modifier
                     .background(appBackground())
-                    .fillMaxWidth()
-                    .fillMaxHeight()
+                    .fillMaxSize()
                     .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
             ) {
                 NavHost(
@@ -126,26 +123,6 @@ fun AppRoot(
                     walletInfoNavGraph(navController, appViewModel)
                     channelsNavGraph(navController, appViewModel)
                 }
-            }
-
-            val context = LocalContext.current
-            val isScreenLocked by appViewModel.isScreenLocked
-            val biometricLockState = activeUserPrefs?.getIsScreenLockBiometricsEnabled?.collectAsState(initial = null)
-            val customPinLockState = activeUserPrefs?.getIsScreenLockPinEnabled?.collectAsState(initial = null)
-
-            if ((biometricLockState?.value == true || customPinLockState?.value == true) && isScreenLocked) {
-                BackHandler {
-                    // back button minimises the app
-                    context.findActivitySafe()?.moveTaskToBack(false)
-                }
-                ScreenLockPrompt(
-                    promptScreenLockImmediately = appViewModel.promptScreenLockImmediately.value,
-                    onLock = { appViewModel.lockScreen() },
-                    onUnlock = {
-                        appViewModel.unlockScreen()
-                        appViewModel.promptScreenLockImmediately.value = false
-                    },
-                )
             }
 
             val lastCompletedPayment = business?.paymentsManager?.lastCompletedPayment?.collectAsState()

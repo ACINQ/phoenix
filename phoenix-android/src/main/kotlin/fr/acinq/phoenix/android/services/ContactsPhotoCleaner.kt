@@ -25,7 +25,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.components.contact.ContactsPhotoHelper
 import fr.acinq.phoenix.android.security.SeedManager
@@ -44,7 +44,7 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
         try {
 
             // get the active business map, or create it no business is active
-            val businessMap = BusinessRepo.businessFlow.value.takeIf { it.isNotEmpty() }
+            val businessMap = BusinessManager.businessFlow.value.takeIf { it.isNotEmpty() }
                 ?: run {
                     val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
                     if (seedMap.isNullOrEmpty()) {
@@ -53,13 +53,13 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
                     }
 
                     seedMap.map { (nodeId, words) ->
-                        val res = BusinessRepo.startNewBusiness(words = words, isHeadless = true)
+                        val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
                         if (res is StartBusinessResult.Failure) {
                             log.info("failed to start business for node_id=$nodeId")
                             return Result.failure()
                         }
 
-                        val business = BusinessRepo.businessFlow.value[nodeId]
+                        val business = BusinessManager.businessFlow.value[nodeId]
                         if (business == null) {
                             log.info("failed to access business for node_id=$nodeId")
                             return Result.success()

@@ -62,8 +62,8 @@ class FCMService : FirebaseMessagingService() {
         serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.warn("failed to save fcm token after onNewToken event: {}", e.localizedMessage)
         }) {
-            val internalData = (applicationContext as PhoenixApplication).internalDataRepository
-            internalData.saveFcmToken(token)
+            val globalPrefs = (applicationContext as PhoenixApplication).globalPrefs
+            globalPrefs.saveFcmToken(token)
         }
     }
 }

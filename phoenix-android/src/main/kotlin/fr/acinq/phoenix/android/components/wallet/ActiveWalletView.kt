@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.components.wallet
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
@@ -33,7 +31,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,8 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
@@ -52,16 +47,15 @@ import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.monoTypo
 
 @Composable
 fun ActiveWalletView(
     nodeId: String,
-    walletMetadata: UserWalletMetadata?,
+    metadata: UserWalletMetadata,
     onClick: () -> Unit,
     showMoreButton: Boolean,
 ) {
-
-    val metadata = walletMetadata ?: UserWalletMetadata(nodeId = nodeId, name = null, createdAt = null)
     var showMoreMenu by remember { mutableStateOf(false) }
     var showWalletEditDialog by remember { mutableStateOf(false) }
 
@@ -73,23 +67,13 @@ fun ActiveWalletView(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.weight(1f)
         ) {
-            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)) {
-                Surface(
-                    color = metadata.color,
-                    shape = CircleShape,
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_wallet),
-                        contentDescription = "wallet",
-                        modifier = Modifier.padding(8.dp).size(18.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
-                    )
-                }
+            Row(modifier = Modifier.padding(horizontal = 0.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                WalletAvatar(metadata.avatar)
                 Spacer(Modifier.width(12.dp))
                 Column {
-                    Text(text = metadata.name?.takeIf { it.isNotBlank() } ?: "Unnamed Wallet", modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
+                    Text(text = metadata.name(), modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
                     Spacer(Modifier.height(2.dp))
-                    Text(text = nodeId, modifier = Modifier.widthIn(max = 200.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2)
+                    Text(text = nodeId, modifier = Modifier.widthIn(max = 200.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
                 }
             }
         }

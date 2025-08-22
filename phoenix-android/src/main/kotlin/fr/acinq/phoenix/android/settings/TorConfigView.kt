@@ -41,7 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
@@ -147,7 +147,7 @@ fun TorConfigView(
                             log.info("shutting down app")
                             scope.launch {
                                 isTearingDownBusiness = true
-                                BusinessRepo.stopBusiness(nodeId = nodeId)
+                                BusinessManager.stopBusiness(nodeId = nodeId)
                                 userPrefs.saveIsTorEnabled(!isTorEnabled)
                                 delay(500)
                                 showConfirmTorDialog = false

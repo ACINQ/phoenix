@@ -24,7 +24,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.security.EncryptedSeed
@@ -32,7 +32,6 @@ import fr.acinq.phoenix.android.security.KeystoreHelper
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.services.ContactsPhotoCleaner
-import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.nodeIdHash
 import fr.acinq.phoenix.utils.extensions.phoenixName
@@ -76,7 +75,6 @@ class StartupViewModel(
     val state = mutableStateOf<StartupViewState>(StartupViewState.Init)
 
     fun startupNode(nodeId: String, words: List<String>, onStartupSuccess: () -> Unit) {
-        log.info("entering init-view")
         if (state.value !is StartupViewState.Init) {
             return
         }
@@ -87,7 +85,7 @@ class StartupViewModel(
         }) {
             state.value = StartupViewState.StartingBusiness
             val startResult = withContext(Dispatchers.Default) {
-                BusinessRepo.startNewBusiness(words, isHeadless = false)
+                BusinessManager.startNewBusiness(words, isHeadless = false)
             }
 
             ChannelsWatcher.schedule(application.applicationContext)

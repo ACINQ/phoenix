@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -34,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,17 +43,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.ListWalletState
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.wallet.AvailableWalletsView
+import fr.acinq.phoenix.android.components.wallet.AvailableWalletsList
 import fr.acinq.phoenix.android.globalPrefs
-import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.shareFile
@@ -68,16 +67,13 @@ fun StartupView(
     onSeedNotFound: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
-    val showIntro by internalData.getShowIntro.collectAsState(initial = null)
-
-    if (showIntro == true) {
+    val showIntro = application.globalPrefs.getShowIntro.collectAsState(initial = null)
+    if (showIntro.value == true) {
         LaunchedEffect(Unit) { onShowIntro() }
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -91,14 +87,21 @@ fun StartupView(
                 Text(text = stringResource(id = R.string.startup_loading_seed))
             }
             is ListWalletState.Success -> {
-
                 val availableWallets by appViewModel.availableWallets.collectAsState()
+                val defaultNodeId = globalPrefs.getDefaultNodeId.collectAsState(null)
+                // the default wallet should be immediately started only *once* ; to keep track of that, we use a state in the app VM
+                val startDefaultImmediately by remember { mutableStateOf(appViewModel.startDefaultImmediately.value) }
+                LaunchedEffect(Unit) {
+                    if (appViewModel.startDefaultImmediately.value) {
+                        appViewModel.startDefaultImmediately.value = false
+                    }
+                }
 
                 // we may already have a desired node id and thus may not need user input to know which wallet to load
                 val desiredNodeIdFlow = appViewModel.desiredNodeId.collectAsState()
                 val desiredNodeId = desiredNodeIdFlow.value
 
-                val businessMap by BusinessRepo.businessFlow.collectAsState()
+                val businessMap by BusinessManager.businessFlow.collectAsState()
                 val desiredBusiness = businessMap[desiredNodeId]
                 val desiredNodeWallet = availableWallets[desiredNodeId]
 
@@ -118,42 +121,42 @@ fun StartupView(
                         }
                     }
                     else -> {
-                        val availableWalletMetadata by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
+                        val availableWalletMetadataPrefs = globalPrefs.getAvailableWalletsMeta.collectAsState(null)
+                        val availableWalletMetadata = availableWalletMetadataPrefs.value
 
                         when {
                             availableWallets.isEmpty() -> {
                                 LaunchedEffect(Unit) { onSeedNotFound() }
                             }
+                            availableWalletMetadata == null -> {
+                                PhoenixStartupIcon()
+                                Text(text = stringResource(R.string.utils_loading_prefs))
+                            }
                             else -> {
                                 // TODO if default is set => launch default
                                 when (val startupState = startupViewModel.state.value) {
                                     is StartupViewState.Init -> {
-                                        LazyColumn(modifier = Modifier.padding(horizontal = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                            item {
+                                        AvailableWalletsList(
+                                            wallets = availableWallets,
+                                            walletsMetadata = availableWalletMetadata,
+                                            activeNodeId = null,
+                                            loadNodeImmediately = if (startDefaultImmediately) defaultNodeId.value else null,
+                                            onWalletClick = { userWallet ->
+                                                startupViewModel.startupNode(nodeId = userWallet.nodeId, words = userWallet.words, onStartupSuccess = {
+                                                    appViewModel.switchToWallet(userWallet.nodeId)
+                                                    onBusinessStarted()
+                                                })
+                                            },
+                                            modifier = Modifier.padding(horizontal = 24.dp),
+                                            topContent = {
                                                 Spacer(Modifier.height(64.dp))
                                                 Text(text = "Select a wallet", style = MaterialTheme.typography.h4)
                                                 Spacer(Modifier.height(16.dp))
-                                            }
-                                            items(items = availableWallets.entries.toList()) { (nodeId, userWallet) ->
-                                                AvailableWalletsView(
-                                                    nodeId = nodeId,
-                                                    walletMetadata = availableWalletMetadata[nodeId],
-                                                    isCurrent = false,
-                                                    isActive = false,
-                                                    onClick = {
-                                                        startupViewModel.startupNode(nodeId = nodeId, words = userWallet.words, onStartupSuccess = {
-                                                            appViewModel.updateDesiredNodeId(nodeId)
-                                                            onBusinessStarted()
-                                                        })
-                                                    }
-                                                )
-                                                Spacer(Modifier.height(8.dp))
-                                            }
-                                            item {
+                                            },
+                                            bottomContent = {
                                                 Spacer(Modifier.height(128.dp))
                                             }
-                                        }
-
+                                        )
                                     }
                                     is StartupViewState.StartingBusiness -> {
                                         PhoenixStartupIcon()

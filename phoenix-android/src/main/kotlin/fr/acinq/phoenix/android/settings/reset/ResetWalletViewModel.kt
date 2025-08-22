@@ -24,11 +24,12 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -92,11 +93,9 @@ class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: Stri
             delay(500)
 
             state.value = ResetWalletStep.Deleting.Prefs
-            application.userPrefs.clear()
-            application.internalDataRepository.clear()
-            application.globalPrefs.clear()
+            DataStoreManager.deleteNodeUserPrefs(application.applicationContext, nodeId)
             FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
-                if (task.isSuccessful) BusinessRepo.refreshFcmToken()
+                if (task.isSuccessful) BusinessManager.refreshFcmToken()
             }
 
             delay(400)

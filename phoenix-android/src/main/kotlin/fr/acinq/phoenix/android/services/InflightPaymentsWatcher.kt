@@ -28,11 +28,11 @@ import androidx.work.WorkerParameters
 import fr.acinq.lightning.channel.states.Syncing
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.BusinessRepo
-import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import kotlinx.coroutines.Dispatchers
@@ -65,89 +65,100 @@ import kotlin.time.toJavaDuration
  */
 class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
         log.info("starting $name")
 
+        if (BusinessManager.businessFlow.first().isNotEmpty()) {
+            log.debug("there already are active businesses, aborting $name")
+            return Result.success()
+        }
+
+        val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
+        if (seedMap.isNullOrEmpty()) {
+            log.debug("could not load any seed, aborting $name")
+            return Result.success()
+        }
+
+        val watchResult = seedMap.map { (nodeId, words) ->
+            watchNodeId(nodeId, words)
+        }
+
+        if (BusinessManager.isHeadless.first()) {
+            BusinessManager.stopAllBusinesses()
+        }
+
+        return if (watchResult.all { it }) {
+            log.info("finished $name, watchers have all terminated successfully")
+            Result.success()
+        } else {
+            log.info("finished $name, one or more watchers encountered an error")
+            Result.failure()
+        }
+    }
+
+    private suspend fun watchNodeId(nodeId: String, words: List<String>): Boolean {
         try {
-            val application = (applicationContext as PhoenixApplication)
-            val internalData = application.internalDataRepository
-            val inFlightPaymentsCount = internalData.getInFlightPaymentsCount.first()
+            val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(applicationContext, nodeId = nodeId)
+            val inFlightPaymentsCount = internalPrefs.getInFlightPaymentsCount.first()
 
             if (inFlightPaymentsCount == 0) {
                 log.info("aborting $name: expecting NO in-flight payments")
-                return Result.success()
+                return true
             }
 
-            if (BusinessRepo.businessFlow.first().isNotEmpty()) {
-                log.info("there already are active businesses, aborting $name")
-                return Result.success()
+            val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
+            if (res is StartBusinessResult.Failure) {
+                log.info("failed to start business for node_id=$nodeId")
+                return false
             }
 
-            val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
-            if (seedMap.isNullOrEmpty()) {
-                log.info("could not load any seed, aborting $name")
-                return Result.success()
+            val business = BusinessManager.businessFlow.value[nodeId]
+            if (business == null) {
+                log.info("failed to access business for node_id=$nodeId")
+                return false
             }
-
-            val businessMap = seedMap.map { (nodeId, words) ->
-                val res = BusinessRepo.startNewBusiness(words = words, isHeadless = true)
-                if (res is StartBusinessResult.Failure) {
-                    log.info("failed to start business for node_id=$nodeId")
-                    return Result.success()
-                }
-
-                val business = BusinessRepo.businessFlow.value[nodeId]
-                if (business == null) {
-                    log.info("failed to access business for node_id=$nodeId")
-                    return Result.success()
-                }
-
-                nodeId to business
-            }.toMap()
 
             withContext(Dispatchers.Default) {
                 val stopJobs = MutableStateFlow(false)
 
                 val jobTimer = launch {
                     delay(2.minutes)
-                    log.info("stopping $name after 2 minutes without resolution - show notification")
+                    log.info("stopping $name-$nodeId after 2 minutes without resolution - show notification")
                     scheduleOnce(applicationContext)
                     SystemNotificationHelper.notifyInFlightHtlc(applicationContext)
                     stopJobs.value = true
                 }
 
-                val watchers = businessMap.map { (nodeId, business) ->
-                    launch {
-                        business.appConnectionsDaemon?.forceReconnect()
-                        business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
-                        log.debug("watching in-flight payments for node_id=$nodeId")
+                val watcher = launch {
+                    business.appConnectionsDaemon?.forceReconnect()
+                    business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
+                    log.debug("watching in-flight payments for node_id=$nodeId")
 
-                        business.peerManager.channelsFlow.filterNotNull().collectIndexed { index, channels ->
-                            val paymentsCount = channels.inFlightPaymentsCount()
-                            internalData.saveInFlightPaymentsCount(paymentsCount)
-                            when {
-                                channels.isEmpty() -> {
-                                    log.info("no channels found, successfully terminating watcher (#$index)")
-                                    stopJobs.value = true
-                                }
+                    business.peerManager.channelsFlow.filterNotNull().collectIndexed { index, channels ->
+                        val paymentsCount = channels.inFlightPaymentsCount()
+                        internalPrefs.saveInFlightPaymentsCount(paymentsCount)
+                        when {
+                            channels.isEmpty() -> {
+                                log.info("no channels found, successfully terminating watcher (#$index)")
+                                stopJobs.value = true
+                            }
 
-                                channels.any { it.value.state is Syncing } -> {
-                                    log.debug("channels syncing, pausing 10s before next check (#$index)")
-                                    delay(10.seconds)
-                                }
+                            channels.any { it.value.state is Syncing } -> {
+                                log.debug("channels syncing, pausing 10s before next check (#$index)")
+                                delay(10.seconds)
+                            }
 
-                                paymentsCount > 0 -> {
-                                    log.debug("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
-                                    delay(5.seconds)
-                                }
+                            paymentsCount > 0 -> {
+                                log.debug("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
+                                delay(5.seconds)
+                            }
 
-                                else -> {
-                                    log.info("$paymentsCount payments in-flight, successfully completing worker (#$index)...")
-                                    stopJobs.value = true
-                                }
+                            else -> {
+                                log.info("$paymentsCount payments in-flight, successfully completing worker (#$index)...")
+                                stopJobs.value = true
                             }
                         }
                     }
@@ -155,18 +166,14 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
                 stopJobs.first { it }
                 log.debug("stop-job signal detected")
-                watchers.forEach { it.cancelAndJoin() }
+                watcher.cancelAndJoin()
                 jobTimer.cancelAndJoin()
             }
-            return Result.success()
+
+            return true
         } catch (e: Exception) {
-            log.error("error in $name: ", e)
-            return Result.failure()
-        } finally {
-            if (BusinessRepo.isHeadless.first()) {
-                BusinessRepo.stopAllBusinesses()
-            }
-            log.info("finished $name...")
+            log.error("error in $name-$nodeId: ", e)
+            return false
         }
     }
 

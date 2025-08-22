@@ -25,17 +25,17 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
-fun UserPrefsRepository?.getHomeAmountDisplayMode() : State<HomeAmountDisplayMode> =
+fun UserPrefs?.getHomeAmountDisplayMode() : State<HomeAmountDisplayMode> =
     (this?.getHomeAmountDisplayMode ?: flowOf(HomeAmountDisplayMode.REDACTED)).collectAsState(initial = HomeAmountDisplayMode.REDACTED)
 
 @Composable
-fun UserPrefsRepository?.getIsAmountInFiat(): State<Boolean> =
+fun UserPrefs?.getIsAmountInFiat(): State<Boolean> =
     (this?.getIsAmountInFiat ?: flowOf(false)).collectAsState(initial = false)
 
 @Composable
-fun UserPrefsRepository?.getBitcoinUnits(): State<PreferredBitcoinUnits> =
+fun UserPrefs?.getBitcoinUnits(): State<PreferredBitcoinUnits> =
     (this?.getBitcoinUnits ?: flowOf(PreferredBitcoinUnits(primary = BitcoinUnit.Sat))).collectAsState(initial = PreferredBitcoinUnits(primary = BitcoinUnit.Sat))
 
 @Composable
-fun UserPrefsRepository?.getFiatCurrencies(): State<AppConfigurationManager.PreferredFiatCurrencies> =
+fun UserPrefs?.getFiatCurrencies(): State<AppConfigurationManager.PreferredFiatCurrencies> =
     (this?.getFiatCurrencies ?: flowOf(AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))).collectAsState(initial = AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))

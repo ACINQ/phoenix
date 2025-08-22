@@ -86,7 +86,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
         CreateWalletView(onSeedWritten = { nodeId ->
             navController.navigate(Screen.Startup.route)
             appViewModel.listAvailableWallets()
-            appViewModel.updateDesiredNodeId(nodeId = nodeId)
+            appViewModel.switchToWallet(nodeId = nodeId)
         })
     }
 
@@ -94,7 +94,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
         RestoreWalletView(onRestoreDone = { nodeId ->
             navController.navigate(Screen.Startup.route)
             appViewModel.listAvailableWallets()
-            appViewModel.updateDesiredNodeId(nodeId = nodeId)
+            appViewModel.switchToWallet(nodeId = nodeId)
         })
     }
 }

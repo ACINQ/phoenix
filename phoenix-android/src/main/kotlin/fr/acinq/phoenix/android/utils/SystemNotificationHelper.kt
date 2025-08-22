@@ -40,14 +40,13 @@ import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateString
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
-import java.util.Random
 
 object SystemNotificationHelper {
     private const val PAYMENT_FAILED_NOTIF_ID = 354319
@@ -253,7 +252,7 @@ object SystemNotificationHelper {
 
     suspend fun notifyPaymentsReceived(
         context: Context,
-        userPrefs: UserPrefsRepository,
+        userPrefs: UserPrefs,
         id: UUID,
         amount: MilliSatoshi,
         rates: List<ExchangeRate>,

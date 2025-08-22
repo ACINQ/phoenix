@@ -43,6 +43,7 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: App
         val noticesViewModel = viewModel<NoticesViewModel>(
             viewModelStoreOwner = parentEntry,
             factory = NoticesViewModel.Factory(
+                nodeId = nodeId,
                 appConfigurationManager = business.appConfigurationManager,
                 peerManager = business.peerManager,
                 connectionsManager = business.connectionsManager,
@@ -71,8 +72,9 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: App
 fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel: AppViewModel) {
     val log = LoggerFactory.getLogger("Navigation")
 
-    businessComposable(Screen.Receive.route, appViewModel) { _, _, _ ->
+    businessComposable(Screen.Receive.route, appViewModel) { _, nodeId, _ ->
         ReceiveView(
+            nodeId = nodeId,
             onBackClick = { navController.popBackStack() },
             onScanDataClick = { navController.navigate("${Screen.Send.route}?openScanner=true&forceNavOnBack=true") },
             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },

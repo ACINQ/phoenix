@@ -27,7 +27,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.security.SeedManager
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +53,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
     override suspend fun doWork(): Result {
         log.info("starting $name")
 
-        if (BusinessRepo.businessFlow.first().isNotEmpty()) {
+        if (BusinessManager.businessFlow.first().isNotEmpty()) {
             log.info("there already are active businesses, aborting $name")
             return Result.success()
         }
@@ -66,13 +66,13 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
 
         try {
             val businessMap = seedMap.map { (nodeId, words) ->
-                val res = BusinessRepo.startNewBusiness(words = words, isHeadless = true)
+                val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
                 if (res is StartBusinessResult.Failure) {
                     log.info("failed to start business for node_id=$nodeId")
                     return Result.success()
                 }
 
-                val business = BusinessRepo.businessFlow.value[nodeId]
+                val business = BusinessManager.businessFlow.value[nodeId]
                 if (business == null) {
                     log.info("failed to access business for node_id=$nodeId")
                     return Result.success()
@@ -118,8 +118,8 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
             log.error("error in $name: ", e)
             return Result.failure()
         } finally {
-            if (BusinessRepo.isHeadless.first()) {
-                BusinessRepo.stopAllBusinesses()
+            if (BusinessManager.isHeadless.first()) {
+                BusinessManager.stopAllBusinesses()
             }
             log.info("finished $name")
         }

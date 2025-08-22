@@ -38,10 +38,9 @@ import fr.acinq.phoenix.android.components.prefs.ListPreferenceButton
 import fr.acinq.phoenix.android.components.prefs.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.extensions.label
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -72,7 +71,7 @@ fun DisplayPrefsView() {
 }
 
 @Composable
-private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
+private fun BitcoinUnitPreference(userPrefs: UserPrefs, scope: CoroutineScope) {
     var prefsEnabled by remember { mutableStateOf(true) }
     val preferences = listOf(
         PreferenceItem(item = BitcoinUnit.Sat, title = "${BitcoinUnit.Sat.label()} (${BitcoinUnit.Sat.displayCode})", description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
@@ -100,7 +99,7 @@ private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: Corouti
 }
 
 @Composable
-private fun FiatCurrencyPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
+private fun FiatCurrencyPreference(userPrefs: UserPrefs, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
 
     val preferences = FiatCurrency.values.map {
@@ -131,7 +130,7 @@ private fun FiatCurrencyPreference(userPrefs: UserPrefsRepository, scope: Corout
 }
 
 @Composable
-private fun UserThemePreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
+private fun UserThemePreference(userPrefs: UserPrefs, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
     val preferences = UserTheme.entries.map {
         PreferenceItem(it, title = it.label())

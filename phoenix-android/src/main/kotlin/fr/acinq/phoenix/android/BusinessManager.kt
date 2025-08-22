@@ -27,13 +27,11 @@ import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.InflightPaymentsWatcher
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
-import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
-import fr.acinq.phoenix.data.ExchangeRate
-import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
@@ -45,19 +43,14 @@ import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -73,7 +66,7 @@ sealed class StartBusinessResult {
     }
 }
 
-object BusinessRepo {
+object BusinessManager {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private val supervisor = SupervisorJob()
@@ -83,8 +76,6 @@ object BusinessRepo {
     // No memory leaks because this can only contain the application context.
     private lateinit var appContext: Context
     private val application by lazy { appContext as PhoenixApplication }
-    private val userPrefs by lazy { application.userPrefs }
-    private val internalPrefs by lazy { application.internalDataRepository }
 
     /** A map of active businesses */
     private val _businessFlow = MutableStateFlow<Map<String, PhoenixBusiness>>(emptyMap())
@@ -126,6 +117,9 @@ object BusinessRepo {
         }
 
         val nodeId = walletInfo.nodeId.toHex()
+        val globalPrefs = application.globalPrefs
+        val userPrefs = DataStoreManager.loadUserPrefsForNodeId(appContext, nodeId)
+        val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(appContext, nodeId)
 
         val businessInFlow = businessFlow.value[nodeId]
         if (businessInFlow != null) {
@@ -137,12 +131,12 @@ object BusinessRepo {
             log.info("preparing new business with node_id=$nodeId...")
 
             // check last used version to display a patch note
-            val lastVersionUsed = internalPrefs.getLastUsedAppCode.first()
+            val lastVersionUsed = globalPrefs.getLastUsedAppCode.first()
             if (lastVersionUsed == null) {
                 // lastUsedAppCode was added in version 99, and is set up during the wallet creation. So if it's null, this Phoenix was installed prior v99 and we can show a patch note
-                internalPrefs.saveShowReleaseNoteSinceCode(98)
+                globalPrefs.saveShowReleaseNoteSinceCode(98)
             } else if (lastVersionUsed < BuildConfig.VERSION_CODE) {
-                internalPrefs.saveShowReleaseNoteSinceCode(lastVersionUsed)
+                globalPrefs.saveShowReleaseNoteSinceCode(lastVersionUsed)
             }
 
             // update app configuration with user preferences
@@ -152,9 +146,9 @@ object BusinessRepo {
             // setup jobs monitoring the business events
             eventsMonitoringJobs[nodeId] = listOf(
                 scope.launch { monitorPaymentsWhenHeadless(business.nodeParamsManager, business.currencyManager, userPrefs) },
-                scope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager) },
+                scope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager, internalPrefs) },
                 scope.launch { monitorFcmToken(business) },
-                scope.launch { monitorInFlightPayments(business.peerManager) },
+                scope.launch { monitorInFlightPayments(business.peerManager, internalPrefs) },
             )
 
             // startup params depend user's settings: Tor and liquidity policy
@@ -167,7 +161,7 @@ object BusinessRepo {
             business.start(startupParams)
 
             // the node has been started, so we can now increment the last-used build code
-            internalPrefs.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
+            globalPrefs.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
 
             // start watching the swap-in wallet
             scope.launch {
@@ -211,18 +205,18 @@ object BusinessRepo {
                 log.warn("fetching FCM registration token failed: ${task.exception?.localizedMessage}")
                 return@OnCompleteListener
             }
-            task.result?.let { scope.launch { application.internalDataRepository.saveFcmToken(it) } }
+            task.result?.let { scope.launch { application.globalPrefs.saveFcmToken(it) } }
         })
     }
 
     private suspend fun monitorFcmToken(business: PhoenixBusiness) {
-        val token = internalPrefs.getFcmToken.filterNotNull().first()
+        val token = application.globalPrefs.getFcmToken.filterNotNull().first()
         business.connectionsManager.connections.first { it.peer == Connection.ESTABLISHED }
         log.info("registering fcm token=$token")
         business.registerFcmToken(token)
     }
 
-    private suspend fun monitorNodeEvents(peerManager: PeerManager, nodeParamsManager: NodeParamsManager) {
+    private suspend fun monitorNodeEvents(peerManager: PeerManager, nodeParamsManager: NodeParamsManager, internalPrefs: InternalPrefs) {
         val monitoringStartedAt = currentTimestampMillis()
         combine(peerManager.swapInNextTimeout, nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents) { nextTimeout, nodeEvent ->
             nextTimeout to nodeEvent
@@ -273,7 +267,7 @@ object BusinessRepo {
         }
     }
 
-    private suspend fun monitorPaymentsWhenHeadless(nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager, userPrefs: UserPrefsRepository) {
+    private suspend fun monitorPaymentsWhenHeadless(nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager, userPrefs: UserPrefs) {
         nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
             when (event) {
                 is PaymentEvents.PaymentReceived -> {
@@ -294,7 +288,7 @@ object BusinessRepo {
         }
     }
 
-    private suspend fun monitorInFlightPayments(peerManager: PeerManager) {
+    private suspend fun monitorInFlightPayments(peerManager: PeerManager, internalPrefs: InternalPrefs) {
         peerManager.channelsFlow.filterNotNull().collect {
             val inFlightPaymentsCount = it.inFlightPaymentsCount()
             internalPrefs.saveInFlightPaymentsCount(inFlightPaymentsCount)

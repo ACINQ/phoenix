@@ -128,8 +128,8 @@ private fun PermamentNotice(
     notice: Notice
 ) {
     val context = LocalContext.current
-    val internalData = application.internalDataRepository
-    val userPrefs = application.userPrefs
+    val internalPrefs = LocalInternalPrefs.current
+    val userPrefs = LocalUserPrefs.current
     val nc = LocalNavController.current
     val scope = rememberCoroutineScope()
 
@@ -175,7 +175,7 @@ private fun PermamentNotice(
                         confirmStateChange = {
                             if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
                                 scope.launch {
-                                    userPrefs.saveShowNotificationPermissionReminder(false)
+                                    userPrefs?.saveShowNotificationPermissionReminder(false)
                                 }
                             }
                             true
@@ -220,7 +220,7 @@ private fun PermamentNotice(
                 message = stringResource(id = R.string.inappnotif_watchtower_late_message),
                 actionText = stringResource(id = R.string.inappnotif_watchtower_late_action),
                 onActionClick = {
-                    scope.launch { internalData.saveChannelsWatcherOutcome(ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
+                    scope.launch { internalPrefs?.saveChannelsWatcherOutcome(ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
                 }
             )
         }
@@ -241,7 +241,7 @@ private fun PermamentNotice(
                 actionText = stringResource(id = R.string.btn_ok),
                 onActionClick = {
                     scope.launch {
-                        internalData.saveLastReadWalletNoticeIndex(notice.notice.index)
+                        internalPrefs?.saveLastReadWalletNoticeIndex(notice.notice.index)
                     }
                 },
             )

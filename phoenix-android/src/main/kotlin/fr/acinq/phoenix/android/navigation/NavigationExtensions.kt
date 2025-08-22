@@ -30,7 +30,6 @@ import androidx.navigation.compose.composable
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.AppViewModel
-import fr.acinq.phoenix.android.BusinessRepo
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.logger
 import io.ktor.http.encodeURLParameter

@@ -19,38 +19,33 @@ package fr.acinq.phoenix.android.components.auth.spendinglock
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
-import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinViewModel
 import fr.acinq.phoenix.android.security.EncryptedSpendingPin
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import kotlinx.coroutines.flow.first
 
-class CheckSpendingPinViewModel(private val userPrefsRepository: UserPrefsRepository) : CheckPinViewModel() {
+class CheckSpendingPinViewModel(private val userPrefs: UserPrefs) : CheckPinViewModel() {
 
     override suspend fun getPinCodeAttempt(): Int {
-        return userPrefsRepository.getSpendingPinCodeAttempt.first()
+        return userPrefs.getSpendingPinCodeAttempt.first()
     }
 
     override suspend fun savePinCodeSuccess() {
-        userPrefsRepository.saveSpendingPinCodeSuccess()
+        userPrefs.saveSpendingPinCodeSuccess()
     }
 
     override suspend fun savePinCodeFailure() {
-        userPrefsRepository.saveSpendingPinCodeFailure()
+        userPrefs.saveSpendingPinCodeFailure()
     }
 
     override suspend fun getExpectedPin(context: Context): String? {
         return EncryptedSpendingPin.getSpendingPinFromDisk(context)
     }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-                return CheckSpendingPinViewModel(application.userPrefs) as T
-            }
+    class Factory(val userPrefs: UserPrefs) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return CheckSpendingPinViewModel(userPrefs) as T
         }
     }
 }

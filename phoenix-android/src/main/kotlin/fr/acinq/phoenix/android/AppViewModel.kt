@@ -26,11 +26,12 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.BusinessRepo.businessFlow
+import fr.acinq.phoenix.android.BusinessManager.businessFlow
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -73,7 +74,8 @@ data class UserWallet(
 data class ActiveWallet(
     val nodeId: String,
     val business: PhoenixBusiness?,
-    val userPrefs: UserPrefsRepository,
+    val userPrefs: UserPrefs,
+    val internalPrefs: InternalPrefs,
 )
 
 class AppViewModel(
@@ -82,11 +84,8 @@ class AppViewModel(
 
     private val log = LoggerFactory.getLogger(AppViewModel::class.java)
 
-    val isScreenLocked = mutableStateOf(true)
-    val promptScreenLockImmediately = mutableStateOf(true)
-
     private val autoLockHandler = Handler(Looper.getMainLooper())
-    private val autoLockRunnable: Runnable = Runnable { lockScreen() }
+    private val autoLockRunnable: Runnable = Runnable { resetActiveWallet() }
 
     val listWalletState = mutableStateOf<ListWalletState>(ListWalletState.Init)
 
@@ -95,6 +94,7 @@ class AppViewModel(
 
     private val _desiredNodeId = MutableStateFlow<String?>(null)
     val desiredNodeId = _desiredNodeId.asStateFlow()
+    val startDefaultImmediately = MutableStateFlow(true)
 
     private val _activeWalletInUI = MutableStateFlow<ActiveWallet?>(null)
     val activeWalletInUI = _activeWalletInUI.asStateFlow()
@@ -124,20 +124,8 @@ class AppViewModel(
     }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     init {
-        viewModelScope.launch {
-            val defaultNodeId = application.globalPrefs.getDefaultNodeId.first()
-            if (_desiredNodeId.value == null) {
-                _desiredNodeId.value = defaultNodeId
-            }
-        }
-        monitorUserLockPrefs()
-        scheduleAutoLock()
         listAvailableWallets()
         monitorActiveWallet()
-    }
-
-    fun updateDesiredNodeId(nodeId: String) {
-        _desiredNodeId.value = nodeId
     }
 
     private fun monitorActiveWallet() {
@@ -145,8 +133,10 @@ class AppViewModel(
             combine(businessFlow, _desiredNodeId.filterNotNull()) { businessMap, activeNodeId ->
                 activeNodeId to businessMap[activeNodeId]
             }.collect { (nodeId, business) ->
-                val userPrefs = DataStoreManager.loadPrefsForNodeId(application.applicationContext, nodeId = nodeId)
-                _activeWalletInUI.value = ActiveWallet(nodeId = nodeId, business = business, userPrefs = userPrefs)
+                val userPrefs = DataStoreManager.loadUserPrefsForNodeId(application.applicationContext, nodeId = nodeId)
+                val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId = nodeId)
+                _activeWalletInUI.value = ActiveWallet(nodeId = nodeId, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
+                scheduleAutoLock()
             }
         }
     }
@@ -191,33 +181,28 @@ class AppViewModel(
 
     fun scheduleAutoLock() {
         viewModelScope.launch {
-            val autoLockDelay = application.userPrefs.getAutoLockDelay.first()
             autoLockHandler.removeCallbacksAndMessages(null)
-            if (autoLockDelay != Duration.INFINITE) {
+            val activeUserPrefs = activeWalletInUI.first()?.userPrefs ?: return@launch
+
+            val biometricLockEnabled = activeUserPrefs.getIsScreenLockBiometricsEnabled.first()
+            val customPinLockEnabled = activeUserPrefs.getIsScreenLockPinEnabled.first()
+            val autoLockDelay = activeUserPrefs.getAutoLockDelay.first()
+
+            if ((biometricLockEnabled || customPinLockEnabled) && autoLockDelay != Duration.INFINITE) {
                 autoLockHandler.postDelayed(autoLockRunnable, autoLockDelay.inWholeMilliseconds)
             }
         }
     }
 
-    private fun monitorUserLockPrefs() {
-        viewModelScope.launch {
-            combine(application.userPrefs.getIsScreenLockBiometricsEnabled, application.userPrefs.getIsScreenLockPinEnabled) { isBiometricEnabled, isCustomPinEnabled ->
-                isBiometricEnabled to isCustomPinEnabled
-            }.collect { (isBiometricEnabled, isCustomPinEnabled) ->
-                if (!isBiometricEnabled && !isCustomPinEnabled) {
-                    unlockScreen()
-                }
-            }
-        }
+    /** Will switch the active wallet to the given nodeId. */
+    fun switchToWallet(nodeId: String) {
+        _desiredNodeId.value = nodeId
     }
 
-    fun unlockScreen() {
-        isScreenLocked.value = false
-        scheduleAutoLock()
-    }
-
-    fun lockScreen() {
-        isScreenLocked.value = true
+    /** Calling this method will clear the active wallet and redirect the UI to the startup screen with the wallets list prompt. */
+    fun resetActiveWallet() {
+        _desiredNodeId.value = null
+        _activeWalletInUI.value = null
     }
 
     override fun onCleared() {

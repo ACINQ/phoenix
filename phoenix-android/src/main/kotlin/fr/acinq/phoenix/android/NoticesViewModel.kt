@@ -32,6 +32,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.ConnectionsManager
@@ -62,6 +64,7 @@ sealed class Notice() {
 
 class NoticesViewModel(
     val application: PhoenixApplication,
+    val nodeId: String,
     val appConfigurationManager: AppConfigurationManager,
     val peerManager: PeerManager,
     private val connectionsManager: ConnectionsManager,
@@ -70,6 +73,7 @@ class NoticesViewModel(
 
     val notices = mutableStateListOf<Notice>()
     var isPowerSaverModeOn by mutableStateOf(false)
+    val internalPrefs: InternalPrefs
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -79,6 +83,7 @@ class NoticesViewModel(
     }
 
     init {
+        internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId)
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }
@@ -151,7 +156,7 @@ class NoticesViewModel(
     }
 
     private suspend fun monitorWalletNotice() {
-        combine(appConfigurationManager.walletNotice, application.internalDataRepository.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
+        combine(appConfigurationManager.walletNotice, internalPrefs.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
             notice to lastReadIndex
         }.collect { (notice, lastReadIndex) ->
             log.debug("collecting wallet-notice={}", notice)
@@ -173,7 +178,7 @@ class NoticesViewModel(
     }
 
     private suspend fun monitorSeedBackupPref() {
-        application.internalDataRepository.showSeedBackupNotice.collect {
+        internalPrefs.showSeedBackupNotice.collect {
             if (it) {
                 addNotice(Notice.BackupSeedReminder)
             } else {
@@ -183,7 +188,7 @@ class NoticesViewModel(
     }
 
     private suspend fun monitorChannelsWatcherOutcome() {
-        application.internalDataRepository.getChannelsWatcherOutcome.filterNotNull().collect {
+        internalPrefs.getChannelsWatcherOutcome.filterNotNull().collect {
             if (currentTimestampMillis() - it.timestamp > 6 * DateUtils.DAY_IN_MILLIS) {
                 addNotice(Notice.WatchTowerLate)
             } else {
@@ -193,6 +198,7 @@ class NoticesViewModel(
     }
 
     class Factory(
+        private val nodeId: String,
         private val appConfigurationManager: AppConfigurationManager,
         private val peerManager: PeerManager,
         private val connectionsManager: ConnectionsManager,
@@ -201,7 +207,7 @@ class NoticesViewModel(
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
             return NoticesViewModel(
-                application, appConfigurationManager, peerManager, connectionsManager,
+                application, nodeId, appConfigurationManager, peerManager, connectionsManager,
             ) as T
         }
     }

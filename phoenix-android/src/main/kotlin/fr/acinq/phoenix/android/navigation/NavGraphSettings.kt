@@ -118,6 +118,7 @@ fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewMo
         val noticesViewModel = viewModel<NoticesViewModel>(
             viewModelStoreOwner = parentEntry,
             factory = NoticesViewModel.Factory(
+                nodeId = nodeId,
                 appConfigurationManager = business.appConfigurationManager,
                 peerManager = business.peerManager,
                 connectionsManager = business.connectionsManager,
@@ -151,8 +152,8 @@ fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewMo
         SettingsContactsView(onBackClick = { navController.popBackStack() }, immediatelyShowAddContactDialog = showAddContactDialog)
     }
 
-    businessComposable(Screen.Experimental.route, appViewModel) { _, _, _ ->
-        ExperimentalView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.Experimental.route, appViewModel) { _, nodeId, _ ->
+        ExperimentalView(onBackClick = { navController.popBackStack() }, nodeId = nodeId)
     }
 
     businessComposable(Screen.ResetWallet.route, appViewModel) { _, nodeId, _ ->

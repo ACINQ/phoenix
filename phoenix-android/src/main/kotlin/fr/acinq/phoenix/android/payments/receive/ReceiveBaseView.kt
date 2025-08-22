@@ -96,11 +96,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ReceiveView(
+    nodeId: String,
     onBackClick: () -> Unit,
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
-    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.nodeParamsManager, business.walletManager))
+    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, nodeId, business.peerManager, business.nodeParamsManager, business.walletManager))
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = false) {
         DefaultScreenHeader(

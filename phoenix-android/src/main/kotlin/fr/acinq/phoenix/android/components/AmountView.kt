@@ -38,7 +38,7 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.launch
@@ -55,7 +55,7 @@ fun AmountView(
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     separatorSpace: Dp = 4.dp,
     mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE,
-    onClick: (suspend (UserPrefsRepository, Boolean) -> Unit)? = { userPrefs, inFiat -> userPrefs.saveIsAmountInFiat(!inFiat) }
+    onClick: (suspend (UserPrefs, Boolean) -> Unit)? = { userPrefs, inFiat -> userPrefs.saveIsAmountInFiat(!inFiat) }
 ) {
     val scope = rememberCoroutineScope()
     val userPrefs = LocalUserPrefs.current

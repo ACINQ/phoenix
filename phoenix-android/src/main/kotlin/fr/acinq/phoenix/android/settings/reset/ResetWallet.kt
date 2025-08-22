@@ -41,7 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.phoenix.android.BusinessRepo
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
@@ -62,6 +62,7 @@ import fr.acinq.phoenix.android.components.wallet.ActiveWalletView
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.datastore.getByNodeId
 import fr.acinq.phoenix.android.utils.negativeColor
 
 
@@ -121,18 +122,10 @@ private fun InitReset(
         Spacer(modifier = Modifier.height(4.dp))
         Row {
             val availableWallet by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
-            ActiveWalletView(nodeId, availableWallet[nodeId], onClick = {}, showMoreButton = false)
+            ActiveWalletView(nodeId, availableWallet.getByNodeId(nodeId), onClick = {}, showMoreButton = false)
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "All data for this wallet will be removed, including the payments history.")
-
-//        Text(text = stringResource(id = R.string.reset_wallet_instructions_header))
-//
-//        Spacer(modifier = Modifier.height(4.dp))
-//        Text(
-//            text = stringResource(id = R.string.reset_wallet_instructions_details),
-//            style = MaterialTheme.typography.subtitle2
-//        )
     }
 
     Card {
@@ -257,7 +250,7 @@ private fun WalletDeleted(nodeId: String) {
             text = stringResource(id = R.string.btn_ok),
             icon = R.drawable.ic_check,
             onClick = {
-                BusinessRepo.stopBusiness(nodeId)
+                BusinessManager.stopBusiness(nodeId)
                 context.startActivity(
                     Intent(context, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

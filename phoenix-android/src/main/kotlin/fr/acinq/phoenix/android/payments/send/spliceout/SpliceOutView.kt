@@ -44,6 +44,7 @@ import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
@@ -61,7 +62,6 @@ import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.components.enableOrFade
-import fr.acinq.phoenix.android.internalData
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -259,8 +259,8 @@ private fun SpliceOutReadyView(
     } else {
         // low feerate == below 1 hour estimate
         val isUsingLowFeerate = mempoolFeerate != null && FeeratePerByte(state.userFeerate).feerate < mempoolFeerate.hour.feerate
-        val showSpliceoutCapacityDisclaimer = internalData.getSpliceoutCapacityDisclaimer.collectAsState(initial = true).value
-        ReviewSpliceOutAndConfirm(onExecute, isAmountValid, isUsingLowFeerate, showSpliceoutCapacityDisclaimer)
+        val showCapacityDisclaimer = LocalInternalPrefs.current?.getSpliceoutCapacityDisclaimer?.collectAsState(initial = true)?.value
+        ReviewSpliceOutAndConfirm(onExecute, isAmountValid, isUsingLowFeerate, showSpliceoutCapacityDisclaimer = showCapacityDisclaimer == true)
     }
 }
 
@@ -354,12 +354,12 @@ private fun ReviewSpliceOutAndConfirm(
                             modifier = Modifier.fillMaxWidth(),
                         )
                     } else {
-                        val internalPrefs = internalData
+                        val internalPrefs = LocalInternalPrefs.current
                         SmartSpendButton(
                             text = stringResource(R.string.send_confirm_pay_button),
                             shape = RoundedCornerShape(12.dp),
                             onSpend = {
-                                internalPrefs.saveSpliceoutCapacityDisclaimer(showCapacityDisclaimer)
+                                internalPrefs?.saveSpliceoutCapacityDisclaimer(showCapacityDisclaimer)
                                 onExecute()
                             },
                             enabled = isAmountValid,
