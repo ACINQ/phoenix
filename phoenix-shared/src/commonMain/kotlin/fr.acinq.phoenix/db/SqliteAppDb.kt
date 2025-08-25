@@ -150,20 +150,24 @@ class SqliteAppDb(val driver: SqlDriver) {
         notificationsQueries.get(id)
     }
 
-    suspend fun saveNotification(notification: Notification) = withContext(Dispatchers.Default) {
-        notificationsQueries.save(notification)
+    suspend fun saveNotification(notification: Notification, nodeIdHash: String) = withContext(Dispatchers.Default) {
+        notificationsQueries.save(notification, nodeIdHash)
     }
 
     suspend fun dismissNotifications(ids: Set<UUID>) = withContext(Dispatchers.Default) {
         notificationsQueries.markAsRead(ids)
     }
 
-    suspend fun dismissAllNotifications() {
+    suspend fun dismissAllNotifications() = withContext(Dispatchers.Default) {
         notificationsQueries.markAllAsRead()
     }
 
-    suspend fun listUnreadNotification(): Flow<List<Pair<Set<UUID>, Notification>>> = withContext(Dispatchers.Default) {
-        notificationsQueries.listUnread()
+    fun listUnreadNotification(nodeIdHash: String): Flow<List<Pair<Set<UUID>, Notification>>> {
+        return notificationsQueries.listUnread(nodeIdHash)
+    }
+
+    suspend fun initializeNodeIdHashColumn(nodeIdHash: String) = withContext(Dispatchers.Default) {
+        notificationsQueries.initializeNodeIdHashColumn(nodeIdHash)
     }
 
     fun close() {
