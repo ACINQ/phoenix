@@ -32,7 +32,7 @@ extension Color {
 extension UIColor {
 	
 	static var appAccent: UIColor {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return UIColor.appAccentTestnet
 		} else {
 			return UIColor.appAccentMainnet

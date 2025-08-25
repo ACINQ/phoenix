@@ -83,9 +83,10 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 		let _walletId = WalletIdentifier(chain: chain, walletInfo: walletInfo)
 		self.walletId = _walletId
 		
+		let prefs = Prefs.wallet(_walletId)
 		actor = SyncSeedManager_Actor(
-			isEnabled: Prefs.shared.backupSeed.isEnabled,
-			hasUploadedSeed: Prefs.shared.backupSeed.hasUploadedSeed(_walletId)
+			isEnabled: prefs.backupSeed.isEnabled,
+			hasUploadedSeed: prefs.backupSeed.hasUploadedSeed
 		)
 		statePublisher = CurrentValueSubject<SyncSeedManager_State, Never>(actor.initialState)
 		
@@ -203,7 +204,7 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 		let chain = self.chain
 		upgradeTask = Task { @MainActor in
 			
-			if Prefs.shared.hasUpgradedSeedCloudBackups {
+			if prefs.hasUpgradedSeedCloudBackups {
 				return
 			}
 			
@@ -257,7 +258,7 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 			}
 			
 			log.debug("upgradeSeeds(): Done!")
-			Prefs.shared.hasUpgradedSeedCloudBackups = true
+			prefs.hasUpgradedSeedCloudBackups = true
 		}
 	}
 	
@@ -419,7 +420,7 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 		log.trace("startPreferencesMonitor()")
 		
 		var isFirstFire = true
-		Prefs.shared.backupSeed.isEnabled_publisher.sink {[weak self](shouldEnable: Bool) in
+		prefs.backupSeed.isEnabledPublisher.sink {[weak self](shouldEnable: Bool) in
 			
 			if isFirstFire {
 				isFirstFire = false
@@ -429,7 +430,7 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 				return
 			}
 			
-			log.debug("Prefs.shared.backupSeed_isEnabled_publisher = \(shouldEnable ? "true" : "false")")
+			log.debug("prefs.backupSeed_isEnabled_publisher = \(shouldEnable ? "true" : "false")")
 			Task {
 				if let newState = await self.actor.didChangeIsEnabled(shouldEnable) {
 					self.handleNewState(newState)
@@ -442,13 +443,13 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 	private func startNameMonitor() {
 		log.trace("startNameMonitor()")
 		
-		Prefs.shared.backupSeed.name_publisher.sink {[weak self] _ in
+		prefs.backupSeed.namePublisher.sink {[weak self] _ in
 			
 			guard let self = self else {
 				return
 			}
 			
-			log.debug("Prefs.shared.backupSeed_name_publisher => fired")
+			log.debug("prefs.backupSeed_name_publisher => fired")
 			Task {
 				if let newState = await self.actor.didChangeName() {
 					self.handleNewState(newState)
@@ -465,15 +466,9 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 	private func publishNewState(_ state: SyncSeedManager_State) {
 		log.trace("publishNewState()")
 		
-		let block = {
+		runOnMainThread {
 			log.debug("statePublisher.value = \(state)")
 			self.statePublisher.value = state
-		}
-		
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
 		}
 	}
 	
@@ -556,7 +551,7 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 	private func uploadSeed() {
 		log.trace("uploadSeed()")
 		
-		let uploadedName = Prefs.shared.backupSeed.name(walletId) ?? ""
+		let uploadedName = prefs.backupSeed.name ?? ""
 		Task {
 			log.trace("uploadSeed(): starting task")
 			
@@ -630,14 +625,14 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 					// Since this is an async process, the user may have changed the seed name again
 					// while we were uploading the original name. So we need to check for that.
 					
-					let currentName = Prefs.shared.backupSeed.name(walletId) ?? ""
+					let currentName = prefs.backupSeed.name ?? ""
 					let needsReUpload = currentName != uploadedName
 					
 					if needsReUpload {
 						log.debug("uploadSeed(): finished: needsReUpload")
 					} else {
 						log.trace("uploadSeed(): finished: success")
-						Prefs.shared.backupSeed.setHasUploadedSeed(true, walletId)
+						prefs.backupSeed.hasUploadedSeed = true
 					}
 					self.consecutiveErrorCount = 0
 					
@@ -728,7 +723,7 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 					
 					log.trace("deleteSeed(): finish: success")
 					
-					Prefs.shared.backupSeed.setHasUploadedSeed(false, walletId)
+					prefs.backupSeed.hasUploadedSeed = false
 					self.consecutiveErrorCount = 0
 					
 					Task {
@@ -766,6 +761,10 @@ class SyncSeedManager: SyncManagerProtcol, @unchecked Sendable {
 			recordName: walletId.encryptedNodeId,
 			zoneID: CKRecordZone.default().zoneID
 		)
+	}
+	
+	private var prefs: Prefs_Wallet {
+		Prefs.wallet(walletId)
 	}
 	
 	// ----------------------------------------

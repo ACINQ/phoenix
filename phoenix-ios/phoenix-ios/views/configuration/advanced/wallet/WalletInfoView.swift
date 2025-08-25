@@ -41,10 +41,11 @@ struct WalletInfoView: View {
 	
 	@StateObject var toast = Toast()
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -105,7 +106,7 @@ struct WalletInfoView: View {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 				
-				let nodeId = Biz.nodeId ?? "?"
+				let nodeId = Biz.walletInfo?.nodeIdString ?? "?"
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					Text("Node id").font(.headline.bold())
@@ -614,6 +615,8 @@ struct WalletInfoView: View {
 					case .forceCloseChannels : break
 					case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
 					case .finalWallet        : newNavLinkTag = NavLinkTag.FinalWalletDetails
+					case .appAccess          : break
+					case .walletMetadata     : break
 				}
 				
 				if let newNavLinkTag {
