@@ -113,7 +113,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Saldo:</string>
+    <string name="send_balance_prefix">Saldo</string>
     <string name="send_error_amount_too_large">El importe es demasiado elevado.</string>
     <string name="send_error_amount_negative">El importe no puede ser negativo.</string>
     <string name="send_error_amount_invalid">Este importe no es válido.</string>

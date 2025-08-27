@@ -123,7 +123,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Salio:</string>
+    <string name="send_balance_prefix">Salio</string>
     <string name="send_error_amount_too_large">Kiasi ni kubwa kupita kiasi.</string>
     <string name="send_error_amount_negative">Kiasi hakiwezi kuwa hasi.</string>
     <string name="send_error_amount_invalid">Hii si kiasi halali.</string>

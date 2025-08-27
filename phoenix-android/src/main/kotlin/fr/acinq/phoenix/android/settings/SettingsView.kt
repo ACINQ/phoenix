@@ -60,8 +60,6 @@ import fr.acinq.phoenix.android.components.wallet.AvailableWalletsList
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigation.Screen
-import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
-import fr.acinq.phoenix.android.utils.datastore.getByNodeId
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -159,17 +157,12 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
 
     val activeWalletInUI by appViewModel.activeWalletInUI.collectAsState()
     val availableWallets by appViewModel.availableWallets.collectAsState()
-
     val activeNodeId = activeWalletInUI?.nodeId ?: return
-
     var showAvailableWalletsDialog by remember { mutableStateOf(false) }
-    val metadata by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
 
     ActiveWalletView(
         nodeId = activeNodeId,
-        metadata = metadata.getByNodeId(activeNodeId),
         onClick = { showAvailableWalletsDialog = true },
-        showMoreButton = true,
     )
 
     if (showAvailableWalletsDialog) {
@@ -178,8 +171,7 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
             activeNodeId = activeNodeId,
             availableWallets = availableWallets,
             onWalletClick = { appViewModel.switchToWallet(it.nodeId) },
-            availableWalletsMetadata = metadata,
-            onLockWallet = { appViewModel.resetActiveWallet() }
+            onLockWallet = { appViewModel.resetActiveWallet() },
         )
     }
 }
@@ -189,11 +181,11 @@ private fun AvailableWalletsDialog(
     onDismiss: () -> Unit,
     activeNodeId: String,
     availableWallets: Map<String, UserWallet>,
-    availableWalletsMetadata: Map<String, UserWalletMetadata>,
     onWalletClick: (UserWallet) -> Unit,
     onLockWallet: () -> Unit,
 ) {
     FullScreenDialog(onDismiss = onDismiss) {
+        val metadata by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
         Box(modifier = Modifier.fillMaxSize().clickable(onClick = onDismiss)) {  }
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 96.dp)) {
             Column(
@@ -203,10 +195,11 @@ private fun AvailableWalletsDialog(
             ) {
                 AvailableWalletsList(
                     wallets = availableWallets,
-                    walletsMetadata = availableWalletsMetadata,
+                    walletsMetadata = metadata,
                     activeNodeId = activeNodeId,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     onWalletClick = onWalletClick,
+                    canEdit = true,
                     bottomContent = {
                         Spacer(Modifier.height(4.dp))
                         val navController = navController

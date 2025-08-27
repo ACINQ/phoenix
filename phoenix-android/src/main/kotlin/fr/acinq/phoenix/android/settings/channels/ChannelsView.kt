@@ -70,9 +70,9 @@ fun ChannelsView(
     onImportChannelsDataClick: () -> Unit,
     onSpendFromChannelBalance: () -> Unit,
 ) {
-    val channelsState by business.peerManager.channelsFlow.collectAsState()
     val balance by business.balanceManager.balance.collectAsState()
-    val inboundLiquidity = channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()
+    val channelsState by business.peerManager.channelsFlow.collectAsState()
+    val inboundLiquidity = remember(channelsState) { channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()}
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(

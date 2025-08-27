@@ -58,7 +58,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
-import fr.acinq.phoenix.android.components.buttons.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.HSeparator
@@ -93,6 +93,7 @@ object LiquidityLimits {
 
 @Composable
 fun RequestLiquidityView(
+    nodeId: String,
     onBackClick: () -> Unit,
 ) {
     val balance by business.balanceManager.balance.collectAsState(null)
@@ -100,7 +101,7 @@ fun RequestLiquidityView(
     val currentInbound = channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
         topContent = { RequestLiquidityTopSection(currentInbound) },
         bottomContent = {
             if (channelsState.isNullOrEmpty()) {

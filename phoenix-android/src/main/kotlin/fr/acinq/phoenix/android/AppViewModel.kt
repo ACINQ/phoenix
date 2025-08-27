@@ -27,6 +27,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessManager.businessFlow
+import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
@@ -170,10 +171,14 @@ class AppViewModel(
                 }
 
                 is DecryptSeedResult.Success -> {
-                    listWalletState.value = ListWalletState.Success
-                    _availableWallets.value = result.mnemonicsMap.map {
-                        it.key to UserWallet(nodeId = it.key, words = it.value)
+                    val metadataMap = application.globalPrefs.getAvailableWalletsMeta.first()
+                    _availableWallets.value = result.mnemonicsMap.map { (nodeId, words) ->
+                        if (metadataMap[nodeId] == null) {
+                            application.globalPrefs.saveAvailableWalletMeta(nodeId, name = null, avatar = WalletAvatars.list.random())
+                        }
+                        nodeId to UserWallet(nodeId = nodeId, words = words)
                     }.toMap()
+                    listWalletState.value = ListWalletState.Success
                 }
             }
         }

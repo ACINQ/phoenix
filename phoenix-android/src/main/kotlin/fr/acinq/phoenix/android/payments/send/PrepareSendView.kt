@@ -113,6 +113,7 @@ import fr.acinq.phoenix.managers.SendManager
  */
 @Composable
 fun SendView(
+    nodeId: String,
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
     fromDeepLink: Boolean,
@@ -144,16 +145,16 @@ fun SendView(
             LocalViewModelStoreOwner.current?.viewModelStore?.clear()
             when (val data = parseState.data) {
                 is SendManager.ParseResult.Bolt11Invoice -> {
-                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, nodeId = nodeId)
                 }
                 is SendManager.ParseResult.Bolt12Offer -> {
-                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, nodeId = nodeId)
                 }
                 is SendManager.ParseResult.Uri -> {
-                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
+                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() }, nodeId = nodeId)
                 }
                 is SendManager.ParseResult.Lnurl.Pay -> {
-                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, nodeId = nodeId)
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
                     LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })

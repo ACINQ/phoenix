@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.components.wallet
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -48,8 +49,6 @@ import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.utils.mutedBgColor
 
 object WalletAvatars {
-    // New wallets get a random avatar based on their node id. Modifying this list will affect
-    // their avatar, so it should be avoided and we should only append new items.
     val list = listOf(
         "😃", "🙃", "🤑", "😎", "🥳", "🧐", "🤠", "🤖",
         "👑", "🚀", "✈️", "🚣", "⛵", "🚗", "🏍️",
@@ -64,8 +63,8 @@ object WalletAvatars {
 }
 
 @Composable
-fun WalletAvatar(avatar: String, fontSize: TextUnit = 28.sp, backgroundColor: Color = MaterialTheme.colors.surface, internalPadding: PaddingValues = PaddingValues(10.dp)) {
-    Box(modifier = Modifier.clip(CircleShape).background(backgroundColor).padding(internalPadding), contentAlignment = Alignment.Center) {
+fun WalletAvatar(avatar: String, fontSize: TextUnit = 28.sp, borderColor: Color = Color.Transparent, backgroundColor: Color = MaterialTheme.colors.surface, internalPadding: PaddingValues = PaddingValues(10.dp)) {
+    Box(modifier = Modifier.clip(CircleShape).background(backgroundColor).border(1.dp, color = borderColor, shape = CircleShape).padding(internalPadding), contentAlignment = Alignment.Center) {
         Text(
             text = avatar,
             fontSize = fontSize,

@@ -115,7 +115,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Số dư:</string>
+    <string name="send_balance_prefix">Số dư</string>
     <string name="send_error_amount_too_large">Số tiền quá lớn.</string>
     <string name="send_error_amount_negative">Số tiền không thể âm.</string>
     <string name="send_error_amount_invalid">Số tiền này không hợp lệ.</string>

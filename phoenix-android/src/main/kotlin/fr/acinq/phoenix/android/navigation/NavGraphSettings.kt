@@ -137,8 +137,8 @@ fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewMo
         )
     }
 
-    businessComposable(Screen.LiquidityRequest.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:requestliquidity" })) { _, _, _ ->
-        RequestLiquidityView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.LiquidityRequest.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:requestliquidity" })) { _, nodeId, _ ->
+        RequestLiquidityView(onBackClick = { navController.popBackStack() }, nodeId = nodeId)
     }
 
     businessComposable(Screen.AdvancedLiquidityPolicy.route, appViewModel) { _, _, _ ->

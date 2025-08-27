@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android.utils.datastore
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -26,12 +25,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.lightning.utils.getValue
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.wallet.WalletAvatar
-import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -40,7 +35,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import kotlin.random.Random
 
 class GlobalPrefs(private val data: DataStore<Preferences>) {
 
@@ -90,7 +84,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
 
     suspend fun saveAvailableWalletMeta(nodeId: String, name: String?, avatar: String) = data.edit {
         val existingMap: Map<String, UserWalletMetadata> = getAvailableWalletsMeta.first()
-        val newMap = existingMap + (nodeId to UserWalletMetadata(nodeId = nodeId, name = name, _avatar = avatar, createdAt = existingMap[nodeId]?.createdAt ?: currentTimestampMillis()))
+        val newMap = existingMap + (nodeId to UserWalletMetadata(nodeId = nodeId, name = name, avatar = avatar, createdAt = existingMap[nodeId]?.createdAt ?: currentTimestampMillis()))
         it[AVAILABLE_WALLETS_META] = Json.encodeToString(newMap)
     }
 
@@ -118,20 +112,10 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
 }
 
 @Serializable
-data class UserWalletMetadata(val nodeId: String, val name: String?, private val _avatar: String? = null, val createdAt: Long?) {
-
-    /** Repeatable random number generator. */
-    private val random: Random by lazy {
-        val randomSeed = java.util.UUID.nameUUIDFromBytes(ByteVector.fromHex(nodeId).sha256().toByteArray()).mostSignificantBits
-        Random(randomSeed)
-    }
-
-    // use a fixed list size in case more elements are added to the avatars list
-    val avatar = _avatar ?: WalletAvatars.list.take(116).random(random)
-
+data class UserWalletMetadata(val nodeId: String, val name: String?, val avatar: String, val createdAt: Long?) {
     @Composable
-    fun name() = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.wallet_name_default, nodeId.take(8))
+    fun nameOrDefault() = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.wallet_name_default, nodeId.take(8))
 }
 
 /** Helper method that finds the wallet metadata matching the node id in the map, or returns a default value if absent. */
-fun Map<String, UserWalletMetadata>.getByNodeId(nodeId: String): UserWalletMetadata = this[nodeId] ?: UserWalletMetadata(nodeId = nodeId, name = null, createdAt = null)
+fun Map<String, UserWalletMetadata>.getByNodeIdOrDefault(nodeId: String): UserWalletMetadata = this[nodeId] ?: UserWalletMetadata(nodeId = nodeId, name = null, avatar = "", createdAt = null)

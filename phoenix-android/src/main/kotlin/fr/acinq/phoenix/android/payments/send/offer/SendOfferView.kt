@@ -49,7 +49,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
-import fr.acinq.phoenix.android.components.buttons.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
@@ -65,6 +65,7 @@ import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 
 @Composable
 fun SendToOfferView(
+    nodeId: String,
     offer: OfferTypes.Offer,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -97,7 +98,7 @@ fun SendToOfferView(
     var showMessageDialog by remember { mutableStateOf(false) }
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = requestedAmount,

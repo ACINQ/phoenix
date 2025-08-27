@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.buttons.SwitchView
@@ -44,6 +45,7 @@ import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.globalPrefs
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.launch
@@ -73,7 +75,7 @@ fun EditWalletDialog(
                 avatar = avatarInput,
                 onAvatarChange = { avatarInput = it },
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             TextInput(
                 text = nameInput,
                 onTextChange = { nameInput = it.take(48) /* stealthy max chars */ },
@@ -82,7 +84,11 @@ fun EditWalletDialog(
                 staticLabel = null,
                 showResetButton = true,
             )
+            metadata.createdAt?.let {
+                Text(text = "Created on ${it.toAbsoluteDateTimeString()}", style = MaterialTheme.typography.caption.copy(fontSize = 14.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+            }
         }
+
         Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
             SwitchView(
                 text = "Default Wallet",
@@ -99,7 +105,8 @@ fun EditWalletDialog(
                 onCheckedChange = { }
             )
         }
-        Column(modifier = Modifier.padding(24.dp).align(Alignment.End)) {
+
+        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp).align(Alignment.End)) {
             FilledButton(
                 text = stringResource(R.string.btn_save),
                 icon = R.drawable.ic_check,
@@ -119,10 +126,12 @@ fun EditWalletDialog(
             Spacer(Modifier.height(16.dp))
             TransparentFilledButton(
                 text = stringResource(R.string.btn_cancel),
+                textStyle = MaterialTheme.typography.caption,
                 icon = R.drawable.ic_cross,
+                iconTint = MaterialTheme.typography.caption.color,
                 onClick = onDismiss,
             )
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

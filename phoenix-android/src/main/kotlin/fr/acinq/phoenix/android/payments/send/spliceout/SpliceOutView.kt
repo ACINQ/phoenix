@@ -29,7 +29,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -56,7 +55,7 @@ import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.inputs.FeerateSlider
-import fr.acinq.phoenix.android.components.buttons.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
@@ -71,6 +70,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SendSpliceOutView(
+    nodeId: String,
     requestedAmount: Satoshi?,
     address: String,
     onBackClick: () -> Unit,
@@ -91,7 +91,7 @@ fun SendSpliceOutView(
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = requestedAmount?.toMilliSatoshi(),

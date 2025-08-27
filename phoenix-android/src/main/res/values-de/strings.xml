@@ -115,7 +115,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Guthaben:</string>
+    <string name="send_balance_prefix">Guthaben</string>
     <string name="send_error_amount_too_large">Der Betrag ist zu groß.</string>
     <string name="send_error_amount_negative">Der Betrag darf nicht negativ sein.</string>
     <string name="send_error_amount_invalid">Dies ist kein gültiger Betrag.</string>

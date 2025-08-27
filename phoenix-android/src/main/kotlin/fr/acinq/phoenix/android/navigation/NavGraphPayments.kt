@@ -141,7 +141,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
             navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
             navDeepLink { uriPattern = "scanview:{data}" },
         )
-    ) { backStackEntry, _, _ ->
+    ) { backStackEntry, nodeId, _ ->
         @Suppress("DEPRECATION")
         val intent = try {
             backStackEntry.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
@@ -160,6 +160,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
 
         log.info("navigating to send-payment with input=$input")
         SendView(
+            nodeId = nodeId,
             initialInput = input,
             fromDeepLink = !isIntentFromNavigation,
             immediatelyOpenScanner = backStackEntry.arguments?.getBoolean("openScanner") ?: false,

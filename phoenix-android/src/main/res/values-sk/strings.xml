@@ -114,7 +114,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Zostatok:</string>
+    <string name="send_balance_prefix">Zostatok</string>
     <string name="send_error_amount_too_large">Suma je príliš vysoká.</string>
     <string name="send_error_amount_negative">Suma nemôže byť záporná.</string>
     <string name="send_error_amount_invalid">Táto suma nie je platná.</string>

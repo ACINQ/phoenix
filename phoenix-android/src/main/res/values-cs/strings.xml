@@ -143,7 +143,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Zůstatek:</string>
+    <string name="send_balance_prefix">Zůstatek</string>
     <string name="send_error_amount_too_large">Částka je příliš vysoká.</string>
     <string name="send_error_amount_negative">Částka nemůže být záporná.</string>
     <string name="send_error_amount_invalid">Tato částka není platná.</string>

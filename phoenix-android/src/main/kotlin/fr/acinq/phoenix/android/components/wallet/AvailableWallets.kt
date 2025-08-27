@@ -17,16 +17,22 @@
 package fr.acinq.phoenix.android.components.wallet
 
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,20 +46,30 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
+import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
 import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
-import fr.acinq.phoenix.android.utils.datastore.getByNodeId
+import fr.acinq.phoenix.android.utils.datastore.getByNodeIdOrDefault
 import fr.acinq.phoenix.android.utils.extensions.findActivity
+import fr.acinq.phoenix.android.utils.positiveColor
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -63,6 +79,7 @@ fun AvailableWalletsList(
     wallets: Map<String, UserWallet>,
     walletsMetadata: Map<String, UserWalletMetadata>,
     activeNodeId: String?,
+    canEdit: Boolean,
     onWalletClick: (UserWallet) -> Unit,
     loadNodeImmediately: String? = null,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -73,7 +90,8 @@ fun AvailableWalletsList(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val walletsList = remember(wallets) { wallets.entries.toList() }
+    val currentWallet = remember(wallets) { wallets.entries.firstOrNull { it.key == activeNodeId }?.value }
+    val otherWalletsList = remember(wallets) { wallets.entries.filterNot { it.key == activeNodeId }.toList() }
     var isClickEnabled by remember { mutableStateOf(true) }
     var unlockNodeId by remember { mutableStateOf<UserWallet?>(null) }
 
@@ -102,11 +120,26 @@ fun AvailableWalletsList(
         topContent?.let {
             item { it.invoke() }
         }
-        items(items = walletsList) { (nodeId, userWallet) ->
+        if (currentWallet != null) {
+            item {
+                AvailableWalletView(
+                    nodeId = currentWallet.nodeId,
+                    metadata = walletsMetadata.getByNodeIdOrDefault(currentWallet.nodeId),
+                    isCurrent = true,
+                    canEdit = canEdit,
+                    onClick = { loadWallet(currentWallet.nodeId, currentWallet) },
+                )
+                Spacer(Modifier.height(12.dp))
+                HSeparator(width = 100.dp)
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+        items(items = otherWalletsList) { (nodeId, userWallet) ->
             AvailableWalletView(
                 nodeId = nodeId,
-                metadata = walletsMetadata.getByNodeId(nodeId),
-                isCurrent = nodeId == activeNodeId,
+                metadata = walletsMetadata.getByNodeIdOrDefault(nodeId),
+                isCurrent = false,
+                canEdit = canEdit,
                 onClick = { loadWallet(nodeId, userWallet) },
             )
             Spacer(Modifier.height(8.dp))
@@ -120,7 +153,7 @@ fun AvailableWalletsList(
         ScreenLockPromptDialog(
             onDismiss = { unlockNodeId = null ; isClickEnabled = true },
             nodeId = userWallet.nodeId,
-            walletName = walletsMetadata.getByNodeId(userWallet.nodeId).name(),
+            walletName = walletsMetadata.getByNodeIdOrDefault(userWallet.nodeId).nameOrDefault(),
             onUnlock = { onWalletClick(userWallet) },
             onLock = { },
         )
@@ -222,6 +255,61 @@ private fun ScreenLockPromptDialog(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AvailableWalletView(
+    modifier: Modifier = Modifier,
+    nodeId: String,
+    metadata: UserWalletMetadata,
+    isCurrent: Boolean,
+    canEdit: Boolean,
+    onClick: (String) -> Unit,
+) {
+    var showWalletEditDialog by remember { mutableStateOf(false) }
+    if (showWalletEditDialog) {
+        EditWalletDialog(
+            onDismiss = { showWalletEditDialog = false },
+            nodeId = nodeId,
+            metadata = metadata,
+        )
+    }
+
+    Clickable(
+        modifier = modifier,
+        onClick = {
+            if (isCurrent) {
+                if (canEdit) showWalletEditDialog = true else return@Clickable
+            } else {
+                onClick(nodeId)
+            }
+        },
+        shape = RoundedCornerShape(16.dp),
+        backgroundColor = MaterialTheme.colors.surface,
+    ) {
+        Row(modifier = Modifier.height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp).weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                WalletAvatar(avatar = metadata.avatar, backgroundColor = Color.Transparent, internalPadding = PaddingValues(4.dp))
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Row {
+                        Text(text = metadata.nameOrDefault(), modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
+                        Spacer(Modifier.width(6.dp))
+                        if (isCurrent) {
+                            Image(painter = painterResource(R.drawable.ic_check), contentDescription = "Current active wallet", modifier = Modifier.size(18.dp), colorFilter = ColorFilter.tint(positiveColor))
+                        }
+                    }
+                    Spacer(Modifier.height(2.dp))
+                    Text(text = nodeId, modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp))
+                }
+            }
+            if (isCurrent && canEdit) {
+                Spacer(Modifier.width(8.dp))
+                PhoenixIcon(R.drawable.ic_edit, tint = MaterialTheme.typography.caption.color)
+                Spacer(Modifier.width(16.dp))
             }
         }
     }

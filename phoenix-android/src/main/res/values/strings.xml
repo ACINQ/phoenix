@@ -146,7 +146,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Balance:</string>
+    <string name="send_balance_prefix">Balance</string>
     <string name="send_error_amount_too_large">Amount is too large.</string>
     <string name="send_error_amount_negative">Amount cannot be negative.</string>
     <string name="send_error_amount_invalid">This is not a valid amount.</string>

@@ -147,6 +147,7 @@ fun StartupView(
                                                     onBusinessStarted()
                                                 })
                                             },
+                                            canEdit = false,
                                             modifier = Modifier.padding(horizontal = 24.dp),
                                             topContent = {
                                                 Spacer(Modifier.height(64.dp))

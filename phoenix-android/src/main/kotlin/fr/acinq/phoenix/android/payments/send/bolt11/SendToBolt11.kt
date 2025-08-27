@@ -41,7 +41,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
-import fr.acinq.phoenix.android.components.buttons.BackButtonWithBalance
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SendToBolt11View(
+    nodeId: String,
     invoice: Bolt11Invoice,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -84,7 +85,7 @@ fun SendToBolt11View(
     val isOverpaymentEnabled = LocalUserPrefs.current?.getIsOverpaymentEnabled?.collectAsState(initial = false)?.value ?: false
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
         topContent = {
             var inputForcedAmount by remember { mutableStateOf(requestedAmount) }
             AmountHeroInput(

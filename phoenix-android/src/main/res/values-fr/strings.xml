@@ -110,7 +110,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Solde:</string>
+    <string name="send_balance_prefix">Solde</string>
     <string name="send_error_amount_too_large">Le montant est trop élevé.</string>
     <string name="send_error_amount_negative">Le montant ne peut pas être négatif.</string>
     <string name="send_error_amount_invalid">Ce montant n\'est pas valide.</string>

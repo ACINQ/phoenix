@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.components.wallet
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,13 +25,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,70 +37,112 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import fr.acinq.lightning.utils.sum
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.AmountView
+import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.dialogs.PopupBasicDialog
+import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.datastore.getByNodeIdOrDefault
 import fr.acinq.phoenix.android.utils.monoTypo
+
+@Composable
+fun ActiveWalletCompactView(
+    nodeId: String,
+    showBalance: Boolean,
+    showInbound: Boolean,
+) {
+    val metadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
+    val metadata = metadataMap.getByNodeIdOrDefault(nodeId)
+
+    var showDetailsDialog by remember { mutableStateOf(false) }
+
+    Clickable(onClick = { showDetailsDialog = true }) {
+        WalletAvatar(avatar = metadata.avatar, fontSize = 20.sp, borderColor = if (showDetailsDialog) MaterialTheme.colors.primary else Color.Transparent, internalPadding = PaddingValues(8.dp))
+    }
+
+    if (showDetailsDialog) {
+        ActiveWalletBalanceDialog(onDismiss = { showDetailsDialog = false }, showBalance = showBalance, showInbound = showInbound, metadata = metadata)
+    }
+}
 
 @Composable
 fun ActiveWalletView(
     nodeId: String,
-    metadata: UserWalletMetadata,
     onClick: () -> Unit,
-    showMoreButton: Boolean,
 ) {
-    var showMoreMenu by remember { mutableStateOf(false) }
-    var showWalletEditDialog by remember { mutableStateOf(false) }
+    val metadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
+    val metadata = metadataMap.getByNodeIdOrDefault(nodeId)
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
+    Clickable(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Clickable(
-            onClick = onClick,
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.weight(1f)
-        ) {
-            Row(modifier = Modifier.padding(horizontal = 0.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                WalletAvatar(metadata.avatar)
-                Spacer(Modifier.width(12.dp))
-                Column {
-                    Text(text = metadata.name(), modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
-                    Spacer(Modifier.height(2.dp))
-                    Text(text = nodeId, modifier = Modifier.widthIn(max = 200.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
-                }
-            }
-        }
-        if (showMoreButton) {
-            Spacer(Modifier.width(32.dp))
-            Button(
-                icon = R.drawable.ic_menu_dots,
-                shape = CircleShape,
-                padding = PaddingValues(8.dp, 12.dp),
-                backgroundColor = Color.Transparent,
-                onClick = { showMoreMenu = true },
-            )
-            Box(contentAlignment = Alignment.TopEnd) {
-                DropdownMenu(expanded = showMoreMenu, onDismissRequest = { showMoreMenu = false }) {
-                    DropdownMenuItem(onClick = { showWalletEditDialog = true }, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                        TextWithIcon(text = "Edit wallet...", icon = R.drawable.ic_edit, textStyle = MaterialTheme.typography.body1)
-                    }
-                    DropdownMenuItem(onClick = onClick, contentPadding = PaddingValues(horizontal = 16.dp)) {
-                        TextWithIcon(text = "Switch wallet...", icon = R.drawable.ic_swap, textStyle = MaterialTheme.typography.body1)
-                    }
-                }
+        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            WalletAvatar(metadata.avatar)
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(text = metadata.nameOrDefault(), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
+                Spacer(Modifier.height(2.dp))
+                Text(text = nodeId, modifier = Modifier.widthIn(max = 250.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
             }
         }
     }
+}
 
-    if (showWalletEditDialog) {
-        EditWalletDialog(
-            onDismiss = { showWalletEditDialog = false },
-            nodeId = nodeId,
-            metadata = metadata,
-        )
+@Composable
+private fun ActiveWalletBalanceDialog(
+    showBalance: Boolean,
+    showInbound: Boolean,
+    metadata: UserWalletMetadata,
+    onDismiss: () -> Unit,
+) {
+    val business = LocalBusiness.current
+    if (business != null) {
+        PopupBasicDialog(
+            onDismiss = onDismiss,
+            internalPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
+            borderStroke = null,
+        ) {
+            val balance by business.balanceManager.balance.collectAsState()
+            val channelsState by business.peerManager.channelsFlow.collectAsState()
+            val inboundLiquidity = remember(channelsState) { channelsState?.values?.mapNotNull { it.availableForReceive }?.sum() }
+
+            Text(text = metadata.nameOrDefault(), style = MaterialTheme.typography.h4, modifier = Modifier.fillMaxWidth())
+            Spacer(Modifier.height(8.dp))
+            HSeparator(width = 100.dp)
+
+            if (showBalance) {
+                Spacer(Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.send_balance_prefix), style = MaterialTheme.typography.subtitle2)
+                Spacer(Modifier.height(4.dp))
+                Row {
+                    PhoenixIcon(resourceId = R.drawable.ic_send)
+                    Spacer(Modifier.width(4.dp))
+                    balance?.let { AmountView(amount = it) } ?: ProgressView(stringResource(R.string.utils_loading_data))
+                }
+            }
+
+            if (showInbound) {
+                Spacer(Modifier.height(8.dp))
+                Text(text = "Inbound liquidity", style = MaterialTheme.typography.subtitle2)
+                Spacer(Modifier.height(4.dp))
+                Row {
+                    PhoenixIcon(resourceId = R.drawable.ic_bucket)
+                    Spacer(Modifier.width(4.dp))
+                    inboundLiquidity?.let { AmountView(amount = it) } ?: ProgressView(stringResource(R.string.utils_loading_data))
+                }
+            }
+        }
     }
 }

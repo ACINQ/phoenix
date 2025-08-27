@@ -20,6 +20,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -132,10 +133,11 @@ fun RowScope.IconPopup(
 }
 
 @Composable
-fun PopupDialog(
+fun PopupBasicDialog(
     onDismiss: () -> Unit,
-    message: String,
-    button: @Composable (() -> Unit)? = null,
+    internalPadding: PaddingValues = PaddingValues(0.dp),
+    borderStroke: BorderStroke? = BorderStroke(1.dp, MaterialTheme.colors.primary),
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Popup(
         alignment = Alignment.TopCenter,
@@ -143,23 +145,34 @@ fun PopupDialog(
         onDismissRequest = onDismiss,
     ) {
         Surface(
-            modifier = Modifier.widthIn(min = 280.dp, max = 280.dp),
+            modifier = Modifier.widthIn(min = 240.dp, max = 280.dp),
             shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+            border = borderStroke,
             elevation = 6.dp,
         ) {
-            Column() {
-                Text(
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 8.dp),
-                    text = message,
-                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
-                )
-                button?.let {
-                    it()
-                } ?: run {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+            Column(modifier = Modifier.padding(internalPadding)) {
+                content()
             }
+        }
+    }
+}
+
+@Composable
+fun PopupDialog(
+    onDismiss: () -> Unit,
+    message: String,
+    button: @Composable (() -> Unit)? = null,
+) {
+    PopupBasicDialog(onDismiss = onDismiss) {
+        Text(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 8.dp),
+            text = message,
+            style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+        )
+        button?.let {
+            it()
+        } ?: run {
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

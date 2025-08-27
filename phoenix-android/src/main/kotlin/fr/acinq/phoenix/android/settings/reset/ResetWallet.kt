@@ -21,7 +21,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,10 +58,8 @@ import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.wallet.ActiveWalletView
-import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
-import fr.acinq.phoenix.android.utils.datastore.getByNodeId
 import fr.acinq.phoenix.android.utils.negativeColor
 
 
@@ -120,10 +117,7 @@ private fun InitReset(
     ) {
         Text(text = "Do you want to delete this wallet from your device ?")
         Spacer(modifier = Modifier.height(4.dp))
-        Row {
-            val availableWallet by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
-            ActiveWalletView(nodeId, availableWallet.getByNodeId(nodeId), onClick = {}, showMoreButton = false)
-        }
+        ActiveWalletView(nodeId, onClick = {})
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "All data for this wallet will be removed, including the payments history.")
     }
