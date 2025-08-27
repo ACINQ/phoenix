@@ -74,7 +74,7 @@ class PhoenixBusiness(
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
+    val appDb by lazy { makeSharedAppDb(ctx) }
     val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
@@ -120,7 +120,6 @@ class PhoenixBusiness(
         peerManager.cancel()
         appConfigurationManager.cancel()
         if (closeDatabases) {
-            appDb.close()
             databaseManager.close()
         }
         databaseManager.cancel()
@@ -163,5 +162,12 @@ class PhoenixBusiness(
 
         override fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController =
             AppCloseChannelsConfigurationController(_this, isForceClose = true)
+    }
+
+    companion object {
+        private var sharedAppDb: SqliteAppDb? = null
+        fun makeSharedAppDb(ctx: PlatformContext): SqliteAppDb {
+            return sharedAppDb ?: SqliteAppDb(createAppDbDriver(ctx)).also { sharedAppDb = it }
+        }
     }
 }
