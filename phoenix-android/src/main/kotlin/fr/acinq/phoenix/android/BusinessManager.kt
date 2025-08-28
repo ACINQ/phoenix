@@ -59,7 +59,7 @@ import kotlin.time.Duration.Companion.hours
 
 
 sealed class StartBusinessResult {
-    data class Success(val walletInfo: WalletManager.WalletInfo): StartBusinessResult()
+    data class Success(val walletInfo: WalletManager.WalletInfo, val business: PhoenixBusiness): StartBusinessResult()
     sealed class Failure : StartBusinessResult() {
         data class Generic(val cause: Throwable): Failure()
         data object LoadWalletError: Failure()
@@ -124,7 +124,7 @@ object BusinessManager {
         val businessInFlow = businessFlow.value[nodeId]
         if (businessInFlow != null) {
             log.info("business already exists in flow, ignoring...")
-            return StartBusinessResult.Success(walletInfo)
+            return StartBusinessResult.Success(walletInfo, businessInFlow)
         }
 
         return try {
@@ -169,7 +169,7 @@ object BusinessManager {
             }
 
             log.info("business initialisation has successfully completed")
-            StartBusinessResult.Success(walletInfo)
+            StartBusinessResult.Success(walletInfo, business)
         } catch (e: Exception) {
             log.error("there was an error when initialising new business: ", e)
             stopBusiness(nodeId)

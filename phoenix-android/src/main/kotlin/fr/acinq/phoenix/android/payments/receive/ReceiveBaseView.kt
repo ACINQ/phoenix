@@ -86,7 +86,7 @@ import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
 import fr.acinq.phoenix.android.components.dialogs.IconTextPopup
 import fr.acinq.phoenix.android.components.nfc.HceMonitorDialog
-import fr.acinq.phoenix.android.components.wallet.ActiveWalletCompactView
+import fr.acinq.phoenix.android.components.wallet.CompactWalletViewWithBalance
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.safeLet
@@ -117,7 +117,7 @@ fun ReceiveView(
                     space = 6.dp,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                ActiveWalletCompactView(nodeId = nodeId, showBalance = false, showInbound = true)
+                CompactWalletViewWithBalance(nodeId = nodeId, showBalance = false, showInbound = true)
                 Spacer(modifier = Modifier.width(16.dp))
             },
         )

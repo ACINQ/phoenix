@@ -62,7 +62,6 @@
     <!-- Lock prompt -->
 
     <string name="lockprompt_title">Unlock to continue</string>
-    <string name="lockprompt_title2">Unlock %1$s</string>
     <string name="lockprompt_pin_button">PIN code</string>
     <string name="lockprompt_biometrics_button">System lock</string>
 
@@ -71,8 +70,9 @@
     <string name="startup_init">Initialising…</string>
     <string name="startup_preparing">Preparing wallet…</string>
     <string name="startup_loading_seed">Decrypting…</string>
-    <string name="startup_starting">Starting…</string>
-    <string name="startup_started">Opening app…</string>
+    <string name="startup_starting">Starting wallet…</string>
+    <string name="startup_started">Opening wallet…</string>
+    <string name="startup_selector_title">Select a wallet</string>
 
     <string name="startup_recovery_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
     <string name="startup_recovery_input_label">Enter word #%1$d</string>
@@ -87,9 +87,10 @@
     <string name="startup_recovery_error_keystore_error">Failed to perform keystore operations.</string>
     <string name="startup_recovery_success_match">Seed matches.\nWriting to disk…</string>
 
-    <string name="startup_error_generic">The application could not start</string>
-    <string name="startup_error_try_again">Restart the app and try again.</string>
-    <string name="startup_error_decryption_general">Failed to decrypt wallet</string>
+    <string name="startup_error_start_business">Could not start the wallet</string>
+    <string name="startup_error_generic">Could not retrieve wallets</string>
+    <string name="startup_error_try_again">Try again</string>
+    <string name="startup_error_decryption_general">Decryption error</string>
     <string name="startup_error_decryption_keystore">Android keystore failure</string>
     <string name="startup_error_recovery_button">Enter recovery phrase</string>
 
@@ -1012,5 +1013,13 @@
     <string name="wallet_name_default">Wallet</string>
     <string name="wallet_add_new">Add new wallet</string>
     <string name="wallet_lock">Lock</string>
+
+
+    <string name="wallet_edit_name_placeholder">Enter a name</string>
+    <string name="wallet_edit_default_label">Default Wallet</string>
+    <string name="wallet_edit_default_description">If a default wallet is selected, it will be automatically opened on app launch.</string>
+    <string name="wallet_edit_secret_label">Hidden Wallet (WIP)</string>
+    <string name="wallet_edit_secret_description">Wallet will not be visible in selector screens. To access the wallet, you must enter its lock PIN.</string>
+
 
 </resources>

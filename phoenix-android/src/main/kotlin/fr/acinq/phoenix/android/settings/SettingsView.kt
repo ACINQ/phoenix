@@ -55,8 +55,8 @@ import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.CardHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.wallet.ActiveWalletView
-import fr.acinq.phoenix.android.components.wallet.AvailableWalletsList
+import fr.acinq.phoenix.android.components.wallet.ClickableWalletView
+import fr.acinq.phoenix.android.components.wallet.WalletsSelector
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigation.Screen
@@ -160,7 +160,7 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
     val activeNodeId = activeWalletInUI?.nodeId ?: return
     var showAvailableWalletsDialog by remember { mutableStateOf(false) }
 
-    ActiveWalletView(
+    ClickableWalletView(
         nodeId = activeNodeId,
         onClick = { showAvailableWalletsDialog = true },
     )
@@ -170,7 +170,7 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
             onDismiss = { showAvailableWalletsDialog = false },
             activeNodeId = activeNodeId,
             availableWallets = availableWallets,
-            onWalletClick = { appViewModel.switchToWallet(it.nodeId) },
+            onSwitchWallet = { appViewModel.resetActiveWallet() ; appViewModel.switchToWallet(it.nodeId) },
             onLockWallet = { appViewModel.resetActiveWallet() },
         )
     }
@@ -181,7 +181,7 @@ private fun AvailableWalletsDialog(
     onDismiss: () -> Unit,
     activeNodeId: String,
     availableWallets: Map<String, UserWallet>,
-    onWalletClick: (UserWallet) -> Unit,
+    onSwitchWallet: (UserWallet) -> Unit,
     onLockWallet: () -> Unit,
 ) {
     FullScreenDialog(onDismiss = onDismiss) {
@@ -193,12 +193,12 @@ private fun AvailableWalletsDialog(
                     .background(MaterialTheme.colors.background, shape = MaterialTheme.shapes.large)
                     .padding(8.dp)
             ) {
-                AvailableWalletsList(
+                WalletsSelector(
                     wallets = availableWallets,
                     walletsMetadata = metadata,
                     activeNodeId = activeNodeId,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
-                    onWalletClick = onWalletClick,
+                    onWalletClick = onSwitchWallet,
                     canEdit = true,
                     bottomContent = {
                         Spacer(Modifier.height(4.dp))

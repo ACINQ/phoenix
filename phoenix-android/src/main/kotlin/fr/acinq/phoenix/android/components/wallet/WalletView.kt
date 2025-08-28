@@ -56,7 +56,40 @@ import fr.acinq.phoenix.android.utils.datastore.getByNodeIdOrDefault
 import fr.acinq.phoenix.android.utils.monoTypo
 
 @Composable
-fun ActiveWalletCompactView(
+fun WalletView(
+    nodeId: String,
+    modifier: Modifier = Modifier,
+) {
+    val metadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
+    val metadata = metadataMap.getByNodeIdOrDefault(nodeId)
+
+    Row(modifier = modifier.padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        WalletAvatar(metadata.avatar)
+        Spacer(Modifier.width(12.dp))
+        Column {
+            Text(text = metadata.nameOrDefault(), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
+            Spacer(Modifier.height(2.dp))
+            Text(text = nodeId, modifier = Modifier.widthIn(max = 250.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
+        }
+    }
+}
+
+@Composable
+fun ClickableWalletView(
+    nodeId: String,
+    onClick: () -> Unit,
+) {
+    Clickable(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        WalletView(nodeId)
+    }
+}
+
+@Composable
+fun CompactWalletViewWithBalance(
     nodeId: String,
     showBalance: Boolean,
     showInbound: Boolean,
@@ -72,31 +105,6 @@ fun ActiveWalletCompactView(
 
     if (showDetailsDialog) {
         ActiveWalletBalanceDialog(onDismiss = { showDetailsDialog = false }, showBalance = showBalance, showInbound = showInbound, metadata = metadata)
-    }
-}
-
-@Composable
-fun ActiveWalletView(
-    nodeId: String,
-    onClick: () -> Unit,
-) {
-    val metadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
-    val metadata = metadataMap.getByNodeIdOrDefault(nodeId)
-
-    Clickable(
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            WalletAvatar(metadata.avatar)
-            Spacer(Modifier.width(12.dp))
-            Column {
-                Text(text = metadata.nameOrDefault(), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
-                Spacer(Modifier.height(2.dp))
-                Text(text = nodeId, modifier = Modifier.widthIn(max = 250.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
-            }
-        }
     }
 }
 

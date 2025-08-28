@@ -126,20 +126,13 @@ class AppViewModel(
 
     init {
         listAvailableWallets()
-        monitorActiveWallet()
     }
 
-    private fun monitorActiveWallet() {
-        viewModelScope.launch {
-            combine(businessFlow, _desiredNodeId.filterNotNull()) { businessMap, activeNodeId ->
-                activeNodeId to businessMap[activeNodeId]
-            }.collect { (nodeId, business) ->
-                val userPrefs = DataStoreManager.loadUserPrefsForNodeId(application.applicationContext, nodeId = nodeId)
-                val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId = nodeId)
-                _activeWalletInUI.value = ActiveWallet(nodeId = nodeId, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
-                scheduleAutoLock()
-            }
-        }
+    fun setActiveWallet(nodeId: String, business: PhoenixBusiness) {
+        val userPrefs = DataStoreManager.loadUserPrefsForNodeId(application.applicationContext, nodeId = nodeId)
+        val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId = nodeId)
+        _activeWalletInUI.value = ActiveWallet(nodeId = nodeId, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
+        scheduleAutoLock()
     }
 
     fun listAvailableWallets() {

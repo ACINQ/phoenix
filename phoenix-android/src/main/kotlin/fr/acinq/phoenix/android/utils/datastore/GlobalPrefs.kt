@@ -88,7 +88,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         it[AVAILABLE_WALLETS_META] = Json.encodeToString(newMap)
     }
 
-    val getDefaultNodeId: Flow<String?> = safeData.map { it[DEFAULT_NODE_ID] }
+    val getDefaultNodeId: Flow<String> = safeData.map { it[DEFAULT_NODE_ID] ?: "" }
     suspend fun saveDefaultNodeId(nodeId: String) = data.edit { it[DEFAULT_NODE_ID] = nodeId }
     suspend fun clearDefaultNodeId() = data.edit { it.remove(DEFAULT_NODE_ID) }
 

@@ -51,7 +51,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
             startupViewModel = startupViewModel,
             onShowIntro = { navController.navigate(Screen.Intro.route) },
             onSeedNotFound = { navController.navigate(Screen.InitWallet.route) },
-            onBusinessStarted = {
+            onWalletReady = {
                 val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
 
                 if (next == null) {

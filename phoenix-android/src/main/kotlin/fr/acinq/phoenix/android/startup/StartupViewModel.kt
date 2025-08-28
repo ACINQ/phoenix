@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
@@ -45,8 +46,8 @@ import org.slf4j.LoggerFactory
 
 sealed class StartupViewState {
     data object Init : StartupViewState()
-    data object StartingBusiness : StartupViewState()
-    data object BusinessActive: StartupViewState()
+    data class StartingBusiness(val nodeId: String) : StartupViewState()
+    data class BusinessActive(val nodeId: String): StartupViewState()
 
     sealed class Error: StartupViewState() {
         abstract val nodeId: String
@@ -74,7 +75,7 @@ class StartupViewModel(
 
     val state = mutableStateOf<StartupViewState>(StartupViewState.Init)
 
-    fun startupNode(nodeId: String, words: List<String>, onStartupSuccess: () -> Unit) {
+    fun startupNode(nodeId: String, words: List<String>, onStartupSuccess: (PhoenixBusiness) -> Unit) {
         if (state.value !is StartupViewState.Init) {
             return
         }
@@ -83,7 +84,7 @@ class StartupViewModel(
             log.error("error when initialising startup-view: ", e)
             state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = e)
         }) {
-            state.value = StartupViewState.StartingBusiness
+            state.value = StartupViewState.StartingBusiness(nodeId)
             val startResult = withContext(Dispatchers.Default) {
                 BusinessManager.startNewBusiness(words, isHeadless = false)
             }
@@ -93,9 +94,9 @@ class StartupViewModel(
 
             when (startResult) {
                 is StartBusinessResult.Success -> {
-                    state.value = StartupViewState.BusinessActive
+                    state.value = StartupViewState.BusinessActive(nodeId)
                     launch(Dispatchers.Main) {
-                        onStartupSuccess()
+                        onStartupSuccess(startResult.business)
                     }
                 }
                 is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = startResult.cause)

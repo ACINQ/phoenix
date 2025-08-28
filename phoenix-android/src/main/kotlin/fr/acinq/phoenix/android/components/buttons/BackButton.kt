@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.PhoenixIcon
-import fr.acinq.phoenix.android.components.wallet.ActiveWalletCompactView
+import fr.acinq.phoenix.android.components.wallet.CompactWalletViewWithBalance
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
 /** Button for navigation purpose, with the back arrow. */
@@ -72,7 +72,7 @@ fun BackButtonWithActiveWallet(
     ) {
         BackButton(onClick = onBackClick)
         Spacer(Modifier.weight(1f))
-        ActiveWalletCompactView(
+        CompactWalletViewWithBalance(
             nodeId = nodeId,
             showBalance = true,
             showInbound = false,

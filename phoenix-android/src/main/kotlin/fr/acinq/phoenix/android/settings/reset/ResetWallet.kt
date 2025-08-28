@@ -57,7 +57,7 @@ import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.wallet.ActiveWalletView
+import fr.acinq.phoenix.android.components.wallet.ClickableWalletView
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -117,7 +117,7 @@ private fun InitReset(
     ) {
         Text(text = "Do you want to delete this wallet from your device ?")
         Spacer(modifier = Modifier.height(4.dp))
-        ActiveWalletView(nodeId, onClick = {})
+        ClickableWalletView(nodeId, onClick = {})
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "All data for this wallet will be removed, including the payments history.")
     }
