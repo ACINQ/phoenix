@@ -23,17 +23,17 @@ class InboundFeeState: ObservableObject {
 	init() {
 		log.trace("init()")
 		
-		Biz.business.connectionsManager.connectionsPublisher()
-			.sink {[weak self](newValue: Connections) in
+		Task { @MainActor [weak self] in
+			for await newValue in Biz.business.connectionsManager.connectionsSequence() {
 				self?.connectionsChanged(newValue)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
-		Biz.business.peerManager.channelsPublisher()
-			.sink {[weak self](newValue: [LocalChannelInfo]) in
+		Task { @MainActor [weak self] in
+			for await newValue in Biz.business.peerManager.channelsArraySequence() {
 				self?.channelsChanged(newValue)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		GroupPrefs.current.liquidityPolicyPublisher
 			.sink {[weak self](newValue: LiquidityPolicy) in

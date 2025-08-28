@@ -86,13 +86,13 @@ class PhoenixManager {
 		business = nil
 		walletId = nil
 		cancellables.removeAll()
-
-		currentBusiness.connectionsManager.connectionsPublisher().sink {
-			[weak self](connections: Connections) in
-
-			self?.oldConnectionsChanged(connections)
-		}
-		.store(in: &oldCancellables)
+		
+		let theOldBusiness = currentBusiness
+		Task { @MainActor [theOldBusiness, weak self] in
+			for await connections in theOldBusiness.connectionsManager.connectionsSequence() {
+				self?.oldConnectionsChanged(connections)
+			}
+		}.store(in: &oldCancellables)
 
 		currentBusiness.appConnectionsDaemon?.incrementDisconnectCount(
 			target: AppConnectionsDaemon.ControlTarget.companion.All
@@ -248,13 +248,12 @@ class PhoenixManager {
 		business.start(startupParams: startupParams)
 
 		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
-		business.currencyManager.ratesPubliser().sink {
-			[weak self](rates: [ExchangeRate]) in
-
-			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
-			self?.fiatExchangeRates = rates
-		}
-		.store(in: &cancellables)
+		Task { @MainActor [business, weak self] in
+			for await rates in business.currencyManager.ratesSequence() {
+				assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread
+				self?.fiatExchangeRates = rates
+			}
+		}.store(in: &cancellables)
 	}
 
 	// --------------------------------------------------

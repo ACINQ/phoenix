@@ -38,28 +38,29 @@ fileprivate struct UploadContactsOperationInfo {
 extension SyncBackupManager {
 	
 	func startContactsQueueCountMonitor() {
-		log.trace("startContactsQueueCountMonitor()")
+		log.trace(#function)
 		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.contacts.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("contacts.queueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
+		let queueCountSequnece = cloudKitDb.contacts.queueCountSequence()
+		Task { @MainActor [weak self] in
+			for await count in queueCountSequnece {
+				self?.queueCountChanged(count)
 			}
-			
-			// Note: Upload delay doesn't apply to contacts.
-			
-			let count = Int(clamping: queueCount)
-			Task {
-				if let newState = await self.actor.contactsQueueCountChanged(count, wait: nil) {
-					self.handleNewState(newState)
-				}
-			}
-
 		}.store(in: &cancellables)
+	}
+	
+	// ----------------------------------------
+	// MARK: Notifications
+	// ----------------------------------------
+	
+	private func queueCountChanged(_ queueCount: Int64) {
+		log.trace("contacts.queueCountChanged(): count = \(queueCount)")
+		
+		let count = Int(clamping: queueCount)
+		Task {
+			if let newState = await self.actor.contactsQueueCountChanged(count, wait: nil) {
+				self.handleNewState(newState)
+			}
+		}
 	}
 	
 	// ----------------------------------------
