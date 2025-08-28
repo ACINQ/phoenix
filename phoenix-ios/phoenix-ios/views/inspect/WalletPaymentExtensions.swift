@@ -67,7 +67,7 @@ extension Lightning_kmpWalletPayment {
 		
 		if let address = address {
 			let str: String
-			if BusinessManager.isTestnet {
+			if Biz.isTestnet {
 				str = "https://mempool.space/testnet/address/\(address)"
 			} else {
 				str = "https://mempool.space/address/\(address)"

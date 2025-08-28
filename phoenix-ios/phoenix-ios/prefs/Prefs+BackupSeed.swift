@@ -1,208 +1,188 @@
 import Foundation
 import Combine
 
-fileprivate enum Key: String {
-	case backupSeed_enabled
-	case backupSeed_hasUploadedSeed
-	case backupSeed_name
-	case manualBackup_taskDone
+fileprivate let filename = "Prefs+BackupSeed"
+#if DEBUG && true
+fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
+#else
+fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+#endif
+
+fileprivate typealias Key = PrefsKey
+
+enum BackupSeedState {
+	case notBackedUp
+	case backupInProgress
+	case safelyBackedUp
 }
 
-/// Preferences pertaining to backing up the recovery phrase (seed) in the user's own iCloud account.
+/// Standard app preferences, stored in the iOS UserDefaults system.
+///
+/// This set pertains to backing up the recovery phrase (seed) in the user's own iCloud account.
+///
+/// - Note:
+/// The values here are NOT shared with other extensions bundled in the app, such as the
+/// notification-service-extension. For preferences shared with extensions, see `GroupPrefs`.
 ///
 class Prefs_BackupSeed {
 	
-	private var defaults: UserDefaults {
-		return Prefs.shared.defaults
+	private static var defaults: UserDefaults {
+		return Prefs.defaults
 	}
 	
-	/// Updating publishers should always be done on the main thread.
-	/// Otherwise we risk updating UI components on a background thread, which is dangerous.
-	/// 
-	private func runOnMainThread(_ block: @escaping () -> Void) {
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
-		}
+	private let id: String
+	private let defaults: UserDefaults
+#if DEBUG
+	private let isDefault: Bool
+#endif
+	
+	init(id: String) {
+		self.id = id
+		self.defaults = Self.defaults
+	#if DEBUG
+		self.isDefault = (id == PREFS_DEFAULT_ID)
+	#endif
 	}
 	
-	lazy private(set) var isEnabled_publisher: CurrentValueSubject<Bool, Never> = {
-		return CurrentValueSubject<Bool, Never>(self.isEnabled)
+	// --------------------------------------------------
+	// MARK: User Options
+	// --------------------------------------------------
+	
+	lazy private(set) var isEnabledPublisher = {
+		CurrentValueSubject<Bool, Never>(self.isEnabled)
 	}()
 	
 	var isEnabled: Bool {
 		get {
-			let key = Key.backupSeed_enabled.rawValue
-			if defaults.object(forKey: key) != nil {
-				return defaults.bool(forKey: key)
-			} else {
-				return false // default value
-			}
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.backupSeed_enabled.value(id), defaultValue: false)
 		}
 		set {
-			let key = Key.backupSeed_enabled.rawValue
-			defaults.set(newValue, forKey: key)
+			defaults.set(newValue, forKey: Key.backupSeed_enabled.value(id))
 			runOnMainThread {
-				self.isEnabled_publisher.send(newValue)
+				self.isEnabledPublisher.send(newValue)
 			}
 		}
 	}
 	
-	lazy private(set) var hasUploadedSeed_publisher: PassthroughSubject<Void, Never> = {
-		return PassthroughSubject<Void, Never>()
+	lazy private(set) var hasUploadedSeedPublisher = {
+		return CurrentValueSubject<Bool, Never>(self.hasUploadedSeed)
 	}()
 	
-	private func hasUploadedSeed_key(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.backupSeed_hasUploadedSeed.rawValue)-\(walletId.prefsKeySuffix)"
-	}
-	
-	func hasUploadedSeed(_ walletId: WalletIdentifier) -> Bool {
-		
-		return defaults.bool(forKey: hasUploadedSeed_key(walletId))
-	}
-	
-	func setHasUploadedSeed(_ value: Bool, _ walletId: WalletIdentifier) {
-		
-		let key = hasUploadedSeed_key(walletId)
-		if value == true {
-			defaults.setValue(value, forKey: key)
-		} else {
-			defaults.removeObject(forKey: key)
+	var hasUploadedSeed: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.backupSeed_hasUploadedSeed.value(id))
 		}
-		runOnMainThread {
-			self.hasUploadedSeed_publisher.send()
-		}
-	}
-	
-	lazy private(set) var name_publisher: PassthroughSubject<Void, Never> = {
-		return PassthroughSubject<Void, Never>()
-	}()
-	
-	private func name_key(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.backupSeed_name)-\(walletId.prefsKeySuffix)"
-	}
-	
-	func name(_ walletId: WalletIdentifier) -> String? {
-		
-		return defaults.string(forKey: name_key(walletId))
-	}
-	
-	func setName(_ value: String?, _ walletId: WalletIdentifier) {
-		
-		let key = name_key(walletId)
-		let oldValue = name(walletId) ?? ""
-		let newValue = value ?? ""
-		
-		if oldValue != newValue {
-			if newValue.isEmpty {
-				defaults.removeObject(forKey: key)
-			} else {
-				defaults.setValue(newValue, forKey: key)
-			}
-			setHasUploadedSeed(false, walletId)
+		set {
+			defaults.setValue(newValue, forKey: Key.backupSeed_hasUploadedSeed.value(id))
 			runOnMainThread {
-				self.name_publisher.send()
+				self.hasUploadedSeedPublisher.send(newValue)
 			}
-			
 		}
 	}
 	
-	lazy private(set) var manualBackup_taskDone_publisher: PassthroughSubject<Void, Never> = {
-		return PassthroughSubject<Void, Never>()
+	lazy private(set) var namePublisher = {
+		CurrentValueSubject<String?, Never>(self.name)
 	}()
 	
-	private func manualBackup_taskDone_key(_ walletId: WalletIdentifier) -> String {
-		return "\(Key.manualBackup_taskDone)-\(walletId.prefsKeySuffix)"
-	}
-	
-	func manualBackup_taskDone(_ walletId: WalletIdentifier) -> Bool {
-		
-		return defaults.bool(forKey: manualBackup_taskDone_key(walletId))
-	}
-	
-	func manualBackup_setTaskDone(_ newValue: Bool, _ walletId: WalletIdentifier) {
-		
-		let key = manualBackup_taskDone_key(walletId)
-		if newValue {
-			defaults.setValue(newValue, forKey: key)
-		} else {
-			defaults.removeObject(forKey: key)
+	var name: String? {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.string(forKey: Key.backupSeed_name.value(id))
 		}
-		runOnMainThread {
-			self.manualBackup_taskDone_publisher.send()
+		set {
+			if self.name == newValue {
+				return
+			}
+			let trimmedName = (newValue ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+			let newName = trimmedName.isEmpty ? nil : trimmedName
+			defaults.setValue(newName, forKey: Key.backupSeed_name.value(id))
+			runOnMainThread {
+				self.namePublisher.send(newName)
+				self.hasUploadedSeed = false
+			}
 		}
 	}
 	
-	func resetWallet(_ walletId: WalletIdentifier) {
-		
-		defaults.removeObject(forKey: Key.backupSeed_enabled.rawValue)
-		defaults.removeObject(forKey: hasUploadedSeed_key(walletId))
-		defaults.removeObject(forKey: name_key(walletId))
-		defaults.removeObject(forKey: manualBackup_taskDone_key(walletId))
-		
-		// Reset any publishers with stored state
-		runOnMainThread {
-			self.isEnabled_publisher.send(self.isEnabled)
+	lazy private(set) var manualBackupDonePublisher = {
+		return CurrentValueSubject<Bool, Never>(self.manualBackupDone)
+	}()
+	
+	var manualBackupDone: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.manualBackupDone.value(id))
+		}
+		set {
+			defaults.setValue(newValue, forKey: Key.manualBackupDone.value(id))
+			runOnMainThread {
+				self.manualBackupDonePublisher.send(newValue)
+			}
 		}
 	}
-}
-
-extension Prefs {
 	
-	func backupSeedStatePublisher(_ walletId: WalletIdentifier) -> AnyPublisher<BackupSeedState, Never> {
+	// --------------------------------------------------
+	// MARK: Seed State
+	// --------------------------------------------------
+	
+	func statePublisher() -> AnyPublisher<BackupSeedState, Never> {
 		
-		let publisher = Publishers.CombineLatest3(
-			backupSeed.isEnabled_publisher,            // CurrentValueSubject<Bool, Never>
-			backupSeed.hasUploadedSeed_publisher,      // PassthroughSubject<Void, Never>
-			backupSeed.manualBackup_taskDone_publisher // PassthroughSubject<Void, Never>
-		).map { (backupSeed_isEnabled: Bool, _, _) -> BackupSeedState in
+		return Publishers.CombineLatest3(
+			self.isEnabledPublisher,             // CurrentValueSubject<Bool, Never>
+			self.hasUploadedSeedPublisher,       // CurrentValueSubject<Bool, Never>
+			self.manualBackupDonePublisher       // CurrentValueSubject<Bool, Never>
+		).map { (isEnabled: Bool, hasUploadedSeed: Bool, manualBackupDone: Bool) -> BackupSeedState in
 			
-			let prefs = Prefs.shared
-			
-			let backupSeed_hasUploadedSeed = prefs.backupSeed.hasUploadedSeed(walletId)
-			let manualBackup_taskDone = prefs.backupSeed.manualBackup_taskDone(walletId)
-			
-			if backupSeed_isEnabled {
-				if backupSeed_hasUploadedSeed {
+			if isEnabled {
+				if hasUploadedSeed {
 					return .safelyBackedUp
 				} else {
 					return .backupInProgress
 				}
 			} else {
-				if manualBackup_taskDone {
+				if manualBackupDone {
 					return .safelyBackedUp
 				} else {
 					return .notBackedUp
 				}
 			}
-		}
-		.handleEvents(receiveRequest: { _ in
 			
-			// Publishers.CombineLatest doesn't fire until all publishers have emitted a value.
-			// We don't have have to worry about that with the CurrentValueSubject, because it always has a value.
-			// But for the PassthroughSubject publishers, this poses a problem.
-			//
-			// The other related publishers (Merge & Zip) don't do exactly what we want either.
-			// So we're taking the simplest approach, and force-firing the associated PassthroughSubject publishers.
-			
-			let prefs = Prefs.shared
-			
-			// On iOS 15:
-			//   * Causes a crash
-			//   * Solution is to delay these calls until next runloop cycle
-			//
-			// On iOS 16
-			//   * Causes a runtime warning: Publishing changes from within view updates is not allowed
-			//   * Solution is to delay these calls until next runloop cycle
-			// 
-			DispatchQueue.main.async {
-				prefs.backupSeed.hasUploadedSeed_publisher.send()
-				prefs.backupSeed.manualBackup_taskDone_publisher.send()
-			}
-		})
-		.eraseToAnyPublisher()
-		
-		return publisher
+		}.eraseToAnyPublisher()
 	}
+	
+	// --------------------------------------------------
+	// MARK: Debugging
+	// --------------------------------------------------
+	
+	@inline(__always)
+	func maybeLogDefaultAccess(_ functionName: String) {
+	#if DEBUG
+		if isDefault {
+			log.info("Default access: \(functionName)")
+		}
+	#endif
+	}
+	
+	#if DEBUG
+	static func valueDescription(_ prefix: String, _ value: Any) -> String? {
+		
+		switch prefix {
+		case Key.backupSeed_enabled.prefix:
+			return printBool(value)
+			
+		case Key.backupSeed_hasUploadedSeed.prefix:
+			return printBool(value)
+			
+		case Key.backupSeed_name.prefix:
+			return printString(value)
+			
+		case Key.manualBackupDone.prefix:
+			return printBool(value)
+			
+		default:
+			return nil
+		}
+	}
+	#endif
 }

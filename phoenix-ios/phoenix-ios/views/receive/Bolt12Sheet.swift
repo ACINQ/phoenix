@@ -97,6 +97,19 @@ struct Bolt12Sheet: View {
 		} // </HStack>
 	}
 	
+	@ViewBuilder
+	func content_buttons() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer()
+			Button {
+				navigateToFAQ()
+			} label: {
+				Text("Learn more")
+			} // </Button>
+		} // </HStack>
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------

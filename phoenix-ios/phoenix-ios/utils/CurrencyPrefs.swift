@@ -10,11 +10,21 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 /// An ObservableObject that monitors the currently stored values in UserDefaults.
-/// Available as an EnvironmentObject:
-///
-/// @EnvironmentObject var currencyPrefs: CurrencyPrefs
 ///
 class CurrencyPrefs: ObservableObject {
+	
+	private static var last: CurrencyPrefs? = nil
+	
+	static var current: CurrencyPrefs {
+		let id = Biz.walletId?.standardKeyId ?? PREFS_DEFAULT_ID
+		if let last, last.id == id {
+			return last
+		} else {
+			let prefs = CurrencyPrefs(id)
+			last = prefs
+			return prefs
+		}
+	}
 	
 	@Published private(set) var currencyType: CurrencyType
 	@Published private(set) var fiatCurrency: FiatCurrency
@@ -33,25 +43,31 @@ class CurrencyPrefs: ObservableObject {
 		}
 	}
 	
+	private let id: String
 	private var cancellables = Set<AnyCancellable>()
 	private var delayedSave = DelayedSave()
 
-	init() {
-		currencyType = GroupPrefs.shared.currencyType
-		fiatCurrency = GroupPrefs.shared.fiatCurrency
-		bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-		hideAmounts = Prefs.shared.hideAmounts
-		showOriginalFiatValue = Prefs.shared.showOriginalFiatAmount
+	private init(_ id: String) {
+		self.id = id
 		
-		GroupPrefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
+		let groupPrefs = GroupPrefs.wallet(id)
+		let prefs = Prefs.wallet(id)
+		
+		currencyType = groupPrefs.currencyType
+		fiatCurrency = groupPrefs.fiatCurrency
+		bitcoinUnit = groupPrefs.bitcoinUnit
+		hideAmounts = prefs.hideAmounts
+		showOriginalFiatValue = prefs.showOriginalFiatAmount
+		
+		groupPrefs.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
 			self?.fiatCurrency = newValue
 		}.store(in: &cancellables)
 		
-		GroupPrefs.shared.bitcoinUnitPublisher.sink {[weak self](newValue: BitcoinUnit) in
+		groupPrefs.bitcoinUnitPublisher.sink {[weak self](newValue: BitcoinUnit) in
 			self?.bitcoinUnit = newValue
 		}.store(in: &cancellables)
 		
-		Prefs.shared.showOriginalFiatAmountPublisher.sink {[weak self](newValue: Bool) in
+		prefs.showOriginalFiatAmountPublisher.sink {[weak self](newValue: Bool) in
 			self?.showOriginalFiatValue = newValue
 		}.store(in: &cancellables)
 		
@@ -59,27 +75,6 @@ class CurrencyPrefs: ObservableObject {
 		business.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
 			self?.fiatExchangeRates = rates
 		}.store(in: &cancellables)
-	}
-	
-	private init(
-		currencyType: CurrencyType,
-		fiatCurrency: FiatCurrency,
-		bitcoinUnit: BitcoinUnit,
-		exchangeRate: Double
-	) {
-		self.currencyType = currencyType
-		self.fiatCurrency = fiatCurrency
-		self.bitcoinUnit = bitcoinUnit
-		self.hideAmounts = false
-		self.showOriginalFiatValue = false
-		
-		let exchangeRate = ExchangeRate.BitcoinPriceRate(
-			fiatCurrency: fiatCurrency,
-			price: exchangeRate,
-			source: "",
-			timestampMillis: 0
-		)
-		fiatExchangeRates.append(exchangeRate)
 	}
 	
 	func toggleCurrencyType() {
@@ -108,8 +103,8 @@ class CurrencyPrefs: ObservableObject {
 		// which automatically triggers a save too.
 		
 		delayedSave.save(withDelay: 10.0) {
-			GroupPrefs.shared.currencyType = self.currencyType
-			Prefs.shared.hideAmounts = self.hideAmounts
+			GroupPrefs.wallet(self.id).currencyType = self.currencyType
+			Prefs.wallet(self.id).hideAmounts = self.hideAmounts
 		}
 	}
 	
@@ -156,23 +151,5 @@ class CurrencyPrefs: ObservableObject {
 				return nil
 			}
 		}
-	}
-	
-	static func mockUSD() -> CurrencyPrefs {
-		return CurrencyPrefs(
-			currencyType: .bitcoin,
-			fiatCurrency: .usd,
-			bitcoinUnit: .sat,
-			exchangeRate: 20_000.00
-		)
-	}
-	
-	static func mockEUR() -> CurrencyPrefs {
-		return CurrencyPrefs(
-			currencyType: .bitcoin,
-			fiatCurrency: .eur,
-			bitcoinUnit: .sat,
-			exchangeRate: 17_000.00
-		)
 	}
 }

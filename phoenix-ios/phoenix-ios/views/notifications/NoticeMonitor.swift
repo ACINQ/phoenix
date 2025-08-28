@@ -11,9 +11,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 class NoticeMonitor: ObservableObject {
 	
-	@Published private var isNewWallet = Prefs.shared.isNewWallet
-	@Published private var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
-	@Published private var manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
+	@Published private var isNewWallet = Prefs.current.isNewWallet
+	@Published private var backupSeed_enabled = Prefs.current.backupSeed.isEnabled
+	@Published private var manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 	
 	@Published private var walletContext: WalletContext? = nil
 	
@@ -22,27 +22,32 @@ class NoticeMonitor: ObservableObject {
 	@Published private var notificationPermissions = NotificationsManager.shared.permissions.value
 	@Published private var bgRefreshStatus = NotificationsManager.shared.backgroundRefreshStatus.value
 	
+	@Published private var torNetworkIssue = false
+	
 	@NestedObservableObject private var customElectrumServerObserver = CustomElectrumServerObserver()
+	
+	private var isTorEnabled: Bool? = nil
+	private var connections: Connections? = nil
 	
 	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
 		
-		Prefs.shared.isNewWalletPublisher
+		Prefs.current.isNewWalletPublisher
 			.sink {[weak self](value: Bool) in
 				self?.isNewWallet = value
 			}
 			.store(in: &cancellables)
 		
-		Prefs.shared.backupSeed.isEnabled_publisher
+		Prefs.current.backupSeed.isEnabledPublisher
 			.sink {[weak self](enabled: Bool) in
 				self?.backupSeed_enabled = enabled
 			}
 			.store(in: &cancellables)
 		
-		Prefs.shared.backupSeed.manualBackup_taskDone_publisher
+		Prefs.current.backupSeed.manualBackupDonePublisher
 			.sink {[weak self] _ in
-				self?.manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(Biz.walletId!)
+				self?.manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 			}
 			.store(in: &cancellables)
 		
@@ -69,6 +74,17 @@ class NoticeMonitor: ObservableObject {
 				self?.bgRefreshStatus = status
 			}
 			.store(in: &cancellables)
+		
+		Publishers.CombineLatest(
+			Biz.business.appConfigurationManager.isTorEnabledPublisher(),
+			Biz.business.connectionsManager.connectionsPublisher()
+		).sink {[weak self](enabled: Bool, connections: Connections) in
+			if let self {
+				self.isTorEnabled = enabled
+				self.connections = connections
+				self.checkForTorIssues()
+			}
+		}.store(in: &cancellables)
 	}
 	
 	var hasNotice: Bool {
@@ -79,6 +95,7 @@ class NoticeMonitor: ObservableObject {
 		if hasNotice_mempoolFull { return true }
 		if hasNotice_backgroundPayments { return true }
 		if hasNotice_watchTower { return true }
+		if hasNotice_torNetworkIssue { return true }
 		
 		return false
 	}
@@ -113,5 +130,33 @@ class NoticeMonitor: ObservableObject {
 	
 	var hasNotice_watchTower: Bool {
 		return bgRefreshStatus != .available
+	}
+	
+	var hasNotice_torNetworkIssue: Bool {
+		return torNetworkIssue
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utils
+	// --------------------------------------------------
+	
+	func checkForTorIssues(needsDelay: Bool = true) {
+		
+		guard let isTorEnabled, let connections else {
+			return
+		}
+		
+		if isTorEnabled && !connections.peer.isEstablished() {
+			if needsDelay {
+				Task { @MainActor in
+					try await Task.sleep(seconds: 3.0)
+					checkForTorIssues(needsDelay: false)
+				}
+			} else {
+				torNetworkIssue = true
+			}
+		} else {
+			torNetworkIssue = false
+		}
 	}
 }

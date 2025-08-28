@@ -22,17 +22,14 @@ struct HomeView : MVIView {
 	let showSwapInWallet: () -> Void
 	let showFinalWallet: () -> Void
 	
-	@StateObject var mvi = MVIState({ $0.home() })
-
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.home() })
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	@StateObject var serverMessageMonitor = ServerMessageMonitor()
 	@StateObject var syncState = DownloadMonitor()
 	
-	let recentPaymentsConfigPublisher = Prefs.shared.recentPaymentsConfigPublisher
-	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
+	let recentPaymentsConfigPublisher = Prefs.current.recentPaymentsConfigPublisher
+	@State var recentPaymentsConfig = Prefs.current.recentPaymentsConfig
 	@State var lastCompletedPaymentId: Lightning_kmpUUID? = nil
 	
 	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
@@ -80,12 +77,14 @@ struct HomeView : MVIView {
 	
 	@State var activeSheet: HomeViewSheet? = nil
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.openURL) var openURL
 	@Environment(\.colorScheme) var colorScheme
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var smartModalState: SmartModalState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -174,19 +173,19 @@ struct HomeView : MVIView {
 		.sheet(item: $activeSheet) { (sheet: HomeViewSheet) in
 			switch sheet {
 			case .paymentView(let selectedPayment):
-				
-				PaymentView(
-					location: .sheet(closeSheet: { self.activeSheet = nil }),
-					paymentInfo: selectedPayment
-				)
-				.modifier(GlobalEnvironment.sheetInstance())
+				GlobalEnvironmentView {
+					PaymentView(
+						location: .sheet(closeSheet: { self.activeSheet = nil }),
+						paymentInfo: selectedPayment
+					)
+				}
 				
 			case .notificationsView:
-				
-				NotificationsView(
-					location: .sheet
-				)
-				.modifier(GlobalEnvironment.sheetInstance())
+				GlobalEnvironmentView {
+					NotificationsView(
+						location: .sheet
+					)
+				}
 			}
 		}
 	}
@@ -483,6 +482,8 @@ struct HomeView : MVIView {
 					navigationToBackgroundPayments()
 				} else if noticeMonitor.hasNotice_watchTower {
 					fixBackgroundAppRefreshDisabled()
+				} else if noticeMonitor.hasNotice_torNetworkIssue {
+					showTorNetworkIssueSheet()
 				} else if noticeMonitor.hasNotice_mempoolFull {
 					openMempoolFullURL()
 				}
@@ -520,6 +521,10 @@ struct HomeView : MVIView {
 			
 		} else if noticeMonitor.hasNotice_mempoolFull {
 			NotificationCell.mempoolFull()
+				.font(.footnote)
+			
+		} else if noticeMonitor.hasNotice_torNetworkIssue {
+			NotificationCell.torNetworkIssue()
 				.font(.footnote)
 			
 		} else if let item = bizNotifications_watchtower.first {
@@ -737,6 +742,7 @@ struct HomeView : MVIView {
 		if noticeMonitor.hasNotice_mempoolFull        { count += 1 }
 		if noticeMonitor.hasNotice_backgroundPayments { count += 1 }
 		if noticeMonitor.hasNotice_watchTower         { count += 1 }
+		if noticeMonitor.hasNotice_torNetworkIssue    { count += 1 }
 		
 		count += bizNotifications_watchtower.count
 		
@@ -785,8 +791,8 @@ struct HomeView : MVIView {
 		let incomingBalance = swapInWallet.totalBalance.sat
 		
 		if balance > 0 || incomingBalance > 0 {
-			if Prefs.shared.isNewWallet {
-				Prefs.shared.isNewWallet = false
+			if Prefs.current.isNewWallet {
+				Prefs.current.isNewWallet = false
 			}
 		}
 	}
@@ -811,9 +817,12 @@ struct HomeView : MVIView {
 			case .electrum           : break
 			case .backgroundPayments : break
 			case .liquiditySettings  : break
+			case .torSettings        : break
 			case .forceCloseChannels : break
 			case .swapInWallet       : break
 			case .finalWallet        : break
+			case .appAccess          : break
+			case .walletMetadata     : break
 			}
 		}
 	}
@@ -989,7 +998,7 @@ struct HomeView : MVIView {
 	// --------------------------------------------------
 	
 	func toggleCurrencyType() -> Void {
-		log.trace("toggleCurrencyType()")
+		log.trace(#function)
 		
 		// bitcoin -> fiat -> hidden
 		
@@ -1008,7 +1017,7 @@ struct HomeView : MVIView {
 	}
 	
 	func showIncomingBalancePopover() {
-		log.trace("showIncomingBalancePopover()")
+		log.trace(#function)
 		
 		popoverState.display(dismissable: true) {
 			IncomingBalancePopover(
@@ -1021,11 +1030,11 @@ struct HomeView : MVIView {
 	func dismissServerMessage(index: Int) {
 		log.trace("dismissServerMessage(index: \(index))")
 		
-		Prefs.shared.serverMessageReadIndex = index
+		Prefs.current.serverMessageReadIndex = index
 	}
 	
 	func openNotificationsSheet() {
-		log.trace("openNotificationSheet()")
+		log.trace(#function)
 		
 		if activeSheet == nil {
 			activeSheet = .notificationsView
@@ -1033,25 +1042,25 @@ struct HomeView : MVIView {
 	}
 	
 	func navigateToBackup() {
-		log.trace("navigateToBackup()")
+		log.trace(#function)
 		
 		deepLinkManager.broadcast(DeepLink.backup)
 	}
 	
 	func navigationToElecrumServer() {
-		log.trace("navigateToElectrumServer()")
+		log.trace(#function)
 		
 		deepLinkManager.broadcast(DeepLink.electrum)
 	}
 	
 	func navigationToBackgroundPayments() {
-		log.trace("navigateToBackgroundPayments()")
+		log.trace(#function)
 		
 		deepLinkManager.broadcast(DeepLink.backgroundPayments)
 	}
 	
 	func openMempoolFullURL() {
-		log.trace("openMempoolFullURL()")
+		log.trace(#function)
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
 			openURL(url)
@@ -1059,15 +1068,23 @@ struct HomeView : MVIView {
 	}
 	
 	func fixBackgroundAppRefreshDisabled() {
-		log.trace("fixBackgroundAppRefreshDisabled()")
+		log.trace(#function)
 		
 		popoverState.display(dismissable: true) {
 			BgRefreshDisabledPopover()
 		}
 	}
 	
+	func showTorNetworkIssueSheet() {
+		log.trace(#function)
+		
+		smartModalState.display(dismissable: true) {
+			TorNetworkIssueSheet()
+		}
+	}
+	
 	func didSelectPayment(row: WalletPaymentInfo) -> Void {
-		log.trace("didSelectPayment()")
+		log.trace(#function)
 		
 		if activeSheet == nil {
 			activeSheet = .paymentView(payment: row)
@@ -1280,51 +1297,5 @@ fileprivate struct FooterCell: View {
 		log.trace("[FooterCell] onAppear()")
 		
 		didAppearCallback()
-	}
-}
-
-// --------------------------------------------------
-// MARK: -
-// --------------------------------------------------
-
-class DownloadMonitor: ObservableObject {
-	
-	@Published var isDownloading: Bool = false
-	@Published var oldestCompletedDownload: Date? = nil
-	
-	private var cancellables = Set<AnyCancellable>()
-	
-	init() {
-		let syncManager = Biz.syncManager!
-		let syncStatePublisher = syncManager.syncBackupManager.statePublisher
-		
-		syncStatePublisher.sink {[weak self](state: SyncBackupManager_State) in
-			self?.update(state)
-		}
-		.store(in: &cancellables)
-	}
-	
-	private func update(_ state: SyncBackupManager_State) {
-		log.trace("[DownloadMonitor] update()")
-		
-		if case .downloading(let details) = state {
-			log.trace("[DownloadMonitor] isDownloading = true")
-			isDownloading = true
-			
-			subscribe(details)
-		} else {
-			log.trace("[DownloadMonitor] isDownloading = false")
-			isDownloading = false
-		}
-	}
-	
-	private func subscribe(_ details: SyncBackupManager_State_Downloading) {
-		log.trace("[DownloadMonitor] subscribe()")
-		
-		details.$payments_oldestCompletedDownload.sink {[weak self](date: Date?) in
-			log.trace("[DownloadMonitor] oldestCompletedDownload = \(date?.description ?? "nil")")
-			self?.oldestCompletedDownload = date
-		}
-		.store(in: &cancellables)
 	}
 }

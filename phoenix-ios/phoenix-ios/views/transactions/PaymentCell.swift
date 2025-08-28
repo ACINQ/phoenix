@@ -18,10 +18,11 @@ struct PaymentCell : View {
 	
 	@ScaledMetric var textScaling: CGFloat = 100
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
 	init(
 		info: WalletPaymentInfo,

@@ -130,7 +130,7 @@ struct MainView_Small: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -165,6 +165,7 @@ struct MainView_Small: View {
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
 			MergeChannelsView(location: .sheet)
+				.environmentObject(GlobalEnvironment.deviceInfo)
 		}
 	}
 	
@@ -688,6 +689,10 @@ struct MainView_Small: View {
 					navCoordinator.path.append(NavLinkTag.ConfigurationView)
 					navCoordinator.path.append(ConfigurationList.NavLinkTag.ChannelManagement)
 					
+				case .torSettings:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.Tor)
+					
 				case .forceCloseChannels:
 					navCoordinator.path.append(NavLinkTag.ConfigurationView)
 					navCoordinator.path.append(ConfigurationList.NavLinkTag.ForceCloseChannels)
@@ -701,6 +706,14 @@ struct MainView_Small: View {
 					navCoordinator.path.append(NavLinkTag.ConfigurationView)
 					navCoordinator.path.append(ConfigurationList.NavLinkTag.WalletInfo)
 					navCoordinator.path.append(WalletInfoView.NavLinkTag.FinalWalletDetails)
+					
+				case .appAccess:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.AppAccess)
+					
+				case .walletMetadata:
+					navCoordinator.path.append(NavLinkTag.ConfigurationView)
+					navCoordinator.path.append(ConfigurationList.NavLinkTag.WalletMetadata)
 				}
 			}
 			
@@ -717,10 +730,13 @@ struct MainView_Small: View {
 					case .drainWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .electrum           : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .backgroundPayments : newNavLinkTag = .ConfigurationView ; delay *= 3
-					case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 3
+					case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .torSettings        : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .appAccess          : newNavLinkTag = .ConfigurationView ; delay *= 2
+					case .walletMetadata     : newNavLinkTag = .ConfigurationView ; delay *= 2
 				}
 				
 				if let newNavLinkTag {

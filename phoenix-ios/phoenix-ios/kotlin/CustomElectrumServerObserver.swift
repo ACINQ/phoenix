@@ -40,7 +40,6 @@ class CustomElectrumServerObserver: ObservableObject {
 				self?.isTorEnabledChanged(newValue)
 			}.store(in: &cancellables)
 		
-		
 		Biz.business.appConfigurationManager.electrumConfigPublisher()
 			.sink {[weak self](newValue: ElectrumConfig) in
 				self?.electrumConfigChanged(newValue)

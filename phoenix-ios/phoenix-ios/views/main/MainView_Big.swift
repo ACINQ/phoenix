@@ -620,9 +620,12 @@ struct MainView_Big: View {
 				case .electrum           : showSettings()
 				case .backgroundPayments : showSettings()
 				case .liquiditySettings  : showSettings()
+				case .torSettings        : showSettings()
 				case .forceCloseChannels : showSettings()
 				case .swapInWallet       : showSettings()
 				case .finalWallet        : showSettings()
+				case .appAccess          : showSettings()
+				case .walletMetadata     : showSettings()
 			}
 			
 			if #available(iOS 17, *) {
@@ -652,6 +655,10 @@ struct MainView_Big: View {
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.ChannelManagement)
 					
+				case .torSettings:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.Tor)
+					
 				case .forceCloseChannels:
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.ForceCloseChannels)
@@ -665,6 +672,14 @@ struct MainView_Big: View {
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletInfo)
 					navCoordinator_settings.path.append(WalletInfoView.NavLinkTag.FinalWalletDetails)
+					
+				case .appAccess:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.AppAccess)
+					
+				case .walletMetadata:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletMetadata)
 				}
 			}
 		}

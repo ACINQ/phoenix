@@ -55,7 +55,7 @@ extension SyncBackupManager {
 			let count = Int(clamping: queueCount)
 			
 			let wait: SyncBackupManager_State_Waiting?
-			if Prefs.shared.backupTransactions.useUploadDelay {
+			if prefs.backupTransactions.useUploadDelay {
 				let delay = TimeInterval.random(in: 10 ..< 900)
 				wait = SyncBackupManager_State_Waiting(
 					kind: .randomizedUploadDelay,
@@ -78,8 +78,8 @@ extension SyncBackupManager {
 	func startPaymentsMigrations() {
 		log.trace("startPaymentsMigrations()")
 		
-		let hasDownloadedPayments = Prefs.shared.backupTransactions.hasDownloadedPayments(walletId)
-		let hasReUploadedPayments = Prefs.shared.backupTransactions.hasReUploadedPayments(walletId)
+		let hasDownloadedPayments = prefs.backupTransactions.hasDownloadedPayments
+		let hasReUploadedPayments = prefs.backupTransactions.hasReUploadedPayments
 		
 		let needsMigration = hasDownloadedPayments && !hasReUploadedPayments
 		
@@ -92,7 +92,7 @@ extension SyncBackupManager {
 		Task { @MainActor in
 		
 			try await self.cloudKitDb.payments.enqueueOutdatedItems()
-			Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
+			prefs.backupTransactions.hasReUploadedPayments = true
 		}
 	}
 	
@@ -306,8 +306,8 @@ extension SyncBackupManager {
 				
 				log.trace("downloadPayments(): finish: success")
 				
-				Prefs.shared.backupTransactions.markHasDownloadedPayments(walletId)
-				Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
+				prefs.backupTransactions.hasDownloadedPayments = true
+				prefs.backupTransactions.hasReUploadedPayments = true
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadPayments() {
@@ -432,7 +432,7 @@ extension SyncBackupManager {
 			let container = CKContainer.default()
 			
 			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = Prefs.shared.backupTransactions.useCellular
+			configuration.allowsCellularAccess = self.prefs.backupTransactions.useCellular
 			
 			return try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				

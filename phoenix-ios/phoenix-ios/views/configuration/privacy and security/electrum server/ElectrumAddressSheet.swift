@@ -810,12 +810,12 @@ struct ElectrumAddressSheet: View {
 				pinnedPubKey: pinnedPubKey,
 				requireOnionIfTorEnabled: !noRequireOnionAddress
 			)
-			GroupPrefs.shared.electrumConfig = newPrefs
+			GroupPrefs.current.electrumConfig = newPrefs
 			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: newPrefs.customConfig))
 			
 		} else {
 			
-			GroupPrefs.shared.electrumConfig = nil
+			GroupPrefs.current.electrumConfig = nil
 			mvi.intent(ElectrumConfiguration.IntentUpdateElectrumServer(config: nil))
 		}
 		
