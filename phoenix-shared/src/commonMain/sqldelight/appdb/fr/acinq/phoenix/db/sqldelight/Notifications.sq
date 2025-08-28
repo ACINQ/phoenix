@@ -9,13 +9,18 @@ CREATE TABLE IF NOT EXISTS notifications (
     type_version TEXT NOT NULL,
     data_json BLOB NOT NULL,
     created_at INTEGER NOT NULL,
-    read_at INTEGER DEFAULT NULL
+    read_at INTEGER DEFAULT NULL,
+    node_id_hash TEXT DEFAULT NULL
 );
+
+-- Create index to optimize the `listUnread` query.
+-- Tip: Use "explain query plan" to ensure they're actually being used.
+CREATE INDEX notifications_source ON notifications(node_id_hash) WHERE read_at IS NULL;
 
 listUnread:
 SELECT id, group_concat(id, ';') AS grouped_ids, type_version, data_json, max(created_at)
 FROM notifications
-WHERE read_at IS NULL
+WHERE read_at IS NULL AND node_id_hash = ?
 GROUP BY type_version, data_json
 ORDER BY created_at DESC;
 
@@ -24,11 +29,14 @@ SELECT id, type_version, data_json, created_at, read_at FROM notifications WHERE
 
 insert:
 INSERT INTO notifications (
-    id, type_version, data_json, created_at
-) VALUES (?, ?, ?, ?);
+    id, type_version, data_json, created_at, node_id_hash
+) VALUES (?, ?, ?, ?, ?);
 
 markAsRead:
 UPDATE notifications SET read_at=? WHERE id IN ?;
 
 markAllAsRead:
 UPDATE notifications SET read_at=? WHERE read_at IS NULL;
+
+initializeNodeIdHashColumn:
+UPDATE notifications SET node_id_hash=? WHERE node_id_hash IS NULL;

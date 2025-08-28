@@ -38,8 +38,9 @@ struct LiquidityAdsView: View {
 	@State var popoverPresent_serviceFee = false
 	@State var popoverPresent_duration = false
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	var popoverPresent: Bool {
@@ -132,11 +133,15 @@ struct LiquidityAdsView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(Biz.business.peerManager.channelsPublisher()) {
-			channelsChanged($0)
+		.task {
+			for await newValue in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(newValue)
+			}
 		}
-		.onReceive(Biz.business.balanceManager.balancePublisher()) {
-			balanceChanged($0)
+		.task {
+			for await newValue in Biz.business.balanceManager.balanceSequence() {
+				balanceChanged(newValue)
+			}
 		}
 		.task {
 			await fetchMempoolRecommendedFees()
@@ -733,6 +738,7 @@ struct LiquidityAdsView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
+	@MainActor
 	func fetchMempoolRecommendedFees() async {
 		
 		for try await response in MempoolMonitor.shared.stream() {
@@ -856,7 +862,7 @@ struct LiquidityAdsView: View {
 	func maybePurchaseLiquidity() {
 		log.trace("maybePurchaseLiquidity()")
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let enabledSecurity = Keychain.current.enabledSecurity
 		if enabledSecurity.contains(.spendingPin) {
 			
 			smartModalState.display(dismissable: false) {

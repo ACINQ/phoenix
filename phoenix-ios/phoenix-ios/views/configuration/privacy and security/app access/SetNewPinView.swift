@@ -278,17 +278,17 @@ struct SetNewPinView: View {
 	func savePinAndDismiss() {
 		log.trace("savePinAndDismiss()")
 		
-		AppSecurity.shared.setPin(pin1, type) { error in
+		Keychain.current.setPin(pin1, type) { error in
 			if error != nil {
 				self.dismissView(.Failed)
 			} else {
 				if type == .lockPin {
 					// Enabling the lock pin implies disabling the passcode fallback.
-					AppSecurity.shared.setPasscodeFallback(enabled: false) { _ in }
+					Keychain.current.setPasscodeFallback(enabled: false) { _ in }
 				}
 				
 				// If there still exists an InvalidPin in the keychain, it should be cleared now.
-				AppSecurity.shared.setInvalidPin(nil, type) { _ in
+				Keychain.current.setInvalidPin(nil, type) { _ in
 					self.dismissView(.PinSet)
 				}
 			}

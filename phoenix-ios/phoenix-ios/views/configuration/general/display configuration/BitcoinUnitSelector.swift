@@ -92,7 +92,7 @@ struct BitcoinUnitSelector: View {
 		log.trace("didSelect(bitcoinUnit = \(bitcoinUnit.shortName)")
 		
 		selectedBitcoinUnit = bitcoinUnit
-		GroupPrefs.shared.bitcoinUnit = bitcoinUnit
+		GroupPrefs.current.bitcoinUnit = bitcoinUnit
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
 			presentationMode.wrappedValue.dismiss()

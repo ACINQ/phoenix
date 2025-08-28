@@ -17,7 +17,7 @@ struct ResetWalletView_Confirm: MVISubView {
 	
 	let syncSeedManager = Biz.syncManager!.syncSeedManager
 	@State var backupSeed_state = SyncSeedManager_State.disabled
-	@State var backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
+	@State var backupSeed_enabled = Prefs.current.backupSeed.isEnabled
 	
 	@State var confirm_taskDone: Bool = false
 	@State var confirm_lossRisk: Bool = false
@@ -25,7 +25,7 @@ struct ResetWalletView_Confirm: MVISubView {
 	
 	@State var didAppear = false
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -413,16 +413,11 @@ struct ResetWalletView_Confirm: MVISubView {
 	// --------------------------------------------------
 	
 	func deleteWallet() {
-		log.trace("deleteWallet()")
+		log.trace(#function)
 		
-		if let scene = UIApplication.shared.connectedScenes.first,
-			let sceneDelegate = scene.delegate as? UIWindowSceneDelegate,
-			let mySceneDelegate = sceneDelegate as? SceneDelegate
-		{
-			mySceneDelegate.transitionToResetWalletWindow(
-				deleteTransactionHistory: deleteTransactionHistory,
-				deleteSeedBackup: deleteSeedBackup
-			)
-		}
+		SceneDelegate.get().startResetWallet(ResetWalletOptions(
+			deleteTransactionHistory: deleteTransactionHistory,
+			deleteSeedBackup: deleteSeedBackup
+		))
 	}
 }
