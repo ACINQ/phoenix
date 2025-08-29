@@ -816,6 +816,7 @@ struct HomeView : MVIView {
 			case .finalWallet        : break
 			case .appAccess          : break
 			case .walletMetadata     : break
+			case .bip353Registration : break
 			}
 		}
 	}

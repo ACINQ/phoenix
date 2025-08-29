@@ -61,6 +61,7 @@ struct LightningDualView: View {
 		case receiving
 	}
 	@State var cardState: CardState? = nil
+	@State var cardOfferId: Bitcoin_kmpByteVector32? = nil
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -395,11 +396,8 @@ struct LightningDualView: View {
 	@ViewBuilder
 	func invoiceDescriptionView() -> some View {
 		
-		let trimmedDesc = description.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-		let finalDesc = trimmedDesc.isEmpty ? nil : trimmedDesc
-		
-		if let finalDesc {
-			Text(finalDesc)
+		if let trimmedDesc = trimmedDescription() {
+			Text(trimmedDesc)
 		} else {
 			Text("no description", comment: "placeholder: invoice is description-less")
 		}
@@ -648,6 +646,12 @@ struct LightningDualView: View {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
+	func trimmedDescription() -> String? {
+		
+		let trimmedDesc = description.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+		return trimmedDesc.isEmpty ? nil : trimmedDesc
+	}
+
 	func title() -> String {
 		
 		switch activeType {
@@ -723,13 +727,12 @@ struct LightningDualView: View {
 	func updateInvoiceOrOffer() {
 		log.trace("updateInvoiceOrOffer()")
 		
-		let trimmedDesc = description.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-		let finalDesc = trimmedDesc.isEmpty ? nil : trimmedDesc
+		let trimmedDesc = trimmedDescription()
 		
 		if activeType == .bolt11_invoice {
 			mvi.intent(Receive.IntentAsk(
 				amount: amountMsat,
-				desc: finalDesc,
+				desc: trimmedDesc,
 				expirySeconds: Prefs.current.invoiceExpirationSeconds
 			))
 			
@@ -742,9 +745,9 @@ struct LightningDualView: View {
 			// Requirement in lightning-kmp:
 			// > an offer description must be provided if the amount isn't null
 			//
-			var fixedDesc = finalDesc
+			var fixedDesc = trimmedDesc
 			if amountMsat != nil {
-				fixedDesc = finalDesc ?? ""
+				fixedDesc = trimmedDesc ?? ""
 			}
 			
 			let offerPair = Lightning_kmpOfferManagerCompanion.shared.deterministicOffer(
@@ -838,7 +841,20 @@ struct LightningDualView: View {
 				}
 			}
 			
-		} else if let _ = lightningPayment as? Lightning_kmpBolt12IncomingPayment {
+		} else if let b12Payment = lightningPayment as? Lightning_kmpBolt12IncomingPayment {
+			
+			if let cardOfferId {
+				// The user scanned a Bolt Card with a V2 value.
+				// So we generated a temporary offer, and sent it to the card holder's host/wallet,
+				// along with the CardParameters (encrypted data).
+				//
+				// We are therefore looking for an incoming Bolt12 payment,
+				// where the offerId matches our temporary.offerId.
+				//
+				if b12Payment.metadata.offerId == cardOfferId {
+					didCompletePayment = true
+				}
+			}
 			
 			if activeType == .bolt12_offer {
 				didCompletePayment = true
@@ -886,12 +902,17 @@ struct LightningDualView: View {
 		//
 		needsUpdateInvoiceOrOffer = true
 		
-		if activeType == .bolt12_offer {
-			if cardPending {
+		if cardPending {
+			switch activeType {
+			case .bolt11_invoice:
+				// Handled in `modelChanged()`
+				break
+			case .bolt12_offer:
 				cardPending = false
 				startCardReader()
 			}
 		}
+
 	}
 	
 	func modifyInvoiceSheetDidCancel() {
@@ -1183,6 +1204,15 @@ struct LightningDualView: View {
 		}
 	}
 	
+	func didCopyLink() {
+		log.trace(#function)
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
+		)
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
@@ -1285,7 +1315,7 @@ struct LightningDualView: View {
 			colorScheme: colorScheme.opposite,
 			style: .chrome,
 			duration: 5.0,
-			alignment: .bottom,
+			alignment: .bottom(),
 			showCloseButton: true
 		)
 	}
@@ -1296,6 +1326,11 @@ struct LightningDualView: View {
 	
 	func startCardReader() {
 		log.trace(#function)
+		
+		guard amountMsat != nil else {
+			log.debug("\(#function): ignoring: amount not set")
+			return
+		}
 		
 		cardState = .scanning
 		NfcReader.shared.readCard { result in
@@ -1314,39 +1349,38 @@ struct LightningDualView: View {
 					cardErrorMessage = String(localized: "Error reading tag")
 				}
 				
-			case .success(let result):
-				log.debug("NFCNDEFMessage: \(result)")
+			case .success(let message):
+				log.debug("NFCNDEFMessage: \(message)")
 				
-				var scannedUri: URL? = nil
-				
-				result.records.forEach { payload in
-					if let uri = payload.wellKnownTypeURIPayload() {
-						log.debug("found uri = \(uri)")
-						if scannedUri == nil {
-							scannedUri = uri
-						}
-						
-					} else if let text = payload.wellKnownTypeTextPayload().0 {
-						log.debug("found text = \(text)")
-						
-					} else {
-						log.debug("found tag with unknown type")
-					}
-				}
-				
-				if let scannedUri {
+				if let result = BoltCardScan.parse(message) {
 					cardErrorMessage = nil
-					handleScannedUri(scannedUri)
+					
+					switch result {
+					case .v1(let v1):
+						if let v2 = v1.v2 {
+							handleV2(v2)
+						} else {
+							handleV1(v1)
+						}
+					case .v2(let v2):
+						handleV2(v2)
+					}
 					
 				} else {
-					cardErrorMessage = String(localized: "No URI detected in NFC tag")
+					log.debug("BoltCardScan.parse() => nil")
+					
+					cardErrorMessage = String(localized: "Bolt Card not detected in NFC tag")
 				}
 			}
 		}
 	}
 	
-	func handleScannedUri(_ scannedUri: URL) {
-		log.trace("handleScannedUri(\(scannedUri.absoluteString))")
+	// --------------------------------------------------
+	// MARK: Card Payment: V1
+	// --------------------------------------------------
+	
+	func handleV1(_ v1: BoltCardScan.V1) {
+		log.trace("handleV1(\(v1.url.absoluteString)")
 		
 		cardState = .parsing
 		Task { @MainActor in
@@ -1356,12 +1390,12 @@ struct LightningDualView: View {
 				}
 				
 				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
-					request: scannedUri.absoluteString,
+					request: v1.url.absoluteString,
 					progress: progressHandler
 				)
 				
 				cardState = nil
-				handleParseResult(result)
+				handleV1_ParseResult(v1, result)
 				
 			} catch {
 				log.error("handleScannedUri: error: \(error)")
@@ -1373,15 +1407,19 @@ struct LightningDualView: View {
 		} // </Task>
 	}
 	
-	func handleParseResult(_ result: SendManager.ParseResult) {
-		log.trace("handleParseResult()")
+	func handleV1_ParseResult(_ v1: BoltCardScan.V1, _ result: SendManager.ParseResult) {
+		log.trace(#function)
 		
 		guard let expectedResult = result as? SendManager.ParseResult_Lnurl_Withdraw else {
 			handleParseError(result)
 			return
 		}
-		
-		guard let model = mvi.model as? Receive.Model_Generated else {
+		guard let msat = amountMsat else {
+			log.error("\(#function): precondition failed: amount not set")
+			return
+		}
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			log.error("\(#function): peer not available")
 			return
 		}
 		
@@ -1389,15 +1427,28 @@ struct LightningDualView: View {
 		Task { @MainActor in
 			do {
 				
+				// We need a Bolt 11 invoice, which we may already have.
+				// Note: mvi.model is outdated when activeType is bolt12_offer.
+				let invoice: Lightning_kmpBolt11Invoice
+				if activeType == .bolt11_invoice, let model = mvi.model as? Receive.Model_Generated {
+					invoice = model.invoice
+				} else {
+					invoice = try await peer._createInvoice(
+						amount: msat,
+						description: trimmedDescription() ?? "",
+						expiryInSeconds: Prefs.current.invoiceExpirationSeconds
+					)
+				}
+				
 				let err: SendManager.LnurlWithdrawError? =
 					try await Biz.business.sendManager.lnurlWithdraw_sendInvoice(
 						lnurlWithdraw: expectedResult.lnurlWithdraw,
-						invoice: model.invoice
+						invoice: invoice
 					)
 				
 				if let remoteErr = err as? SendManager.LnurlWithdrawErrorRemoteError {
 					cardState = nil
-					handleRequestError(remoteErr)
+					handleV1_RequestError(remoteErr)
 				} else {
 					cardState = .receiving
 				}
@@ -1411,44 +1462,7 @@ struct LightningDualView: View {
 		} // </Task>
 	}
 	
-	func handleParseError(_ result: SendManager.ParseResult) {
-		log.trace(#function)
-		
-		var msg = String(localized: "Does not appear to be a bolt card.")
-		var websiteLink: URL? = nil
-		
-		if let badRequest = result as? SendManager.ParseResult_BadRequest {
-			
-			if let serviceError = badRequest.reason as? SendManager.BadRequestReason_ServiceError {
-				
-				let remoteFailure: LnurlError.RemoteFailure = serviceError.error
-				let origin = remoteFailure.origin
-				
-				if remoteFailure is LnurlError.RemoteFailure_IsWebsite {
-					websiteLink = URL(string: serviceError.url.description())
-					msg = String(
-						localized: "Unreadable response from service: \(origin)",
-						comment: "Error message - scanning lightning invoice"
-					)
-				}
-			}
-		}
-		
-		if let websiteLink {
-			popoverState.display(dismissable: true) {
-				WebsiteLinkPopover(
-					link: websiteLink,
-					didCopyLink: didCopyLink,
-					didOpenLink: nil
-				)
-			}
-			
-		} else {
-			cardErrorMessage = msg
-		}
-	}
-	
-	func handleRequestError(_ result: SendManager.LnurlWithdrawErrorRemoteError) {
+	func handleV1_RequestError(_ result: SendManager.LnurlWithdrawErrorRemoteError) {
 		log.trace(#function)
 		
 		let remoteFailure = result.err
@@ -1486,12 +1500,114 @@ struct LightningDualView: View {
 		}
 	}
 	
-	func didCopyLink() {
-		log.trace("didCopyLink()")
+	// --------------------------------------------------
+	// MARK: Card Payment: V2
+	// --------------------------------------------------
+	
+	func handleV2(_ v2: BoltCardScan.V2) {
+		log.trace("handleV2(\(v2.baseText))")
 		
-		toast.pop(
-			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
-			colorScheme: colorScheme.opposite
-		)
+		cardState = .parsing
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					// nothing to do here currently
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: v2.baseText,
+					progress: progressHandler
+				)
+				
+				cardState = nil
+				handleV2_ParseResult(v2, result)
+				
+			} catch {
+				log.error("handleV2: error: \(error)")
+				
+				cardState = nil
+				cardErrorMessage = String(localized: "Could not communicate with card's wallet")
+			}
+			
+		} // </Task>
+	}
+	
+	func handleV2_ParseResult(_ v2: BoltCardScan.V2, _ result: SendManager.ParseResult) {
+		log.trace("handleV2_ParseResult()")
+		
+		guard let bolt12Offer = result as? SendManager.ParseResult_Bolt12Offer else {
+			handleParseError(result)
+			return
+		}
+		guard let msat = amountMsat else {
+			log.error("handleV2_ParseResult(): precondition failed: amount not set")
+			return
+		}
+		guard let peer = Biz.business.peerManager.peerStateValue() else {
+			log.error("handleV2_ParseResult(): peer not available")
+			return
+		}
+		
+		cardState = .requesting
+		Task { @MainActor in
+			do {
+				let tuple: KotlinPair<Lightning_kmpBolt12Invoice, Bitcoin_kmpByteVector32> =
+					try await peer.requestCardPayment(
+						amount: msat,
+						cardHolderOffer: bolt12Offer.offer,
+						cardParams: v2.parametersText
+					)
+				
+				cardState = .receiving
+				cardOfferId = tuple.second
+				
+			} catch {
+				log.error("handleV2_ParseResult: error: \(error)")
+				
+				cardState = nil
+				cardErrorMessage = String(localized: "Cound not communicate with card's host")
+			}
+		} // </Task>
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payment: Errors
+	// --------------------------------------------------
+	
+	func handleParseError(_ result: SendManager.ParseResult) {
+		log.trace(#function)
+		
+		var msg = String(localized: "Does not appear to be a bolt card.")
+		var websiteLink: URL? = nil
+		
+		if let badRequest = result as? SendManager.ParseResult_BadRequest {
+			
+			if let serviceError = badRequest.reason as? SendManager.BadRequestReason_ServiceError {
+				
+				let remoteFailure: LnurlError.RemoteFailure = serviceError.error
+				let origin = remoteFailure.origin
+				
+				if remoteFailure is LnurlError.RemoteFailure_IsWebsite {
+					websiteLink = URL(string: serviceError.url.description())
+					msg = String(
+						localized: "Unreadable response from service: \(origin)",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+			}
+		}
+		
+		if let websiteLink {
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
+				)
+			}
+			
+		} else {
+			cardErrorMessage = msg
+		}
 	}
 }

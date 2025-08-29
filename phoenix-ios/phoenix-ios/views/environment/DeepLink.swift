@@ -20,6 +20,7 @@ enum DeepLink: Equatable, CustomStringConvertible {
 	case finalWallet
 	case appAccess
 	case walletMetadata
+	case bip353Registration
 	
 	var description: String {
 		return switch self {
@@ -35,6 +36,7 @@ enum DeepLink: Equatable, CustomStringConvertible {
 			case .finalWallet        : "finalWallet"
 			case .appAccess          : "appAccess"
 			case .walletMetadata     : "walletMetadata"
+			case .bip353Registration : "bip353Registration"
 		}
 	}
 }

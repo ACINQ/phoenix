@@ -1,5 +1,5 @@
 {
-  "originHash" : "653895f3cf5de8736e109a9ddd2552da4dbecc49c096d31ff1dcbb9c5314a3b4",
+  "originHash" : "d649fbe2be50831fdb28cb2641e76bb148d3b4a074f1350225d4c038ab447877",
   "pins" : [
     {
       "identity" : "abseil-cpp-swiftpm",
@@ -125,6 +125,15 @@
       "state" : {
         "revision" : "3e4e743631e86c8c70dbc6efdc7beaa6e90fd3bb",
         "version" : "2.1.1"
+      }
+    },
+    {
+      "identity" : "swcrypt",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/soyersoyer/SwCrypt",
+      "state" : {
+        "revision" : "d18cf90973a32dc0d28f94eec91faf14ae8b4443",
+        "version" : "5.1.4"
       }
     },
     {

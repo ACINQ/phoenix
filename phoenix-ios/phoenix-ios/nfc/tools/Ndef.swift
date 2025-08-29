@@ -209,4 +209,105 @@ public class Ndef {
 		let result: [UInt8] = fileHeader + messageHeader + typeHeader + textBytes
 		return result
 	}
+	
+	class func ndefDataForTemplate(_ template: Template) -> [UInt8] {
+		
+		switch template.value {
+		case .Left(let url):
+			return ndefDataForUrl(url)
+		case .Right(let text):
+			return ndefDataForText(text)
+		}
+	}
+	
+	struct Template {
+		let value: Either<URL, String>
+		let piccDataOffset: Int
+		let cmacOffset: Int
+		
+		var valueString: String {
+			switch value {
+			case .Left(let url):
+				return url.absoluteString
+			case .Right(let text):
+				return text
+			}
+		}
+		
+		init?(baseUrl: URL) {
+			
+			guard var comps = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false) else {
+				return nil
+			}
+			
+			var queryItems = comps.queryItems ?? []
+			
+			// The `baseUrl` SHOULD NOT have either `picc_data` or `cmac` parameters.
+			// But just to be safe, we'll remove them if they're present.
+			//
+			queryItems.removeAll(where: { item in
+				let name = item.name.lowercased()
+				return name == "picc_data" || name == "cmac"
+			})
+			
+			// picc_data=(16_bytes_hexadecimal)
+			// cmac=(8_bytes_hexadecimal)
+			
+			queryItems.append(URLQueryItem(name: "picc_data", value: "00000000000000000000000000000000"))
+			queryItems.append(URLQueryItem(name: "cmac",      value: "0000000000000000"))
+			
+			comps.queryItems = queryItems
+			
+			guard let resolvedUrl = comps.url else {
+				return nil
+			}
+			
+			let urlString = resolvedUrl.absoluteString
+			
+			// Ultimately, the URL gets encoded as UTF-8,
+			// and the offsets are used as indexes within this UTF-8 representation.
+			//
+			// So we need to do our calculations within the string's utf8View.
+			
+			let urlUtf8 = urlString.utf8
+			
+			guard let range1 = urlUtf8.ranges(of: "picc_data=".utf8).last else {
+				return nil
+			}
+			let offset1 = urlUtf8.distance(from: urlUtf8.startIndex, to: range1.upperBound)
+			
+			guard let range2 = urlUtf8.ranges(of: "cmac=".utf8).last else {
+				return nil
+			}
+			let offset2 = urlUtf8.distance(from: urlUtf8.startIndex, to: range2.upperBound)
+			
+			self.value = Either.Left(resolvedUrl)
+			self.piccDataOffset = offset1 + Ndef.URL_HEADER_SIZE
+			self.cmacOffset = offset2 + Ndef.URL_HEADER_SIZE
+		}
+		
+		init(baseText: String) {
+			
+			// picc_data=(16_bytes_hexadecimal)
+			// cmac=(8_bytes_hexadecimal)
+			
+			let fullText = "\(baseText)?picc_data=00000000000000000000000000000000&cmac=0000000000000000"
+			//                         +123456789 123456789 123456789 123456789 123456789
+			//                                    ^+11                                  ^+49
+			
+			// Ultimately, the value gets encoded as UTF-8,
+			// and the offsets are used as indexes within this UTF-8 representation.
+			//
+			// So we need to do our calculations within the string's utf8View.
+			
+			let baseTextLength = baseText.utf8.count
+			let offset1 = baseTextLength + 11
+			let offset2 = baseTextLength + 49
+			
+			self.value = Either.Right(fullText)
+			self.piccDataOffset = offset1 + Ndef.TEXT_HEADER_SIZE
+			self.cmacOffset = offset2 + Ndef.TEXT_HEADER_SIZE
+		}
+		
+	} // </struct Template>
 }

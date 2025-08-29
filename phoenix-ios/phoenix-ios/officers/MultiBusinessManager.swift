@@ -52,33 +52,29 @@ class MultiBusinessManager {
 		currentBizPublisher.send(newBiz)
 	}
 	
-	func launchBackgroundBiz(_ push: PushNotification) {
+	func launchBackgroundBiz(_ notification: FcmPushNotification) {
 		log.trace(#function)
 		
-		guard let nodeId = push.nodeId else {
-			log.warning("launchBackgroundBiz(): invalid parameter: push.nodeId == nil")
+		guard let chain = notification.chain else {
+			log.warning("\(#function): invalid parameter: notification.chain == nil")
 			return
 		}
-		guard let chain = push.chain else {
-			log.warning("launchBackgroundBiz(): invalid parameter: push.chain == nil")
-			return
-		}
-		guard let nodeIdHash = push.nodeIdHash else {
-			log.warning("launchBackgroundBiz(): invalid parameter: push.nodeIdHash == nil")
+		guard let nodeIdHash = notification.nodeIdHash else {
+			log.warning("\(#function): invalid parameter: notification.nodeIdHash == nil")
 			return
 		}
 		
 		// Step 1:
 		// Check to see if the target is already loaded.
 		
-		if let walletInfo = currentBiz.walletInfo, walletInfo.nodeIdString == nodeId {
-			log.debug("launchBackgroundBiz(): already loaded (current)")
+		if let walletInfo = currentBiz.walletInfo, walletInfo.nodeIdHash == nodeIdHash {
+			log.debug("\(#function): already loaded (current)")
 			return
 		}
 		
 		for biz in bgBizList {
-			if let walletInfo = biz.walletInfo, walletInfo.nodeIdString == nodeId {
-				log.debug("launchBackgroundBiz(): already loaded (background)")
+			if let walletInfo = biz.walletInfo, walletInfo.nodeIdHash == nodeIdHash {
+				log.debug("\(#function): already loaded (background)")
 				startOrResetTimerForBiz(biz)
 				return
 			}
@@ -88,33 +84,33 @@ class MultiBusinessManager {
 		// Lookup the key information for the target nodeId.
 		
 		guard let securityFile = SecurityFileManager.shared.currentSecurityFile() else {
-			log.warning("launchBackgroundBiz(): SecurityFile.current(): nil found")
+			log.warning("\(#function): SecurityFile.current(): nil found")
 			return
 		}
 		guard case .v1(let v1) = securityFile else {
-			log.warning("launchBackgroundBiz(): SecurityFile.current(): v0 found")
+			log.warning("\(#function): SecurityFile.current(): v0 found")
 			return
 		}
 		
 		let id = SecurityFile.V1.KeyComponents(chain: chain, nodeIdHash: nodeIdHash)
 		guard let sealedBox = v1.getWallet(id)?.keychain else {
-			log.warning("launchBackgroundBiz(): SecurityFile.current().getWallet(): nil found")
+			log.warning("\(#function): SecurityFile.current().getWallet(): nil found")
 			return
 		}
 		
 		let keychainResult = SharedSecurity.shared.readKeychainEntry(id.standardKeyId, sealedBox)
 		guard case .success(let cleartextData) = keychainResult else {
-			log.warning("launchBackgroundBiz(): readKeychainEntry(): failed")
+			log.warning("\(#function): readKeychainEntry(): failed")
 			return
 		}
 
 		let decodeResult = SharedSecurity.shared.decodeRecoveryPhrase(cleartextData)
 		guard case .success(let recoveryPhrase) = decodeResult else {
-			log.warning("launchBackgroundBiz(): decodeRecoveryPhrase(): failed")
+			log.warning("\(#function): decodeRecoveryPhrase(): failed")
 			return
 		}
 		guard recoveryPhrase.language != nil else {
-			log.warning("launchBackgroundBiz(): recoveryPhrase.language == nil")
+			log.warning("\(#function): recoveryPhrase.language == nil")
 			return
 		}
 		

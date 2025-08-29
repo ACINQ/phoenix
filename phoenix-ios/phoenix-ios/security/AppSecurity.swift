@@ -41,7 +41,6 @@ class AppSecurity {
 		
 		let walletInfo = _calculateWalletInfo(chain, recoveryPhrase, knownSeed)
 		let walletId = WalletIdentifier(chain: chain, walletInfo: walletInfo)
-		let nodeId = walletInfo.nodeIdString
 		
 		let securityFile: SecurityFile.V1
 		

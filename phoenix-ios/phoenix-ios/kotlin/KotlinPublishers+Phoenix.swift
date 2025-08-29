@@ -97,6 +97,17 @@ extension ConnectionsManager {
 }
 
 // MARK: -
+extension CardsManager {
+	
+	func cardsListSequence() -> AnyAsyncSequence<[BoltCardInfo]> {
+		
+		return self.cardsList
+			.compactMap { $0 }
+			.eraseToAnyAsyncSequence()
+	}
+}
+
+// MARK: -
 extension CurrencyManager {
 	
 	func ratesSequence() -> AnyAsyncSequence<[ExchangeRate]> {
@@ -206,6 +217,16 @@ extension PaymentsPageFetcher {
 
 
 // MARK: -
+extension CloudKitCardsDb {
+	
+	func queueCountSequence() -> AnyAsyncSequence<Int64> {
+		
+		return self.queueCount
+			.map { $0.int64Value }
+			.eraseToAnyAsyncSequence()
+	}
+}
+
 extension CloudKitContactsDb {
 	
 	func queueCountSequence() -> AnyAsyncSequence<Int64> {
