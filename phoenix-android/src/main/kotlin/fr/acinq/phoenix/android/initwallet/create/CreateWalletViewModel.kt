@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.Lightning
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.utils.MnemonicLanguage
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -30,7 +31,7 @@ import kotlinx.coroutines.launch
 
 class CreateWalletViewModel(override val application: PhoenixApplication) : InitViewModel() {
 
-    fun createNewWallet(onSeedWritten: (String) -> Unit) {
+    fun createNewWallet(onSeedWritten: (WalletId) -> Unit) {
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when creating new wallet: ", e)
             throw e

@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -97,12 +98,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ReceiveView(
-    nodeId: String,
+    walletId: WalletId,
     onBackClick: () -> Unit,
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
-    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, nodeId, business.peerManager, business.nodeParamsManager, business.walletManager))
+    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, walletId, business.peerManager, business.nodeParamsManager, business.walletManager))
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = false) {
         DefaultScreenHeader(
@@ -117,7 +118,7 @@ fun ReceiveView(
                     space = 6.dp,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                CompactWalletViewWithBalance(nodeId = nodeId, showBalance = false, showInbound = true)
+                CompactWalletViewWithBalance(walletId = walletId, showBalance = false, showInbound = true)
                 Spacer(modifier = Modifier.width(16.dp))
             },
         )

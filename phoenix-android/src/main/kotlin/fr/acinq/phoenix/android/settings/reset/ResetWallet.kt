@@ -45,6 +45,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.ProgressView
@@ -65,10 +66,10 @@ import fr.acinq.phoenix.android.utils.negativeColor
 
 @Composable
 fun ResetWallet(
-    nodeId: String,
+    walletId: WalletId,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<ResetWalletViewModel>(factory = ResetWalletViewModel.Factory(application = application, nodeId = nodeId))
+    val vm = viewModel<ResetWalletViewModel>(factory = ResetWalletViewModel.Factory(application = application, walletId = walletId))
 
     DefaultScreenLayout {
         when (vm.state.value) {
@@ -88,7 +89,7 @@ fun ResetWallet(
 
         when (val state = vm.state.value) {
             ResetWalletStep.Init -> {
-                InitReset(nodeId = nodeId, onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
+                InitReset(walletId = walletId, onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
             }
             ResetWalletStep.Confirm -> {
                 ReviewReset(onConfirmClick = vm::deleteWalletData)
@@ -97,7 +98,7 @@ fun ResetWallet(
                 DeletingWallet(state)
             }
             ResetWalletStep.Result.Success -> {
-                WalletDeleted(nodeId)
+                WalletDeleted(walletId)
             }
             is ResetWalletStep.Result.Failure -> {
                 DeletionFailed(state)
@@ -108,7 +109,7 @@ fun ResetWallet(
 
 @Composable
 private fun InitReset(
-    nodeId: String,
+    walletId: WalletId,
     onReviewClick: () -> Unit
 ) {
     Card(
@@ -117,7 +118,7 @@ private fun InitReset(
     ) {
         Text(text = "Do you want to delete this wallet from your device ?")
         Spacer(modifier = Modifier.height(4.dp))
-        ClickableWalletView(nodeId, onClick = {})
+        ClickableWalletView(walletId, onClick = {})
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "All data for this wallet will be removed, including the payments history.")
     }
@@ -231,7 +232,7 @@ private fun DeletingWallet(state: ResetWalletStep.Deleting) {
 }
 
 @Composable
-private fun WalletDeleted(nodeId: String) {
+private fun WalletDeleted(walletId: WalletId) {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
@@ -244,7 +245,7 @@ private fun WalletDeleted(nodeId: String) {
             text = stringResource(id = R.string.btn_ok),
             icon = R.drawable.ic_check,
             onClick = {
-                BusinessManager.stopBusiness(nodeId)
+                BusinessManager.stopBusiness(walletId)
                 context.startActivity(
                     Intent(context, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

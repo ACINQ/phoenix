@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
@@ -65,7 +66,7 @@ import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlPayView(
-    nodeId: String,
+    walletId: WalletId,
     pay: SendManager.ParseResult.Lnurl.Pay,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -86,7 +87,7 @@ fun LnurlPayView(
     val vm = viewModel<LnurlPayViewModel>(factory = LnurlPayViewModel.Factory(business.sendManager))
 
     SplashLayout(
-        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = minRequestedAmount,

@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.initwallet.WritingSeedState
@@ -34,7 +35,7 @@ import fr.acinq.phoenix.android.initwallet.WritingSeedState
 
 @Composable
 fun CreateWalletView(
-    onSeedWritten: (String) -> Unit
+    onSeedWritten: (WalletId) -> Unit
 ) {
     val vm = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory(application = application))
 

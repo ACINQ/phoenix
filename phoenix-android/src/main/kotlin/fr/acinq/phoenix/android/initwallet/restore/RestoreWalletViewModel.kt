@@ -29,6 +29,7 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.security.EncryptedData
 import fr.acinq.phoenix.managers.DatabaseManager
@@ -93,7 +94,7 @@ class RestoreWalletViewModel(override val application: PhoenixApplication) : Ini
         }
     }
 
-    fun checkSeedAndWrite(onSeedWritten: (String) -> Unit) {
+    fun checkSeedAndWrite(onSeedWritten: (WalletId) -> Unit) {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when checking seed and db files: ${e.message}")
             state = RestoreWalletState.SeedInput.Invalid

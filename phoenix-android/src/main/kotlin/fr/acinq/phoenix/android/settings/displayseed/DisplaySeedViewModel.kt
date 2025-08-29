@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -44,7 +45,7 @@ class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<ReadingSeedState>(ReadingSeedState.Init)
 
-    fun readActiveSeed(nodeId: String) {
+    fun readActiveSeed(walletId: WalletId) {
         if (state.value == ReadingSeedState.ReadingSeed) return
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to read seed: ${e.message}")
@@ -54,11 +55,11 @@ class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
             when (val result = SeedManager.loadAndDecrypt(application.applicationContext)) {
                 is DecryptSeedResult.Success -> {
                     delay(300)
-                    val match = result.mnemonicsMap[nodeId]
+                    val match = result.mnemonicsMap[walletId]
                     if (!match.isNullOrEmpty()) {
                         state.value = ReadingSeedState.Decrypted(match)
                     } else {
-                        log.error("could not find mnemonics for node_id=$nodeId")
+                        log.error("could not find mnemonics for wallet=$walletId")
                         state.value = ReadingSeedState.Error.CouldNotFindMatch
                     }
                 }

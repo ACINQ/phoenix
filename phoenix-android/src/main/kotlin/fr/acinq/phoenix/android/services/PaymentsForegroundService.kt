@@ -10,9 +10,11 @@ import android.os.Looper
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
@@ -26,8 +28,10 @@ import kotlin.time.Duration.Companion.minutes
 
 
 /**
- * This service starts a [PhoenixBusiness] in the foreground up receiving payment messages from the LSP. This service
- * allows Phoenix to receive payments (or settle pending payments) even when it's closed or in the background.
+ * This foreground service starts a [PhoenixBusiness] upon receiving FCM payment messages from the LSP. Being a foreground
+ * service, it needs to display a foreground notification visible by the user.
+ *
+ * This service allows Phoenix to receive payments (or settle pending payments) even when it's closed or in the background.
  */
 class PaymentsForegroundService : Service() {
 
@@ -63,7 +67,7 @@ class PaymentsForegroundService : Service() {
         log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
 
         val reason = intent?.getStringExtra(EXTRA_REASON)
-        val nodeId = intent?.getStringExtra(EXTRA_NODE_ID)
+        val walletId = intent?.getStringExtra(EXTRA_NODE_ID_HASH)?.let { WalletId(it) }
 
         val businessMap = BusinessManager.businessFlow.value
 
@@ -75,9 +79,9 @@ class PaymentsForegroundService : Service() {
                 SystemNotificationHelper.notifyRunningHeadless(applicationContext)
             }
 
-            !nodeId.isNullOrBlank() && businessMap[nodeId] != null -> {
-                log.info("active business found for node_id=${nodeId.take(10)}..., ignoring background message (reason=$reason)")
-                businessMap[nodeId]?.let {
+            walletId != null && businessMap[walletId] != null -> {
+                log.info("active business found for wallet=$walletId, ignoring background message (reason=$reason)")
+                businessMap[walletId]?.let {
                     if (it.connectionsManager.connections.value.peer !is Connection.ESTABLISHED) {
                         it.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
                     }
@@ -85,8 +89,8 @@ class PaymentsForegroundService : Service() {
                 SystemNotificationHelper.notifyRunningHeadless(applicationContext)
             }
 
-            nodeId.isNullOrBlank() -> {
-                log.info("no specific node_id provided, ignoring background message (reason=$reason)")
+            walletId == null -> {
+                log.info("no wallet_id provided, ignoring background message (reason=$reason)")
                 SystemNotificationHelper.notifyRunningHeadless(applicationContext)
             }
 
@@ -106,15 +110,15 @@ class PaymentsForegroundService : Service() {
                     }
                     is DecryptSeedResult.Success -> {
                         val mnemonicsMap = result.mnemonicsMap
-                        val match = mnemonicsMap[nodeId]
+                        val match = mnemonicsMap[walletId]
                         if (match.isNullOrEmpty()) {
-                            log.info("seed not found for node_id=${nodeId.take(10)}..., ignoring background message (reason=$reason)")
+                            log.info("seed not found for node_id=$walletId, ignoring background message (reason=$reason)")
                             SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                         } else {
                             serviceScope.launch(Dispatchers.Default) {
                                 when (val res = BusinessManager.startNewBusiness(match, isHeadless = true)) {
                                     is StartBusinessResult.Failure -> {
-                                        log.error("error when starting node_id=${nodeId.take(10)}... from foreground service: $res")
+                                        log.error("error when starting wallet=$walletId... from foreground service: $res")
                                         stopForeground(STOP_FOREGROUND_REMOVE)
                                         stopSelf()
                                     }
@@ -146,7 +150,7 @@ class PaymentsForegroundService : Service() {
     }
 
     companion object {
-        const val EXTRA_REASON = "${BuildConfig.APPLICATION_ID}.SERVICE_SPAWN_REASON"
-        const val EXTRA_NODE_ID = "${BuildConfig.APPLICATION_ID}.SERVICE_SPAWN_NODE_ID"
+        const val EXTRA_REASON = "${BuildConfig.APPLICATION_ID}.FCM_MESSAGE.REASON"
+        const val EXTRA_NODE_ID_HASH = "${BuildConfig.APPLICATION_ID}.FCM_MESSAGE.NODE_ID_HASH"
     }
 }

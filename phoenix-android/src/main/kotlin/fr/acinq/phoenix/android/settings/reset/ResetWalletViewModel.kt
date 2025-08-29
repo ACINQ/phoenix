@@ -26,6 +26,7 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
@@ -57,7 +58,7 @@ sealed class ResetWalletStep {
     }
 }
 
-class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: String) : ViewModel() {
+class ResetWalletViewModel(val application: PhoenixApplication, val walletId: WalletId) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
@@ -70,7 +71,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: Stri
             log.error("failed to reset wallet data: ", e)
             state.value = ResetWalletStep.Result.Failure.Error(e)
         }) {
-            log.info("resetting wallet with node_id=$nodeId")
+            log.info("resetting wallet with wallet=$walletId")
             delay(350)
 
             val context = application.applicationContext
@@ -86,14 +87,13 @@ class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: Stri
             delay(250)
 
             state.value = ResetWalletStep.Deleting.Databases
-            val nodeIdHash = PublicKey.fromHex(nodeId).hash160().byteVector().toHex()
             val chain = NodeParamsManager.chain
-            context.deleteDatabase("payments-${chain.phoenixName}-$nodeIdHash.sqlite")
-            context.deleteDatabase("channels-${chain.phoenixName}-$nodeIdHash.sqlite")
+            context.deleteDatabase("payments-${chain.phoenixName}-${walletId.nodeIdHash}.sqlite")
+            context.deleteDatabase("channels-${chain.phoenixName}-${walletId.nodeIdHash}.sqlite")
             delay(500)
 
             state.value = ResetWalletStep.Deleting.Prefs
-            DataStoreManager.deleteNodeUserPrefs(application.applicationContext, nodeId)
+            DataStoreManager.deleteNodeUserPrefs(application.applicationContext, walletId)
             FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
                 if (task.isSuccessful) BusinessManager.refreshFcmToken()
             }
@@ -101,7 +101,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: Stri
             delay(400)
 
             state.value = ResetWalletStep.Deleting.Seed
-            val newSeedMap = seedMap - nodeId
+            val newSeedMap = seedMap - walletId
             val newEncryptedSeed = EncryptedSeed.V2.MultipleSeed.encrypt(newSeedMap)
             try {
                 SeedManager.writeSeedToDisk(context, newEncryptedSeed, overwrite = true)
@@ -112,17 +112,17 @@ class ResetWalletViewModel(val application: PhoenixApplication, val nodeId: Stri
             }
 
             delay(300)
-            log.info("successfully deleted wallet with node_id=$nodeId")
+            log.info("successfully deleted wallet=$walletId")
 
             state.value = ResetWalletStep.Result.Success
         }
     }
 
-    class Factory(val application: PhoenixApplication, val nodeId: String) : ViewModelProvider.Factory {
+    class Factory(val application: PhoenixApplication, val walletId: WalletId) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             @Suppress("UNCHECKED_CAST")
-            return ResetWalletViewModel(application, nodeId) as T
+            return ResetWalletViewModel(application, walletId = walletId) as T
         }
     }
 }

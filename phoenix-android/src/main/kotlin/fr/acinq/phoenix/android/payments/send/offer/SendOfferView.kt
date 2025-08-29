@@ -46,6 +46,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
@@ -65,7 +66,7 @@ import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 
 @Composable
 fun SendToOfferView(
-    nodeId: String,
+    walletId: WalletId,
     offer: OfferTypes.Offer,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -98,7 +99,7 @@ fun SendToOfferView(
     var showMessageDialog by remember { mutableStateOf(false) }
 
     SplashLayout(
-        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = requestedAmount,

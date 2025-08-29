@@ -65,46 +65,46 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
         }
 
         try {
-            val businessMap = seedMap.map { (nodeId, words) ->
+            val businessMap = seedMap.map { (walletId, words) ->
                 val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
                 if (res is StartBusinessResult.Failure) {
-                    log.info("failed to start business for node_id=$nodeId")
+                    log.info("failed to start business for wallet=$walletId")
                     return Result.success()
                 }
 
-                val business = BusinessManager.businessFlow.value[nodeId]
+                val business = BusinessManager.businessFlow.value[walletId]
                 if (business == null) {
-                    log.info("failed to access business for node_id=$nodeId")
+                    log.info("failed to access business for wallet=$walletId")
                     return Result.success()
                 }
 
-                nodeId to business
+                walletId to business
             }.toMap()
 
             withContext(Dispatchers.Default) {
                 val stopJobSignal = MutableStateFlow(false)
 
-                val watchers = businessMap.map { (nodeId, business) ->
+                val watchers = businessMap.map { (walletId, business) ->
                     launch {
                         business.appConnectionsDaemon?.forceReconnect()
                         business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
-                        log.debug("connections established for node_id=$nodeId")
+                        log.debug("connections established for wallet={}", walletId)
 
                         business.peerManager.channelsFlow.filterNotNull().collect { channels ->
                             when {
                                 channels.isEmpty() -> {
-                                    log.info("no channels found for node_id=$nodeId")
+                                    log.info("no channels found for wallet=$walletId")
                                     stopJobSignal.value = true
                                 }
                                 else -> {
-                                    log.info("${channels.size} channel(s) found for node_id=$nodeId, waiting 60s...")
+                                    log.info("${channels.size} channel(s) found for wallet=$walletId, waiting 60s...")
                                     delay(60_000)
                                     stopJobSignal.value = true
                                 }
                             }
                         }
                     }.also {
-                        it.invokeOnCompletion { log.debug("completed watching-channels job for node_id=$nodeId (${it?.localizedMessage})") }
+                        it.invokeOnCompletion { log.debug("completed watching-channels job for wallet={} ({})", walletId, it?.localizedMessage) }
                     }
                 }
                 stopJobSignal.first { it }

@@ -26,6 +26,7 @@ import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.managers.NodeParamsManager
@@ -64,7 +65,7 @@ abstract class InitViewModel : ViewModel() {
     fun writeSeed(
         mnemonics: List<String>,
         isNewWallet: Boolean,
-        onSeedWritten: (String) -> Unit
+        onSeedWritten: (WalletId) -> Unit
     ) {
         if (writingState !is WritingSeedState.Init) return
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
@@ -77,7 +78,7 @@ abstract class InitViewModel : ViewModel() {
 
             val seed = MnemonicCode.toSeed(mnemonics, "").toByteVector()
             val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
-            val newNodeId = keyManager.nodeKeys.nodeKey.publicKey.toHex()
+            val newWalletId = WalletId(keyManager.nodeKeys.nodeKey.publicKey)
 
             when {
                 existingSeeds == null -> {
@@ -85,13 +86,13 @@ abstract class InitViewModel : ViewModel() {
                     writingState = WritingSeedState.Error.CannotLoadSeedMap
                     return@launch
                 }
-                existingSeeds.containsKey(newNodeId) -> {
+                existingSeeds.containsKey(newWalletId) -> {
                     log.info("attempting to import a seed that already exists, aborting...")
                     writingState = WritingSeedState.Error.SeedAlreadyExists
                     return@launch
                 }
                 else -> {
-                    val newSeedMap = existingSeeds + (newNodeId to mnemonics)
+                    val newSeedMap = existingSeeds + (newWalletId to mnemonics)
                     val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(newSeedMap)
                     SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
@@ -106,7 +107,7 @@ abstract class InitViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.Main) {
                 application.globalPrefs.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
                 delay(1000)
-                onSeedWritten(newNodeId)
+                onSeedWritten(newWalletId)
             }
         }
     }

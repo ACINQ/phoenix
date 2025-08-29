@@ -51,6 +51,7 @@ import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
@@ -72,7 +73,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DisplaySeedView(
     onBackClick: () -> Unit,
-    nodeId: String
+    walletId: WalletId,
 ) {
     val internalPrefs = LocalInternalPrefs.current!!
     val scope = rememberCoroutineScope()
@@ -98,7 +99,7 @@ fun DisplaySeedView(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         enabled = true,
-                        onSpend = { vm.readActiveSeed(nodeId) },
+                        onSpend = { vm.readActiveSeed(walletId) },
                         prompt = { PinDialogTitle(text = stringResource(R.string.pincode_check_spending_displayseed_title)) },
                         ignoreChannelsState = true,
                     )

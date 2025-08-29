@@ -19,9 +19,8 @@ package fr.acinq.phoenix.android.utils.datastore
 import android.content.Context
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.byteVector
 import fr.acinq.phoenix.android.BusinessManager
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.globalPrefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,78 +36,77 @@ object DataStoreManager {
     private val supervisor = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Main.immediate + supervisor)
 
-    // map of: node_id -> userPrefs for that node_id
-    // note that the UI relies on [AppViewModel.activeWalletInUI] to track the currently active user preferences
-    private val _userPrefsMapFlow = MutableStateFlow<Map<String, UserPrefs>>(emptyMap())
-    private val _internalPrefsMapFlow = MutableStateFlow<Map<String, InternalPrefs>>(emptyMap())
+    // maps of: (wallet_id -> userPrefs) and (wallet_id -> internalPrefs)
+    private val _userPrefsMapFlow = MutableStateFlow<Map<WalletId, UserPrefs>>(emptyMap())
+    private val _internalPrefsMapFlow = MutableStateFlow<Map<WalletId, InternalPrefs>>(emptyMap())
 
-    fun loadUserPrefsForNodeId(context: Context, nodeId: String): UserPrefs {
-        val existingUserPrefs = _userPrefsMapFlow.value[nodeId]
+    fun loadUserPrefsForWallet(context: Context, walletId: WalletId): UserPrefs {
+        val existingUserPrefs = _userPrefsMapFlow.value[walletId]
         if (existingUserPrefs != null) return existingUserPrefs
 
         val newUserPrefs = PreferenceDataStoreFactory.create {
-            userPrefsFile(context, nodeId)
+            userPrefsFile(context, walletId)
         }.let { UserPrefs(it) }
 
         val newUserPrefsMap = _userPrefsMapFlow.value.toMutableMap()
-        newUserPrefsMap[nodeId] = newUserPrefs
+        newUserPrefsMap[walletId] = newUserPrefs
         _userPrefsMapFlow.value = newUserPrefsMap
 
         return newUserPrefs
     }
 
-    fun loadInternalPrefsForNodeId(context: Context, nodeId: String): InternalPrefs {
-        val existingInternalPrefs = _internalPrefsMapFlow.value[nodeId]
+    fun loadInternalPrefsForWallet(context: Context, walletId: WalletId): InternalPrefs {
+        val existingInternalPrefs = _internalPrefsMapFlow.value[walletId]
         if (existingInternalPrefs != null) return existingInternalPrefs
 
         val newInternalPrefs = PreferenceDataStoreFactory.create {
-            internalPrefsFile(context, nodeId)
+            internalPrefsFile(context, walletId)
         }.let { InternalPrefs(it) }
 
         val newInternalPrefsMap = _internalPrefsMapFlow.value.toMutableMap()
-        newInternalPrefsMap[nodeId] = newInternalPrefs
+        newInternalPrefsMap[walletId] = newInternalPrefs
         _internalPrefsMapFlow.value = newInternalPrefsMap
 
         return newInternalPrefs
     }
 
-    private fun unloadUserPrefs(nodeId: String) {
+    private fun unloadUserPrefs(id: WalletId) {
         val newUserPrefsMap = _userPrefsMapFlow.value.toMutableMap()
-        newUserPrefsMap.remove(nodeId)
+        newUserPrefsMap.remove(id)
         _userPrefsMapFlow.value = newUserPrefsMap
     }
 
-    private fun unloadInternalPrefs(nodeId: String) {
+    private fun unloadInternalPrefs(id: WalletId) {
         val newInternalPrefsMap = _internalPrefsMapFlow.value.toMutableMap()
-        newInternalPrefsMap.remove(nodeId)
+        newInternalPrefsMap.remove(id)
         _internalPrefsMapFlow.value = newInternalPrefsMap
     }
 
-    /** Deletes the preferences files for a given node id, and removes the preferences from the map flow. */
-    fun deleteNodeUserPrefs(context: Context, nodeId: String): Boolean {
-        val userPrefsFile = userPrefsFile(context, nodeId)
+    /** Deletes the preferences files for a given wallet id, and removes the preferences from the map flow. */
+    fun deleteNodeUserPrefs(context: Context, id: WalletId): Boolean {
+        val userPrefsFile = userPrefsFile(context, id)
         val userPrefsFileDeleted = userPrefsFile.delete()
 
         if (userPrefsFileDeleted) {
-            unloadUserPrefs(nodeId)
+            unloadUserPrefs(id)
         }
 
-        val internalPrefsFile = internalPrefsFile(context, nodeId)
+        val internalPrefsFile = internalPrefsFile(context, id)
         val internalPrefsFileDeleted = internalPrefsFile.delete()
 
         if (internalPrefsFileDeleted) {
-            unloadInternalPrefs(nodeId)
+            unloadInternalPrefs(id)
         }
 
         return userPrefsFileDeleted && internalPrefsFileDeleted
     }
 
-    fun migratePrefsNodeId(context: Context, nodeId: String) {
+    fun migratePrefsForWallet(context: Context, id: WalletId) {
         try {
             val userPrefsOldFile = context.dataStoreFile("userprefs.preferences_pb")
             if (userPrefsOldFile.exists()) {
                 log.info("migrating prefs: ${userPrefsOldFile.name}")
-                val userPrefsNewFile = userPrefsFile(context, nodeId)
+                val userPrefsNewFile = userPrefsFile(context, id)
                 userPrefsOldFile.copyTo(userPrefsNewFile, overwrite = true)
                 userPrefsOldFile.delete()
             }
@@ -121,15 +119,15 @@ object DataStoreManager {
                 }
                 log.info("migrating prefs: ${internalPrefsOldFile.name}")
                 BusinessManager.refreshFcmToken()
-                val internalPrefsNewFile = internalPrefsFile(context, nodeId)
+                val internalPrefsNewFile = internalPrefsFile(context, id)
                 internalPrefsOldFile.copyTo(internalPrefsNewFile, overwrite = true)
                 internalPrefsOldFile.delete()
             }
         } catch (e: Exception) {
-            log.error("error when migrating prefs for node_id=$nodeId")
+            log.error("error when migrating prefs for wallet=$id")
         }
     }
 
-    private fun userPrefsFile(context: Context, nodeId: String): File = context.dataStoreFile("userprefs_${PublicKey.fromHex(nodeId).hash160().byteVector().toHex()}.preferences_pb")
-    private fun internalPrefsFile(context: Context, nodeId: String): File = context.dataStoreFile("internalprefs_${PublicKey.fromHex(nodeId).hash160().byteVector().toHex()}.preferences_pb")
+    private fun userPrefsFile(context: Context, id: WalletId): File = context.dataStoreFile("userprefs_${id.nodeIdHash}.preferences_pb")
+    private fun internalPrefsFile(context: Context, id: WalletId): File = context.dataStoreFile("internalprefs_${id.nodeIdHash}.preferences_pb")
 }

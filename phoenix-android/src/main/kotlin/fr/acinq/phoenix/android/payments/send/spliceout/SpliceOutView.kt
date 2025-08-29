@@ -45,6 +45,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -70,7 +71,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SendSpliceOutView(
-    nodeId: String,
+    walletId: WalletId,
     requestedAmount: Satoshi?,
     address: String,
     onBackClick: () -> Unit,
@@ -91,7 +92,7 @@ fun SendSpliceOutView(
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
-        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = requestedAmount?.toMilliSatoshi(),

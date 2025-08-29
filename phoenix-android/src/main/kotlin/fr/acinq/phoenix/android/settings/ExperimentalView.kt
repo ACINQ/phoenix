@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -104,13 +105,13 @@ class ExperimentalViewModel(val peerManager: PeerManager, private val internalPr
     }
 
     class Factory(
-        private val nodeId: String,
+        private val walletId: WalletId,
         private val peerManager: PeerManager,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-            val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId)
+            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
             @Suppress("UNCHECKED_CAST")
             return ExperimentalViewModel(peerManager, internalPrefs) as T
         }
@@ -119,10 +120,10 @@ class ExperimentalViewModel(val peerManager: PeerManager, private val internalPr
 
 @Composable
 fun ExperimentalView(
-    nodeId: String,
+    walletId: WalletId,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(nodeId, business.peerManager))
+    val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(walletId, business.peerManager))
 
     DefaultScreenLayout {
         DefaultScreenHeader(

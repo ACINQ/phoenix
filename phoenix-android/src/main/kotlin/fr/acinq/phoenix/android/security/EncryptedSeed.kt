@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.security
 
 import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.utils.extensions.tryWith
 import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.secp256k1.Hex
@@ -56,17 +57,17 @@ sealed class EncryptedSeed {
         class MultipleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
             private fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
 
-            fun decryptAndGetSeedMap(): Map<String, ByteArray> {
+            fun decryptAndGetSeedMap(): Map<WalletId, ByteArray> {
                 val payload = decrypt().decodeToString()
                 val json = Json.decodeFromString<Map<String, ByteArray>>(payload)
-                return json
+                return json.map { WalletId(it.key) to it.value}.toMap()
             }
 
             companion object {
-                fun encrypt(seedMap: Map<String, List<String>>): MultipleSeed = tryWith(GeneralSecurityException()) {
+                fun encrypt(seedMap: Map<WalletId, List<String>>): MultipleSeed = tryWith(GeneralSecurityException()) {
                     val json = Json.encodeToString(
-                        seedMap.map { (nodeId, words) ->
-                            nodeId to fromMnemonics(words)
+                        seedMap.map { (id, words) ->
+                            id.nodeIdHash to fromMnemonics(words)
                         }.toMap()
                     )
                     val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)

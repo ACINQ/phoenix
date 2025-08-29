@@ -33,6 +33,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
@@ -157,7 +158,7 @@ class ReceiveViewModel(
 
     class Factory(
         private val chain: Chain,
-        private val nodeId: String,
+        private val walletId: WalletId,
         private val peerManager: PeerManager,
         private val nodeParamsManager: NodeParamsManager,
         private val walletManager: WalletManager,
@@ -165,8 +166,8 @@ class ReceiveViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-            val userPrefs = DataStoreManager.loadUserPrefsForNodeId(application.applicationContext, nodeId)
-            val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId)
+            val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId)
+            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
             @Suppress("UNCHECKED_CAST")
             return ReceiveViewModel(chain, peerManager, nodeParamsManager, walletManager, internalPrefs, userPrefs) as T
         }

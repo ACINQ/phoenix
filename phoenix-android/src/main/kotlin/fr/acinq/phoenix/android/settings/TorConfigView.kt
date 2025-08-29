@@ -44,6 +44,7 @@ import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -61,7 +62,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TorConfigView(
-    nodeId: String,
+    walletId: WalletId,
     onBackClick: () -> Unit,
     onBusinessTeardown: () -> Unit,
 ) {
@@ -147,7 +148,7 @@ fun TorConfigView(
                             log.info("shutting down app")
                             scope.launch {
                                 isTearingDownBusiness = true
-                                BusinessManager.stopBusiness(nodeId = nodeId)
+                                BusinessManager.stopBusiness(walletId = walletId)
                                 userPrefs.saveIsTorEnabled(!isTorEnabled)
                                 delay(500)
                                 showConfirmTorDialog = false

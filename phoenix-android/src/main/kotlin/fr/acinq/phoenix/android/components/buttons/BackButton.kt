@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.wallet.CompactWalletViewWithBalance
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -62,7 +63,7 @@ fun BackButton(onClick: () -> Unit, backgroundColor: Color = Color.Transparent) 
 @Composable
 fun BackButtonWithActiveWallet(
     onBackClick: () -> Unit,
-    nodeId: String,
+    walletId: WalletId,
 ) {
     Row(
         modifier = Modifier
@@ -73,7 +74,7 @@ fun BackButtonWithActiveWallet(
         BackButton(onClick = onBackClick)
         Spacer(Modifier.weight(1f))
         CompactWalletViewWithBalance(
-            nodeId = nodeId,
+            walletId = walletId,
             showBalance = true,
             showInbound = false,
         )

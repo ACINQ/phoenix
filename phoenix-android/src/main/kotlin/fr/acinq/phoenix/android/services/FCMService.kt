@@ -31,11 +31,15 @@ class FCMService : FirebaseMessagingService() {
         )
 
         val reason = remoteMessage.data["reason"]
+        val nodeIdHash = remoteMessage.data["node_id_hash"]
         val encryptedSeed = SeedManager.loadEncryptedSeedFromDisk(applicationContext)
 
         when {
-            encryptedSeed !is EncryptedSeed.V2.SingleSeed -> {
-                log.warn("ignored fcm message with unhandled seed=${encryptedSeed?.name()}")
+            encryptedSeed == null -> {
+                log.info("no seed yet, ignoring fcm message")
+            }
+            nodeIdHash.isNullOrEmpty() -> {
+                log.warn("no node_id_hash provided, ignoring fcm message")
             }
             remoteMessage.priority != RemoteMessage.PRIORITY_HIGH -> {
                 // cannot start foreground service from low/normal priority message
@@ -48,14 +52,17 @@ class FCMService : FirebaseMessagingService() {
             }
             else -> {
                 log.debug("starting phoenix foreground service with reason=$reason")
-                startPhoenixForegroundService(reason)
+                startPhoenixForegroundService(reason, nodeIdHash)
             }
         }
     }
 
-    private fun startPhoenixForegroundService(reason: String?) {
+    private fun startPhoenixForegroundService(reason: String?, nodeIdHash: String) {
         ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, PaymentsForegroundService::class.java)
-            .apply { reason?.let { putExtra(PaymentsForegroundService.EXTRA_REASON, it) } })
+            .apply {
+                reason?.let { putExtra(PaymentsForegroundService.EXTRA_REASON, it) }
+                putExtra(PaymentsForegroundService.EXTRA_NODE_ID_HASH, nodeIdHash)
+            })
     }
 
     override fun onNewToken(token: String) {

@@ -25,8 +25,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.BusinessManager.businessFlow
 import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
@@ -41,13 +42,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration
 
@@ -65,15 +66,32 @@ sealed class ListWalletState {
     }
 }
 
+sealed class BaseWalletId
+data object EmptyWalletId: BaseWalletId()
+/** Wraps a nodeIdHash (hash160 of a nodeId). Easier to maintain and upgrade than a plain String. */
+@Serializable
+data class WalletId(val nodeIdHash: String): BaseWalletId() {
+    constructor(nodeId: PublicKey) : this(
+        nodeIdHash = nodeId.hash160().byteVector().toHex()
+    )
+    override fun toString() = nodeIdHash
+    override fun hashCode() = nodeIdHash.hashCode()
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is WalletId) return false
+        return nodeIdHash == other.nodeIdHash
+    }
+}
+
 data class UserWallet(
-    val nodeId: String,
+    val walletId: WalletId,
     val words: List<String>,
 ) {
-    override fun toString(): String = "UserWallet[ node_id=$nodeId, words=*** ]"
+    override fun toString(): String = "UserWallet[ wallet_id=$walletId, words=*** ]"
 }
 
 data class ActiveWallet(
-    val nodeId: String,
+    val id: WalletId,
     val business: PhoenixBusiness?,
     val userPrefs: UserPrefs,
     val internalPrefs: InternalPrefs,
@@ -90,11 +108,11 @@ class AppViewModel(
 
     val listWalletState = mutableStateOf<ListWalletState>(ListWalletState.Init)
 
-    private val _availableWallets = MutableStateFlow<Map<String, UserWallet>>(emptyMap())
+    private val _availableWallets = MutableStateFlow<Map<WalletId, UserWallet>>(emptyMap())
     val availableWallets = _availableWallets.asStateFlow()
 
-    private val _desiredNodeId = MutableStateFlow<String?>(null)
-    val desiredNodeId = _desiredNodeId.asStateFlow()
+    private val _desiredWalletId = MutableStateFlow<WalletId?>(null)
+    val desiredWalletId = _desiredWalletId.asStateFlow()
     val startDefaultImmediately = MutableStateFlow(true)
 
     private val _activeWalletInUI = MutableStateFlow<ActiveWallet?>(null)
@@ -128,10 +146,10 @@ class AppViewModel(
         listAvailableWallets()
     }
 
-    fun setActiveWallet(nodeId: String, business: PhoenixBusiness) {
-        val userPrefs = DataStoreManager.loadUserPrefsForNodeId(application.applicationContext, nodeId = nodeId)
-        val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId = nodeId)
-        _activeWalletInUI.value = ActiveWallet(nodeId = nodeId, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
+    fun setActiveWallet(id: WalletId, business: PhoenixBusiness) {
+        val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId = id)
+        val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId = id)
+        _activeWalletInUI.value = ActiveWallet(id = id, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
         scheduleAutoLock()
     }
 
@@ -165,11 +183,11 @@ class AppViewModel(
 
                 is DecryptSeedResult.Success -> {
                     val metadataMap = application.globalPrefs.getAvailableWalletsMeta.first()
-                    _availableWallets.value = result.mnemonicsMap.map { (nodeId, words) ->
-                        if (metadataMap[nodeId] == null) {
-                            application.globalPrefs.saveAvailableWalletMeta(nodeId, name = null, avatar = WalletAvatars.list.random())
+                    _availableWallets.value = result.mnemonicsMap.map { (walletId, words) ->
+                        if (metadataMap[walletId] == null) {
+                            application.globalPrefs.saveAvailableWalletMeta(walletId, name = null, avatar = WalletAvatars.list.random())
                         }
-                        nodeId to UserWallet(nodeId = nodeId, words = words)
+                        walletId to UserWallet(walletId = walletId, words = words)
                     }.toMap()
                     listWalletState.value = ListWalletState.Success
                 }
@@ -192,14 +210,14 @@ class AppViewModel(
         }
     }
 
-    /** Will switch the active wallet to the given nodeId. */
-    fun switchToWallet(nodeId: String) {
-        _desiredNodeId.value = nodeId
+    /** Will signal the startup screen that the user wishes to use the given [walletId]. */
+    fun switchToWallet(walletId: WalletId) {
+        _desiredWalletId.value = walletId
     }
 
     /** Calling this method will clear the active wallet and redirect the UI to the startup screen with the wallets list prompt. */
     fun resetActiveWallet() {
-        _desiredNodeId.value = null
+        _desiredWalletId.value = null
         _activeWalletInUI.value = null
     }
 

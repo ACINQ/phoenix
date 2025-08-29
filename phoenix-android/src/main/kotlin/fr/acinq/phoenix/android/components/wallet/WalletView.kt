@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.PhoenixIcon
@@ -52,16 +53,16 @@ import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.dialogs.PopupBasicDialog
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
-import fr.acinq.phoenix.android.utils.datastore.getByNodeIdOrDefault
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.android.utils.monoTypo
 
 @Composable
 fun WalletView(
-    nodeId: String,
+    walletId: WalletId,
     modifier: Modifier = Modifier,
 ) {
     val metadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
-    val metadata = metadataMap.getByNodeIdOrDefault(nodeId)
+    val metadata = metadataMap.getByWalletIdOrDefault(walletId)
 
     Row(modifier = modifier.padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         WalletAvatar(metadata.avatar)
@@ -69,14 +70,14 @@ fun WalletView(
         Column {
             Text(text = metadata.nameOrDefault(), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
             Spacer(Modifier.height(2.dp))
-            Text(text = nodeId, modifier = Modifier.widthIn(max = 250.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
+            Text(text = walletId.nodeIdHash, modifier = Modifier.widthIn(max = 250.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
         }
     }
 }
 
 @Composable
 fun ClickableWalletView(
-    nodeId: String,
+    walletId: WalletId,
     onClick: () -> Unit,
 ) {
     Clickable(
@@ -84,18 +85,18 @@ fun ClickableWalletView(
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        WalletView(nodeId)
+        WalletView(walletId)
     }
 }
 
 @Composable
 fun CompactWalletViewWithBalance(
-    nodeId: String,
+    walletId: WalletId,
     showBalance: Boolean,
     showInbound: Boolean,
 ) {
     val metadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
-    val metadata = metadataMap.getByNodeIdOrDefault(nodeId)
+    val metadata = metadataMap.getByWalletIdOrDefault(walletId)
 
     var showDetailsDialog by remember { mutableStateOf(false) }
 

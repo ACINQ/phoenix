@@ -30,13 +30,13 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,7 +67,6 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
         log.info("starting $name")
 
@@ -99,9 +98,9 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
         }
     }
 
-    private suspend fun watchNodeId(nodeId: String, words: List<String>): Boolean {
+    private suspend fun watchNodeId(walletId: WalletId, words: List<String>): Boolean {
         try {
-            val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(applicationContext, nodeId = nodeId)
+            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId = walletId)
             val inFlightPaymentsCount = internalPrefs.getInFlightPaymentsCount.first()
 
             if (inFlightPaymentsCount == 0) {
@@ -111,13 +110,13 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
             val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
             if (res is StartBusinessResult.Failure) {
-                log.info("failed to start business for node_id=$nodeId")
+                log.info("failed to start business for wallet=$walletId")
                 return false
             }
 
-            val business = BusinessManager.businessFlow.value[nodeId]
+            val business = BusinessManager.businessFlow.value[walletId]
             if (business == null) {
-                log.info("failed to access business for node_id=$nodeId")
+                log.info("failed to access business for wallet=$walletId")
                 return false
             }
 
@@ -126,7 +125,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
                 val jobTimer = launch {
                     delay(2.minutes)
-                    log.info("stopping $name-$nodeId after 2 minutes without resolution - show notification")
+                    log.info("stopping $name-$walletId after 2 minutes without resolution - show notification")
                     scheduleOnce(applicationContext)
                     SystemNotificationHelper.notifyInFlightHtlc(applicationContext)
                     stopJobs.value = true
@@ -135,7 +134,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                 val watcher = launch {
                     business.appConnectionsDaemon?.forceReconnect()
                     business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
-                    log.debug("watching in-flight payments for node_id=$nodeId")
+                    log.debug("watching in-flight payments for wallet={}", walletId)
 
                     business.peerManager.channelsFlow.filterNotNull().collectIndexed { index, channels ->
                         val paymentsCount = channels.inFlightPaymentsCount()
@@ -172,7 +171,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
             return true
         } catch (e: Exception) {
-            log.error("error in $name-$nodeId: ", e)
+            log.error("error in $name-$walletId: ", e)
             return false
         }
     }

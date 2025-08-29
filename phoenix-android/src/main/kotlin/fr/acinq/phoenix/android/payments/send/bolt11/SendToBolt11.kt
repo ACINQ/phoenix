@@ -36,6 +36,7 @@ import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -51,7 +52,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SendToBolt11View(
-    nodeId: String,
+    walletId: WalletId,
     invoice: Bolt11Invoice,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -85,7 +86,7 @@ fun SendToBolt11View(
     val isOverpaymentEnabled = LocalUserPrefs.current?.getIsOverpaymentEnabled?.collectAsState(initial = false)?.value ?: false
 
     SplashLayout(
-        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             var inputForcedAmount by remember { mutableStateOf(requestedAmount) }
             AmountHeroInput(

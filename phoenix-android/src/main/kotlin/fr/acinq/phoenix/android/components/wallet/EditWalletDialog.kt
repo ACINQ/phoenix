@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.buttons.SwitchView
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -50,7 +51,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EditWalletDialog(
-    nodeId: String,
+    walletId: WalletId,
     metadata: UserWalletMetadata,
     onDismiss: () -> Unit,
 ) {
@@ -65,8 +66,8 @@ fun EditWalletDialog(
 
         var nameInput by remember { mutableStateOf(metadata.name ?: "") }
         var avatarInput by remember { mutableStateOf(metadata.avatar) }
-        val defaultWalletPref by globalPrefs.getDefaultNodeId.collectAsState(null)
-        val isDefaultWalletInPref = remember(defaultWalletPref) { defaultWalletPref == nodeId }
+        val defaultWalletPref by globalPrefs.getDefaultWallet.collectAsState(null)
+        val isDefaultWalletInPref = remember(defaultWalletPref) { defaultWalletPref == walletId }
         var isDefaultWalletInput by remember(isDefaultWalletInPref) { mutableStateOf(isDefaultWalletInPref) }
 
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
@@ -109,11 +110,11 @@ fun EditWalletDialog(
                 enabled = nameInput != (metadata.name ?: "") || avatarInput != metadata.avatar || isDefaultWalletInput != isDefaultWalletInPref,
                 onClick = {
                     scope.launch {
-                        globalPrefs.saveAvailableWalletMeta(nodeId = nodeId, name = nameInput.takeIf { it.isNotBlank() }, avatar = avatarInput)
+                        globalPrefs.saveAvailableWalletMeta(walletId = walletId, name = nameInput.takeIf { it.isNotBlank() }, avatar = avatarInput)
                         when {
                             // we only update the default preferences when relevant: goes from default to not ; or goes from not default to default wallet.
-                            defaultWalletPref == nodeId && !isDefaultWalletInput -> globalPrefs.clearDefaultNodeId()
-                            isDefaultWalletInput -> globalPrefs.saveDefaultNodeId(nodeId)
+                            defaultWalletPref == walletId && !isDefaultWalletInput -> globalPrefs.clearDefaultWallet()
+                            isDefaultWalletInput -> globalPrefs.saveDefaultWallet(walletId)
                         }
                         onDismiss()
                     }

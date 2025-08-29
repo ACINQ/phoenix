@@ -78,7 +78,7 @@ fun AppRoot(
     log.debug("entering app root")
 
     val activeWallet by appViewModel.activeWalletInUI.collectAsState(null)
-    val activeNodeId = activeWallet?.nodeId
+    val activeWalletId = activeWallet?.id
     val business = activeWallet?.business
     val activeUserPrefs = activeWallet?.userPrefs
     val activeInternalPrefs = activeWallet?.internalPrefs
@@ -111,7 +111,7 @@ fun AppRoot(
                     startDestination = "${Screen.Startup.route}?next={next}",
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None },
-                    route = "main-$activeNodeId" // works like an id, can be used to scope view models with `navController.getBackStackEntry("main")`
+                    route = "main-$activeWalletId" // works like an id, can be used to scope view models with `navController.getBackStackEntry("main")`
                 ) {
                     baseNavGraph(navController, appViewModel)
                     baseSettingsNavGraph(navController, appViewModel, business)

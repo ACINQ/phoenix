@@ -55,6 +55,7 @@ import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
@@ -93,7 +94,7 @@ object LiquidityLimits {
 
 @Composable
 fun RequestLiquidityView(
-    nodeId: String,
+    walletId: WalletId,
     onBackClick: () -> Unit,
 ) {
     val balance by business.balanceManager.balance.collectAsState(null)
@@ -101,7 +102,7 @@ fun RequestLiquidityView(
     val currentInbound = channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()
 
     SplashLayout(
-        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, nodeId = nodeId) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = { RequestLiquidityTopSection(currentInbound) },
         bottomContent = {
             if (channelsState.isNullOrEmpty()) {

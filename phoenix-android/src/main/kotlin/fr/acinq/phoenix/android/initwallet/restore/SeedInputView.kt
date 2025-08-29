@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.PhoenixIcon
@@ -69,7 +70,7 @@ import fr.acinq.phoenix.android.utils.negativeColor
 fun SeedInputView(
     state: RestoreWalletState.SeedInput,
     vm: RestoreWalletViewModel,
-    onRestoreDone: (String) -> Unit,
+    onRestoreDone: (WalletId) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     var filteredWords by remember { mutableStateOf(emptyList<String>()) }

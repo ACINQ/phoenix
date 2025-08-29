@@ -30,6 +30,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
@@ -61,7 +62,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
         }
 
         val watchResult = seedMap.map { (nodeId, words) ->
-            watchNodeId(nodeId, words)
+            watchWallet(nodeId, words)
         }
 
         if (BusinessManager.isHeadless.first()) {
@@ -78,19 +79,19 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
     }
 
     /** Watches channels for a given node id ; return false if an error occurred. */
-    private suspend fun watchNodeId(nodeId: String, words: List<String>): Boolean {
+    private suspend fun watchWallet(walletId: WalletId, words: List<String>): Boolean {
 
         val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
-        val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(applicationContext, nodeId)
+        val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId)
         if (res is StartBusinessResult.Failure) {
-            log.info("failed to start business for node_id=$nodeId")
+            log.info("failed to start business for wallet=$walletId")
             internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return true
         }
 
-        val business = BusinessManager.businessFlow.value[nodeId]
+        val business = BusinessManager.businessFlow.value[walletId]
         if (business == null) {
-            log.info("failed to access business for node_id=$nodeId")
+            log.info("failed to access business for wallet=$walletId")
             internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return true
         }

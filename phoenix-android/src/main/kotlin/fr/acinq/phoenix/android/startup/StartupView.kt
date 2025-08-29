@@ -64,6 +64,7 @@ import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.ListWalletState
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
@@ -78,7 +79,7 @@ import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
-import fr.acinq.phoenix.android.utils.datastore.getByNodeIdOrDefault
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.android.utils.shareFile
 import kotlinx.coroutines.flow.first
@@ -112,7 +113,7 @@ fun StartupView(
             }
             is ListWalletState.Success -> {
                 val availableWallets by appViewModel.availableWallets.collectAsState()
-                val defaultNodeId = globalPrefs.getDefaultNodeId.collectAsState(null)
+                val defaultWallet = globalPrefs.getDefaultWallet.collectAsState(null)
                 // the default wallet should be immediately started only *once* ; to keep track of that, we use a state in the app VM
                 var startDefaultImmediately by remember { mutableStateOf(appViewModel.startDefaultImmediately.value) }
                 LaunchedEffect(Unit) {
@@ -125,7 +126,7 @@ fun StartupView(
                 val availableWalletMetadata = availableWalletMetadataPrefs.value
 
                 // we may already have a desired node id and thus may not need user input to know which wallet to load
-                val desiredNodeIdFlow = appViewModel.desiredNodeId.collectAsState()
+                val desiredNodeIdFlow = appViewModel.desiredWalletId.collectAsState()
                 val desiredNodeId = desiredNodeIdFlow.value
 
                 val activeWalletFlow = appViewModel.activeWalletInUI.collectAsState()
@@ -136,11 +137,11 @@ fun StartupView(
                         LaunchedEffect(Unit) { onSeedNotFound() }
                         WalletStartupView(text = stringResource(R.string.startup_init), metadata = null)
                     }
-                    availableWalletMetadata == null || defaultNodeId.value == null -> {
+                    availableWalletMetadata == null || defaultWallet.value == null -> {
                         WalletStartupView(text = stringResource(R.string.startup_preparing), metadata = null)
                     }
                     activeWallet != null -> {
-                        WalletStartupView(text = stringResource(R.string.startup_started), metadata = availableWalletMetadata[activeWallet.nodeId])
+                        WalletStartupView(text = stringResource(R.string.startup_started), metadata = availableWalletMetadata[activeWallet.id])
                         LaunchedEffect(Unit) {
                             onWalletReady()
                         }
@@ -153,7 +154,7 @@ fun StartupView(
                                         when {
                                             availableWallets.size == 1 -> availableWallets.entries.firstOrNull()?.value
                                             desiredNodeId != null -> availableWallets[desiredNodeId]
-                                            startDefaultImmediately -> availableWallets[defaultNodeId.value]
+                                            startDefaultImmediately -> availableWallets[defaultWallet.value]
                                             else -> null
                                         }
                                     )
@@ -164,7 +165,7 @@ fun StartupView(
                                         WalletsSelector(
                                             wallets = availableWallets,
                                             walletsMetadata = availableWalletMetadata,
-                                            activeNodeId = null,
+                                            activeWalletId = null,
                                             onWalletClick = { loadingWallet = it },
                                             canEdit = false,
                                             modifier = Modifier.padding(horizontal = 24.dp),
@@ -179,14 +180,14 @@ fun StartupView(
                                         )
                                     }
                                     else -> {
-                                        val metadata = remember { availableWalletMetadata.getByNodeIdOrDefault(wallet.nodeId) }
+                                        val metadata = remember { availableWalletMetadata.getByWalletIdOrDefault(wallet.walletId) }
                                         LoadWallet(
                                             userWallet = wallet,
                                             metadata = metadata,
                                             promptScreenLockImmediately = startDefaultImmediately,
                                             doLoadWallet = { userWallet ->
-                                                startupViewModel.startupNode(nodeId = userWallet.nodeId, words = userWallet.words, onStartupSuccess = {
-                                                    appViewModel.setActiveWallet(nodeId = userWallet.nodeId, business = it)
+                                                startupViewModel.startupNode(walletId = userWallet.walletId, words = userWallet.words, onStartupSuccess = {
+                                                    appViewModel.setActiveWallet(id = userWallet.walletId, business = it)
                                                     onWalletReady()
                                                 })
                                                 loadingWallet = null
@@ -200,10 +201,10 @@ fun StartupView(
                                 }
                             }
                             is StartupViewState.StartingBusiness -> {
-                                WalletStartupView(text = stringResource(R.string.startup_starting), metadata = availableWalletMetadata[startupState.nodeId])
+                                WalletStartupView(text = stringResource(R.string.startup_starting), metadata = availableWalletMetadata[startupState.walletId])
                             }
                             is StartupViewState.BusinessActive -> {
-                                WalletStartupView(text = stringResource(R.string.startup_started), metadata = availableWalletMetadata[startupState.nodeId])
+                                WalletStartupView(text = stringResource(R.string.startup_started), metadata = availableWalletMetadata[startupState.walletId])
                             }
                             is StartupViewState.Error -> {
                                 StartBusinessError(error = startupState, onTryAgainClick = {
@@ -339,7 +340,7 @@ private fun BoxScope.LoadWallet(
     val context = LocalContext.current
 
     val isScreenLockRequired = produceState<Boolean?>(initialValue = null, key1 = userWallet) {
-        val userPrefs = DataStoreManager.loadUserPrefsForNodeId(context, userWallet.nodeId)
+        val userPrefs = DataStoreManager.loadUserPrefsForWallet(context, userWallet.walletId)
         val biometricLockEnabled = userPrefs.getIsScreenLockBiometricsEnabled.first()
         val customPinLockEnabled = userPrefs.getIsScreenLockPinEnabled.first()
 
@@ -353,7 +354,7 @@ private fun BoxScope.LoadWallet(
         true -> {
             WalletStartupView(text = stringResource(id = R.string.lockprompt_title), metadata = metadata)
             ScreenLockPrompt(
-                nodeId = userWallet.nodeId,
+                walletId = userWallet.walletId,
                 walletName = metadata.nameOrDefault(),
                 promptScreenLockImmediately = promptScreenLockImmediately,
                 onUnlock = { doLoadWallet(userWallet) },
@@ -372,7 +373,7 @@ private fun BoxScope.LoadWallet(
 
 @Composable
 private fun BoxScope.ScreenLockPrompt(
-    nodeId: String,
+    walletId: WalletId,
     walletName: String,
     promptScreenLockImmediately: Boolean,
     onLock: () -> Unit,
@@ -382,7 +383,7 @@ private fun BoxScope.ScreenLockPrompt(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val userPrefs = DataStoreManager.loadUserPrefsForNodeId(context, nodeId)
+    val userPrefs = DataStoreManager.loadUserPrefsForWallet(context, walletId)
 
     val isBiometricLockEnabledState = userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(initial = null)
     val isBiometricLockEnabled = isBiometricLockEnabledState.value

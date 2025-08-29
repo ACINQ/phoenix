@@ -48,19 +48,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
-import fr.acinq.phoenix.android.utils.datastore.getByNodeIdOrDefault
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.android.utils.positiveColor
 
 @Composable
 fun WalletsSelector(
     modifier: Modifier = Modifier,
-    wallets: Map<String, UserWallet>,
-    walletsMetadata: Map<String, UserWalletMetadata>,
-    activeNodeId: String?,
+    wallets: Map<WalletId, UserWallet>,
+    walletsMetadata: Map<WalletId, UserWalletMetadata>,
+    activeWalletId: WalletId?,
     canEdit: Boolean,
     onWalletClick: (UserWallet) -> Unit,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -69,8 +70,8 @@ fun WalletsSelector(
     bottomContent: @Composable (() -> Unit)? = null,
 ) {
 
-    val currentWallet = remember(wallets) { wallets.entries.firstOrNull { it.key == activeNodeId }?.value }
-    val otherWalletsList = remember(wallets) { wallets.entries.filterNot { it.key == activeNodeId }.toList() }
+    val currentWallet = remember(wallets) { wallets.entries.firstOrNull { it.key == activeWalletId }?.value }
+    val otherWalletsList = remember(wallets) { wallets.entries.filterNot { it.key == activeWalletId }.toList() }
 
     LazyColumn(modifier = modifier, verticalArrangement = verticalArrangement, horizontalAlignment = horizontalAlignment) {
         topContent?.let {
@@ -79,8 +80,8 @@ fun WalletsSelector(
         if (currentWallet != null) {
             item {
                 AvailableWalletView(
-                    nodeId = currentWallet.nodeId,
-                    metadata = walletsMetadata.getByNodeIdOrDefault(currentWallet.nodeId),
+                    walletId = currentWallet.walletId,
+                    metadata = walletsMetadata.getByWalletIdOrDefault(currentWallet.walletId),
                     isCurrent = true,
                     canEdit = canEdit,
                     onClick = { onWalletClick(currentWallet) }
@@ -90,10 +91,10 @@ fun WalletsSelector(
                 Spacer(Modifier.height(8.dp))
             }
         }
-        items(items = otherWalletsList) { (nodeId, userWallet) ->
+        items(items = otherWalletsList) { (walletId, userWallet) ->
             AvailableWalletView(
-                nodeId = nodeId,
-                metadata = walletsMetadata.getByNodeIdOrDefault(nodeId),
+                walletId = walletId,
+                metadata = walletsMetadata.getByWalletIdOrDefault(walletId),
                 isCurrent = false,
                 canEdit = canEdit,
                 onClick = { onWalletClick(userWallet) }
@@ -109,17 +110,17 @@ fun WalletsSelector(
 @Composable
 private fun AvailableWalletView(
     modifier: Modifier = Modifier,
-    nodeId: String,
+    walletId: WalletId,
     metadata: UserWalletMetadata,
     isCurrent: Boolean,
     canEdit: Boolean,
-    onClick: (String) -> Unit,
+    onClick: (WalletId) -> Unit,
 ) {
     var showWalletEditDialog by remember { mutableStateOf(false) }
     if (showWalletEditDialog) {
         EditWalletDialog(
             onDismiss = { showWalletEditDialog = false },
-            nodeId = nodeId,
+            walletId = walletId,
             metadata = metadata,
         )
     }
@@ -130,7 +131,7 @@ private fun AvailableWalletView(
             if (isCurrent) {
                 if (canEdit) showWalletEditDialog = true else return@Clickable
             } else {
-                onClick(nodeId)
+                onClick(walletId)
             }
         },
         shape = RoundedCornerShape(16.dp),
@@ -151,7 +152,8 @@ private fun AvailableWalletView(
                         }
                     }
                     Spacer(Modifier.height(2.dp))
-                    Text(text = nodeId, modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp))
+                    // TODO: get the actual node id
+                    Text(text = walletId.nodeIdHash, modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp))
                 }
             }
             if (isCurrent && canEdit) {

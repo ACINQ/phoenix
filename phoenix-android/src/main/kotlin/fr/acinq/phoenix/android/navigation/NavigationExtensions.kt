@@ -30,6 +30,7 @@ import androidx.navigation.compose.composable
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.logger
 import io.ktor.http.encodeURLParameter
@@ -57,14 +58,14 @@ fun NavGraphBuilder.businessComposable(
     deepLinkPrefix: String = "",
     arguments: List<NamedNavArgument> = emptyList(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry, String, PhoenixBusiness) -> Unit
+    content: @Composable AnimatedContentScope.(NavBackStackEntry, WalletId, PhoenixBusiness) -> Unit
 ) {
     composable(route = route, arguments = arguments, deepLinks = deepLinks) { entry ->
         val log = logger("Navigation")
         val activeWallet by appViewModel.activeWalletInUI.collectAsState()
-        val nodeId = activeWallet?.nodeId
+        val walletId = activeWallet?.id
         val business = activeWallet?.business
-        if (nodeId == null || business == null) {
+        if (walletId == null || business == null) {
 
             // in case it's a deeplink we need to look into the intent and apply some optional prefix
             // for example, when deep-linking to the send view, the link is "scanview:lnbc1....."
@@ -84,7 +85,7 @@ fun NavGraphBuilder.businessComposable(
                 popUpTo(navController.graph.id) { inclusive = true }
             }
         } else {
-            content(entry, nodeId, business)
+            content(entry, walletId, business)
         }
     }
 }

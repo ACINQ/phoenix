@@ -24,6 +24,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.services.ContactsPhotoCleaner
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -35,12 +36,12 @@ import org.slf4j.LoggerFactory
 
 sealed class StartupViewState {
     data object Init : StartupViewState()
-    data class StartingBusiness(val nodeId: String) : StartupViewState()
-    data class BusinessActive(val nodeId: String): StartupViewState()
+    data class StartingBusiness(val walletId: WalletId) : StartupViewState()
+    data class BusinessActive(val walletId: WalletId): StartupViewState()
 
     sealed class Error: StartupViewState() {
-        abstract val nodeId: String
-        data class Generic(override val nodeId: String, val cause: Throwable?): Error()
+        abstract val walletId: WalletId
+        data class Generic(override val walletId: WalletId, val cause: Throwable?): Error()
     }
 }
 
@@ -51,16 +52,16 @@ class StartupViewModel(
 
     val state = mutableStateOf<StartupViewState>(StartupViewState.Init)
 
-    fun startupNode(nodeId: String, words: List<String>, onStartupSuccess: (PhoenixBusiness) -> Unit) {
+    fun startupNode(walletId: WalletId, words: List<String>, onStartupSuccess: (PhoenixBusiness) -> Unit) {
         if (state.value !is StartupViewState.Init) {
             return
         }
 
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when initialising startup-view: ", e)
-            state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = e)
+            state.value = StartupViewState.Error.Generic(walletId = walletId, cause = e)
         }) {
-            state.value = StartupViewState.StartingBusiness(nodeId)
+            state.value = StartupViewState.StartingBusiness(walletId)
             val startResult = withContext(Dispatchers.Default) {
                 BusinessManager.startNewBusiness(words, isHeadless = false)
             }
@@ -70,13 +71,13 @@ class StartupViewModel(
 
             when (startResult) {
                 is StartBusinessResult.Success -> {
-                    state.value = StartupViewState.BusinessActive(nodeId)
+                    state.value = StartupViewState.BusinessActive(walletId)
                     launch(Dispatchers.Main) {
                         onStartupSuccess(startResult.business)
                     }
                 }
-                is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = startResult.cause)
-                is StartBusinessResult.Failure.LoadWalletError -> state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = null)
+                is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(walletId = walletId, cause = startResult.cause)
+                is StartBusinessResult.Failure.LoadWalletError -> state.value = StartupViewState.Error.Generic(walletId = walletId, cause = null)
             }
         }
     }

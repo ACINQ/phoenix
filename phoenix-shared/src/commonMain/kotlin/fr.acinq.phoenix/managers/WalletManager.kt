@@ -61,18 +61,19 @@ class WalletManager(
     }
 
     /**
-     * Utility wrapper for keys needed by the iOS app.
-     * - nodeIdHash:
+     * Utility wrapper for keys used by the wallet.
+     *
+     * @param nodeIdHash Hex of the hash160 of [nodeId].
      *   We need to store data in the local filesystem that's associated with the
      *   specific nodeId, but we don't want to leak the nodeId.
      *   (i.e. We don't want to use the nodeId in cleartext anywhere).
      *   So we instead use the nodeIdHash as the identifier for local files.
      *
-     * - cloudKey:
+     * @param cloudKey
      *   We need a key to encypt/decrypt the blobs we store in the cloud.
      *   And we prefer this key to be seperate from other keys.
      *
-     * - cloudKeyHash:
+     * @param cloudKeyHash
      *   Similar to the nodeIdHash, we need to store data in the cloud that's associated
      *   with the specific nodeId, but we don't want to leak the nodeId.
      */

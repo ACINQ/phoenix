@@ -35,15 +35,15 @@ import fr.acinq.phoenix.android.payments.send.SendView
 import org.slf4j.LoggerFactory
 
 fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: AppViewModel) {
-    businessComposable(Screen.Home.route, appViewModel) { backStackEntry, nodeId, business ->
+    businessComposable(Screen.Home.route, appViewModel) { backStackEntry, walletId, business ->
 
-        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("main-$nodeId") }
+        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("main-$walletId") }
         val paymentsViewModel = viewModel<PaymentsViewModel>(viewModelStoreOwner = parentEntry, factory = PaymentsViewModel.Factory(business.paymentsManager))
 
         val noticesViewModel = viewModel<NoticesViewModel>(
             viewModelStoreOwner = parentEntry,
             factory = NoticesViewModel.Factory(
-                nodeId = nodeId,
+                walletId = walletId,
                 appConfigurationManager = business.appConfigurationManager,
                 peerManager = business.peerManager,
                 connectionsManager = business.connectionsManager,
@@ -72,9 +72,9 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: App
 fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel: AppViewModel) {
     val log = LoggerFactory.getLogger("Navigation")
 
-    businessComposable(Screen.Receive.route, appViewModel) { _, nodeId, _ ->
+    businessComposable(Screen.Receive.route, appViewModel) { _, walletId, _ ->
         ReceiveView(
-            nodeId = nodeId,
+            walletId = walletId,
             onBackClick = { navController.popBackStack() },
             onScanDataClick = { navController.navigate("${Screen.Send.route}?openScanner=true&forceNavOnBack=true") },
             onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) },
@@ -141,7 +141,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
             navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
             navDeepLink { uriPattern = "scanview:{data}" },
         )
-    ) { backStackEntry, nodeId, _ ->
+    ) { backStackEntry, walletId, _ ->
         @Suppress("DEPRECATION")
         val intent = try {
             backStackEntry.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
@@ -160,7 +160,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
 
         log.info("navigating to send-payment with input=$input")
         SendView(
-            nodeId = nodeId,
+            walletId = walletId,
             initialInput = input,
             fromDeepLink = !isIntentFromNavigation,
             immediatelyOpenScanner = backStackEntry.arguments?.getBoolean("openScanner") ?: false,

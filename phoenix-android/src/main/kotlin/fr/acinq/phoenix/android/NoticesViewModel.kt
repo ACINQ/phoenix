@@ -64,7 +64,7 @@ sealed class Notice() {
 
 class NoticesViewModel(
     val application: PhoenixApplication,
-    val nodeId: String,
+    val walletId: WalletId,
     val appConfigurationManager: AppConfigurationManager,
     val peerManager: PeerManager,
     private val connectionsManager: ConnectionsManager,
@@ -83,7 +83,7 @@ class NoticesViewModel(
     }
 
     init {
-        internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(application.applicationContext, nodeId)
+        internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }
@@ -198,7 +198,7 @@ class NoticesViewModel(
     }
 
     class Factory(
-        private val nodeId: String,
+        private val walletId: WalletId,
         private val appConfigurationManager: AppConfigurationManager,
         private val peerManager: PeerManager,
         private val connectionsManager: ConnectionsManager,
@@ -207,7 +207,7 @@ class NoticesViewModel(
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
             return NoticesViewModel(
-                application, nodeId, appConfigurationManager, peerManager, connectionsManager,
+                application, walletId, appConfigurationManager, peerManager, connectionsManager,
             ) as T
         }
     }

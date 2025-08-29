@@ -77,8 +77,8 @@ object BusinessManager {
     private lateinit var appContext: Context
     private val application by lazy { appContext as PhoenixApplication }
 
-    /** A map of active businesses */
-    private val _businessFlow = MutableStateFlow<Map<String, PhoenixBusiness>>(emptyMap())
+    /** A map of (walletId -> active businesses) */
+    private val _businessFlow = MutableStateFlow<Map<WalletId, PhoenixBusiness>>(emptyMap())
     val businessFlow = _businessFlow.asStateFlow()
 
     val receivedInTheBackground = mutableStateListOf<MilliSatoshi>()
@@ -86,7 +86,7 @@ object BusinessManager {
     val isHeadless = _isHeadless.asStateFlow()
 
     /** Mpa of jobs monitoring events/payments after business starts */
-    private val eventsMonitoringJobs = mutableMapOf<String, List<Job>>()
+    private val eventsMonitoringJobs = mutableMapOf<WalletId, List<Job>>()
 
     fun initialize(context: Context) {
         appContext = context.applicationContext
@@ -116,19 +116,20 @@ object BusinessManager {
             return StartBusinessResult.Failure.LoadWalletError
         }
 
+        val walletId = WalletId(walletInfo.nodeIdHash)
         val nodeId = walletInfo.nodeId.toHex()
         val globalPrefs = application.globalPrefs
-        val userPrefs = DataStoreManager.loadUserPrefsForNodeId(appContext, nodeId)
-        val internalPrefs = DataStoreManager.loadInternalPrefsForNodeId(appContext, nodeId)
+        val userPrefs = DataStoreManager.loadUserPrefsForWallet(appContext, walletId)
+        val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(appContext, walletId)
 
-        val businessInFlow = businessFlow.value[nodeId]
+        val businessInFlow = businessFlow.value[walletId]
         if (businessInFlow != null) {
             log.info("business already exists in flow, ignoring...")
             return StartBusinessResult.Success(walletInfo, businessInFlow)
         }
 
         return try {
-            log.info("preparing new business with node_id=$nodeId...")
+            log.info("preparing new business with node_id=$nodeId wallet_id=$walletId...")
 
             // check last used version to display a patch note
             val lastVersionUsed = globalPrefs.getLastUsedAppCode.first()
@@ -144,7 +145,7 @@ object BusinessManager {
             business.appConfigurationManager.updatePreferredFiatCurrencies(userPrefs.getFiatCurrencies.first())
 
             // setup jobs monitoring the business events
-            eventsMonitoringJobs[nodeId] = listOf(
+            eventsMonitoringJobs[walletId] = listOf(
                 scope.launch { monitorPaymentsWhenHeadless(business.nodeParamsManager, business.currencyManager, userPrefs) },
                 scope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager, internalPrefs) },
                 scope.launch { monitorFcmToken(business) },
@@ -157,7 +158,7 @@ object BusinessManager {
 
             // actually start the business
             log.info("starting new business with node_id=$nodeId...")
-            _businessFlow.value += nodeId to business
+            _businessFlow.value += walletId to business
             business.start(startupParams)
 
             // the node has been started, so we can now increment the last-used build code
@@ -172,31 +173,31 @@ object BusinessManager {
             StartBusinessResult.Success(walletInfo, business)
         } catch (e: Exception) {
             log.error("there was an error when initialising new business: ", e)
-            stopBusiness(nodeId)
+            stopBusiness(walletId)
             StartBusinessResult.Failure.Generic(e)
         }
     }
 
     fun stopAllBusinesses() {
         log.info("stopping all businesses...")
-        businessFlow.value.forEach { (nodeId, business) ->
+        businessFlow.value.forEach { (id, business) ->
             business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
             business.stop()
-            eventsMonitoringJobs.remove(nodeId)?.forEach { it.cancel() }
+            eventsMonitoringJobs.remove(id)?.forEach { it.cancel() }
         }
         _businessFlow.value = emptyMap()
     }
 
-    fun stopBusiness(nodeId: String) {
+    fun stopBusiness(walletId: WalletId) {
         val businessMap = _businessFlow.value.toMutableMap()
-        businessMap[nodeId]?.let { business ->
+        businessMap[walletId]?.let { business ->
             business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
             business.stop()
         }
-        businessMap.remove(nodeId)
+        businessMap.remove(walletId)
         _businessFlow.value = businessMap
 
-        eventsMonitoringJobs.remove(nodeId)?.forEach { it.cancel() }
+        eventsMonitoringJobs.remove(walletId)?.forEach { it.cancel() }
     }
 
     fun refreshFcmToken() {

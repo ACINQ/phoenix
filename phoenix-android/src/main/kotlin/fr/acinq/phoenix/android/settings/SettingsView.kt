@@ -46,6 +46,7 @@ import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.buttons.MenuButton
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -134,7 +135,7 @@ fun SettingsView(
         CardHeader(text = stringResource(id = R.string.settings_danger_title))
         Card {
             MenuButton(text = stringResource(R.string.settings_mutual_close), icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose.route) })
-            MenuButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_remove, onClick = { nc.navigate("${Screen.ResetWallet.route}?nodeId=$") })
+            MenuButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_remove, onClick = { nc.navigate(Screen.ResetWallet.route) })
             MenuButton(
                 text = stringResource(R.string.settings_force_close),
                 textStyle = MaterialTheme.typography.button.copy(color = negativeColor),
@@ -157,20 +158,20 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
 
     val activeWalletInUI by appViewModel.activeWalletInUI.collectAsState()
     val availableWallets by appViewModel.availableWallets.collectAsState()
-    val activeNodeId = activeWalletInUI?.nodeId ?: return
+    val activeWalletId = activeWalletInUI?.id ?: return
     var showAvailableWalletsDialog by remember { mutableStateOf(false) }
 
     ClickableWalletView(
-        nodeId = activeNodeId,
+        walletId = activeWalletId,
         onClick = { showAvailableWalletsDialog = true },
     )
 
     if (showAvailableWalletsDialog) {
         AvailableWalletsDialog(
             onDismiss = { showAvailableWalletsDialog = false },
-            activeNodeId = activeNodeId,
+            activeWalletId = activeWalletId,
             availableWallets = availableWallets,
-            onSwitchWallet = { appViewModel.resetActiveWallet() ; appViewModel.switchToWallet(it.nodeId) },
+            onSwitchWallet = { appViewModel.resetActiveWallet() ; appViewModel.switchToWallet(it.walletId) },
             onLockWallet = { appViewModel.resetActiveWallet() },
         )
     }
@@ -179,8 +180,8 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
 @Composable
 private fun AvailableWalletsDialog(
     onDismiss: () -> Unit,
-    activeNodeId: String,
-    availableWallets: Map<String, UserWallet>,
+    activeWalletId: WalletId,
+    availableWallets: Map<WalletId, UserWallet>,
     onSwitchWallet: (UserWallet) -> Unit,
     onLockWallet: () -> Unit,
 ) {
@@ -196,7 +197,7 @@ private fun AvailableWalletsDialog(
                 WalletsSelector(
                     wallets = availableWallets,
                     walletsMetadata = metadata,
-                    activeNodeId = activeNodeId,
+                    activeWalletId = activeWalletId,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     onWalletClick = onSwitchWallet,
                     canEdit = true,

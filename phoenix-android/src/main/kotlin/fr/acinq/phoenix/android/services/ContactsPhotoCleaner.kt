@@ -52,20 +52,20 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
                         return Result.success()
                     }
 
-                    seedMap.map { (nodeId, words) ->
+                    seedMap.map { (walletId, words) ->
                         val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
                         if (res is StartBusinessResult.Failure) {
-                            log.info("failed to start business for node_id=$nodeId")
+                            log.info("failed to start business for wallet=$walletId")
                             return Result.failure()
                         }
 
-                        val business = BusinessManager.businessFlow.value[nodeId]
+                        val business = BusinessManager.businessFlow.value[walletId]
                         if (business == null) {
-                            log.info("failed to access business for node_id=$nodeId")
+                            log.info("failed to access business for wallet=$walletId")
                             return Result.success()
                         }
 
-                        nodeId to business
+                        walletId to business
                     }.toMap()
                 }
 

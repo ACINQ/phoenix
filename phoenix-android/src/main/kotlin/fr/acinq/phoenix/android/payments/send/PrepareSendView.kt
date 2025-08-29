@@ -71,6 +71,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -113,7 +114,7 @@ import fr.acinq.phoenix.managers.SendManager
  */
 @Composable
 fun SendView(
-    nodeId: String,
+    walletId: WalletId,
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
     fromDeepLink: Boolean,
@@ -145,16 +146,16 @@ fun SendView(
             LocalViewModelStoreOwner.current?.viewModelStore?.clear()
             when (val data = parseState.data) {
                 is SendManager.ParseResult.Bolt11Invoice -> {
-                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, nodeId = nodeId)
+                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Bolt12Offer -> {
-                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, nodeId = nodeId)
+                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Uri -> {
-                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() }, nodeId = nodeId)
+                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Lnurl.Pay -> {
-                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, nodeId = nodeId)
+                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
                     LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })

@@ -26,7 +26,10 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.android.BaseWalletId
+import fr.acinq.phoenix.android.EmptyWalletId
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -53,7 +56,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
 
     private companion object {
         // tracks which wallet the app should try to load first, may be null
-        private val DEFAULT_NODE_ID = stringPreferencesKey("DEFAULT_NODE_ID")
+        private val DEFAULT_WALLET_ID = stringPreferencesKey("DEFAULT_WALLET_ID")
         private val AVAILABLE_WALLETS_META = stringPreferencesKey("AVAILABLE_WALLETS_META")
 
         // the FCM token is global for the application and is shared across node_ids
@@ -71,10 +74,10 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
      * always right, that is, we should ignore the data returned by that list if they don't match the SeedManager. This should only
      * happen if there's a syncing problem between the preferences and the seed file containing the map of seeds.
      */
-    val getAvailableWalletsMeta: Flow<Map<String, UserWalletMetadata>> = safeData.map {
+    val getAvailableWalletsMeta: Flow<Map<WalletId, UserWalletMetadata>> = safeData.map {
         it[AVAILABLE_WALLETS_META]?.let { json ->
             try {
-                Json.decodeFromString<Map<String, UserWalletMetadata>>(json)
+                Json.decodeFromString<Map<String, UserWalletMetadata>>(json).map { WalletId(it.key) to it.value }.toMap()
             } catch (e: Exception) {
                 log.error("could not deserialize available_wallets=$json: ", e)
                 null
@@ -82,15 +85,15 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         } ?: emptyMap()
     }
 
-    suspend fun saveAvailableWalletMeta(nodeId: String, name: String?, avatar: String) = data.edit {
-        val existingMap: Map<String, UserWalletMetadata> = getAvailableWalletsMeta.first()
-        val newMap = existingMap + (nodeId to UserWalletMetadata(nodeId = nodeId, name = name, avatar = avatar, createdAt = existingMap[nodeId]?.createdAt ?: currentTimestampMillis()))
-        it[AVAILABLE_WALLETS_META] = Json.encodeToString(newMap)
+    suspend fun saveAvailableWalletMeta(walletId: WalletId, name: String?, avatar: String) = data.edit {
+        val existingMap: Map<WalletId, UserWalletMetadata> = getAvailableWalletsMeta.first()
+        val newMap = existingMap + (walletId to UserWalletMetadata(walletId = walletId, name = name, avatar = avatar, createdAt = existingMap[walletId]?.createdAt ?: currentTimestampMillis()))
+        it[AVAILABLE_WALLETS_META] = Json.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
     }
 
-    val getDefaultNodeId: Flow<String> = safeData.map { it[DEFAULT_NODE_ID] ?: "" }
-    suspend fun saveDefaultNodeId(nodeId: String) = data.edit { it[DEFAULT_NODE_ID] = nodeId }
-    suspend fun clearDefaultNodeId() = data.edit { it.remove(DEFAULT_NODE_ID) }
+    val getDefaultWallet: Flow<BaseWalletId> = safeData.map { it[DEFAULT_WALLET_ID]?.let { WalletId(it) } ?: EmptyWalletId }
+    suspend fun saveDefaultWallet(walletId: WalletId) = data.edit { it[DEFAULT_WALLET_ID] = walletId.nodeIdHash }
+    suspend fun clearDefaultWallet() = data.edit { it.remove(DEFAULT_WALLET_ID) }
 
     /** Returns the Firebase Cloud Messaging token. */
     val getFcmToken: Flow<String?> = safeData.map { it[FCM_TOKEN] }
@@ -112,10 +115,10 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
 }
 
 @Serializable
-data class UserWalletMetadata(val nodeId: String, val name: String?, val avatar: String, val createdAt: Long?) {
+data class UserWalletMetadata(val walletId: WalletId, val name: String?, val avatar: String, val createdAt: Long?) {
     @Composable
-    fun nameOrDefault() = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.wallet_name_default, nodeId.take(8))
+    fun nameOrDefault() = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.wallet_name_default, walletId.nodeIdHash.take(8))
 }
 
 /** Helper method that finds the wallet metadata matching the node id in the map, or returns a default value if absent. */
-fun Map<String, UserWalletMetadata>.getByNodeIdOrDefault(nodeId: String): UserWalletMetadata = this[nodeId] ?: UserWalletMetadata(nodeId = nodeId, name = null, avatar = "", createdAt = null)
+fun Map<WalletId, UserWalletMetadata>.getByWalletIdOrDefault(walletId: WalletId): UserWalletMetadata = this[walletId] ?: UserWalletMetadata(walletId = walletId, name = null, avatar = "", createdAt = null)

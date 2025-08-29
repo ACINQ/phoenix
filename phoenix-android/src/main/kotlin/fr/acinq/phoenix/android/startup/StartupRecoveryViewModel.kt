@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.startup
 
-import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +24,7 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeystoreHelper
 import fr.acinq.phoenix.android.security.SeedManager
@@ -72,7 +72,6 @@ class StartupRecoveryViewModel(
         }) {
             val seed = MnemonicCode.toSeed(mnemonics = words.joinToString(" "), passphrase = "").byteVector()
             val localKeyManager = LocalKeyManager(seed = seed, chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
-            val nodeId = localKeyManager.nodeKeys.nodeKey.publicKey.toHex()
             val nodeIdHash = localKeyManager.nodeIdHash()
 
             val channelsDbFile = application.applicationContext.getDatabasePath("channels-${NodeParamsManager.chain.phoenixName}-$nodeIdHash.sqlite")
@@ -84,7 +83,7 @@ class StartupRecoveryViewModel(
                     state.value = StartupRecoveryState.Error.SeedDoesNotMatch
                     return@launch
                 }
-                val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(mapOf(nodeId to words))
+                val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(mapOf(WalletId(nodeIdHash) to words))
                 SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                 delay(1000)
                 viewModelScope.launch(Dispatchers.Main) {

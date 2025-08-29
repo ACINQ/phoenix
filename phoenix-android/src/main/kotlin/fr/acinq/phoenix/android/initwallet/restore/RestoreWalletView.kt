@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
@@ -36,7 +37,7 @@ import fr.acinq.phoenix.android.navController
 
 @Composable
 fun RestoreWalletView(
-    onRestoreDone: (String) -> Unit,
+    onRestoreDone: (WalletId) -> Unit,
 ) {
     val nc = navController
     val vm = viewModel<RestoreWalletViewModel>(factory = RestoreWalletViewModel.Factory(application = application))
