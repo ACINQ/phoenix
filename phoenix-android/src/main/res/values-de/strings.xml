@@ -48,32 +48,31 @@
 
     <string name="lockprompt_title">Entsperren, um fortzufahren</string>
 
-    <!-- utils: placeholders -->
-
     <!-- Startup -->
 
-    <string name="startup_binding_service">Dienst wird eingebunden…</string>
-    <string name="startup_preparing">Wallet wird vorbereitet…</string>
-    <string name="startup_checking_seed">Entsperren…</string>
-    <string name="startup_unlocked">Zugang gewährt..</string>
-    <string name="startup_unlock_failure">Entsperren fehlgeschlagen</string>
-    <string name="startup_unlock_failure_keystore">Android Keystore-Fehler</string>
-    <string name="startup_unlock_failure_fallback">Mit Saatgut freischalten</string>
+    <string name="startup_selector_title">Wallet auswählen</string>
 
-    <string name="startup_recovery_instructions">Gib deine 12 Wörter ein, um die Brieftasche zu entsperren.\n\nDie Wörter müssen in der richtigen Reihenfolge und mit einem Leerzeichen getrennt eingegeben werden.</string>
-    <string name="startup_recovery_input_label">Wort #%1$d eingeben</string>
-    <string name="startup_recovery_input_label_error">Nicht mehr als 12 Wörter!</string>
-    <string name="startup_recovery_incomplete">Gib den vollständigen Samen ein, um fortzufahren.</string>
-    <string name="startup_recovery_invalid">Dieses Saatgut ist nicht gültig. Achte darauf, dass die Wörter richtig und in der richtigen Reihenfolge sind.</string>
-    <string name="startup_recovery_unlock_button">Brieftasche entsperren</string>
-    <string name="startup_recovery_checking">Saatgut prüfen..</string>
-    <string name="startup_recovery_error_default">Es ist ein Fehler aufgetreten. Bitte versuche es noch einmal.</string>
-    <string name="startup_recovery_error_incorrect_seed">Dieses Saatgut passt nicht zu deinem Geldbeutel.</string>
-    <string name="startup_recovery_success_match">Suchtreffer.\nDas Schreiben auf die Festplatte..</string>
-    <string name="startup_recovery_success_starting">Ab Phoenix..</string>
+    <string name="startup_error_start_business">Wallet konnte nicht gestartet werden</string>
+    <string name="startup_error_generic">Wallet-Daten konnten nicht gelesen werden.</string>
+    <string name="startup_error_try_again">Erneut versuchen</string>
+    <string name="startup_error_decryption_general">Entschlüsselung fehlgeschlagen:\n%1$s</string>
+    <string name="startup_error_recovery_button">Wiederherstellungsphrase eingeben</string>
 
-    <string name="startup_starting">Starten…</string>
-    <string name="startup_error_generic">Die App konnte nicht gestartet werden.</string>
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Wallet-Wiederherstellung</string>
+    <string name="startup_recovery_instructions">Hier können Sie ein einzelnes Wallet manuell wiederherstellen, indem Sie die 12 Wörter umfassende Wiederherstellungsphrase eingeben.\n\nDie Wörter müssen in der richtigen Reihenfolge eingegeben und durch ein Leerzeichen getrennt werden.</string>
+    <string name="startup_recovery_input_label">Geben Sie das Wort #%1$d ein</string>
+    <string name="startup_recovery_input_label_error">Maximal 12 Wörter!</string>
+    <string name="startup_recovery_invalid">Dieser Seed ist ungültig</string>
+
+    <string name="startup_recovery_import_button">Seed importieren</string>
+    <string name="startup_recovery_reset_button">Erneut versuchen</string>
+    <string name="startup_recovery_checking">Seed wird überprüft…</string>
+
+    <string name="startup_recovery_error_default">Ein Fehler ist aufgetreten.</string>
+    <string name="startup_recovery_error_incorrect_seed">Dieser Seed stimmt mit keinen vorhandenen Wallet-Daten überein.</string>
+    <string name="startup_recovery_success_match">Wallet wird wiederhergestellt…</string>
 
     <!-- Payment line -->
 

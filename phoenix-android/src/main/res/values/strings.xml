@@ -74,25 +74,29 @@
     <string name="startup_started">Opening wallet…</string>
     <string name="startup_selector_title">Select a wallet</string>
 
-    <string name="startup_recovery_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
+    <string name="startup_error_start_business">Could not start the wallet</string>
+    <string name="startup_error_generic">Unable to read wallet data.</string>
+    <string name="startup_error_try_again">Try again</string>
+    <string name="startup_error_decryption_general">Decryption failure:\n%1$s</string>
+    <string name="startup_error_decryption_keystore" translatable="false">Android keystore failure:\n%1$s</string>
+    <string name="startup_error_recovery_button">Manual recover</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Wallet recovery</string>
+    <string name="startup_recovery_instructions">This screen lets you manually recover a single wallet by entering its 12-words recovery phrase.\n\nWords must be entered in the correct order, and separated with a single space.</string>
     <string name="startup_recovery_input_label">Enter word #%1$d</string>
     <string name="startup_recovery_input_label_error">No more than 12 words!</string>
     <string name="startup_recovery_invalid">This seed is not valid</string>
-    <string name="startup_recovery_invalid_details">Make sure the words are correct and in order.</string>
-    <string name="startup_recovery_import_button">Import seed</string>
-    <string name="startup_recovery_reset_button">Reset</string>
-    <string name="startup_recovery_checking">Checking seed…</string>
-    <string name="startup_recovery_error_default">An error occurred. Please try again.</string>
-    <string name="startup_recovery_error_incorrect_seed">This seed does not match your wallet data.</string>
-    <string name="startup_recovery_error_keystore_error">Failed to perform keystore operations.</string>
-    <string name="startup_recovery_success_match">Seed matches.\nWriting to disk…</string>
 
-    <string name="startup_error_start_business">Could not start the wallet</string>
-    <string name="startup_error_generic">Could not retrieve wallets</string>
-    <string name="startup_error_try_again">Try again</string>
-    <string name="startup_error_decryption_general">Decryption error</string>
-    <string name="startup_error_decryption_keystore">Android keystore failure</string>
-    <string name="startup_error_recovery_button">Enter recovery phrase</string>
+    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_reset_button">Try again</string>
+    <string name="startup_recovery_checking">Checking seed…</string>
+
+    <string name="startup_recovery_error_default">An error occurred.</string>
+    <string name="startup_recovery_error_incorrect_seed">This seed does not match any existing wallet data.</string>
+    <string name="startup_recovery_error_keystore_error" translatable="false">Failed to perform keystore operations.</string>
+    <string name="startup_recovery_success_match">Recovering wallet…</string>
 
     <!-- Payment line -->
 

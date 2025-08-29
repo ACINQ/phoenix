@@ -30,6 +30,7 @@ import fr.acinq.phoenix.android.initwallet.InitNewWallet
 import fr.acinq.phoenix.android.initwallet.create.CreateWalletView
 import fr.acinq.phoenix.android.initwallet.restore.RestoreWalletView
 import fr.acinq.phoenix.android.intro.IntroView
+import fr.acinq.phoenix.android.startup.StartupRecoveryView
 import fr.acinq.phoenix.android.startup.StartupView
 import fr.acinq.phoenix.android.startup.StartupViewModel
 import org.slf4j.LoggerFactory
@@ -51,6 +52,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
             startupViewModel = startupViewModel,
             onShowIntro = { navController.navigate(Screen.Intro.route) },
             onSeedNotFound = { navController.navigate(Screen.InitWallet.route) },
+            onManualRecoveryClick = { navController.navigate(Screen.StartupRecovery.route) },
             onWalletReady = {
                 val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
 
@@ -67,6 +69,16 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
                     })
                 }
             }
+        )
+    }
+
+    composable(Screen.StartupRecovery.route) {
+        StartupRecoveryView(
+            onBackClick = { navController.popBackStack() },
+            onRecoveryDone = {
+                navController.navigate(Screen.Startup.route)
+                appViewModel.listAvailableWallets()
+            },
         )
     }
 

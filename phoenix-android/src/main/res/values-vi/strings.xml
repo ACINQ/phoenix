@@ -53,28 +53,29 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Binding dịch vụ…</string>
-    <string name="startup_preparing">Đang chuẩn bị ví…</string>
-    <string name="startup_checking_seed">Đang mở khoá…</string>
-    <string name="startup_unlocked">Quyền truy cập được chấp nhận…</string>
-    <string name="startup_unlock_failure">Mở khóa không thành công</string>
-    <string name="startup_unlock_failure_keystore">Lỗi kho khóa Android</string>
-    <string name="startup_unlock_failure_fallback">Mở khóa bằng hạt giống</string>
+    <string name="startup_selector_title">Chọn ví</string>
 
-    <string name="startup_recovery_instructions">Nhập 12 từ khôi phục để mở khóa ví của bạn.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau bằng một dấu cách.</string>
+    <string name="startup_error_start_business">Không thể khởi động ví</string>
+    <string name="startup_error_generic">Không thể đọc dữ liệu ví.</string>
+    <string name="startup_error_try_again">Thử lại</string>
+    <string name="startup_error_decryption_general">Giải mã lỗi:\n%1$s</string>
+    <string name="startup_error_recovery_button">Khôi phục thủ công</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Khôi phục ví</string>
+    <string name="startup_recovery_instructions">Màn hình này cho phép bạn khôi phục thủ công một ví bằng cách nhập cụm từ khôi phục 12 từ của ví đó.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau một khoảng trắng.</string>
     <string name="startup_recovery_input_label">Nhập từ #%1$d</string>
-    <string name="startup_recovery_input_label_error">Không vượt quá 12 từ!</string>
-    <string name="startup_recovery_incomplete">Nhập hạt giống hoàn chỉnh để tiếp tục.</string>
-    <string name="startup_recovery_invalid">Hạt giống này không hợp lệ. Hãy đảm bảo các từ chính xác và theo đúng thứ tự.</string>
-    <string name="startup_recovery_unlock_button">Mở khoá ví</string>
-    <string name="startup_recovery_checking">Đang kiểm tra hạt giống…</string>
-    <string name="startup_recovery_error_default">Đã xảy ra lỗi. Vui lòng thử lại.</string>
-    <string name="startup_recovery_error_incorrect_seed">Hạt giống này không khớp với ví của bạn.</string>
-    <string name="startup_recovery_success_match">Hạt giống đã khớp.\nĐang ghi nhớ vào ổ…</string>
-    <string name="startup_recovery_success_starting">Đang khởi động Phoenix…</string>
+    <string name="startup_recovery_input_label_error">Không quá 12 từ!</string>
+    <string name="startup_recovery_invalid">Hạt giống này không hợp lệ</string>
 
-    <string name="startup_starting">Đang khởi động…</string>
-    <string name="startup_error_generic">Ứng dụng không khởi động được.</string>
+    <string name="startup_recovery_import_button">Nhập hạt giống</string>
+    <string name="startup_recovery_reset_button">Thử lại</string>
+    <string name="startup_recovery_checking">Đang kiểm tra hạt giống…</string>
+
+    <string name="startup_recovery_error_default">Đã xảy ra lỗi.</string>
+    <string name="startup_recovery_error_incorrect_seed">Hạt giống này không khớp với bất kỳ dữ liệu ví nào hiện có.</string>
+    <string name="startup_recovery_success_match">Đang khôi phục ví…</string>
 
     <!-- Payment line -->
 

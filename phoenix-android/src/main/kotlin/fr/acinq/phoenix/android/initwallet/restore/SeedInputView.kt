@@ -71,7 +71,6 @@ fun SeedInputView(
     vm: RestoreWalletViewModel,
     onRestoreDone: (String) -> Unit,
 ) {
-    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var filteredWords by remember { mutableStateOf(emptyList<String>()) }
     val enteredWords = vm.mnemonics.filterNot { it.isNullOrBlank() }

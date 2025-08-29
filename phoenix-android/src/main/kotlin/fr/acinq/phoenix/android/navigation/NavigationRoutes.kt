@@ -22,6 +22,7 @@ sealed class Screen(val route: String) {
     data object CreateWallet : Screen("createwallet")
     data object RestoreWallet : Screen("restorewallet")
     data object Startup : Screen("startup")
+    data object StartupRecovery : Screen("startuprecovery")
     data object Home : Screen("home")
     data object Receive : Screen("receive")
     data object Send : Screen("send")

@@ -91,6 +91,7 @@ fun StartupView(
     startupViewModel: StartupViewModel,
     onShowIntro: () -> Unit,
     onSeedNotFound: () -> Unit,
+    onManualRecoveryClick: () -> Unit,
     onWalletReady: () -> Unit,
 ) {
     val showIntro = application.globalPrefs.getShowIntro.collectAsState(initial = null)
@@ -211,16 +212,12 @@ fun StartupView(
                                     startupViewModel.state.value = StartupViewState.Init
                                 })
                             }
-                            is StartupViewState.SeedRecovery -> {
-                                StartupRecoveryView(state = startupState, onRecoveryClick = startupViewModel::recoverSeed, onReset = { startupViewModel.state.value = StartupViewState.SeedRecovery.Init })
-                                TODO("handle that in a separate screen/state")
-                            }
                         }
                     }
                 }
             }
             is ListWalletState.Error -> {
-                ListWalletsError(state = listWalletState, onFallbackClick = { startupViewModel.state.value = StartupViewState.SeedRecovery.Init })
+                ListWalletsError(state = listWalletState, onManualRecoveryClick = onManualRecoveryClick)
             }
         }
     }
@@ -275,19 +272,19 @@ private fun StartBusinessError(error: StartupViewState.Error, onTryAgainClick: (
 }
 
 @Composable
-private fun ListWalletsError(state: ListWalletState.Error, onFallbackClick: () -> Unit) {
+private fun ListWalletsError(state: ListWalletState.Error, onManualRecoveryClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         ErrorMessage(
-            header = when (state) {
-                is ListWalletState.Error.Generic -> stringResource(id = R.string.startup_error_generic)
-                is ListWalletState.Error.DecryptionError.GeneralException -> stringResource(id = R.string.startup_error_decryption_general)
-                is ListWalletState.Error.DecryptionError.KeystoreFailure -> stringResource(id = R.string.startup_error_decryption_keystore)
-            },
+            header = stringResource(id = R.string.startup_error_generic),
             details = when (state) {
                 is ListWalletState.Error.Generic -> state.cause?.message
-                is ListWalletState.Error.DecryptionError.GeneralException -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}"
-                is ListWalletState.Error.DecryptionError.KeystoreFailure -> "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}" +
+                is ListWalletState.Error.DecryptionError.GeneralException -> stringResource(id = R.string.startup_error_decryption_general,
+                    "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}"
+                )
+                is ListWalletState.Error.DecryptionError.KeystoreFailure -> stringResource(id = R.string.startup_error_decryption_keystore,
+                    "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}" +
                         (state.cause.cause?.localizedMessage?.take(80) ?: "")
+                )
             },
             alignment = Alignment.CenterHorizontally,
         )
@@ -297,7 +294,7 @@ private fun ListWalletsError(state: ListWalletState.Error, onFallbackClick: () -
         BorderButton(
             text = stringResource(id = R.string.startup_error_recovery_button),
             icon = R.drawable.ic_key,
-            onClick = onFallbackClick
+            onClick = onManualRecoveryClick
         )
         Spacer(modifier = Modifier.height(16.dp))
         StartErrorShareLogsButton()

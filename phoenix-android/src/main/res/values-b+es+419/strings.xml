@@ -51,28 +51,34 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Vinculando el servicio…</string>
+    <string name="startup_init">Inicializando…</string>
     <string name="startup_preparing">Preparando la billetera…</string>
-    <string name="startup_checking_seed">Desbloqueando…</string>
-    <string name="startup_unlocked">Acceso concedido…</string>
-    <string name="startup_unlock_failure">Error al desbloquear</string>
-    <string name="startup_unlock_failure_keystore">Error de Android Keystore</string>
-    <string name="startup_unlock_failure_fallback">Desbloquear con semilla</string>
+    <string name="startup_loading_seed">Descifrado…</string>
+    <string name="startup_starting">Iniciando la billetera…</string>
+    <string name="startup_started">Opening wallet…</string>
+    <string name="startup_selector_title">seleccionar una billetera</string>
 
-    <string name="startup_recovery_instructions">Ingresa tus 12 palabras de recuperación para desbloquear la billetera.\n\nLas palabras deben ingresarse en el orden correcto y estar separadas por un solo espacio.</string>
-    <string name="startup_recovery_input_label">Escribe la palabra #%1$d</string>
-    <string name="startup_recovery_input_label_error">¡No ingreses más de 12 palabras!</string>
-    <string name="startup_recovery_incomplete">Ingresa la semilla completa para continuar.</string>
-    <string name="startup_recovery_invalid">Esta semilla no es válida. Comprueba que las palabras estén correctas y en orden.</string>
-    <string name="startup_recovery_unlock_button">Desbloquear billetera</string>
+    <string name="startup_error_start_business">No se pudo iniciar la billetera</string>
+    <string name="startup_error_generic">No se pudieron leer los datos de la billetera.</string>
+    <string name="startup_error_try_again">Inténtalo de nuevo</string>
+    <string name="startup_error_decryption_general">Error de descifrado:\n%1$s</string>
+    <string name="startup_error_recovery_button">Introduce la frase de recuperación</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Recuperación de billetera</string>
+    <string name="startup_recovery_instructions">Esta pantalla le permite recuperar manualmente una sola billetera ingresando su frase de recuperación de 12 palabras.\n\nLas palabras deben ingresarse en el orden correcto y separadas por un solo espacio.</string>
+    <string name="startup_recovery_input_label">Ingrese la palabra #%1$d</string>
+    <string name="startup_recovery_input_label_error">¡No más de 12 palabras!</string>
+    <string name="startup_recovery_invalid">Esta semilla no es válida</string>
+
+    <string name="startup_recovery_import_button">Importar semilla</string>
+    <string name="startup_recovery_reset_button">Inténtelo de nuevo</string>
     <string name="startup_recovery_checking">Comprobando la semilla…</string>
-    <string name="startup_recovery_error_default">Se produjo un error. Intenta de nuevo.</string>
-    <string name="startup_recovery_error_incorrect_seed">Esta semilla no coincide con la billetera.</string>
-    <string name="startup_recovery_success_match">La semilla coincide.\nEscribiendo en el disco…</string>
-    <string name="startup_recovery_success_starting">Iniciando Phoenix…</string>
 
-    <string name="startup_starting">Iniciando…</string>
-    <string name="startup_error_generic">No se pudo iniciar la aplicación.</string>
+    <string name="startup_recovery_error_default">Error.</string>
+    <string name="startup_recovery_error_incorrect_seed">Esta semilla no coincide con ningún dato de la billetera existente.</string>
+    <string name="startup_recovery_success_match">Recuperando la billetera…</string>
 
     <!-- Payment line -->
 

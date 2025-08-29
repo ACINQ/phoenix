@@ -16,29 +16,18 @@
 
 package fr.acinq.phoenix.android.startup
 
-import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.byteVector
-import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
-import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.KeystoreHelper
-import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.services.ContactsPhotoCleaner
-import fr.acinq.phoenix.managers.NodeParamsManager
-import fr.acinq.phoenix.managers.nodeIdHash
-import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
@@ -52,19 +41,6 @@ sealed class StartupViewState {
     sealed class Error: StartupViewState() {
         abstract val nodeId: String
         data class Generic(override val nodeId: String, val cause: Throwable?): Error()
-    }
-
-    sealed class SeedRecovery : StartupViewState() {
-        data object Init: SeedRecovery()
-        data object CheckingSeed: SeedRecovery()
-        sealed class Success: SeedRecovery() {
-            data object MatchingData: Success()
-        }
-        sealed class Error: SeedRecovery() {
-            data class Other(val cause: Throwable): Error()
-            data object SeedDoesNotMatch: Error()
-            data class KeyStoreFailure(val cause: Throwable): Error()
-        }
     }
 }
 
@@ -101,43 +77,6 @@ class StartupViewModel(
                 }
                 is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = startResult.cause)
                 is StartBusinessResult.Failure.LoadWalletError -> state.value = StartupViewState.Error.Generic(nodeId = nodeId, cause = null)
-            }
-        }
-    }
-
-    /**
-     * This method checks if the provided mnemonics matches a channel file in the local files.
-     * If so, the key in the keystore is updated and the seed is written to disk.
-     */
-    fun recoverSeed(context: Context, words: List<String>) {
-        if (state.value is StartupViewState.SeedRecovery.CheckingSeed) return
-        state.value = StartupViewState.SeedRecovery.CheckingSeed
-
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.error("error when checking seed fallback against existing data: ", e)
-            state.value = StartupViewState.SeedRecovery.Error.Other(e)
-        }) {
-            val seed = MnemonicCode.toSeed(mnemonics = words.joinToString(" "), passphrase = "").byteVector()
-            val localKeyManager = LocalKeyManager(seed = seed, chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
-            val nodeId = localKeyManager.nodeKeys.nodeKey.publicKey.toHex()
-            val nodeIdHash = localKeyManager.nodeIdHash()
-
-            val channelsDbFile = context.getDatabasePath("channels-${NodeParamsManager.chain.phoenixName}-$nodeIdHash.sqlite")
-            if (channelsDbFile.exists()) {
-                state.value = StartupViewState.SeedRecovery.Success.MatchingData
-                try {
-                    KeystoreHelper.checkEncryptionCipherOrReset(KeystoreHelper.KEY_NO_AUTH)
-                } catch (e: Exception) {
-                    state.value = StartupViewState.SeedRecovery.Error.SeedDoesNotMatch
-                    return@launch
-                }
-                val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(mapOf(nodeId to words))
-                SeedManager.writeSeedToDisk(context, encrypted, overwrite = true)
-                delay(1000)
-                state.value = StartupViewState.Init
-                TODO("start recovered seed")
-            } else {
-                state.value = StartupViewState.SeedRecovery.Error.SeedDoesNotMatch
             }
         }
     }

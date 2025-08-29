@@ -50,28 +50,34 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Vinculando o serviço…</string>
+    <string name="startup_init">Inicializando…</string>
     <string name="startup_preparing">Preparando a carteira…</string>
-    <string name="startup_checking_seed">Desbloqueando…</string>
-    <string name="startup_unlocked">Acesso concedido…</string>
-    <string name="startup_unlock_failure">Falha no desbloqueio</string>
-    <string name="startup_unlock_failure_keystore">Erro do Android Keystore</string>
-    <string name="startup_unlock_failure_fallback">Desbloquear com seed</string>
+    <string name="startup_loading_seed">Descifrando…</string>
+    <string name="startup_starting">Iniciando a carteira…</string>
+    <string name="startup_started">Abrindo carteira…</string>
+    <string name="startup_selector_title">Selecionando uma carteira</string>
 
-    <string name="startup_recovery_instructions">Digite suas 12 palavras de recuperação para desbloquear a carteira.\n\nAs palavras devem ser digitadas na ordem correta e separadas por um único espaço.</string>
+    <string name="startup_error_start_business">Não foi possível iniciar a carteira</string>
+    <string name="startup_error_generic">Não foi possível ler os dados da carteira.</string>
+    <string name="startup_error_try_again">Tentar novamente</string>
+    <string name="startup_error_decryption_general">Falha na descriptografia:\n%1$s</string>
+    <string name="startup_error_recovery_button">Digite a frase de recuperação</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Recuperação de carteira</string>
+    <string name="startup_recovery_instructions">Esta tela permite recuperar manualmente uma única carteira inserindo sua frase de recuperação de 12 palavras.\n\nAs palavras devem ser inseridas na ordem correta e separadas por um único espaço.</string>
     <string name="startup_recovery_input_label">Digite a palavra #%1$d</string>
-    <string name="startup_recovery_input_label_error">Não insira mais de 12 palavras!</string>
-    <string name="startup_recovery_incomplete">Insira a semente completa para continuar.</string>
-    <string name="startup_recovery_invalid">Esta semente é inválida. Verifique se as palavras estão corretas e em ordem.</string>
-    <string name="startup_recovery_unlock_button">Desbloquear carteira</string>
-    <string name="startup_recovery_checking">Verificando a semente…</string>
-    <string name="startup_recovery_error_default">Ocorreu um erro. Tente novamente.</string>
-    <string name="startup_recovery_error_incorrect_seed">Esta semente não corresponde à carteira.</string>
-    <string name="startup_recovery_success_match">Correspondências iniciais.\nGravando no disco…</string>
-    <string name="startup_recovery_success_starting">Iniciando o Phoenix…</string>
+    <string name="startup_recovery_input_label_error">No máximo 12 palavras!</string>
+    <string name="startup_recovery_invalid">Esta semente não é válida</string>
 
-    <string name="startup_starting">Iniciando…</string>
-    <string name="startup_error_generic">Não foi possível iniciar o aplicativo.</string>
+    <string name="startup_recovery_import_button">Importar semente</string>
+    <string name="startup_recovery_reset_button">Tentar novamente</string>
+    <string name="startup_recovery_checking">Verificando a semente…</string>
+
+    <string name="startup_recovery_error_default">Ocorreu um erro.</string>
+    <string name="startup_recovery_error_incorrect_seed">Esta semente não corresponde a nenhum dado de carteira existente.</string>
+    <string name="startup_recovery_success_match">Recuperando a carteira…</string>
 
     <!-- Payment line -->
 

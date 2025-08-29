@@ -43,23 +43,31 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.feedback.SuccessMessage
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
+import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 
 
 @Composable
 fun StartupRecoveryView(
-    state: StartupViewState.SeedRecovery,
-    onReset: () -> Unit,
-    onRecoveryClick: (Context, List<String>) -> Unit,
+    onBackClick: () -> Unit,
+    onRecoveryDone: () -> Unit,
 ) {
+    val vm = viewModel<StartupRecoveryViewModel>(factory = StartupRecoveryViewModel.Factory(application = application))
+    val state = vm.state.value
+
     var inputValue by remember { mutableStateOf("") }
     val inputWords: List<String> = remember(inputValue) { inputValue.split("\\s+".toRegex()) }
     val isSeedValid: Boolean? = remember(inputValue) {
@@ -75,99 +83,100 @@ fun StartupRecoveryView(
         }
     }
 
-    Card(
-        internalPadding = PaddingValues(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = stringResource(id = R.string.startup_recovery_instructions))
-        Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(
-            value = inputValue,
-            onValueChange = { inputValue = it },
-            trailingIcon = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (inputValue.isNotBlank()) {
-                        FilledButton(
-                            onClick = { inputValue = "" },
-                            icon = R.drawable.ic_cross,
-                            backgroundColor = Color.Transparent,
-                            iconTint = MaterialTheme.colors.onSurface,
-                            padding = PaddingValues(12.dp),
-                        )
-                    }
-                }
-            },
-            label = {
-                if (inputWords.size <= 12) {
-                    Text(text = stringResource(id = R.string.startup_recovery_input_label, inputWords.size))
-                } else {
-                    Text(text = stringResource(id = R.string.startup_recovery_input_label_error))
-                }
-            },
-            isError = isSeedValid == false,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.None
-            ),
-            colors = if (isSeedValid == false) errorOutlinedTextFieldColors() else outlinedTextFieldColors(),
-            visualTransformation = VisualTransformation.None,
-            maxLines = 3,
-            singleLine = true,
-            enabled = state is StartupViewState.SeedRecovery.Init,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    DefaultScreenLayout {
+        DefaultScreenHeader(title = "Wallet recovery", onBackClick = onBackClick)
 
-    Spacer(modifier = Modifier.height(12.dp))
-    Column(
-        modifier = Modifier.padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        when (state) {
-            is StartupViewState.SeedRecovery.Init -> {
-                val context = LocalContext.current
-                if (isSeedValid == false) {
+        Card(
+            internalPadding = PaddingValues(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = stringResource(id = R.string.startup_recovery_instructions))
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = inputValue,
+                onValueChange = { inputValue = it },
+                trailingIcon = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (inputValue.isNotBlank()) {
+                            FilledButton(
+                                onClick = { inputValue = "" },
+                                icon = R.drawable.ic_cross,
+                                backgroundColor = Color.Transparent,
+                                iconTint = MaterialTheme.colors.onSurface,
+                                padding = PaddingValues(12.dp),
+                            )
+                        }
+                    }
+                },
+                label = {
+                    if (inputWords.size <= 12) {
+                        Text(text = stringResource(id = R.string.startup_recovery_input_label, inputWords.size), style = MaterialTheme.typography.body2)
+                    } else {
+                        Text(text = stringResource(id = R.string.startup_recovery_input_label_error), style = MaterialTheme.typography.body2.copy(color = negativeColor))
+                    }
+                },
+                isError = isSeedValid == false,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    autoCorrectEnabled = false,
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.None
+                ),
+                colors = if (isSeedValid == false) errorOutlinedTextFieldColors() else outlinedTextFieldColors(),
+                visualTransformation = VisualTransformation.None,
+                maxLines = 3,
+                singleLine = false,
+                enabled = state is StartupRecoveryState.Init,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            when (state) {
+                is StartupRecoveryState.Init -> {
+                    if (isSeedValid == false) {
+                        ErrorMessage(
+                            header = stringResource(id = R.string.startup_recovery_invalid),
+                            alignment = Alignment.CenterHorizontally,
+                        )
+                        Spacer(Modifier.height(16.dp))
+                    }
+                    FilledButton(
+                        text = stringResource(id = R.string.startup_recovery_import_button),
+                        icon = R.drawable.ic_check,
+                        enabled = isSeedValid == true,
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { vm.recoverSeed(inputWords, onRecoveryDone = onRecoveryDone) }
+                    )
+                }
+                is StartupRecoveryState.CheckingSeed -> {
+                    Text(text = stringResource(id = R.string.startup_recovery_checking))
+                }
+                is StartupRecoveryState.Error -> {
                     ErrorMessage(
-                        header = stringResource(id = R.string.startup_recovery_invalid),
+                        header = when (state) {
+                            is StartupRecoveryState.Error.Other -> stringResource(id = R.string.startup_recovery_error_default)
+                            is StartupRecoveryState.Error.SeedDoesNotMatch -> stringResource(id = R.string.startup_recovery_error_incorrect_seed)
+                            is StartupRecoveryState.Error.KeyStoreFailure -> stringResource(id = R.string.startup_recovery_error_keystore_error)
+                        },
                         alignment = Alignment.CenterHorizontally,
                     )
                     Spacer(Modifier.height(16.dp))
+                    BorderButton(
+                        text = stringResource(id = R.string.startup_recovery_reset_button),
+                        icon = R.drawable.ic_revert,
+                        onClick = { vm.state.value = StartupRecoveryState.Init }
+                    )
                 }
-                BorderButton(
-                    text = stringResource(id = R.string.startup_recovery_import_button),
-                    icon = R.drawable.ic_check,
-                    enabled = isSeedValid == true,
-                    onClick = { onRecoveryClick(context, inputWords) }
-                )
+                is StartupRecoveryState.Success.MatchingData -> {
+                    SuccessMessage(header = stringResource(id = R.string.startup_recovery_success_match))
+                }
             }
-            is StartupViewState.SeedRecovery.CheckingSeed -> {
-                Text(text = stringResource(id = R.string.startup_recovery_checking))
-            }
-            is StartupViewState.SeedRecovery.Error -> {
-                ErrorMessage(
-                    header = when (state) {
-                        is StartupViewState.SeedRecovery.Error.Other -> stringResource(id = R.string.startup_recovery_error_default)
-                        is StartupViewState.SeedRecovery.Error.SeedDoesNotMatch -> stringResource(id = R.string.startup_recovery_error_incorrect_seed)
-                        is StartupViewState.SeedRecovery.Error.KeyStoreFailure -> stringResource(id = R.string.startup_error_decryption_keystore)
-                    },
-                    alignment = Alignment.CenterHorizontally,
-                )
-                Spacer(Modifier.height(16.dp))
-                BorderButton(
-                    text = stringResource(id = R.string.startup_recovery_reset_button),
-                    icon = R.drawable.ic_revert,
-                    onClick = onReset
-                )
-            }
-            is StartupViewState.SeedRecovery.Success.MatchingData -> {
-                TextWithIcon(
-                    text = stringResource(id = R.string.startup_recovery_success_match),
-                    icon = R.drawable.ic_check_circle
-                )
-            }
+            Spacer(modifier = Modifier.height(100.dp))
         }
-        Spacer(modifier = Modifier.height(100.dp))
     }
 }

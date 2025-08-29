@@ -51,26 +51,33 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Liaison au service…</string>
-    <string name="startup_preparing">Préparation du portefeuille…</string>
-    <string name="startup_checking_seed">Déverrouillage…</string>
-    <string name="startup_unlocked">Accès accordé…</string>
-    <string name="startup_unlock_failure">Échec du déverrouillage</string>
-    <string name="startup_unlock_failure_fallback">Déverrouiller avec la seed</string>
+    <string name="startup_init">Initialisation…</string>
+    <string name="startup_preparing">Préparation du wallet…</string>
+    <string name="startup_loading_seed">Déchiffrement…</string>
+    <string name="startup_starting">Démarrage du wallet…</string>
+    <string name="startup_started">Ouverture du wallet…</string>
+    <string name="startup_selector_title">Selectionner un wallet</string>
 
-    <string name="startup_recovery_instructions">Saisissez vos 12 mots de récupération pour déverrouiller le wallet.\n\nLes mots doivent être saisis dans le bon ordre et séparés par un seul espace.</string>
+    <string name="startup_error_start_business">Le wallet n\'a pas pu démarrer</string>
+    <string name="startup_error_generic">Échec de la lecture des données du wallet</string>
+    <string name="startup_error_try_again">Réessayer</string>
+    <string name="startup_error_decryption_general">Erreur de déchiffrement:\n%1$s</string>
+    <string name="startup_error_recovery_button">Restaurer manuellement</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_instructions">Cet écran vous permet de restaurer un wallet en saissant sa clé de 12 mots.\n\nLes mots de la clé doivent être entrés dans le bon ordre, et séparés par un seul espace.</string>
     <string name="startup_recovery_input_label">Saisir le mot #%1$d</string>
     <string name="startup_recovery_input_label_error">Pas plus de 12 mots !</string>
-    <string name="startup_recovery_incomplete">Saisissez la seed entière pour continuer.</string>
-    <string name="startup_recovery_invalid">Cette seed n\'est pas valide. Assurez-vous que les mots sont corrects et dans l\'ordre.</string>
-    <string name="startup_recovery_checking">Vérification de la seed…</string>
-    <string name="startup_recovery_error_default">Une erreur est survenue. Merci de réessayer.</string>
-    <string name="startup_recovery_error_incorrect_seed">Cette seed ne correspond pas à votre wallet.</string>
-    <string name="startup_recovery_success_match">La seed correspond.\nÉcriture sur le disque…</string>
-    <string name="startup_recovery_success_starting">Démarrage de Phoenix…</string>
+    <string name="startup_recovery_invalid">Cette seed n\'est pas valide</string>
 
-    <string name="startup_starting">Démarrage…</string>
-    <string name="startup_error_generic">L\'application n\'a pas pu démarrer.</string>
+    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_checking">Vérification de la seed…</string>
+    <string name="startup_recovery_reset_button">Réessayer</string>
+
+    <string name="startup_recovery_error_default">Une erreur est survenue.</string>
+    <string name="startup_recovery_error_incorrect_seed">La clé saisie ne correspond pas à un wallet existant.</string>
+    <string name="startup_recovery_success_match">Restauration du wallet…</string>
 
     <!-- Payment line -->
 
