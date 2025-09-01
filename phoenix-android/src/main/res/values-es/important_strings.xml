@@ -25,7 +25,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix funciona en segundo plano</string>
-    <string name="notif_headless_received">Recibido +%1$s</string>
+    <string name="notif_headless_received">%1$s Recibido +%2$s</string>
 
     <string name="notif_pending_settlement_title">Por favor, inicie Phoenix</string>
     <string name="notif_pending_settlement_message">Está pendiente una liquidación.</string>

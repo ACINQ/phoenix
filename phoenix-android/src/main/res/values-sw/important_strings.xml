@@ -29,7 +29,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix inaendesha nyuma</string>
-    <string name="notif_headless_received">Imepokelewa +%1$s</string>
+    <string name="notif_headless_received">%1$s Imepokelewa +%2$s</string>
 
     <string name="notif_pending_settlement_title">Tafadhali anzisha Phoenix</string>
     <string name="notif_pending_settlement_message">Malipo yanayokuja yanangoja kukamilishwa.</string>

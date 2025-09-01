@@ -18,20 +18,20 @@ package fr.acinq.phoenix.android
 
 import android.content.Context
 import android.text.format.DateUtils
-import androidx.compose.runtime.mutableStateListOf
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.lightning.LiquidityEvents
-import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.PaymentEvents
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import fr.acinq.phoenix.android.services.InflightPaymentsWatcher
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
@@ -81,7 +81,6 @@ object BusinessManager {
     private val _businessFlow = MutableStateFlow<Map<WalletId, PhoenixBusiness>>(emptyMap())
     val businessFlow = _businessFlow.asStateFlow()
 
-    val receivedInTheBackground = mutableStateListOf<MilliSatoshi>()
     private var _isHeadless = MutableStateFlow(true)
     val isHeadless = _isHeadless.asStateFlow()
 
@@ -103,7 +102,6 @@ object BusinessManager {
     suspend fun startNewBusiness(words: List<String>, isHeadless: Boolean): StartBusinessResult = startupMutex.withLock {
 
         _isHeadless.value = isHeadless
-        if (!isHeadless) receivedInTheBackground.clear()
 
         val business = PhoenixBusiness(PlatformContext(appContext))
 
@@ -119,6 +117,11 @@ object BusinessManager {
         val walletId = WalletId(walletInfo.nodeIdHash)
         val nodeId = walletInfo.nodeId.toHex()
         val globalPrefs = application.globalPrefs
+        val walletMetadata = globalPrefs.getAvailableWalletsMeta.first()[walletId] ?: run {
+            val metadata = UserWalletMetadata(walletId = walletId, name = null, avatar = WalletAvatars.list.random(), createdAt = currentTimestampMillis())
+            globalPrefs.saveAvailableWalletMeta(metadata)
+            metadata
+        }
         val userPrefs = DataStoreManager.loadUserPrefsForWallet(appContext, walletId)
         val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(appContext, walletId)
 
@@ -146,7 +149,7 @@ object BusinessManager {
 
             // setup jobs monitoring the business events
             eventsMonitoringJobs[walletId] = listOf(
-                scope.launch { monitorPaymentsWhenHeadless(business.nodeParamsManager, business.currencyManager, userPrefs) },
+                scope.launch { monitorPaymentsWhenHeadless(walletId, walletMetadata, business.nodeParamsManager, business.currencyManager, userPrefs) },
                 scope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager, internalPrefs) },
                 scope.launch { monitorFcmToken(business) },
                 scope.launch { monitorInFlightPayments(business.peerManager, internalPrefs) },
@@ -268,18 +271,19 @@ object BusinessManager {
         }
     }
 
-    private suspend fun monitorPaymentsWhenHeadless(nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager, userPrefs: UserPrefs) {
+    private suspend fun monitorPaymentsWhenHeadless(walletId: WalletId, walletMetadata: UserWalletMetadata, nodeParamsManager: NodeParamsManager, currencyManager: CurrencyManager, userPrefs: UserPrefs) {
         nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
             when (event) {
                 is PaymentEvents.PaymentReceived -> {
                     // FIXME handle headless/background behaviour
                     if (isHeadless.value) {
-                        receivedInTheBackground.add(event.payment.amountReceived)
                         SystemNotificationHelper.notifyPaymentsReceived(
                             context = appContext,
                             userPrefs = userPrefs,
-                            id = event.payment.id,
-                            amount = event.payment.amountReceived,
+                            walletId = walletId,
+                            userWalletMetadata = walletMetadata,
+                            paymentId = event.payment.id,
+                            paymentAmount = event.payment.amountReceived,
                             rates = currencyManager.ratesFlow.value,
                         )
                     }

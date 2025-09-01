@@ -128,7 +128,9 @@ fun AppRoot(
             val lastCompletedPayment = business?.paymentsManager?.lastCompletedPayment?.collectAsState()
             lastCompletedPayment?.value?.let { payment ->
                 LaunchedEffect(key1 = payment.id) {
-                    navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
+                    if (navController.currentDestination?.route == Screen.Home.route) {
+                        navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
+                    }
                 }
             }
 

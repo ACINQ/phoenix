@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.navigation
 
 import android.content.Intent
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -28,6 +29,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.home.HomeView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.receive.ReceiveView
@@ -84,7 +86,6 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
     businessComposable(
         route = "${Screen.PaymentDetails.route}?id={id}&fromEvent={fromEvent}",
         appViewModel = appViewModel,
-        //deepLinkPrefix = "phoenix:payments/",
         arguments = listOf(
             navArgument("id") { type = NavType.StringType },
             navArgument("fromEvent") {
@@ -92,17 +93,17 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
                 defaultValue = false
             }
         ),
-        deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{id}" })
-    ) { backstackEntry, _, _ ->
-        val paymentId = remember {
-            try {
-                UUID.fromString(backstackEntry.arguments!!.getString("id")!!)
-            } catch (e: Exception) {
-                null
-            }
+        deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{walletid}/{id}" })
+    ) { backstackEntry, walletId, _ ->
+        val walletIdDeeplink = backstackEntry.arguments!!.getString("walletid")?.let { WalletId(it) }
+        val paymentId = try {
+            UUID.fromString(backstackEntry.arguments!!.getString("id")!!)
+        } catch (_: Exception) {
+            null
         }
-        if (paymentId != null) {
-            log.debug("navigating to payment={}", paymentId)
+        if (walletIdDeeplink != null && walletIdDeeplink != walletId) {
+            LaunchedEffect(Unit) { navController.popToHome() }
+        } else if (paymentId != null) {
             val fromEvent = backstackEntry.arguments?.getBoolean("fromEvent") ?: false
             PaymentDetailsView(
                 paymentId = paymentId,

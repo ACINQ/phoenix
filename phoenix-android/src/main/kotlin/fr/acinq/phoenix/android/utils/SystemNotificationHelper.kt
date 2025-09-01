@@ -38,9 +38,11 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
@@ -253,8 +255,10 @@ object SystemNotificationHelper {
     suspend fun notifyPaymentsReceived(
         context: Context,
         userPrefs: UserPrefs,
-        id: UUID,
-        amount: MilliSatoshi,
+        walletId: WalletId,
+        userWalletMetadata: UserWalletMetadata,
+        paymentId: UUID,
+        paymentAmount: MilliSatoshi,
         rates: List<ExchangeRate>,
     ): Notification {
         val isFiat = userPrefs.getIsAmountInFiat.first() && rates.isNotEmpty()
@@ -282,16 +286,16 @@ object SystemNotificationHelper {
         } else null
 
         return NotificationCompat.Builder(context, PAYMENT_RECEIVED_NOTIF_CHANNEL).apply {
-            setContentTitle(context.getString(R.string.notif_headless_received, amount.toPrettyString(unit, rate, withUnit = true)))
+            setContentTitle(context.getString(R.string.notif_headless_received, userWalletMetadata.avatar, paymentAmount.toPrettyString(unit, rate, withUnit = true)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
-            val intent = Intent(Intent.ACTION_VIEW,"phoenix:payments/$id".toUri(), context, MainActivity::class.java).apply {
+            val intent = Intent(Intent.ACTION_VIEW,"phoenix:payments/$walletId/$paymentId".toUri(), context, MainActivity::class.java).apply {
                 Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
             setAutoCancel(true)
         }.build().also {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                NotificationManagerCompat.from(context).notify(HEADLESS_NOTIF_ID, it)
+                NotificationManagerCompat.from(context).notify(currentTimestampMillis().toInt(), it)
             }
         }
     }

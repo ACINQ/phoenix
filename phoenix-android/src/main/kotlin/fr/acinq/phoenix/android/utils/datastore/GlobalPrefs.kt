@@ -85,6 +85,12 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         } ?: emptyMap()
     }
 
+    // use this when you know there's not metadata for this wallet id yet in the preference
+    suspend fun saveAvailableWalletMeta(metadata: UserWalletMetadata) = data.edit {
+        val existingMap: Map<WalletId, UserWalletMetadata> = getAvailableWalletsMeta.first()
+        val newMap = existingMap + (metadata.walletId to metadata)
+        it[AVAILABLE_WALLETS_META] = Json.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
+    }
     suspend fun saveAvailableWalletMeta(walletId: WalletId, name: String?, avatar: String) = data.edit {
         val existingMap: Map<WalletId, UserWalletMetadata> = getAvailableWalletsMeta.first()
         val newMap = existingMap + (walletId to UserWalletMetadata(walletId = walletId, name = name, avatar = avatar, createdAt = existingMap[walletId]?.createdAt ?: currentTimestampMillis()))
@@ -117,7 +123,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
 @Serializable
 data class UserWalletMetadata(val walletId: WalletId, val name: String?, val avatar: String, val createdAt: Long?) {
     @Composable
-    fun nameOrDefault() = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.wallet_name_default, walletId.nodeIdHash.take(8))
+    fun nameOrDefault() = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.wallet_name_default)
 }
 
 /** Helper method that finds the wallet metadata matching the node id in the map, or returns a default value if absent. */

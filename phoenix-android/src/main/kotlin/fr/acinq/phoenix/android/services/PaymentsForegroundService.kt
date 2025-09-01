@@ -25,6 +25,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 
 /**
@@ -51,12 +52,8 @@ class PaymentsForegroundService : Service() {
     private val shutdownHandler = Handler(Looper.getMainLooper())
     private val shutdownRunnable: Runnable = Runnable {
         if (BusinessManager.isHeadless.value) {
-            log.debug("reached scheduled shutdown while headless")
-            if (BusinessManager.receivedInTheBackground.isEmpty()) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-            } else {
-                stopForeground(STOP_FOREGROUND_DETACH)
-            }
+            log.info("reached scheduled shutdown while headless")
+            stopForeground(STOP_FOREGROUND_REMOVE)
             BusinessManager.stopAllBusinesses()
         }
         stopSelf()
@@ -72,11 +69,11 @@ class PaymentsForegroundService : Service() {
         val businessMap = BusinessManager.businessFlow.value
 
         // the notification for the foreground service depends on whether the business is started or not.
-        val notif = when {
+        val shouldWeWaitLong: Boolean = when {
 
             !BusinessManager.isHeadless.value -> {
                 log.info("app is not headless, ignoring background message (reason=$reason)")
-                SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                false
             }
 
             walletId != null && businessMap[walletId] != null -> {
@@ -86,34 +83,35 @@ class PaymentsForegroundService : Service() {
                         it.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
                     }
                 }
-                SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                false
             }
 
             walletId == null -> {
                 log.info("no wallet_id provided, ignoring background message (reason=$reason)")
-                SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                false
             }
 
             else -> {
                 when (val result = SeedManager.loadAndDecrypt(applicationContext)) {
                     is DecryptSeedResult.Failure.SeedFileNotFound -> {
                         log.info("seed not found, ignoring background message (reason=$reason)")
-                        SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                        false
                     }
                     is DecryptSeedResult.Failure -> {
                         log.info("unable to read seed, ignoring background message (reason=$reason)")
                         when (reason) {
                             "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
                             "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
-                            else -> SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                            else -> Unit
                         }
+                        false
                     }
                     is DecryptSeedResult.Success -> {
                         val userWallets = result.userWalletsMap
                         val wallet = userWallets[walletId]
                         if (wallet == null) {
                             log.info("seed not found for node_id=$walletId, ignoring background message (reason=$reason)")
-                            SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                            false
                         } else {
                             serviceScope.launch(Dispatchers.Default) {
                                 when (val res = BusinessManager.startNewBusiness(wallet.words, isHeadless = true)) {
@@ -125,19 +123,21 @@ class PaymentsForegroundService : Service() {
                                     is StartBusinessResult.Success -> Unit
                                 }
                             }
-                            SystemNotificationHelper.notifyRunningHeadless(applicationContext)
+                            true
                         }
                     }
                 }
             }
         }
 
-        // service will automatically shutdown after a while
-        shutdownHandler.removeCallbacksAndMessages(null)
-        shutdownHandler.postDelayed(shutdownRunnable, 2.minutes.inWholeMilliseconds)
-
         // show a notification -- this is mandatory!
+        val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
         startForeground(notif)
+
+        // service will automatically shutdown -- delay is short if the message is ignored
+        shutdownHandler.removeCallbacksAndMessages(null)
+        shutdownHandler.postDelayed(shutdownRunnable, if (shouldWeWaitLong) 2.minutes.inWholeMilliseconds else 5.seconds.inWholeMilliseconds)
+
         return START_NOT_STICKY
     }
 
@@ -147,6 +147,11 @@ class PaymentsForegroundService : Service() {
         } else {
             startForeground(SystemNotificationHelper.HEADLESS_NOTIF_ID, notif)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        log.info("foreground service destroyed")
     }
 
     companion object {

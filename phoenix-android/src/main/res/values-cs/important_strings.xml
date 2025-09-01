@@ -29,7 +29,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix běží na pozadí</string>
-    <string name="notif_headless_received">Přijaté +%1$s</string>
+    <string name="notif_headless_received">%1$s Přijaté +%2$s</string>
 
     <string name="notif_pending_settlement_title">Spusťte prosím Phoenix</string>
     <string name="notif_pending_settlement_message">Čeká se na příchozí vyrovnání.</string>

@@ -35,9 +35,9 @@ import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.components.nfc.NfcState
 import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
-import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.HceService
+import fr.acinq.phoenix.android.services.PaymentsForegroundService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.android.utils.nfc.NfcReaderCallback
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
@@ -128,6 +128,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        stopService(Intent(this, PaymentsForegroundService::class.java))
     }
 
     override fun onResume() {
