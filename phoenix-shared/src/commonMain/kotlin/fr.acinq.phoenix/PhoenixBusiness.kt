@@ -117,8 +117,8 @@ class PhoenixBusiness(
         peerManager.peerState.value?.cancel()
         peerManager.cancel()
         appConfigurationManager.cancel()
-            appDb.close()
-            databaseManager.close()
+        appDb.close()
+        databaseManager.close()
         databaseManager.cancel()
         lnurlManager.cancel()
         logger.info { "stopped business" }
