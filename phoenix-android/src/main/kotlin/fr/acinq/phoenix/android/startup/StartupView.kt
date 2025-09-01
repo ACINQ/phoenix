@@ -187,7 +187,7 @@ fun StartupView(
                                             promptScreenLockImmediately = startDefaultImmediately,
                                             doLoadWallet = { userWallet ->
                                                 startupViewModel.startupNode(walletId = userWallet.walletId, words = userWallet.words, onStartupSuccess = {
-                                                    appViewModel.setActiveWallet(id = userWallet.walletId, business = it)
+                                                    appViewModel.setActiveWallet(walletId = userWallet.walletId, business = it)
                                                     onWalletReady()
                                                 })
                                                 loadingWallet = null

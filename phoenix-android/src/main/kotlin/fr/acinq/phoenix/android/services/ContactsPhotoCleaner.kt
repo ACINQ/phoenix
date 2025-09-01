@@ -46,14 +46,14 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
             // get the active business map, or create it no business is active
             val businessMap = BusinessManager.businessFlow.value.takeIf { it.isNotEmpty() }
                 ?: run {
-                    val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
-                    if (seedMap.isNullOrEmpty()) {
+                    val userWallets = SeedManager.loadAndDecryptOrNull(applicationContext)
+                    if (userWallets.isNullOrEmpty()) {
                         log.info("no seeds available, terminating $name")
                         return Result.success()
                     }
 
-                    seedMap.map { (walletId, words) ->
-                        val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
+                    userWallets.map { (walletId, wallet) ->
+                        val res = BusinessManager.startNewBusiness(words = wallet.words, isHeadless = true)
                         if (res is StartBusinessResult.Failure) {
                             log.info("failed to start business for wallet=$walletId")
                             return Result.failure()

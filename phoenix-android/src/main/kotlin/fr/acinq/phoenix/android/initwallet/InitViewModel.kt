@@ -74,7 +74,9 @@ abstract class InitViewModel : ViewModel() {
         }) {
             log.debug("writing mnemonics to disk...")
             writingState = WritingSeedState.Writing(mnemonics)
-            val existingSeeds = SeedManager.loadAndDecryptOrNull(application.applicationContext)
+            val existingSeeds = SeedManager.loadAndDecryptOrNull(application.applicationContext)?.map {
+                it.key to it.value.words
+            }?.toMap()
 
             val seed = MnemonicCode.toSeed(mnemonics, "").toByteVector()
             val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)

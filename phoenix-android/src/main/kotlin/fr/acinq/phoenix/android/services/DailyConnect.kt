@@ -58,15 +58,15 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
             return Result.success()
         }
 
-        val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
-        if (seedMap.isNullOrEmpty()) {
+        val userWallets = SeedManager.loadAndDecryptOrNull(applicationContext)
+        if (userWallets.isNullOrEmpty()) {
             log.info("could not load any seed, aborting $name")
             return Result.success()
         }
 
         try {
-            val businessMap = seedMap.map { (walletId, words) ->
-                val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
+            val businessMap = userWallets.map { (walletId, wallet) ->
+                val res = BusinessManager.startNewBusiness(words = wallet.words, isHeadless = true)
                 if (res is StartBusinessResult.Failure) {
                     log.info("failed to start business for wallet=$walletId")
                     return Result.success()

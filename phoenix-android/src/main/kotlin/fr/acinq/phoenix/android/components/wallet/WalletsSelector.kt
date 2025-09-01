@@ -80,7 +80,7 @@ fun WalletsSelector(
         if (currentWallet != null) {
             item {
                 AvailableWalletView(
-                    walletId = currentWallet.walletId,
+                    userWallet = currentWallet,
                     metadata = walletsMetadata.getByWalletIdOrDefault(currentWallet.walletId),
                     isCurrent = true,
                     canEdit = canEdit,
@@ -93,7 +93,7 @@ fun WalletsSelector(
         }
         items(items = otherWalletsList) { (walletId, userWallet) ->
             AvailableWalletView(
-                walletId = walletId,
+                userWallet = userWallet,
                 metadata = walletsMetadata.getByWalletIdOrDefault(walletId),
                 isCurrent = false,
                 canEdit = canEdit,
@@ -110,7 +110,7 @@ fun WalletsSelector(
 @Composable
 private fun AvailableWalletView(
     modifier: Modifier = Modifier,
-    walletId: WalletId,
+    userWallet: UserWallet,
     metadata: UserWalletMetadata,
     isCurrent: Boolean,
     canEdit: Boolean,
@@ -120,7 +120,7 @@ private fun AvailableWalletView(
     if (showWalletEditDialog) {
         EditWalletDialog(
             onDismiss = { showWalletEditDialog = false },
-            walletId = walletId,
+            walletId = userWallet.walletId,
             metadata = metadata,
         )
     }
@@ -131,16 +131,19 @@ private fun AvailableWalletView(
             if (isCurrent) {
                 if (canEdit) showWalletEditDialog = true else return@Clickable
             } else {
-                onClick(walletId)
+                onClick(userWallet.walletId)
             }
         },
         shape = RoundedCornerShape(16.dp),
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         Row(modifier = Modifier.height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
-            Row(modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 12.dp)
-                .weight(1f), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 WalletAvatar(avatar = metadata.avatar, backgroundColor = Color.Transparent, internalPadding = PaddingValues(4.dp))
                 Spacer(Modifier.width(12.dp))
                 Column {
@@ -152,8 +155,7 @@ private fun AvailableWalletView(
                         }
                     }
                     Spacer(Modifier.height(2.dp))
-                    // TODO: get the actual node id
-                    Text(text = walletId.nodeIdHash, modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp))
+                    Text(text = userWallet.nodeId, modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp))
                 }
             }
             if (isCurrent && canEdit) {

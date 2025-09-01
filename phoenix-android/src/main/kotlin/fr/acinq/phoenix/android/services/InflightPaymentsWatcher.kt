@@ -75,14 +75,14 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
             return Result.success()
         }
 
-        val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
-        if (seedMap.isNullOrEmpty()) {
+        val userWallets = SeedManager.loadAndDecryptOrNull(applicationContext)
+        if (userWallets.isNullOrEmpty()) {
             log.debug("could not load any seed, aborting $name")
             return Result.success()
         }
 
-        val watchResult = seedMap.map { (nodeId, words) ->
-            watchNodeId(nodeId, words)
+        val watchResult = userWallets.map { (walletId, wallet) ->
+            watchWallet(walletId, wallet.words)
         }
 
         if (BusinessManager.isHeadless.first()) {
@@ -98,7 +98,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
         }
     }
 
-    private suspend fun watchNodeId(walletId: WalletId, words: List<String>): Boolean {
+    private suspend fun watchWallet(walletId: WalletId, words: List<String>): Boolean {
         try {
             val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId = walletId)
             val inFlightPaymentsCount = internalPrefs.getInFlightPaymentsCount.first()

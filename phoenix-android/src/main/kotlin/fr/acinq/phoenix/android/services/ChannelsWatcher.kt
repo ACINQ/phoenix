@@ -55,14 +55,14 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             return Result.success()
         }
 
-        val seedMap = SeedManager.loadAndDecryptOrNull(applicationContext)
-        if (seedMap.isNullOrEmpty()) {
+        val userWallets = SeedManager.loadAndDecryptOrNull(applicationContext)
+        if (userWallets.isNullOrEmpty()) {
             log.info("could not load any seed, aborting $name")
             return Result.success()
         }
 
-        val watchResult = seedMap.map { (nodeId, words) ->
-            watchWallet(nodeId, words)
+        val watchResult = userWallets.map { (walletId, wallet) ->
+            watchWallet(walletId, wallet.words)
         }
 
         if (BusinessManager.isHeadless.first()) {

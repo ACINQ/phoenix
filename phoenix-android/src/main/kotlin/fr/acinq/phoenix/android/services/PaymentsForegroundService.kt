@@ -109,14 +109,14 @@ class PaymentsForegroundService : Service() {
                         }
                     }
                     is DecryptSeedResult.Success -> {
-                        val mnemonicsMap = result.mnemonicsMap
-                        val match = mnemonicsMap[walletId]
-                        if (match.isNullOrEmpty()) {
+                        val userWallets = result.userWalletsMap
+                        val wallet = userWallets[walletId]
+                        if (wallet == null) {
                             log.info("seed not found for node_id=$walletId, ignoring background message (reason=$reason)")
                             SystemNotificationHelper.notifyRunningHeadless(applicationContext)
                         } else {
                             serviceScope.launch(Dispatchers.Default) {
-                                when (val res = BusinessManager.startNewBusiness(match, isHeadless = true)) {
+                                when (val res = BusinessManager.startNewBusiness(wallet.words, isHeadless = true)) {
                                     is StartBusinessResult.Failure -> {
                                         log.error("error when starting wallet=$walletId... from foreground service: $res")
                                         stopForeground(STOP_FOREGROUND_REMOVE)

@@ -158,18 +158,18 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
 
     val activeWalletInUI by appViewModel.activeWalletInUI.collectAsState()
     val availableWallets by appViewModel.availableWallets.collectAsState()
-    val activeWalletId = activeWalletInUI?.id ?: return
+    val activeWallet = activeWalletInUI ?: return
     var showAvailableWalletsDialog by remember { mutableStateOf(false) }
 
     ClickableWalletView(
-        walletId = activeWalletId,
+        walletId = activeWallet.id,
         onClick = { showAvailableWalletsDialog = true },
     )
 
     if (showAvailableWalletsDialog) {
         AvailableWalletsDialog(
             onDismiss = { showAvailableWalletsDialog = false },
-            activeWalletId = activeWalletId,
+            activeWalletId = activeWallet.id,
             availableWallets = availableWallets,
             onSwitchWallet = { appViewModel.resetActiveWallet() ; appViewModel.switchToWallet(it.walletId) },
             onLockWallet = { appViewModel.resetActiveWallet() },

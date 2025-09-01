@@ -22,8 +22,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.google.firebase.messaging.FirebaseMessaging
-import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.byteVector
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
@@ -75,13 +73,13 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
             delay(350)
 
             val context = application.applicationContext
-            val seedMap = when (val seedFileResult = SeedManager.loadAndDecrypt(context)) {
+            val userWallets = when (val seedFileResult = SeedManager.loadAndDecrypt(context)) {
                 is DecryptSeedResult.Failure -> {
                     log.error("could not decrypt seed file: {}", seedFileResult)
                     state.value = ResetWalletStep.Result.Failure.SeedFileAccess
                     return@launch
                 }
-                is DecryptSeedResult.Success -> seedFileResult.mnemonicsMap
+                is DecryptSeedResult.Success -> seedFileResult.userWalletsMap
             }
 
             delay(250)
@@ -101,7 +99,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
             delay(400)
 
             state.value = ResetWalletStep.Deleting.Seed
-            val newSeedMap = seedMap - walletId
+            val newSeedMap = (userWallets - walletId).map { it.key to it.value.words }.toMap()
             val newEncryptedSeed = EncryptedSeed.V2.MultipleSeed.encrypt(newSeedMap)
             try {
                 SeedManager.writeSeedToDisk(context, newEncryptedSeed, overwrite = true)

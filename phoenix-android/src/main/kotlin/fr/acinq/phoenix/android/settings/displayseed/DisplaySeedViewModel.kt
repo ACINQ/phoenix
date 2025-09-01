@@ -55,9 +55,9 @@ class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
             when (val result = SeedManager.loadAndDecrypt(application.applicationContext)) {
                 is DecryptSeedResult.Success -> {
                     delay(300)
-                    val match = result.mnemonicsMap[walletId]
-                    if (!match.isNullOrEmpty()) {
-                        state.value = ReadingSeedState.Decrypted(match)
+                    val wallet = result.userWalletsMap[walletId]
+                    if (wallet != null) {
+                        state.value = ReadingSeedState.Decrypted(wallet.words)
                     } else {
                         log.error("could not find mnemonics for wallet=$walletId")
                         state.value = ReadingSeedState.Error.CouldNotFindMatch

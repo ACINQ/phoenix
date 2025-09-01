@@ -18,9 +18,9 @@ package fr.acinq.phoenix.android.security
 
 import android.content.Context
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
+import fr.acinq.phoenix.android.UserWallet
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.EncryptedSeed.Companion.toMnemonics
 import fr.acinq.phoenix.android.security.EncryptedSeed.Companion.toMnemonicsSafe
@@ -31,7 +31,7 @@ import java.io.File
 import java.security.KeyStoreException
 
 sealed class DecryptSeedResult {
-    data class Success(val mnemonicsMap: Map<WalletId, List<String>>): DecryptSeedResult()
+    data class Success(val userWalletsMap: Map<WalletId, UserWallet>): DecryptSeedResult()
     sealed class Failure: DecryptSeedResult() {
         data object SeedFileNotFound: Failure()
         data class KeyStoreFailure(val cause: KeyStoreException): Failure()
@@ -74,11 +74,12 @@ object SeedManager {
 
                 val seed = MnemonicCode.toSeed(words, "").toByteVector()
                 val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
-                val walletId = WalletId(keyManager.nodeKeys.nodeKey.publicKey)
+                val nodeId = keyManager.nodeKeys.nodeKey.publicKey
+                val walletId = WalletId(nodeId)
 
                 DataStoreManager.migratePrefsForWallet(context, walletId)
 
-                DecryptSeedResult.Success(mnemonicsMap = mapOf(walletId to words))
+                DecryptSeedResult.Success(userWalletsMap = mapOf(walletId to UserWallet(walletId, nodeId.toHex(), words)))
             }
 
             is EncryptedSeed.V2.MultipleSeed -> {
@@ -96,7 +97,13 @@ object SeedManager {
                 return when {
                     seedMap.isEmpty() -> DecryptSeedResult.Failure.SeedFileNotFound
                     else -> {
-                        seedMap.map { (walletId, seed) -> walletId to toMnemonics(seed) }.toMap().let {
+                        seedMap.map { (walletId, payload) ->
+                            val words = toMnemonics(payload)
+                            val seed = MnemonicCode.toSeed(words, "").toByteVector()
+                            val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
+                            val nodeId = keyManager.nodeKeys.nodeKey.publicKey
+                            walletId to UserWallet(walletId, nodeId.toHex(), words)
+                        }.toMap().let {
                             DecryptSeedResult.Success(it)
                         }
                     }
@@ -112,8 +119,8 @@ object SeedManager {
      * Returns an empty map if the seed file does not exist yet.
      * Returns null if there was a problem when loading or decrypting the seed file.
      */
-    fun loadAndDecryptOrNull(context: Context): Map<WalletId, List<String>>? = when (val res = loadAndDecrypt(context)) {
-        is DecryptSeedResult.Success -> res.mnemonicsMap
+    fun loadAndDecryptOrNull(context: Context): Map<WalletId, UserWallet>? = when (val res = loadAndDecrypt(context)) {
+        is DecryptSeedResult.Success -> res.userWalletsMap
         is DecryptSeedResult.Failure.SeedFileNotFound -> emptyMap()
         is DecryptSeedResult.Failure -> null
     }

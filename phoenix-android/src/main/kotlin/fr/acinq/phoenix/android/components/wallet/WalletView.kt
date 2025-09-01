@@ -45,6 +45,7 @@ import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.PhoenixIcon
@@ -70,7 +71,10 @@ fun WalletView(
         Column {
             Text(text = metadata.nameOrDefault(), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
             Spacer(Modifier.height(2.dp))
-            Text(text = walletId.nodeIdHash, modifier = Modifier.widthIn(max = 250.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
+            val nodeParams by business.nodeParamsManager.nodeParams.collectAsState()
+            nodeParams?.nodeId?.toString()?.let {
+                Text(text = it, modifier = Modifier.widthIn(max = 250.dp), maxLines = 1, overflow = TextOverflow.Ellipsis, style = monoTypo.copy(color = MaterialTheme.typography.caption.color))
+            }
         }
     }
 }

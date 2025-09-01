@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -141,7 +142,7 @@ fun SettingWithCopy(
         title = title,
         titleNote = titleNote,
         subtitle = {
-            Text(text = value, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
+            Text(text = value, fontFamily = FontFamily.Monospace, fontSize = 12.sp, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
         },
         trailingIcon = {
             Button(

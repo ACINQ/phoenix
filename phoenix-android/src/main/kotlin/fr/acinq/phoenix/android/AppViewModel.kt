@@ -85,6 +85,7 @@ data class WalletId(val nodeIdHash: String): BaseWalletId() {
 
 data class UserWallet(
     val walletId: WalletId,
+    val nodeId: String,
     val words: List<String>,
 ) {
     override fun toString(): String = "UserWallet[ wallet_id=$walletId, words=*** ]"
@@ -146,10 +147,10 @@ class AppViewModel(
         listAvailableWallets()
     }
 
-    fun setActiveWallet(id: WalletId, business: PhoenixBusiness) {
-        val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId = id)
-        val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId = id)
-        _activeWalletInUI.value = ActiveWallet(id = id, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
+    fun setActiveWallet(walletId: WalletId, business: PhoenixBusiness) {
+        val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId = walletId)
+        val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId = walletId)
+        _activeWalletInUI.value = ActiveWallet(id = walletId, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
         scheduleAutoLock()
     }
 
@@ -183,12 +184,12 @@ class AppViewModel(
 
                 is DecryptSeedResult.Success -> {
                     val metadataMap = application.globalPrefs.getAvailableWalletsMeta.first()
-                    _availableWallets.value = result.mnemonicsMap.map { (walletId, words) ->
+                    result.userWalletsMap.forEach { (walletId, _) ->
                         if (metadataMap[walletId] == null) {
                             application.globalPrefs.saveAvailableWalletMeta(walletId, name = null, avatar = WalletAvatars.list.random())
                         }
-                        walletId to UserWallet(walletId = walletId, words = words)
-                    }.toMap()
+                    }
+                    _availableWallets.value = result.userWalletsMap
                     listWalletState.value = ListWalletState.Success
                 }
             }
