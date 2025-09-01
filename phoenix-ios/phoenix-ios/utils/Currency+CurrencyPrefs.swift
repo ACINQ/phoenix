@@ -16,9 +16,9 @@ extension Currency {
 	///   - currencyPrefs: Pass the view's EvironmentObject instance
 	///   - plus: Optionally add an additional Currency to the end of the list
 	///
-	static func displayable(currencyPrefs: CurrencyPrefs, plus: Currency? = nil) -> [Currency] {
+	static func displayable(currencyPrefs: CurrencyPrefs, plus: [Currency]? = nil) -> [Currency] {
 		
-		var all = [Currency](GroupPrefs.shared.currencyConverterList)
+		var all = [Currency](GroupPrefs.current.currencyConverterList)
 		
 		let preferredFiatCurrency = Currency.fiat(currencyPrefs.fiatCurrency)
 		if !all.contains(preferredFiatCurrency) {
@@ -30,9 +30,11 @@ extension Currency {
 			all.insert(preferredBitcoinUnit, at: 0)
 		}
 		
-		if let plus = plus {
-			if !all.contains(plus) {
-				all.append(plus)
+		if let plus {
+			for currency in plus {
+				if !all.contains(currency) {
+					all.append(currency)
+				}
 			}
 		}
 		

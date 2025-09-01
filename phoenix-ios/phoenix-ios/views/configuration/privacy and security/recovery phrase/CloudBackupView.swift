@@ -21,7 +21,6 @@ struct CloudBackupView: View {
 	
 	@State var animatingLegalToggleColor = false
 	
-	let walletId: WalletIdentifier
 	@State var originalName: String = ""
 	@State var name: String = ""
 	
@@ -29,9 +28,7 @@ struct CloudBackupView: View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	init(backupSeed_enabled: Binding<Bool>) {
-		
 		self._backupSeed_enabled = backupSeed_enabled
-		self.walletId = Biz.walletId!
 	}
 	
 	// --------------------------------------------------
@@ -308,7 +305,7 @@ struct CloudBackupView: View {
 		legal_appleRisk = original_appleRisk
 		legal_governmentRisk = original_governmentRisk
 		
-		originalName = Prefs.shared.backupSeed.name(walletId) ?? ""
+		originalName = Prefs.current.backupSeed.name ?? ""
 		name = originalName
 	}
 	
@@ -365,18 +362,18 @@ struct CloudBackupView: View {
 			backupSeed_enabled = toggle_enabled
 			
 			// Subtle optimizations:
-			// - changing backupSeed_isEnabled causes upload/delete
-			// - changing backupSeed_name can cause upload
+			// - changing backupSeed.enabled causes upload/delete
+			// - changing backupSeed.name can cause upload
 			//
 			// They can be performed in any order, and they will work correctly.
 			// But it might result in 2 uploads.
 			//
 			if toggle_enabled {
-				Prefs.shared.backupSeed.setName(name, walletId)
-				Prefs.shared.backupSeed.isEnabled = toggle_enabled
+				Prefs.current.backupSeed.name = name
+				Prefs.current.backupSeed.isEnabled = toggle_enabled
 			} else {
-				Prefs.shared.backupSeed.isEnabled = toggle_enabled
-				Prefs.shared.backupSeed.setName(name, walletId)
+				Prefs.current.backupSeed.isEnabled = toggle_enabled
+				Prefs.current.backupSeed.name = name
 			}
 		} else {
 			log.trace("!hasChanges || !canSave")

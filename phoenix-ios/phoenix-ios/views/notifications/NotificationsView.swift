@@ -18,8 +18,6 @@ struct NotificationsView : View {
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	
-	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
-	
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
@@ -45,8 +43,10 @@ struct NotificationsView : View {
 				body_embedded()
 			}
 		}
-		.onReceive(bizNotificationsPublisher) {
-			bizNotificationsChanged($0)
+		.task {
+			for await notifications in Biz.business.notificationsManager.notificationsSequence() {
+				bizNotificationsChanged(notifications)
+			}
 		}
 	}
 	

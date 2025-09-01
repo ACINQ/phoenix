@@ -1,6 +1,6 @@
 import Foundation
 
-struct CapabilitiesContainer {
+struct CapabilitiesContainer: CustomStringConvertible {
 	
 	static let minByteCount: Int = 7
 	
@@ -85,6 +85,20 @@ struct CapabilitiesContainer {
 		return buffer
 	}
 	
+	var description: String {
+		
+		var output: String = ""
+		output += "CapabilitiesContainer:\n"
+		output += " - len: \(len)\n"
+		output += " - v: \(Helper.leftNibble(version)).\(Helper.rightNibble(version))\n"
+		output += " - mLe: \(mLe)\n"
+		output += " - mLc: \(mLc)\n"
+		for file in files {
+			output += file.description
+		}
+		return output
+	}
+	
 	static func ntag424Dna_defaultValue() -> CapabilitiesContainer {
 		
 		let file2 = CtrlTLV.ntag424Dna_defaultFile2()
@@ -113,7 +127,7 @@ struct CapabilitiesContainer {
 	}
 }
 
-struct CtrlTLV {
+struct CtrlTLV: CustomStringConvertible {
 	
 	static let byteCount = 8
 	
@@ -190,6 +204,18 @@ struct CtrlTLV {
 		buffer.append(writeAccess)
 		
 		return buffer
+	}
+	
+	var description: String {
+		
+		var output: String = ""
+		output += " - CtrlTLV: fileId: 0x\(fileId.toHex())\n"
+		output += "   - t: \(t)\n"
+		output += "   - l: \(l)\n"
+		output += "   - fileSize: \(fileSize)\n"
+		output += "   - readAccess: 0x\([readAccess].toHex())\n"
+		output += "   - writeAccess: 0x\([writeAccess].toHex())\n"
+		return output
 	}
 	
 	static func ntag424Dna_defaultFile2() -> CtrlTLV {

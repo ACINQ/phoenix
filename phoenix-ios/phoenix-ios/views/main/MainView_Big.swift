@@ -623,6 +623,9 @@ struct MainView_Big: View {
 				case .forceCloseChannels : showSettings()
 				case .swapInWallet       : showSettings()
 				case .finalWallet        : showSettings()
+				case .appAccess          : showSettings()
+				case .walletMetadata     : showSettings()
+				case .bip353Registration : showSettings()
 			}
 			
 			if #available(iOS 17, *) {
@@ -665,6 +668,18 @@ struct MainView_Big: View {
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletInfo)
 					navCoordinator_settings.path.append(WalletInfoView.NavLinkTag.FinalWalletDetails)
+					
+				case .appAccess:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.AppAccess)
+					
+				case .walletMetadata:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletMetadata)
+					
+				case .bip353Registration:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.Experimental)
 				}
 			}
 		}

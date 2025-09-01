@@ -34,7 +34,8 @@ struct ModifyInvoiceSheet: View {
 	
 	@State var didTapSave: Bool = false
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// Workaround for SwiftUI bug
@@ -272,7 +273,7 @@ struct ModifyInvoiceSheet: View {
 			refreshAltAmount()
 		}
 		
-		currencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: currency)
+		currencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: [currency])
 		currencyPickerChoice = CurrencyPickerOption.currency(currency)
 		
 		smartModalState.onNextDidDisappear {
