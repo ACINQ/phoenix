@@ -10,10 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ForceCloseChannelsView : MVIView {
 	
-	@StateObject var mvi = MVIState({ $0.forceCloseChannelsConfiguration() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.forceCloseChannelsConfiguration() })
 	
 	@EnvironmentObject var popoverState: PopoverState
 	

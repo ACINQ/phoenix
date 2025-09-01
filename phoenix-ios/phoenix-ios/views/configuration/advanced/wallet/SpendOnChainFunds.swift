@@ -18,7 +18,6 @@ struct SpendOnChainFunds: View {
 	let source: Source
 	
 	@State var wallet: Lightning_kmpWalletState.WalletWithConfirmations
-	let walletPublisher: AnyPublisher<Lightning_kmpWalletState.WalletWithConfirmations, Never>
 	
 	@State var btcAddressInputResult: Result<BitcoinUri, BtcAddressInput.DetailedError> = .failure(.emptyInput)
 	
@@ -38,7 +37,8 @@ struct SpendOnChainFunds: View {
 	)
 	@State var maxNumberWidth: CGFloat? = nil
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------
@@ -52,10 +52,8 @@ struct SpendOnChainFunds: View {
 		switch source {
 		case .expiredSwapIns:
 			currentWallet = Biz.business.balanceManager.swapInWalletValue()
-			walletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 		case .finalWallet:
 			currentWallet = Biz.business.peerManager.finalWalletValue()
-			walletPublisher = Biz.business.peerManager.finalWalletPublisher()
 		}
 		
 		self._wallet = State(initialValue: currentWallet)
@@ -84,11 +82,21 @@ struct SpendOnChainFunds: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(walletPublisher) {
-			walletChanged($0)
-		}
 		.onChange(of: btcAddressInputResult) { _ in
 			btcAddressInputResultChanged()
+		}
+		.task {
+			let walletSequence: AnyAsyncSequence<Lightning_kmpWalletState.WalletWithConfirmations>
+			switch source {
+			case .expiredSwapIns:
+				walletSequence = Biz.business.balanceManager.swapInWalletSequence()
+			case .finalWallet:
+				walletSequence = Biz.business.peerManager.finalWalletSequence()
+			}
+			
+			for await wallet in walletSequence {
+				walletChanged(wallet)
+			}
 		}
 		.task {
 			await fetchMempoolRecommendedFees()
