@@ -20,37 +20,33 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinViewModel
 import fr.acinq.phoenix.android.security.EncryptedPin
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import kotlinx.coroutines.flow.first
 
-class CheckScreenLockPinViewModel(private val userPrefsRepository: UserPrefsRepository) : CheckPinViewModel() {
+class CheckScreenLockPinViewModel(private val userPrefs: UserPrefs) : CheckPinViewModel() {
 
     override suspend fun getPinCodeAttempt(): Int {
-        return userPrefsRepository.getScreenLockPinCodeAttempt.first()
+        return userPrefs.getScreenLockPinCodeAttempt.first()
     }
 
     override suspend fun savePinCodeSuccess() {
-        userPrefsRepository.saveScreenLockPinCodeSuccess()
+        userPrefs.saveScreenLockPinCodeSuccess()
     }
 
     override suspend fun savePinCodeFailure() {
-        userPrefsRepository.saveScreenLockPinCodeFailure()
+        userPrefs.saveScreenLockPinCodeFailure()
     }
 
     override suspend fun getExpectedPin(context: Context): String? {
         return EncryptedPin.getPinFromDisk(context)
     }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-                return CheckScreenLockPinViewModel(application.userPrefs) as T
-            }
+    class Factory(val userPrefs: UserPrefs) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            return CheckScreenLockPinViewModel(userPrefs) as T
         }
     }
 }

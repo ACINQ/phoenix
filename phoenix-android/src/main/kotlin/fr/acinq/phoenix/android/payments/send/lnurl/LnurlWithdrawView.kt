@@ -32,8 +32,13 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.payments.receive.EvaluateLiquidityIssuesForPayment
 import fr.acinq.phoenix.android.preferredAmountUnit

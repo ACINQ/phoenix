@@ -18,47 +18,64 @@ package fr.acinq.phoenix.android.settings.displayseed
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.SeedFileState
+import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.security.DecryptSeedResult
+import fr.acinq.phoenix.android.security.SeedManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
-class DisplaySeedViewModel : ViewModel() {
+class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
 
     sealed class ReadingSeedState() {
-        object Init : ReadingSeedState()
-        object ReadingSeed : ReadingSeedState()
+        data object Init : ReadingSeedState()
+        data object ReadingSeed : ReadingSeedState()
         data class Decrypted(val words: List<String>) : ReadingSeedState()
-        data class Error(val message: String) : ReadingSeedState()
+        sealed class Error : ReadingSeedState() {
+            data object CouldNotReadSeedFile: Error()
+            data object CouldNotFindMatch: Error()
+        }
     }
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<ReadingSeedState>(ReadingSeedState.Init)
 
-    fun readSeed(seedFileState: SeedFileState) {
+    fun readActiveSeed(walletId: WalletId) {
         if (state.value == ReadingSeedState.ReadingSeed) return
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to read seed: ${e.message}")
-            state.value = ReadingSeedState.Error(e.localizedMessage ?: "n/a")
+            state.value = ReadingSeedState.Error.CouldNotReadSeedFile
         }) {
             state.value = ReadingSeedState.ReadingSeed
-            when {
-                seedFileState is SeedFileState.Present && seedFileState.encryptedSeed is EncryptedSeed.V2.NoAuth -> {
-                    val words = EncryptedSeed.toMnemonics(seedFileState.encryptedSeed.decrypt())
+            when (val result = SeedManager.loadAndDecrypt(application.applicationContext)) {
+                is DecryptSeedResult.Success -> {
                     delay(300)
-                    state.value = ReadingSeedState.Decrypted(words)
+                    val wallet = result.userWalletsMap[walletId]
+                    if (wallet != null) {
+                        state.value = ReadingSeedState.Decrypted(wallet.words)
+                    } else {
+                        log.error("could not find mnemonics for wallet=$walletId")
+                        state.value = ReadingSeedState.Error.CouldNotFindMatch
+                    }
                 }
-                seedFileState is SeedFileState.Error.Unreadable -> {
-                    state.value = ReadingSeedState.Error(seedFileState.message ?: "n/a")
-                }
-                else -> {
-                    log.warn("unable to read seed in state=$seedFileState")
-                    state.value = ReadingSeedState.Error("unhandled state=${seedFileState::class.simpleName}")
+                is DecryptSeedResult.Failure -> {
+                    log.error("unable to get active seed: {}", result)
+                    state.value = ReadingSeedState.Error.CouldNotReadSeedFile
                 }
             }
+        }
+    }
+
+    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            @Suppress("UNCHECKED_CAST")
+            return DisplaySeedViewModel(application) as T
         }
     }
 }

@@ -23,7 +23,7 @@
     <path
         android:fillColor="#00000000"
         android:pathData="M22,2l-7,20 -4,-9 -9,-4 20,-7z"
-        android:strokeWidth="1"
+        android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
@@ -31,7 +31,7 @@
     <path
         android:fillColor="#00000000"
         android:pathData="M18,6L11,13"
-        android:strokeWidth="1"
+        android:strokeWidth="1.5"
         android:strokeColor="?attr/colorPrimary"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />

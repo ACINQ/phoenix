@@ -47,7 +47,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-class UserPrefsRepository(private val data: DataStore<Preferences>) {
+class UserPrefs(private val data: DataStore<Preferences>) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private val json = Json { ignoreUnknownKeys = true } // some prefs are json-serialized

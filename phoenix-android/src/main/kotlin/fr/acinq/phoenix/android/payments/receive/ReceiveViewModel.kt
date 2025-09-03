@@ -33,9 +33,11 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
@@ -76,8 +78,8 @@ class ReceiveViewModel(
     private val peerManager: PeerManager,
     private val nodeParamsManager: NodeParamsManager,
     private val walletManager: WalletManager,
-    private val internalDataRepository: InternalDataRepository,
-    private val userPrefs: UserPrefsRepository
+    private val internalPrefs: InternalPrefs,
+    private val userPrefs: UserPrefs
 ): ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -139,7 +141,7 @@ class ReceiveViewModel(
             } else {
                 // immediately set an address using the index saved in settings, so that the user does not have to wait for the wallet to synchronise
                 val keyManager = walletManager.keyManager.filterNotNull().first()
-                val startIndex = internalDataRepository.getLastUsedSwapIndex.first()
+                val startIndex = internalPrefs.getLastUsedSwapIndex.first()
                 val startAddress = keyManager.swapInOnChainWallet.getSwapInProtocol(startIndex).address(chain)
                 val image = QRCodeHelper.generateBitmap("bitcoin:$startAddress").asImageBitmap()
                 bitcoinAddressState = BitcoinAddressState(startIndex, startAddress, image)
@@ -147,7 +149,7 @@ class ReceiveViewModel(
                 // monitor the actual address from the swap-in wallet -- might take some time since the wallet must check all previous addresses
                 peerManager.getPeer().phoenixSwapInWallet.swapInAddressFlow.filterNotNull().collect { (newAddress, newIndex) ->
                     val newImage = QRCodeHelper.generateBitmap("bitcoin:$newAddress").asImageBitmap()
-                    internalDataRepository.saveLastUsedSwapIndex(newIndex)
+                    internalPrefs.saveLastUsedSwapIndex(newIndex)
                     bitcoinAddressState = BitcoinAddressState(newIndex, newAddress, newImage)
                 }
             }
@@ -156,6 +158,7 @@ class ReceiveViewModel(
 
     class Factory(
         private val chain: Chain,
+        private val walletId: WalletId,
         private val peerManager: PeerManager,
         private val nodeParamsManager: NodeParamsManager,
         private val walletManager: WalletManager,
@@ -163,8 +166,10 @@ class ReceiveViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
+            val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId)
+            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
             @Suppress("UNCHECKED_CAST")
-            return ReceiveViewModel(chain, peerManager, nodeParamsManager, walletManager, application.internalDataRepository, application.userPrefs) as T
+            return ReceiveViewModel(chain, peerManager, nodeParamsManager, walletManager, internalPrefs, userPrefs) as T
         }
     }
 }

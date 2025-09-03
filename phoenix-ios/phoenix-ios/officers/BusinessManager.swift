@@ -145,7 +145,7 @@ class BusinessManager {
 	public func stop() {
 
 		cancellables.removeAll()
-		business.stop(closeDatabases: true)
+		business.stop()
 		syncManager?.shutdown()
 	}
 

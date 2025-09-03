@@ -57,8 +57,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
@@ -69,9 +70,8 @@ import fr.acinq.phoenix.android.utils.negativeColor
 fun SeedInputView(
     state: RestoreWalletState.SeedInput,
     vm: RestoreWalletViewModel,
-    onRestoreDone: () -> Unit,
+    onRestoreDone: (WalletId) -> Unit,
 ) {
-    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var filteredWords by remember { mutableStateOf(emptyList<String>()) }
     val enteredWords = vm.mnemonics.filterNot { it.isNullOrBlank() }
@@ -142,13 +142,13 @@ fun SeedInputView(
     if (state is RestoreWalletState.SeedInput.Valid) {
         RestorePaymentsDbButton(
             restorePaymentDbState = vm.restorePaymentsDbState,
-            onImportDbClick = { vm.loadPaymentsDb(context, it) },
+            onImportDbClick = { vm.loadPaymentsDb(it) },
         )
         Spacer(modifier = Modifier.height(16.dp))
         Clickable(
             onClick = {
                 focusManager.clearFocus()
-                vm.checkSeedAndWrite(context, onRestoreDone)
+                vm.checkSeedAndWrite(onRestoreDone)
             },
             modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),

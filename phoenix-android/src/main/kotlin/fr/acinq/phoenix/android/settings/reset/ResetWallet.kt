@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.settings
+package fr.acinq.phoenix.android.settings.reset
 
-import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -40,111 +39,38 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.bitcoin.Chain
-import fr.acinq.bitcoin.byteVector
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Checkbox
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.wallet.ClickableWalletView
+import fr.acinq.phoenix.android.components.wallet.WalletView
 import fr.acinq.phoenix.android.primaryFiatRate
-import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.negativeColor
-import fr.acinq.phoenix.utils.extensions.phoenixName
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
-
-sealed class ResetWalletStep {
-    object Init : ResetWalletStep()
-    object Confirm : ResetWalletStep()
-    sealed class Deleting : ResetWalletStep() {
-        object Init: Deleting()
-        object Databases: Deleting()
-        object Prefs: Deleting()
-        object Seed: Deleting()
-    }
-    sealed class Result : ResetWalletStep() {
-        object Success : Result()
-        sealed class Failure : Result() {
-            data class Error(val e: Throwable) : Failure()
-        }
-    }
-}
-
-class ResetWalletViewModel : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
-
-    val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
-
-    fun deleteWalletData(
-        context: Context,
-        chain: Chain,
-        nodeIdHash: String,
-        onShutdownBusiness: () -> Unit,
-        onShutdownService: () -> Unit,
-        onPrefsClear: suspend () -> Unit,
-        onBusinessReset: () -> Unit,
-    ) {
-        if (state.value != ResetWalletStep.Confirm) return
-        state.value = ResetWalletStep.Deleting.Init
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            state.value = ResetWalletStep.Result.Failure.Error(e)
-            log.error("failed to reset wallet data: ", e)
-        }) {
-            delay(350)
-            onShutdownService()
-            onShutdownBusiness()
-            delay(250)
-
-            state.value = ResetWalletStep.Deleting.Databases
-            context.deleteDatabase("appdb.sqlite")
-            context.deleteDatabase("payments-${chain.phoenixName}-$nodeIdHash.sqlite")
-            context.deleteDatabase("channels-${chain.phoenixName}-$nodeIdHash.sqlite")
-            delay(500)
-
-            state.value = ResetWalletStep.Deleting.Prefs
-            onPrefsClear()
-            delay(400)
-
-            state.value = ResetWalletStep.Deleting.Seed
-            val datadir = SeedManager.getDatadir(context)
-            datadir.listFiles()?.forEach { it.delete() }
-            datadir.delete()
-            delay(300)
-
-            onBusinessReset()
-            state.value = ResetWalletStep.Result.Success
-        }
-    }
-}
 
 @Composable
 fun ResetWallet(
-    onShutdownBusiness: () -> Unit,
-    onShutdownService: () -> Unit,
-    onPrefsClear: suspend () -> Unit,
-    onBusinessReset: () -> Unit,
+    walletId: WalletId,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<ResetWalletViewModel>()
+    val vm = viewModel<ResetWalletViewModel>(factory = ResetWalletViewModel.Factory(application = application, walletId = walletId))
 
     DefaultScreenLayout {
         when (vm.state.value) {
@@ -164,31 +90,16 @@ fun ResetWallet(
 
         when (val state = vm.state.value) {
             ResetWalletStep.Init -> {
-                InitReset(onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
+                InitReset(walletId = walletId, onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
             }
             ResetWalletStep.Confirm -> {
-                val context = LocalContext.current
-                val business = business
-                val nodeIdHash = business.nodeParamsManager.nodeParams.value!!.nodeId.hash160().byteVector().toHex()
-                ReviewReset(
-                    onConfirmClick = {
-                        vm.deleteWalletData(
-                            context = context,
-                            chain = business.chain,
-                            nodeIdHash = nodeIdHash,
-                            onShutdownBusiness = onShutdownBusiness,
-                            onShutdownService = onShutdownService,
-                            onPrefsClear = onPrefsClear,
-                            onBusinessReset = onBusinessReset,
-                        )
-                    }
-                )
+                ReviewReset(onConfirmClick = vm::deleteWalletData)
             }
             is ResetWalletStep.Deleting -> {
                 DeletingWallet(state)
             }
             ResetWalletStep.Result.Success -> {
-                WalletDeleted()
+                WalletDeleted(walletId)
             }
             is ResetWalletStep.Result.Failure -> {
                 DeletionFailed(state)
@@ -199,18 +110,18 @@ fun ResetWallet(
 
 @Composable
 private fun InitReset(
+    walletId: WalletId,
     onReviewClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Text(text = stringResource(id = R.string.reset_wallet_instructions_header))
+        Text(text = "Do you want to delete this wallet from your device ?")
         Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = stringResource(id = R.string.reset_wallet_instructions_details),
-            style = MaterialTheme.typography.subtitle2
-        )
+        WalletView(walletId)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = "All data for this wallet will be removed, including the payments history.")
     }
 
     Card {
@@ -322,7 +233,7 @@ private fun DeletingWallet(state: ResetWalletStep.Deleting) {
 }
 
 @Composable
-private fun WalletDeleted() {
+private fun WalletDeleted(walletId: WalletId) {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
@@ -335,6 +246,7 @@ private fun WalletDeleted() {
             text = stringResource(id = R.string.btn_ok),
             icon = R.drawable.ic_check,
             onClick = {
+                BusinessManager.stopBusiness(walletId)
                 context.startActivity(
                     Intent(context, MainActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -353,6 +265,8 @@ private fun DeletionFailed(
         header = stringResource(id = R.string.reset_wallet_failure_title),
         details = when (failure) {
             is ResetWalletStep.Result.Failure.Error -> failure.e.localizedMessage
+            is ResetWalletStep.Result.Failure.SeedFileAccess -> "Could not access seed file, try again"
+            is ResetWalletStep.Result.Failure.WriteNewSeed -> "Could not delete seed, try again"
         },
     )
 }

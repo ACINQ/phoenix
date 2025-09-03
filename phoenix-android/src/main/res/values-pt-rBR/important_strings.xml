@@ -25,7 +25,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">O Phoenix está sendo executado em segundo plano</string>
-    <string name="notif_headless_received">Recebeu +%1$s</string>
+    <string name="notif_headless_received">%1$s Recebeu +%2$s</string>
 
     <string name="notif_pending_settlement_title">Por favor, inicie o Phoenix</string>
     <string name="notif_pending_settlement_message">Uma liquidação recebida está pendente.</string>

@@ -71,21 +71,23 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
 import fr.acinq.phoenix.android.components.dialogs.IconTextPopup
 import fr.acinq.phoenix.android.components.nfc.HceMonitorDialog
-import fr.acinq.phoenix.android.userPrefs
+import fr.acinq.phoenix.android.components.wallet.CompactWalletViewWithBalance
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.safeLet
@@ -96,11 +98,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ReceiveView(
+    walletId: WalletId,
     onBackClick: () -> Unit,
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
 ) {
-    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, business.peerManager, business.nodeParamsManager, business.walletManager))
+    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(business.chain, walletId, business.peerManager, business.nodeParamsManager, business.walletManager))
 
     DefaultScreenLayout(horizontalAlignment = Alignment.CenterHorizontally, isScrollable = false) {
         DefaultScreenHeader(
@@ -114,6 +117,8 @@ fun ReceiveView(
                     padding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     space = 6.dp,
                 )
+                Spacer(modifier = Modifier.width(4.dp))
+                CompactWalletViewWithBalance(walletId = walletId, showBalance = false, showInbound = true)
                 Spacer(modifier = Modifier.width(16.dp))
             },
         )
@@ -161,8 +166,8 @@ private fun ReceiveViewPages(
                     Spacer(Modifier.height(topPadding))
                     when (index) {
                         0 -> {
-                            val defaultInvoiceExpiry by userPrefs.getInvoiceDefaultExpiry.collectAsState(null)
-                            val defaultInvoiceDesc by userPrefs.getInvoiceDefaultDesc.collectAsState(null)
+                            val defaultInvoiceExpiry = LocalUserPrefs.current?.getInvoiceDefaultExpiry?.collectAsState(null)?.value
+                            val defaultInvoiceDesc = LocalUserPrefs.current?.getInvoiceDefaultDesc?.collectAsState(null)?.value
                             safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
                                 LightningInvoiceView(
                                     vm = vm, onFeeManagementClick = onFeeManagementClick,

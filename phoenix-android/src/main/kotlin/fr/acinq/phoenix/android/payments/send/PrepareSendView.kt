@@ -71,12 +71,13 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
@@ -84,7 +85,7 @@ import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.nfc.NfcReaderMonitor
-import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.navController
@@ -94,7 +95,7 @@ import fr.acinq.phoenix.android.payments.send.lnurl.LnurlPayView
 import fr.acinq.phoenix.android.payments.send.lnurl.LnurlWithdrawView
 import fr.acinq.phoenix.android.payments.send.offer.SendToOfferView
 import fr.acinq.phoenix.android.payments.send.spliceout.SendSpliceOutView
-import fr.acinq.phoenix.android.popToHome
+import fr.acinq.phoenix.android.navigation.popToHome
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.gray300
@@ -113,6 +114,7 @@ import fr.acinq.phoenix.managers.SendManager
  */
 @Composable
 fun SendView(
+    walletId: WalletId,
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
     fromDeepLink: Boolean,
@@ -144,16 +146,16 @@ fun SendView(
             LocalViewModelStoreOwner.current?.viewModelStore?.clear()
             when (val data = parseState.data) {
                 is SendManager.ParseResult.Bolt11Invoice -> {
-                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Bolt12Offer -> {
-                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Uri -> {
-                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
+                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Lnurl.Pay -> {
-                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
                     LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })

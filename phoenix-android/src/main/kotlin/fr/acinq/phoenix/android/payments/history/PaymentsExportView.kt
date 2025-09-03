@@ -36,7 +36,15 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
+import fr.acinq.phoenix.android.components.buttons.SwitchView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toBasicAbsoluteDateString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toBasicAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.copyToClipboard

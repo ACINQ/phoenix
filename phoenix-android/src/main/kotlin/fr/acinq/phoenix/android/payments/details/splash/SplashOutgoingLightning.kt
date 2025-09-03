@@ -38,8 +38,8 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.components.WebLink
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.buttons.WebLink
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString

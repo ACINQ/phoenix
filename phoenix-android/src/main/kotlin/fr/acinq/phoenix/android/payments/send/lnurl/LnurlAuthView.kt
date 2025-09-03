@@ -29,12 +29,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.buttons.InlineButton
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.userPrefs
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.managers.SendManager
 
@@ -46,7 +52,7 @@ fun LnurlAuthView(
     onAuthDone: () -> Unit,
 ) {
     var showHowItWorks by remember { mutableStateOf(false) }
-    val prefAuthScheme by userPrefs.getLnurlAuthScheme.collectAsState(initial = null)
+    val prefAuthScheme = LocalUserPrefs.current?.getLnurlAuthScheme?.collectAsState(initial = null)?.value
     val isLegacyDomain = remember(auth) { LnurlAuth.LegacyDomain.isEligible(auth.initialUrl) }
     val vm = viewModel<LnurlAuthViewModel>(factory = LnurlAuthViewModel.Factory(business.sendManager))
 

@@ -47,8 +47,15 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.openLink
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.home.TorDisconnectedDialog
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
@@ -121,8 +128,8 @@ private fun PermamentNotice(
     notice: Notice
 ) {
     val context = LocalContext.current
-    val internalData = application.internalDataRepository
-    val userPrefs = application.userPrefs
+    val internalPrefs = LocalInternalPrefs.current
+    val userPrefs = LocalUserPrefs.current
     val nc = LocalNavController.current
     val scope = rememberCoroutineScope()
 
@@ -168,7 +175,7 @@ private fun PermamentNotice(
                         confirmStateChange = {
                             if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
                                 scope.launch {
-                                    userPrefs.saveShowNotificationPermissionReminder(false)
+                                    userPrefs?.saveShowNotificationPermissionReminder(false)
                                 }
                             }
                             true
@@ -213,7 +220,7 @@ private fun PermamentNotice(
                 message = stringResource(id = R.string.inappnotif_watchtower_late_message),
                 actionText = stringResource(id = R.string.inappnotif_watchtower_late_action),
                 onActionClick = {
-                    scope.launch { internalData.saveChannelsWatcherOutcome(ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
+                    scope.launch { internalPrefs?.saveChannelsWatcherOutcome(ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
                 }
             )
         }
@@ -234,7 +241,7 @@ private fun PermamentNotice(
                 actionText = stringResource(id = R.string.btn_ok),
                 onActionClick = {
                     scope.launch {
-                        internalData.saveLastReadWalletNoticeIndex(notice.notice.index)
+                        internalPrefs?.saveLastReadWalletNoticeIndex(notice.notice.index)
                     }
                 },
             )
@@ -348,7 +355,7 @@ private fun ImportantNotification(
             Column(modifier = Modifier.alignByBaseline()) {
                 Text(text = message, style = MaterialTheme.typography.body1.copy(fontSize = 16.sp))
                 safeLet(actionText, onActionClick) { text, onClick ->
-                    Button(
+                    fr.acinq.phoenix.android.components.buttons.Button(
                         text = text, textStyle = MaterialTheme.typography.body2.copy(fontSize = 16.sp),
                         icon = R.drawable.ic_chevron_right,
                         modifier = Modifier.offset(x = (-16).dp),

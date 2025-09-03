@@ -47,17 +47,17 @@ import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -78,7 +78,7 @@ fun SwapInWallet(
 ) {
     val btcUnit = LocalBitcoinUnits.current.primary
 
-    val liquidityPolicyInPrefs by userPrefs.getLiquidityPolicy.collectAsState(null)
+    val liquidityPolicyInPrefs = LocalUserPrefs.current?.getLiquidityPolicy?.collectAsState(null)
     val swapInWallet by business.peerManager.swapInWallet.collectAsState()
     var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
 
@@ -111,7 +111,7 @@ fun SwapInWallet(
         Card {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Spacer(modifier = Modifier.height(12.dp))
-                when (val policy = liquidityPolicyInPrefs) {
+                when (val policy = liquidityPolicyInPrefs?.value) {
                     is LiquidityPolicy.Disable -> {
                         Text(text = annotatedStringResource(id = R.string.walletinfo_onchain_swapin_policy_disabled_details))
                     }

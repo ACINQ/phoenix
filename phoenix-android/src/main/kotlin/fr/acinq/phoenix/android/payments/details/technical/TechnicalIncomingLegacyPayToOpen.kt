@@ -27,8 +27,8 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
 import fr.acinq.phoenix.android.payments.details.Bolt11InvoiceSection
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRow

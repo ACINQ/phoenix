@@ -43,8 +43,8 @@ import androidx.compose.ui.window.PopupProperties
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.utils.converters.AmountConverter.toFiat
 import fr.acinq.phoenix.android.utils.borderColor

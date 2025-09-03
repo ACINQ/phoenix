@@ -22,8 +22,8 @@ import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.LightningIncomingPayment
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
 import fr.acinq.phoenix.android.payments.details.Bolt11InvoiceSection
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount

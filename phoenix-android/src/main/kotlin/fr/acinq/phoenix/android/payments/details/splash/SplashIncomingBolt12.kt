@@ -34,7 +34,7 @@ import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.contact.ContactCompactView
 import fr.acinq.phoenix.android.components.contact.OfferContactState
 import fr.acinq.phoenix.android.utils.extensions.smartDescription

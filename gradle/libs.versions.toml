@@ -36,7 +36,7 @@ playservices = "18.5.0"
 junit = "4.13"
 espresso = "3.3.0"
 robolectric = "4.13"
-agp = "8.8.0"
+agp = "8.12.2"
 
 [libraries]
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }

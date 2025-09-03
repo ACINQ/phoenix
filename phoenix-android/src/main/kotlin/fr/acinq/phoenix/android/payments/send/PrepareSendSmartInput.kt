@@ -58,9 +58,9 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.utils.getValue
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.utils.negativeColor
 
 val domains = listOf(

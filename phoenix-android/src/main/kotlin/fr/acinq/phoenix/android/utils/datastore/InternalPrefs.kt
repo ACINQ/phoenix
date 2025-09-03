@@ -32,35 +32,24 @@ import fr.acinq.phoenix.android.services.ChannelsWatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.slf4j.LoggerFactory
 import java.io.IOException
 
-class InternalDataRepository(private val internalData: DataStore<Preferences>) {
+class InternalPrefs(private val internalData: DataStore<Preferences>) {
     private companion object {
         private val json = Json { ignoreUnknownKeys = true }
 
-        private val IS_SCREEN_LOCKED = booleanPreferencesKey("is_screen_locked")
         private val LAST_REJECTED_ONCHAIN_SWAP_AMOUNT = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_AMOUNT")
         private val LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP = longPreferencesKey("LAST_REJECTED_ONCHAIN_SWAP_TIMESTAMP")
         private val SEED_MANUAL_BACKUP_DONE = booleanPreferencesKey("SEED_MANUAL_BACKUP_DONE")
-        private val LAST_USED_APP_CODE = intPreferencesKey("LAST_USED_APP_CODE")
         private val SEED_LOSS_DISCLAIMER_READ = booleanPreferencesKey("SEED_LOSS_DISCLAIMER_READ")
-        private val LEGACY_MIGRATION_MESSSAGE_SHOWN = booleanPreferencesKey("LEGACY_MIGRATION_MESSSAGE_SHOWN")
-        private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
-        private val FCM_TOKEN = stringPreferencesKey("FCM_TOKEN")
         private val CHANNELS_WATCHER_OUTCOME = stringPreferencesKey("CHANNELS_WATCHER_RESULT")
         private val LAST_USED_SWAP_INDEX = intPreferencesKey("LAST_USED_SWAP_INDEX")
         private val INFLIGHT_PAYMENTS_COUNT = intPreferencesKey("INFLIGHT_PAYMENTS_COUNT")
         private val SHOW_SPLICEOUT_CAPACITY_DISCLAIMER = booleanPreferencesKey("SHOW_SPLICEOUT_CAPACITY_DISCLAIMER")
         private val REMOTE_WALLET_NOTICE_READ_INDEX = intPreferencesKey("REMOTE_WALLET_NOTICE_READ_INDEX")
         private val BIP_353_ADDRESS = stringPreferencesKey("BIP_353_ADDRESS")
-
-        private val SHOW_RELEASE_NOTES_SINCE = intPreferencesKey("SHOW_RELEASE_NOTES_SINCE")
     }
-
-    val log = LoggerFactory.getLogger(this::class.java)
 
     /** Retrieve data stored in [internalData], with a fallback to empty data if prefs file can't be read. */
     private val safeData: Flow<Preferences> = internalData.data.catch { exception ->
@@ -73,25 +62,6 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
 
     suspend fun clear() = internalData.edit { it.clear() }
 
-    val isScreenLocked: Flow<Boolean> = safeData.map { it[IS_SCREEN_LOCKED] ?: false }
-    suspend fun saveIsScreenLocked(isLocked: Boolean) {
-        internalData.edit { it[IS_SCREEN_LOCKED] = isLocked }
-    }
-
-    /** Returns the Firebase Cloud Messaging token. */
-    val getFcmToken: Flow<String?> = safeData.map { it[FCM_TOKEN] }
-    suspend fun saveFcmToken(token: String) = internalData.edit { it[FCM_TOKEN] = token }
-
-    /** Returns the build code of the last Phoenix instance that has been run on the device. Used for migration purposes. */
-    val getLastUsedAppCode: Flow<Int?> = safeData.map { it[LAST_USED_APP_CODE] }
-    suspend fun saveLastUsedAppCode(code: Int) = internalData.edit { it[LAST_USED_APP_CODE] = code }
-
-    /** For some versions, we want to show a release note when opening the Home screen. This preference tracks from which code notes should be shown. If null, show nothing. */
-    val showReleaseNoteSinceCode: Flow<Int?> = safeData.map { it[SHOW_RELEASE_NOTES_SINCE] }
-    suspend fun saveShowReleaseNoteSinceCode(code: Int?) = internalData.edit {
-        if (code == null) it.remove(SHOW_RELEASE_NOTES_SINCE) else it[SHOW_RELEASE_NOTES_SINCE] = code
-    }
-
     /** True when the user states that he made a manual backup of the seed. */
     val isManualSeedBackupDone: Flow<Boolean> = safeData.map { it[SEED_MANUAL_BACKUP_DONE] ?: false }
     suspend fun saveManualSeedBackupDone(isDone: Boolean) = internalData.edit { it[SEED_MANUAL_BACKUP_DONE] = isDone }
@@ -102,14 +72,6 @@ class InternalDataRepository(private val internalData: DataStore<Preferences>) {
 
     /** True if a seed backup warning should be displayed - computed from SEED_MANUAL_BACKUP_DONE & SEED_LOSS_DISCLAIMER_READ. */
     val showSeedBackupNotice = safeData.map { it[SEED_MANUAL_BACKUP_DONE] != true || it[SEED_LOSS_DISCLAIMER_READ] != true }
-
-    /** True if a migration notice has already be shown. */
-    val getLegacyMigrationMessageShown: Flow<Boolean> = safeData.map { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] ?: false }
-    suspend fun saveLegacyMigrationMessageShown(isShown: Boolean) = internalData.edit { it[LEGACY_MIGRATION_MESSSAGE_SHOWN] = isShown }
-
-    /** True if the intro screen must be shown. True by default. */
-    val getShowIntro: Flow<Boolean> = safeData.map { it[SHOW_INTRO] ?: true }
-    suspend fun saveShowIntro(showIntro: Boolean) = internalData.edit { it[SHOW_INTRO] = showIntro }
 
     /** Returns the last hannels-watcher job result. */
     val getChannelsWatcherOutcome: Flow<ChannelsWatcher.Outcome?> = safeData.map {

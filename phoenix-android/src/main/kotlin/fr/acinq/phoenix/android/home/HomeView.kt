@@ -48,22 +48,23 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.MutedFilledButton
 import fr.acinq.phoenix.android.components.PrimarySeparator
-import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.components.openLink
 import fr.acinq.phoenix.android.home.releasenotes.ReleaseNoteDialog
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.utils.FCMHelper
-import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
+import fr.acinq.phoenix.android.utils.datastore.getHomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.data.inFlightPaymentsCount
@@ -86,12 +87,10 @@ fun HomeView(
 ) {
     val context = LocalContext.current
 
-    val internalData = application.internalDataRepository
-    val userPrefs = application.userPrefs
     val isPowerSaverModeOn = noticesViewModel.isPowerSaverModeOn
-    val fcmToken by internalData.getFcmToken.collectAsState(initial = "")
+    val fcmTokenFlow = application.globalPrefs.getFcmToken.collectAsState(initial = "")
     val isFCMAvailable = remember { FCMHelper.isFCMAvailable(context) }
-    val balanceDisplayMode by userPrefs.getHomeAmountDisplayMode.collectAsState(initial = HomeAmountDisplayMode.REDACTED)
+    val balanceDisplayMode by LocalUserPrefs.current.getHomeAmountDisplayMode()
 
     val connections by business.connectionsManager.connections.collectAsState()
     val channels by business.peerManager.channelsFlow.collectAsState()
@@ -236,7 +235,7 @@ fun HomeView(
                     connections = connections,
                     inFlightPaymentsCount = inFlightPaymentsCount,
                     onTorClick = onTorClick,
-                    isFCMUnavailable = fcmToken == null || !isFCMAvailable,
+                    isFCMUnavailable = fcmTokenFlow?.value == null || !isFCMAvailable,
                     isPowerSaverMode = isPowerSaverModeOn,
                     showRequestLiquidity = channels.canRequestLiquidity(),
                     onRequestLiquidityClick = onRequestLiquidityClick,
@@ -272,7 +271,7 @@ fun HomeView(
         }
     }
 
-    val releaseNoteCode by internalData.showReleaseNoteSinceCode.collectAsState(initial = null)
+    val releaseNoteCode = application.globalPrefs.showReleaseNoteSinceCode.collectAsState(initial = null).value
     releaseNoteCode?.let { ReleaseNoteDialog(sinceCode = it) }
 }
 

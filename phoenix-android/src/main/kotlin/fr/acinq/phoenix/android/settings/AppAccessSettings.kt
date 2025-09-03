@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
@@ -38,11 +38,15 @@ import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlo
 import fr.acinq.phoenix.android.components.auth.screenlock.NewScreenLockPinFlow
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
 import fr.acinq.phoenix.android.components.auth.spendinglock.NewSpendingPinFlow
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.prefs.ListPreferenceButton
 import fr.acinq.phoenix.android.components.prefs.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import kotlinx.coroutines.launch
@@ -53,11 +57,12 @@ import kotlin.time.Duration.Companion.minutes
 @Composable
 fun AppAccessSettings(
     onBackClick: () -> Unit,
-    appViewModel: AppViewModel,
+    onScheduleAutoLock: () -> Unit,
 ) {
     val context = LocalContext.current
+    val userPrefs = LocalUserPrefs.current ?: return
+
     val biometricAuthStatus = BiometricsHelper.authStatus(context)
-    val userPrefs = userPrefs
     val isBiometricLockEnabled by userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(null)
     val isCustomPinLockEnabled by userPrefs.getIsScreenLockPinEnabled.collectAsState(null)
     val autoLockDelay by userPrefs.getAutoLockDelay.collectAsState(null)
@@ -88,7 +93,7 @@ fun AppAccessSettings(
                     AutoScreenLockDelayPicker(it, onUpdateDelay = { newDelay ->
                         scope.launch {
                             userPrefs.saveAutoLockDelay(newDelay)
-                            appViewModel.scheduleAutoLock()
+                            onScheduleAutoLock()
                         }
                     })
                 }
@@ -194,9 +199,9 @@ private fun ScreenLockCustomPinView(
     isCustomPinLockEnabled: Boolean,
 ) {
     val context = LocalContext.current
+    val userPrefs = LocalUserPrefs.current ?: return
     var errorMessage by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
 
     var isInNewPinFlow by rememberSaveable { mutableStateOf(false) }
     var isInDisablingCustomPinFlow by rememberSaveable { mutableStateOf(false) }
@@ -233,6 +238,7 @@ private fun ScreenLockCustomPinView(
 
     if (isInDisablingCustomPinFlow) {
         CheckScreenLockPinFlow(
+            userPrefs = userPrefs,
             onCancel = { isInDisablingCustomPinFlow = false },
             onPinValid = {
                 scope.launch {
@@ -257,8 +263,8 @@ private fun ScreenLockCustomPinView(
 @Composable
 private fun SpendLockCustomPinView(isSpendingPinEnabled: Boolean) {
     val context = LocalContext.current
+    val userPrefs = LocalUserPrefs.current ?: return
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
     var errorMessage by remember { mutableStateOf("") }
 
     var isNewPinFlow by rememberSaveable { mutableStateOf(false) }
@@ -336,7 +342,7 @@ private fun AutoScreenLockDelayPicker(
                 Text(text = stringResource(id = R.string.accessctrl_autolock_desc, currentDelay.inWholeMinutes))
             }
         },
-        leadingIcon = { PhoenixIcon(resourceId = R.drawable.ic_lock)},
+        leadingIcon = { PhoenixIcon(resourceId = R.drawable.ic_lock) },
         selectedItem = currentDelay,
         preferences = preferences,
         onPreferenceSubmit = {

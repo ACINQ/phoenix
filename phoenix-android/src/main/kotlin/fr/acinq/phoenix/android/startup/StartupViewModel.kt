@@ -16,108 +16,76 @@
 
 package fr.acinq.phoenix.android.startup
 
-import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.byteVector
-import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.KeystoreHelper
-import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.services.NodeService
-import fr.acinq.phoenix.managers.NodeParamsManager
-import fr.acinq.phoenix.managers.nodeIdHash
-import fr.acinq.phoenix.utils.extensions.phoenixName
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.BusinessManager
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.services.ChannelsWatcher
+import fr.acinq.phoenix.android.services.ContactsPhotoCleaner
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import java.security.GeneralSecurityException
-import java.security.KeyStoreException
 
 
-sealed class StartupDecryptionState {
-    data object Init : StartupDecryptionState()
-    data object DecryptingSeed : StartupDecryptionState()
-    data object DecryptionSuccess : StartupDecryptionState()
-    sealed class DecryptionError : StartupDecryptionState() {
-        data class Other(val cause: Throwable): DecryptionError()
-        data class KeystoreFailure(val cause: Throwable): DecryptionError()
-    }
-    sealed class SeedInputFallback : StartupDecryptionState() {
-        data object Init: SeedInputFallback()
-        data object CheckingSeed: SeedInputFallback()
-        sealed class Success: SeedInputFallback() {
-            object MatchingData: Success()
-            object WrittenToDisk: Success()
-        }
-        sealed class Error: SeedInputFallback() {
-            data class Other(val cause: Throwable): Error()
-            data object SeedDoesNotMatch: Error()
-            data class KeyStoreFailure(val cause: Throwable): Error()
-        }
+sealed class StartupViewState {
+    data object Init : StartupViewState()
+    data class StartingBusiness(val walletId: WalletId) : StartupViewState()
+    data class BusinessActive(val walletId: WalletId): StartupViewState()
+
+    sealed class Error: StartupViewState() {
+        abstract val walletId: WalletId
+        data class Generic(override val walletId: WalletId, val cause: Throwable?): Error()
     }
 }
 
-class StartupViewModel : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
-    val decryptionState = mutableStateOf<StartupDecryptionState>(StartupDecryptionState.Init)
+class StartupViewModel(
+    val application: PhoenixApplication,
+) : ViewModel() {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun decryptSeedAndStart(encryptedSeed: EncryptedSeed, service: NodeService) {
-        if (decryptionState.value is StartupDecryptionState.DecryptingSeed) return
-        decryptionState.value = StartupDecryptionState.DecryptingSeed
+    val state = mutableStateOf<StartupViewState>(StartupViewState.Init)
+
+    fun startupNode(walletId: WalletId, words: List<String>, onStartupSuccess: (PhoenixBusiness) -> Unit) {
+        if (state.value !is StartupViewState.Init) {
+            return
+        }
+
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.error("error when decrypting seed: ", e)
-            decryptionState.value = when (e) {
-                is KeyStoreException, is GeneralSecurityException -> StartupDecryptionState.DecryptionError.KeystoreFailure(e)
-                else -> StartupDecryptionState.DecryptionError.Other(e)
-            }
+            log.error("error when initialising startup-view: ", e)
+            state.value = StartupViewState.Error.Generic(walletId = walletId, cause = e)
         }) {
-            when (encryptedSeed) {
-                is EncryptedSeed.V2.NoAuth -> {
-                    log.debug("decrypting seed...")
-                    delay(200)
-                    val seed = encryptedSeed.decrypt()
-                    log.debug("seed decrypted!")
-                    decryptionState.value = StartupDecryptionState.DecryptionSuccess
-                    service.startBusiness(seed)
+            state.value = StartupViewState.StartingBusiness(walletId)
+            val startResult = withContext(Dispatchers.Default) {
+                BusinessManager.startNewBusiness(words, isHeadless = false)
+            }
+
+            ChannelsWatcher.schedule(application.applicationContext)
+            ContactsPhotoCleaner.schedule(application.applicationContext)
+
+            when (startResult) {
+                is StartBusinessResult.Success -> {
+                    state.value = StartupViewState.BusinessActive(walletId)
+                    launch(Dispatchers.Main) {
+                        onStartupSuccess(startResult.business)
+                    }
                 }
+                is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(walletId = walletId, cause = startResult.cause)
+                is StartBusinessResult.Failure.LoadWalletError -> state.value = StartupViewState.Error.Generic(walletId = walletId, cause = null)
             }
         }
     }
 
-    fun checkSeedFallback(context: Context, words: List<String>, onSuccess: suspend (ByteArray) -> Unit) {
-        if (decryptionState.value is StartupDecryptionState.SeedInputFallback.CheckingSeed) return
-        decryptionState.value = StartupDecryptionState.SeedInputFallback.CheckingSeed
-
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.error("error when checking seed fallback against existing data: ", e)
-            decryptionState.value = StartupDecryptionState.SeedInputFallback.Error.Other(e)
-        }) {
-            val seed = MnemonicCode.toSeed(mnemonics = words.joinToString(" "), passphrase = "").byteVector()
-            val localKeyManager = LocalKeyManager(seed = seed, chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
-            val nodeIdHash = localKeyManager.nodeIdHash()
-            val channelsDbFile = context.getDatabasePath("channels-${NodeParamsManager.chain.phoenixName}-$nodeIdHash.sqlite")
-            if (channelsDbFile.exists()) {
-                decryptionState.value = StartupDecryptionState.SeedInputFallback.Success.MatchingData
-                val encodedSeed = EncryptedSeed.fromMnemonics(words)
-                try {
-                    KeystoreHelper.checkEncryptionCipherOrReset(KeystoreHelper.KEY_NO_AUTH)
-                } catch (e: Exception) {
-                    decryptionState.value = StartupDecryptionState.SeedInputFallback.Error.SeedDoesNotMatch
-                    return@launch
-                }
-                val encrypted = EncryptedSeed.V2.NoAuth.encrypt(encodedSeed)
-                SeedManager.writeSeedToDisk(context, encrypted, overwrite = true)
-                delay(1000)
-                decryptionState.value = StartupDecryptionState.SeedInputFallback.Success.WrittenToDisk
-                onSuccess(encodedSeed)
-            } else {
-                decryptionState.value = StartupDecryptionState.SeedInputFallback.Error.SeedDoesNotMatch
-            }
+    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return StartupViewModel(application) as T
         }
     }
 }
