@@ -154,6 +154,7 @@ fun SendToOfferView(
         Spacer(modifier = Modifier.height(36.dp))
 
         SendOfferStateButton(
+            walletId = walletId,
             state = vm.state,
             offer = offer,
             amount = amount,
@@ -170,6 +171,7 @@ fun SendToOfferView(
 
 @Composable
 private fun SendOfferStateButton(
+    walletId: WalletId,
     state: OfferState,
     offer: OfferTypes.Offer,
     amount: MilliSatoshi?,
@@ -194,6 +196,7 @@ private fun SendOfferStateButton(
             }
 
             SmartSpendButton(
+                walletId = walletId,
                 enabled = amount != null && !isAmountInError,
                 text = if (state is OfferState.Complete.Failed) {
                     stringResource(id = R.string.send_pay_retry_button)

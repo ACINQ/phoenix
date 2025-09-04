@@ -18,7 +18,6 @@ package fr.acinq.phoenix.android.security
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.security.keystore.StrongBoxUnavailableException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.security.KeyStore
@@ -34,10 +33,8 @@ object KeystoreHelper {
   /** The alias of the key used to encrypt an [EncryptedSeed.V2] seed. */
   const val KEY_NO_AUTH = "PHOENIX_KEY_NO_AUTH"
 
-  /** The alias of the key used to encrypt a [EncryptedPin.V1] PIN. */
+  /** The alias of the key used to encrypt [EncryptedLockPin.KeystoreEncrypted], [EncryptedPinLock.V2], [EncryptedPinSpending.V1], [EncryptedPinSpending.V2]. */
   const val KEY_FOR_PINCODE_V1 = "PHOENIX_KEY_FOR_PINCODE_V1"
-  /** The alias of the key used to encrypt a [EncryptedSpendingPin.V1] PIN. */
-  const val KEY_FOR_SPENDINGPINCODE_V1 = "PHOENIX_KEY_FOR_SPENDINGPINCODE_V1"
 
   private val ENC_ALGO = KeyProperties.KEY_ALGORITHM_AES
   private val ENC_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC

@@ -36,6 +36,7 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 typealias CF = ControllerFactory
 
 val LocalTheme = staticCompositionLocalOf { UserTheme.SYSTEM }
+val LocalWalletId = staticCompositionLocalOf<WalletId?> { null }
 val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
 val LocalUserPrefs = staticCompositionLocalOf<UserPrefs?> { null }
 val LocalInternalPrefs = staticCompositionLocalOf<InternalPrefs?> { null }
@@ -76,6 +77,10 @@ val controllerFactory: ControllerFactory
 val business: PhoenixBusiness
     @Composable
     get() = LocalBusiness.current ?: error("business is not available")
+/** only use if there's an active wallet */
+val activeWalletId: WalletId
+    @Composable
+    get() = LocalWalletId.current ?: error("no wallet active")
 
 val application: PhoenixApplication
     @Composable

@@ -83,7 +83,7 @@ class StartupRecoveryViewModel(
                     state.value = StartupRecoveryState.Error.SeedDoesNotMatch
                     return@launch
                 }
-                val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(mapOf(WalletId(nodeIdHash) to words))
+                val encrypted = EncryptedSeed.V2.encrypt(mapOf(WalletId(nodeIdHash) to words))
                 SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                 delay(1000)
                 viewModelScope.launch(Dispatchers.Main) {

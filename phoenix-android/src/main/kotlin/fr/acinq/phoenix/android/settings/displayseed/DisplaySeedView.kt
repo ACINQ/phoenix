@@ -94,6 +94,7 @@ fun DisplaySeedView(
             when (val state = vm.state.value) {
                 is DisplaySeedViewModel.ReadingSeedState.Init -> {
                     SmartSpendButton(
+                        walletId = walletId,
                         text = stringResource(R.string.displayseed_authenticate_button),
                         icon = R.drawable.ic_key,
                         modifier = Modifier.fillMaxWidth(),

@@ -42,17 +42,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.activeWalletId
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.buttons.BorderButton
-import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.inputs.FeerateSlider
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.payments.send.spliceout.spliceFailureDetails
-import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.BitcoinUnit
 
@@ -113,6 +114,7 @@ fun CpfpView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 SmartSpendButton(
+                    walletId = activeWalletId,
                     text = stringResource(id = R.string.cpfp_execute_button),
                     icon = R.drawable.ic_check,
                     enabled = mayDoPayments,

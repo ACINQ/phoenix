@@ -16,37 +16,52 @@
 
 package fr.acinq.phoenix.android.components.auth.screenlock
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinViewModel
-import fr.acinq.phoenix.android.security.EncryptedPin
+import fr.acinq.phoenix.android.security.PinManager
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
-class CheckScreenLockPinViewModel(private val userPrefs: UserPrefs) : CheckPinViewModel() {
+class CheckScreenLockPinViewModel(override val application: PhoenixApplication, override val walletId: WalletId) : CheckPinViewModel() {
 
-    override suspend fun getPinCodeAttempt(): Int {
-        return userPrefs.getScreenLockPinCodeAttempt.first()
+    val userPrefs: UserPrefs by lazy { DataStoreManager.loadUserPrefsForWallet(context = application.applicationContext, walletId) }
+
+    init {
+        viewModelScope.launch { monitorPinCodeAttempts() }
+    }
+
+    override suspend fun getPinCodeAttempt(): Flow<Int> {
+        return userPrefs.getLockPinCodeAttempt
     }
 
     override suspend fun savePinCodeSuccess() {
-        userPrefs.saveScreenLockPinCodeSuccess()
+        userPrefs.saveLockPinCodeSuccess()
     }
 
     override suspend fun savePinCodeFailure() {
-        userPrefs.saveScreenLockPinCodeFailure()
+        userPrefs.saveLockPinCodeFailure()
     }
 
-    override suspend fun getExpectedPin(context: Context): String? {
-        return EncryptedPin.getPinFromDisk(context)
+    override suspend fun getExpectedPin(): String? {
+        return PinManager.getLockPinMapFromDisk(application.applicationContext)[walletId]
     }
 
-    class Factory(val userPrefs: UserPrefs) : ViewModelProvider.Factory {
+    override suspend fun resetPinPrefs() {
+        userPrefs.saveIsScreenLockPinEnabled(false)
+        userPrefs.saveLockPinCodeSuccess()
+    }
+
+    class Factory(val application: PhoenixApplication, val walletId: WalletId) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            return CheckScreenLockPinViewModel(userPrefs) as T
+            return CheckScreenLockPinViewModel(application, walletId) as T
         }
     }
 }

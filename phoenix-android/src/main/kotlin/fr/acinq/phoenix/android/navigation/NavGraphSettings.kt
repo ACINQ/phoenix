@@ -79,8 +79,8 @@ fun NavGraphBuilder.baseSettingsNavGraph(navController: NavController, appViewMo
         PaymentSettingsView(initialShowLnurlAuthSchemeDialog = showAuthSchemeDialog)
     }
 
-    composable(Screen.AppAccess.route) {
-        AppAccessSettings(onBackClick = { navController.popBackStack() }, onScheduleAutoLock = appViewModel::scheduleAutoLock)
+    businessComposable(Screen.AppAccess.route, appViewModel) { _, walletId, _ ->
+        AppAccessSettings(walletId = walletId, onBackClick = { navController.popBackStack() }, onScheduleAutoLock = appViewModel::scheduleAutoLock)
     }
 
     composable(Screen.Logs.route) {
@@ -138,7 +138,7 @@ fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewMo
     }
 
     businessComposable(Screen.LiquidityRequest.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:requestliquidity" })) { _, walletId, _ ->
-        RequestLiquidityView(onBackClick = { navController.popBackStack() }, walletId = walletId)
+        RequestLiquidityView(onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.AdvancedLiquidityPolicy.route, appViewModel) { _, _, _ ->

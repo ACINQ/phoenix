@@ -50,6 +50,7 @@ object SeedManager {
         return File(context.filesDir, BASE_DATADIR)
     }
 
+    @Suppress("DEPRECATION")
     fun loadAndDecrypt(context: Context): DecryptSeedResult {
         val encryptedSeed = try {
             loadEncryptedSeedFromDisk(context)
@@ -78,6 +79,7 @@ object SeedManager {
                 val walletId = WalletId(nodeId)
 
                 DataStoreManager.migratePrefsForWallet(context, walletId)
+                PinManager.migrateSingleWalletPinCode(context, walletId)
 
                 DecryptSeedResult.Success(userWalletsMap = mapOf(walletId to UserWallet(walletId, nodeId.toHex(), words)))
             }
@@ -119,7 +121,7 @@ object SeedManager {
      * Returns an empty map if the seed file does not exist yet.
      * Returns null if there was a problem when loading or decrypting the seed file.
      */
-    fun loadAndDecryptOrNull(context: Context): Map<WalletId, UserWallet>? = when (val res = loadAndDecrypt(context)) {
+    suspend fun loadAndDecryptOrNull(context: Context): Map<WalletId, UserWallet>? = when (val res = loadAndDecrypt(context)) {
         is DecryptSeedResult.Success -> res.userWalletsMap
         is DecryptSeedResult.Failure.SeedFileNotFound -> emptyMap()
         is DecryptSeedResult.Failure -> null

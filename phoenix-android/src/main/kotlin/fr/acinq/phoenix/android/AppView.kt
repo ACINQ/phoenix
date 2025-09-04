@@ -90,6 +90,7 @@ fun AppRoot(
 
     CompositionLocalProvider(
         LocalBusiness provides business,
+        LocalWalletId provides activeWalletId,
         LocalUserPrefs provides activeUserPrefs,
         LocalInternalPrefs provides activeInternalPrefs,
         LocalControllerFactory provides business?.controllers,

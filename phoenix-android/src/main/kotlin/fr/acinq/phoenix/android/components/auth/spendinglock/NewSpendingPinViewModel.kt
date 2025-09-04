@@ -16,25 +16,25 @@
 
 package fr.acinq.phoenix.android.components.auth.spendinglock
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.auth.pincode.NewPinViewModel
-import fr.acinq.phoenix.android.security.EncryptedSpendingPin
+import fr.acinq.phoenix.android.security.PinManager
 
-class NewSpendingPinViewModel(): NewPinViewModel() {
+class NewSpendingPinViewModel(override val application: PhoenixApplication, override val walletId: WalletId): NewPinViewModel() {
 
-    override fun writePinToDisk(context: Context, pin: String) {
-        EncryptedSpendingPin.writeSpendingPinToDisk(context, pin)
+    override suspend fun writePinToDisk(pin: String) {
+        val newPinMap = PinManager.getSpendingPinMapFromDisk(application.applicationContext) + (walletId to pin)
+        PinManager.writeSpendingPinMapToDisk(application.applicationContext, newPinMap)
     }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                return NewSpendingPinViewModel() as T
-            }
+    class Factory(val application: PhoenixApplication, val walletId: WalletId) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            return NewSpendingPinViewModel(application, walletId) as T
         }
     }
 }

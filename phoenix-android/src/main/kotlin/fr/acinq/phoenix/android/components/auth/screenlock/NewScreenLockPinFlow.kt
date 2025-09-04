@@ -17,19 +17,27 @@
 package fr.acinq.phoenix.android.components.auth.screenlock
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.auth.pincode.NewPinFlow
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
+import fr.acinq.phoenix.android.globalPrefs
 
 @Composable
 fun NewScreenLockPinFlow(
+    walletId: WalletId,
     onCancel: () -> Unit,
     onDone: () -> Unit
 ) {
-    val vm = viewModel<NewScreenLockPinViewModel>(factory = NewScreenLockPinViewModel.Factory)
-    NewPinFlow(onCancel = onCancel, onDone = onDone, vm = vm, prompt = {
+    val walletMetadataMap = globalPrefs.getAvailableWalletsMeta.collectAsState(null)
+    val walletMetadata = walletMetadataMap.value?.get(walletId)
+    val vm = viewModel<NewScreenLockPinViewModel>(factory = NewScreenLockPinViewModel.Factory(application, walletId), key = walletId.nodeIdHash)
+
+    NewPinFlow(onCancel = onCancel, onDone = onDone, vm = vm, walletId = walletId, walletMetadata = walletMetadata, prompt = {
         PinDialogTitle(text = stringResource(id = R.string.pincode_new_screenlock_title))
     })
 }

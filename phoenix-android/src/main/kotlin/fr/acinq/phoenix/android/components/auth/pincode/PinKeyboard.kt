@@ -35,14 +35,14 @@ import fr.acinq.phoenix.android.components.buttons.Button
 
 @Composable
 fun PinKeyboard(
+    isPinShuffled: Boolean,
     onPinPress: (Int) -> Unit,
     onResetPress: () -> Unit,
     onDeleteLAst: () -> Unit,
     isEnabled: Boolean,
 ) {
-    val isPinShuffled = LocalUserPrefs.current?.getIsPinKeyboardShuffled?.collectAsState(null)
     val pins = remember { arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0) }
-    if (isPinShuffled?.value == true) {
+    if (isPinShuffled) {
         pins.shuffle()
     }
 

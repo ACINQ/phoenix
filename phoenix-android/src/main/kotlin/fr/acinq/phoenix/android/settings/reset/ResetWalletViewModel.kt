@@ -100,7 +100,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
 
             state.value = ResetWalletStep.Deleting.Seed
             val newSeedMap = (userWallets - walletId).map { it.key to it.value.words }.toMap()
-            val newEncryptedSeed = EncryptedSeed.V2.MultipleSeed.encrypt(newSeedMap)
+            val newEncryptedSeed = EncryptedSeed.V2.encrypt(newSeedMap)
             try {
                 SeedManager.writeSeedToDisk(context, newEncryptedSeed, overwrite = true)
             } catch (e: Exception) {

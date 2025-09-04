@@ -182,6 +182,7 @@ fun SendSpliceOutView(
 
             is SpliceOutState.ReadyToSend -> {
                 SpliceOutReadyView(
+                    walletId = walletId,
                     state = state,
                     mempoolFeerate = mempoolFeerate,
                     balance = balance,
@@ -236,6 +237,7 @@ private fun SpliceOutErrorView(state: SpliceOutState) {
 
 @Composable
 private fun SpliceOutReadyView(
+    walletId: WalletId,
     state: SpliceOutState.ReadyToSend,
     mempoolFeerate: MempoolFeerate?,
     balance: MilliSatoshi?,
@@ -261,7 +263,7 @@ private fun SpliceOutReadyView(
         // low feerate == below 1 hour estimate
         val isUsingLowFeerate = mempoolFeerate != null && FeeratePerByte(state.userFeerate).feerate < mempoolFeerate.hour.feerate
         val showCapacityDisclaimer = LocalInternalPrefs.current?.getSpliceoutCapacityDisclaimer?.collectAsState(initial = true)?.value
-        ReviewSpliceOutAndConfirm(onExecute, isAmountValid, isUsingLowFeerate, showSpliceoutCapacityDisclaimer = showCapacityDisclaimer == true)
+        ReviewSpliceOutAndConfirm(walletId, onExecute, isAmountValid, isUsingLowFeerate, showSpliceoutCapacityDisclaimer = showCapacityDisclaimer == true)
     }
 }
 
@@ -309,6 +311,7 @@ fun SpliceOutCapacityDisclaimer(showCapacityDisclaimer: Boolean, onShowCapacityD
 
 @Composable
 private fun ReviewSpliceOutAndConfirm(
+    walletId: WalletId,
     onExecute: () -> Unit,
     isAmountValid: Boolean,
     isUsingLowFeerate: Boolean,
@@ -357,6 +360,7 @@ private fun ReviewSpliceOutAndConfirm(
                     } else {
                         val internalPrefs = LocalInternalPrefs.current
                         SmartSpendButton(
+                            walletId = walletId,
                             text = stringResource(R.string.send_confirm_pay_button),
                             shape = RoundedCornerShape(12.dp),
                             onSpend = {
@@ -389,6 +393,7 @@ private fun ReviewSpliceOutAndConfirm(
         )
     } else {
         SmartSpendButton(
+            walletId = walletId,
             enabled = isAmountValid,
             modifier = Modifier.enableOrFade(!showSheet),
             onSpend = {

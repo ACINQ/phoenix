@@ -51,6 +51,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.activeWalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -248,6 +249,7 @@ private fun AvailableForRefundView(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         SmartSpendButton(
+                            walletId = activeWalletId,
                             text = stringResource(id = R.string.swapinrefund_send_button),
                             onSpend = { vm.executeRefund(currentState.transaction) },
                             modifier = Modifier.fillMaxWidth(),

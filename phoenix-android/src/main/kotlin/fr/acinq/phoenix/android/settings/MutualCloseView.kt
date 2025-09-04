@@ -59,6 +59,7 @@ import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.activeWalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -254,6 +255,7 @@ fun MutualCloseView(
                                         }
                                         Spacer(modifier = Modifier.height(24.dp))
                                         SmartSpendButton(
+                                            walletId = activeWalletId,
                                             text = stringResource(id = R.string.btn_confirm),
                                             icon = R.drawable.ic_check,
                                             onSpend = {

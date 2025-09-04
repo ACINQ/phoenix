@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
@@ -56,6 +57,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun AppAccessSettings(
+    walletId: WalletId,
     onBackClick: () -> Unit,
     onScheduleAutoLock: () -> Unit,
 ) {
@@ -63,8 +65,8 @@ fun AppAccessSettings(
     val userPrefs = LocalUserPrefs.current ?: return
 
     val biometricAuthStatus = BiometricsHelper.authStatus(context)
-    val isBiometricLockEnabled by userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(null)
-    val isCustomPinLockEnabled by userPrefs.getIsScreenLockPinEnabled.collectAsState(null)
+    val isBiometricLockEnabled by userPrefs.getLockBiometricsEnabled.collectAsState(null)
+    val isCustomPinLockEnabled by userPrefs.getLockPinEnabled.collectAsState(null)
     val autoLockDelay by userPrefs.getAutoLockDelay.collectAsState(null)
 
     DefaultScreenLayout {
@@ -84,7 +86,7 @@ fun AppAccessSettings(
             } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
 
             isCustomPinLockEnabled?.let { pinEnabled ->
-                ScreenLockCustomPinView(isCustomPinLockEnabled = pinEnabled,)
+                ScreenLockCustomPinView(isCustomPinLockEnabled = pinEnabled, walletId = walletId)
             } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))
 
             if (isBiometricLockEnabled == true || isCustomPinLockEnabled == true) {
@@ -100,11 +102,11 @@ fun AppAccessSettings(
             }
         }
 
-        val isSpendLockPinEnabled by userPrefs.getIsSpendingPinEnabled.collectAsState(null)
+        val isSpendLockPinEnabled by userPrefs.getSpendingPinEnabled.collectAsState(null)
         CardHeader(text = stringResource(R.string.accessctrl_spendlock_header))
         Card {
             isSpendLockPinEnabled?.let {
-                SpendLockCustomPinView(it)
+                SpendLockCustomPinView(walletId, it)
             } ?: ProgressView(text = stringResource(R.string.utils_loading_prefs))
         }
 
@@ -196,6 +198,7 @@ private fun ScreenLockBiometricsView(
 
 @Composable
 private fun ScreenLockCustomPinView(
+    walletId: WalletId,
     isCustomPinLockEnabled: Boolean,
 ) {
     val context = LocalContext.current
@@ -225,6 +228,7 @@ private fun ScreenLockCustomPinView(
 
     if (isInNewPinFlow) {
         NewScreenLockPinFlow(
+            walletId = walletId,
             onCancel = { isInNewPinFlow = false },
             onDone = {
                 scope.launch {
@@ -238,7 +242,7 @@ private fun ScreenLockCustomPinView(
 
     if (isInDisablingCustomPinFlow) {
         CheckScreenLockPinFlow(
-            userPrefs = userPrefs,
+            walletId = walletId,
             onCancel = { isInDisablingCustomPinFlow = false },
             onPinValid = {
                 scope.launch {
@@ -261,7 +265,7 @@ private fun ScreenLockCustomPinView(
 }
 
 @Composable
-private fun SpendLockCustomPinView(isSpendingPinEnabled: Boolean) {
+private fun SpendLockCustomPinView(walletId: WalletId, isSpendingPinEnabled: Boolean) {
     val context = LocalContext.current
     val userPrefs = LocalUserPrefs.current ?: return
     val scope = rememberCoroutineScope()
@@ -289,6 +293,7 @@ private fun SpendLockCustomPinView(isSpendingPinEnabled: Boolean) {
 
     if (isNewPinFlow) {
         NewSpendingPinFlow(
+            walletId = walletId,
             onCancel = { isNewPinFlow = false },
             onDone = {
                 scope.launch {
@@ -302,6 +307,7 @@ private fun SpendLockCustomPinView(isSpendingPinEnabled: Boolean) {
 
     if (isDisablingPinFlow) {
         CheckSpendingPinFlow(
+            walletId = walletId,
             onCancel = { isDisablingPinFlow = false },
             onPinValid = {
                 scope.launch {

@@ -184,6 +184,7 @@ fun LnurlPayView(
                 }
 
                 SmartSpendButton(
+                    walletId = walletId,
                     enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
                     onSpend = {
                         safeLet(trampolineFees, amount) { fees, amt ->

@@ -168,6 +168,7 @@ fun SendToBolt11View(
         Spacer(modifier = Modifier.height(36.dp))
         val scope = rememberCoroutineScope()
         SmartSpendButton(
+            walletId = walletId,
             enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
             onSpend = {
                 safeLet(amount, trampolineFees) { amt, fees ->

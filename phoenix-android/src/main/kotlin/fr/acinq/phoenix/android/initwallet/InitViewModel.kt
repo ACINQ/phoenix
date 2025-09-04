@@ -95,7 +95,7 @@ abstract class InitViewModel : ViewModel() {
                 }
                 else -> {
                     val newSeedMap = existingSeeds + (newWalletId to mnemonics)
-                    val encrypted = EncryptedSeed.V2.MultipleSeed.encrypt(newSeedMap)
+                    val encrypted = EncryptedSeed.V2.encrypt(newSeedMap)
                     SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
                     if (isNewWallet) {

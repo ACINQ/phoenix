@@ -341,8 +341,8 @@ private fun BoxScope.LoadWallet(
 
     val isScreenLockRequired = produceState<Boolean?>(initialValue = null, key1 = userWallet) {
         val userPrefs = DataStoreManager.loadUserPrefsForWallet(context, userWallet.walletId)
-        val biometricLockEnabled = userPrefs.getIsScreenLockBiometricsEnabled.first()
-        val customPinLockEnabled = userPrefs.getIsScreenLockPinEnabled.first()
+        val biometricLockEnabled = userPrefs.getLockBiometricsEnabled.first()
+        val customPinLockEnabled = userPrefs.getLockPinEnabled.first()
 
         value = biometricLockEnabled || customPinLockEnabled
     }
@@ -385,9 +385,9 @@ private fun BoxScope.ScreenLockPrompt(
 
     val userPrefs = DataStoreManager.loadUserPrefsForWallet(context, walletId)
 
-    val isBiometricLockEnabledState = userPrefs.getIsScreenLockBiometricsEnabled.collectAsState(initial = null)
+    val isBiometricLockEnabledState = userPrefs.getLockBiometricsEnabled.collectAsState(initial = null)
     val isBiometricLockEnabled = isBiometricLockEnabledState.value
-    val isCustomPinLockEnabledState = userPrefs.getIsScreenLockPinEnabled.collectAsState(initial = null)
+    val isCustomPinLockEnabledState = userPrefs.getLockPinEnabled.collectAsState(initial = null)
     val isCustomPinLockEnabled = isCustomPinLockEnabledState.value
 
     val promptBiometricLock = {
@@ -398,7 +398,7 @@ private fun BoxScope.ScreenLockPrompt(
         BiometricsHelper.getPrompt(
             activity = context.findActivity(),
             onSuccess = {
-                scope.launch { userPrefs.saveScreenLockPinCodeSuccess() }
+                scope.launch { userPrefs.saveLockPinCodeSuccess() }
                 onUnlock()
             },
             onFailure = { onLock() },
@@ -409,7 +409,7 @@ private fun BoxScope.ScreenLockPrompt(
     var showPinLockDialog by rememberSaveable { mutableStateOf(false) }
     if (showPinLockDialog) {
         CheckScreenLockPinFlow(
-            userPrefs = userPrefs,
+            walletId = walletId,
             onCancel = { showPinLockDialog = false },
             onPinValid = { onUnlock() }
         )

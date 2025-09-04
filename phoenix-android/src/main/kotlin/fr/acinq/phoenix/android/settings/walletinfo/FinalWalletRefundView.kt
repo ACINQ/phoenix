@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +50,8 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.activeWalletId
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -254,16 +257,19 @@ private fun ColumnScope.AvailableForRefund(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SmartSpendButton(
+                    walletId = activeWalletId,
                     text = stringResource(id = R.string.swapinrefund_send_button),
                     onSpend = { onExecuteRefund(state.transaction) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = true,
+                    padding = PaddingValues(16.dp),
+                    shape = RectangleShape
                 )
             }
             is FinalWalletRefundState.Publishing -> {
                 ProgressView(text = stringResource(id = R.string.swapinrefund_sending))
             }
-            is FinalWalletRefundState.Success ->  Unit
+            is FinalWalletRefundState.Success -> Unit
         }
     }
 
@@ -281,7 +287,7 @@ private fun ColumnScope.AvailableForRefund(
         Spacer(modifier = Modifier.height(16.dp))
     }
 
-    Spacer(modifier = Modifier.height(60.dp))
+    Spacer(modifier = Modifier.height(40.dp))
 }
 
 @Composable

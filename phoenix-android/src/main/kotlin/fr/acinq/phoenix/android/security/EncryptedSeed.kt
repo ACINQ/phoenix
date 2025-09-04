@@ -34,50 +34,30 @@ sealed class EncryptedSeed {
     /** Serializes an encrypted seed as a byte array. */
     abstract fun serialize(): ByteArray
 
-    fun name(): String = javaClass.canonicalName ?: javaClass.simpleName
+    override fun toString(): String = javaClass.canonicalName ?: javaClass.simpleName
 
-    /** Version 2 encrypts the seed with a [SecretKey] from the Android Keystore. */
-    sealed class V2(val keyAlias: String) : EncryptedSeed() {
+    /**
+     * [V2] encrypts the seed with a [SecretKey] from the Android Keystore. The key in the Keystore does not require user authentication.
+     * The content may be for a [SingleSeed] or a [MultipleSeed].
+     */
+    sealed class V2 : EncryptedSeed() {
         abstract val iv: ByteArray
         abstract val ciphertext: ByteArray
 
-        /** This seed is encrypted with a key that does *NOT* require user unlock. */
-        class SingleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
-            fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
+        @Deprecated("Obsolete, do not use. Instead use [MultipleSeed] that supports multiple wallets.")
+        class SingleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2()
 
-            companion object {
-                // encrypt method has been removed, [SingleSeed] is replaced by [MultipleSeed].
-//                fun encrypt(seed: ByteArray): SingleSeed = tryWith(GeneralSecurityException()) {
-//                    val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
-//                    SingleSeed(cipher.iv, cipher.doFinal(seed))
-//                }
-            }
-        }
-
-        class MultipleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2(KeystoreHelper.KEY_NO_AUTH) {
-            private fun decrypt(): ByteArray = getDecryptionCipher().doFinal(ciphertext)
-
+        class MultipleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2() {
             fun decryptAndGetSeedMap(): Map<WalletId, ByteArray> {
                 val payload = decrypt().decodeToString()
                 val json = Json.decodeFromString<Map<String, ByteArray>>(payload)
-                return json.map { WalletId(it.key) to it.value}.toMap()
-            }
-
-            companion object {
-                fun encrypt(seedMap: Map<WalletId, List<String>>): MultipleSeed = tryWith(GeneralSecurityException()) {
-                    val json = Json.encodeToString(
-                        seedMap.map { (id, words) ->
-                            id.nodeIdHash to fromMnemonics(words)
-                        }.toMap()
-                    )
-                    val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
-                    MultipleSeed(cipher.iv, cipher.doFinal(json.encodeToByteArray()))
-                }
+                return json.map { WalletId(it.key) to it.value }.toMap()
             }
         }
 
-        fun getDecryptionCipher() = KeystoreHelper.getDecryptionCipher(keyAlias, iv)
+        fun decrypt(): ByteArray = KeystoreHelper.getDecryptionCipher(KeystoreHelper.KEY_NO_AUTH, iv).doFinal(ciphertext)
 
+        @Suppress("DEPRECATION")
         /** Serialize to a V2 ByteArray. */
         override fun serialize(): ByteArray {
             if (iv.size != IV_LENGTH) {
@@ -86,13 +66,10 @@ sealed class EncryptedSeed {
             val array = ByteArrayOutputStream()
             array.write(SEED_FILE_VERSION_2.toInt())
             array.write(
-                when (keyAlias) {
-                    KeystoreHelper.KEY_NO_AUTH -> when (this) {
-                        is SingleSeed -> SINGLE_SEED_VERSION
-                        is MultipleSeed -> MULTIPLE_SEED_VERSION
-                    }
-                    else -> throw UnhandledEncryptionKeyAlias(keyAlias)
-                }.toInt()
+                when (this) {
+                    is SingleSeed -> SINGLE_SEED_VERSION
+                    is MultipleSeed -> MULTIPLE_SEED_VERSION
+                }
             )
             array.write(iv)
             array.write(ciphertext)
@@ -102,20 +79,30 @@ sealed class EncryptedSeed {
         companion object {
             private const val IV_LENGTH = 16
             private const val SINGLE_SEED_VERSION = 1
-            private const val REMOVED_DO_NOT_USE = 2
+            // version=2 has been used and removed, do not use again.
             private const val MULTIPLE_SEED_VERSION = 3
 
             fun deserialize(stream: ByteArrayInputStream): V2 {
-                val keyVersion = stream.read()
+                val version = stream.read()
                 val iv = ByteArray(IV_LENGTH)
                 stream.read(iv, 0, IV_LENGTH)
                 val cipherText = ByteArray(stream.available())
                 stream.read(cipherText, 0, stream.available())
-                return when (keyVersion) {
+                return when (version) {
                     SINGLE_SEED_VERSION -> SingleSeed(iv, cipherText)
                     MULTIPLE_SEED_VERSION -> MultipleSeed(iv, cipherText)
-                    else -> throw UnhandledEncryptionKeyVersion(keyVersion)
+                    else -> throw IllegalArgumentException("unhandled V2 seed version=$version")
                 }
+            }
+
+            fun encrypt(seedMap: Map<WalletId, List<String>>): MultipleSeed = tryWith(GeneralSecurityException()) {
+                val json = Json.encodeToString(
+                    seedMap.map { (id, words) ->
+                        id.nodeIdHash to fromMnemonics(words)
+                    }.toMap()
+                )
+                val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
+                MultipleSeed(cipher.iv, cipher.doFinal(json.encodeToByteArray()))
             }
         }
     }
@@ -131,7 +118,7 @@ sealed class EncryptedSeed {
             val version = stream.read()
             return when (version) {
                 SEED_FILE_VERSION_2.toInt() -> V2.deserialize(stream)
-                else -> throw UnhandledSeedVersion(version)
+                else -> throw IllegalArgumentException("unhandled seed file version=$version")
             }
         }
 
@@ -149,8 +136,4 @@ sealed class EncryptedSeed {
         fun toMnemonics(array: ByteArray): List<String> = String(Hex.decode(String(array, Charsets.UTF_8)), Charsets.UTF_8).split(" ")
         fun fromMnemonics(words: List<String>): ByteArray = Hex.encode(words.joinToString(" ").encodeToByteArray()).encodeToByteArray()
     }
-
-    class UnhandledEncryptionKeyVersion(key: Int) : RuntimeException("unhandled encryption key version=$key")
-    class UnhandledEncryptionKeyAlias(alias: String) : RuntimeException("unhandled encryption key alias=$alias")
-    class UnhandledSeedVersion(version: Int) : RuntimeException("unhandled encrypted seed version=$version")
 }

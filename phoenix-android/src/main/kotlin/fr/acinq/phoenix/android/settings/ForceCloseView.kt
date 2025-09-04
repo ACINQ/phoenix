@@ -109,6 +109,7 @@ fun ForceCloseView(
                                 Text(text = stringResource(R.string.forceclose_confirm_details))
                                 Spacer(modifier = Modifier.height(24.dp))
                                 SmartSpendButton(
+                                    walletId = activeWalletId,
                                     text = stringResource(id = R.string.btn_confirm),
                                     icon = R.drawable.ic_check,
                                     onSpend = {

@@ -201,8 +201,8 @@ class AppViewModel(
             autoLockHandler.removeCallbacksAndMessages(null)
             val activeUserPrefs = activeWalletInUI.first()?.userPrefs ?: return@launch
 
-            val biometricLockEnabled = activeUserPrefs.getIsScreenLockBiometricsEnabled.first()
-            val customPinLockEnabled = activeUserPrefs.getIsScreenLockPinEnabled.first()
+            val biometricLockEnabled = activeUserPrefs.getLockBiometricsEnabled.first()
+            val customPinLockEnabled = activeUserPrefs.getLockPinEnabled.first()
             val autoLockDelay = activeUserPrefs.getAutoLockDelay.first()
 
             if ((biometricLockEnabled || customPinLockEnabled) && autoLockDelay != Duration.INFINITE) {
