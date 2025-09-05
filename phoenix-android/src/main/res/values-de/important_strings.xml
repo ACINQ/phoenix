@@ -22,7 +22,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix läuft im Hintergrund</string>
-    <string name="notif_headless_received">%1$s +%2$s empfangen</string>
+    <string name="notif_headless_received">%1$s %2$s empfangen</string>
 
     <string name="notif_pending_settlement_title">Bitte öffnen Sie Phoenix</string>
     <string name="notif_pending_settlement_message">Eine eingehende Zahlung steht aus.</string>

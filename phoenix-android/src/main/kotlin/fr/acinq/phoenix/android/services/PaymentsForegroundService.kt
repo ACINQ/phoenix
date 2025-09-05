@@ -51,11 +51,9 @@ class PaymentsForegroundService : Service() {
 
     private val shutdownHandler = Handler(Looper.getMainLooper())
     private val shutdownRunnable: Runnable = Runnable {
-        if (BusinessManager.isHeadless.value) {
-            log.info("reached scheduled shutdown while headless")
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            BusinessManager.stopAllBusinesses()
-        }
+        log.info("reached scheduled shutdown while headless")
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        BusinessManager.stopAllHeadlessBusinesses()
         stopSelf()
     }
 
@@ -71,14 +69,9 @@ class PaymentsForegroundService : Service() {
         // the notification for the foreground service depends on whether the business is started or not.
         val shouldWeWaitLong: Boolean = when {
 
-            !BusinessManager.isHeadless.value -> {
-                log.info("app is not headless, ignoring background message (reason=$reason)")
-                false
-            }
-
             walletId != null && businessMap[walletId] != null -> {
                 log.info("active business found for wallet=$walletId, ignoring background message (reason=$reason)")
-                businessMap[walletId]?.let {
+                businessMap[walletId]?.business?.let {
                     if (it.connectionsManager.connections.value.peer !is Connection.ESTABLISHED) {
                         it.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
                     }

@@ -85,9 +85,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
             watchWallet(walletId, wallet.words)
         }
 
-        if (BusinessManager.isHeadless.first()) {
-            BusinessManager.stopAllBusinesses()
-        }
+        BusinessManager.stopAllHeadlessBusinesses()
 
         return if (watchResult.all { it }) {
             log.info("finished $name, watchers have all terminated successfully")
@@ -114,7 +112,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                 return false
             }
 
-            val business = BusinessManager.businessFlow.value[walletId]
+            val business = BusinessManager.businessFlow.value[walletId]?.business
             if (business == null) {
                 log.info("failed to access business for wallet=$walletId")
                 return false

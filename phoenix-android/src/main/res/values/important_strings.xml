@@ -29,7 +29,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix is running in the background</string>
-    <string name="notif_headless_received">%1$s Received +%2$s</string>
+    <string name="notif_headless_received">%1$s Received %2$s</string>
 
     <string name="notif_pending_settlement_title">Please start wallet</string>
     <string name="notif_pending_settlement_message">An incoming settlement is pending.</string>

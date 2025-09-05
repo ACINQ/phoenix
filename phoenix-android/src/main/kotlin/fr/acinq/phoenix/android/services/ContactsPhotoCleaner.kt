@@ -70,8 +70,8 @@ class ContactsPhotoCleaner(context: Context, workerParams: WorkerParameters) : C
                 }
 
             val contactsPhotoDir = ContactsPhotoHelper.contactsDir(applicationContext)
-            val toDelete = businessMap.map { (_, business) ->
-                val contacts = business.databaseManager.contactsList.filterNotNull().first()
+            val toDelete = businessMap.map { (_, running) ->
+                val contacts = running.business.databaseManager.contactsList.filterNotNull().first()
                 val contactsPhotoNames = contactsPhotoDir.listFiles()?.map { it.name }?.toSet() ?: emptySet()
                 contactsPhotoNames.subtract(contacts.map { it.photoUri }.toSet()).filterNotNull()
             }.flatten()

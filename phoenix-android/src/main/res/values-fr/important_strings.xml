@@ -25,7 +25,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix tourne en arrière plan</string>
-    <string name="notif_headless_received">%1$s Reçu +%2$s</string>
+    <string name="notif_headless_received">%1$s Reçu %2$s</string>
 
     <string name="notif_pending_settlement_title">Veuillez démarrer Phoenix</string>
     <string name="notif_pending_settlement_message">Un paiement en attente doit être finalisé.</string>

@@ -32,7 +32,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix đang chạy trên nền.</string>
-    <string name="notif_headless_received">%1$s Đã nhận +%2$s</string>
+    <string name="notif_headless_received">%1$s Đã nhận %2$s</string>
 
     <string name="notif_pending_settlement_title">Xin hãy khởi động Phoenix.</string>
     <string name="notif_pending_settlement_message">Một khoản thanh toán đến đang chờ được xử lý.</string>

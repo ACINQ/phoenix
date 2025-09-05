@@ -66,6 +66,18 @@ sealed class StartBusinessResult {
     }
 }
 
+data class BusinessRunning(
+    val business: PhoenixBusiness,
+    val isHeadless: Boolean,
+)
+
+data class BusinessMonitorJobs(
+    val monitorHeadlessPaymentsJob: Job?, // null if the business is not headless, which is something that can change over time
+    val monitorNodeEventsJob: Job,
+    val monitorFcmTokenJob: Job,
+    val monitorInFlightPaymentsJob: Job,
+)
+
 object BusinessManager {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -78,14 +90,11 @@ object BusinessManager {
     private val application by lazy { appContext as PhoenixApplication }
 
     /** A map of (walletId -> active businesses) */
-    private val _businessFlow = MutableStateFlow<Map<WalletId, PhoenixBusiness>>(emptyMap())
+    private val _businessFlow = MutableStateFlow<Map<WalletId, BusinessRunning>>(emptyMap())
     val businessFlow = _businessFlow.asStateFlow()
 
-    private var _isHeadless = MutableStateFlow(true)
-    val isHeadless = _isHeadless.asStateFlow()
-
-    /** Mpa of jobs monitoring events/payments after business starts */
-    private val eventsMonitoringJobs = mutableMapOf<WalletId, List<Job>>()
+    /** Map of jobs monitoring events/payments once business starts */
+    private val eventsMonitoringJobs = mutableMapOf<WalletId, BusinessMonitorJobs>() //List<Job>>()
 
     fun initialize(context: Context) {
         appContext = context.applicationContext
@@ -100,8 +109,6 @@ object BusinessManager {
      * @param isHeadless true if started from a service (e.g. after a FCM notification), false if started from the UI.
      */
     suspend fun startNewBusiness(words: List<String>, isHeadless: Boolean): StartBusinessResult = startupMutex.withLock {
-
-        _isHeadless.value = isHeadless
 
         val business = PhoenixBusiness(PlatformContext(appContext))
 
@@ -125,7 +132,7 @@ object BusinessManager {
         val userPrefs = DataStoreManager.loadUserPrefsForWallet(appContext, walletId)
         val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(appContext, walletId)
 
-        val businessInFlow = businessFlow.value[walletId]
+        val businessInFlow = businessFlow.value[walletId]?.business
         if (businessInFlow != null) {
             log.info("business already exists in flow, ignoring...")
             return StartBusinessResult.Success(walletInfo, businessInFlow)
@@ -148,11 +155,13 @@ object BusinessManager {
             business.appConfigurationManager.updatePreferredFiatCurrencies(userPrefs.getFiatCurrencies.first())
 
             // setup jobs monitoring the business events
-            eventsMonitoringJobs[walletId] = listOf(
-                scope.launch { monitorPaymentsWhenHeadless(walletId, walletMetadata, business.nodeParamsManager, business.currencyManager, userPrefs) },
-                scope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager, internalPrefs) },
-                scope.launch { monitorFcmToken(business) },
-                scope.launch { monitorInFlightPayments(business.peerManager, internalPrefs) },
+            eventsMonitoringJobs[walletId] = BusinessMonitorJobs(
+                monitorHeadlessPaymentsJob = if (isHeadless) {
+                    scope.launch { monitorPaymentsWhenHeadless(walletId, walletMetadata, business.nodeParamsManager, business.currencyManager, userPrefs) }
+                } else null,
+                monitorNodeEventsJob = scope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager, internalPrefs) },
+                monitorFcmTokenJob = scope.launch { monitorFcmToken(business) },
+                monitorInFlightPaymentsJob = scope.launch { monitorInFlightPayments(business.peerManager, internalPrefs) },
             )
 
             // startup params depend user's settings: Tor and liquidity policy
@@ -161,7 +170,7 @@ object BusinessManager {
 
             // actually start the business
             log.info("starting new business with node_id=$nodeId...")
-            _businessFlow.value += walletId to business
+            _businessFlow.value += walletId to BusinessRunning(business = business, isHeadless = isHeadless)
             business.start(startupParams)
 
             // the node has been started, so we can now increment the last-used build code
@@ -181,28 +190,49 @@ object BusinessManager {
         }
     }
 
+    /**
+     * Updates the matching business in the map of active businesses with a non-headless flag. Should be called when the UI starts a given wallet.
+     * If called improperly, will not have severe effects ; the app will just show incoming payment notifications.
+     */
+    fun updateBusinessActiveInUI(walletId: WalletId) {
+        val businessMap = _businessFlow.value.toMutableMap()
+        businessMap[walletId]?.let {
+            businessMap[walletId] = it.copy(isHeadless = false)
+        }
+        eventsMonitoringJobs[walletId]?.monitorHeadlessPaymentsJob?.cancel()
+        _businessFlow.value = businessMap
+    }
+
+    fun stopAllHeadlessBusinesses() {
+        val headlessBusinesses = businessFlow.value.filter { it.value.isHeadless }
+        log.info("stopping all headless businesses (${headlessBusinesses.size})...")
+        headlessBusinesses.forEach { doStopBusiness(it.key, it.value) }
+        _businessFlow.value = businessFlow.value.minus(headlessBusinesses.keys)
+    }
+
     fun stopAllBusinesses() {
         log.info("stopping all businesses...")
-        businessFlow.value.forEach { (id, business) ->
-            business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business.stop()
-            eventsMonitoringJobs.remove(id)?.forEach { it.cancel() }
-        }
+        businessFlow.value.forEach { doStopBusiness(it.key, it.value) }
         _businessFlow.value = emptyMap()
     }
 
     fun stopBusiness(walletId: WalletId) {
         val businessMap = _businessFlow.value.toMutableMap()
-        businessMap[walletId]?.let { business ->
-            business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business.stop()
-        }
+        businessMap[walletId]?.let { doStopBusiness(walletId, it)}
         businessMap.remove(walletId)
         _businessFlow.value = businessMap
-
-        eventsMonitoringJobs.remove(walletId)?.forEach { it.cancel() }
     }
 
+    private fun doStopBusiness(walletId: WalletId, running: BusinessRunning) {
+        running.business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
+        running.business.stop()
+        eventsMonitoringJobs.remove(walletId)?.let {
+            it.monitorHeadlessPaymentsJob?.cancel()
+            it.monitorFcmTokenJob.cancel()
+            it.monitorNodeEventsJob.cancel()
+            it.monitorInFlightPaymentsJob.cancel()
+        }
+    }
     fun refreshFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -275,18 +305,15 @@ object BusinessManager {
         nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents.collect { event ->
             when (event) {
                 is PaymentEvents.PaymentReceived -> {
-                    // FIXME handle headless/background behaviour
-                    if (isHeadless.value) {
-                        SystemNotificationHelper.notifyPaymentsReceived(
-                            context = appContext,
-                            userPrefs = userPrefs,
-                            walletId = walletId,
-                            userWalletMetadata = walletMetadata,
-                            paymentId = event.payment.id,
-                            paymentAmount = event.payment.amountReceived,
-                            rates = currencyManager.ratesFlow.value,
-                        )
-                    }
+                    SystemNotificationHelper.notifyPaymentsReceived(
+                        context = appContext,
+                        userPrefs = userPrefs,
+                        walletId = walletId,
+                        userWalletMetadata = walletMetadata,
+                        paymentId = event.payment.id,
+                        paymentAmount = event.payment.amountReceived,
+                        rates = currencyManager.ratesFlow.value,
+                    )
                 }
                 else -> Unit
             }

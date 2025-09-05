@@ -84,7 +84,8 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
             withContext(Dispatchers.Default) {
                 val stopJobSignal = MutableStateFlow(false)
 
-                val watchers = businessMap.map { (walletId, business) ->
+                val watchers = businessMap.map { (walletId, running) ->
+                    val business = running.business
                     launch {
                         business.appConnectionsDaemon?.forceReconnect()
                         business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
@@ -118,9 +119,7 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
             log.error("error in $name: ", e)
             return Result.failure()
         } finally {
-            if (BusinessManager.isHeadless.first()) {
-                BusinessManager.stopAllBusinesses()
-            }
+            BusinessManager.stopAllHeadlessBusinesses()
             log.info("finished $name")
         }
     }

@@ -65,9 +65,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             watchWallet(walletId, wallet.words)
         }
 
-        if (BusinessManager.isHeadless.first()) {
-            BusinessManager.stopAllBusinesses()
-        }
+        BusinessManager.stopAllHeadlessBusinesses()
 
         return if (watchResult.all { it }) {
             log.info("finished $name, watchers have all terminated successfully")
@@ -89,7 +87,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             return true
         }
 
-        val business = BusinessManager.businessFlow.value[walletId]
+        val business = BusinessManager.businessFlow.value[walletId]?.business
         if (business == null) {
             log.info("failed to access business for wallet=$walletId")
             internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))

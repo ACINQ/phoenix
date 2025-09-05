@@ -151,6 +151,7 @@ class AppViewModel(
         val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId = walletId)
         val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId = walletId)
         _activeWalletInUI.value = ActiveWallet(id = walletId, business = business, userPrefs = userPrefs, internalPrefs = internalPrefs)
+        BusinessManager.updateBusinessActiveInUI(walletId)
         scheduleAutoLock()
     }
 
