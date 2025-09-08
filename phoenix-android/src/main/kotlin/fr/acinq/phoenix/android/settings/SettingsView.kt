@@ -171,8 +171,8 @@ private fun WalletSwitcher(appViewModel: AppViewModel) {
             onDismiss = { showAvailableWalletsDialog = false },
             activeWalletId = activeWallet.id,
             availableWallets = availableWallets,
-            onSwitchWallet = { appViewModel.resetActiveWallet() ; appViewModel.switchToWallet(it.walletId) },
-            onLockWallet = { appViewModel.resetActiveWallet() },
+            onWalletClick = { appViewModel.switchToWallet(it.walletId) },
+            onLockWallet = { appViewModel.resetToSelector() },
         )
     }
 }
@@ -182,7 +182,7 @@ private fun AvailableWalletsDialog(
     onDismiss: () -> Unit,
     activeWalletId: WalletId,
     availableWallets: Map<WalletId, UserWallet>,
-    onSwitchWallet: (UserWallet) -> Unit,
+    onWalletClick: (UserWallet) -> Unit,
     onLockWallet: () -> Unit,
 ) {
     FullScreenDialog(onDismiss = onDismiss) {
@@ -199,7 +199,7 @@ private fun AvailableWalletsDialog(
                     walletsMetadata = metadata,
                     activeWalletId = activeWalletId,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
-                    onWalletClick = onSwitchWallet,
+                    onWalletClick = onWalletClick,
                     canEdit = true,
                     bottomContent = {
                         Spacer(Modifier.height(4.dp))

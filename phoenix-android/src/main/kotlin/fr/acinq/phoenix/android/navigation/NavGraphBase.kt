@@ -75,9 +75,9 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
     composable(Screen.StartupRecovery.route) {
         StartupRecoveryView(
             onBackClick = { navController.popBackStack() },
-            onRecoveryDone = {
+            onRecoveryDone = { walletId ->
                 navController.navigate(Screen.Startup.route)
-                appViewModel.listAvailableWallets()
+                appViewModel.listAvailableWallets(onDone = { appViewModel.switchToWallet(walletId) })
             },
         )
     }
@@ -96,19 +96,13 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
 
     composable(Screen.CreateWallet.route) {
         CreateWalletView(onSeedWritten = { walletId ->
-            appViewModel.listAvailableWallets()
-            appViewModel.resetActiveWallet()
-            appViewModel.switchToWallet(walletId = walletId)
-            navController.navigate(Screen.Startup.route)
+            appViewModel.listAvailableWallets(onDone = { appViewModel.switchToWallet(walletId) })
         })
     }
 
     composable(Screen.RestoreWallet.route) {
         RestoreWalletView(onRestoreDone = { walletId ->
-            appViewModel.listAvailableWallets()
-            appViewModel.resetActiveWallet()
-            appViewModel.switchToWallet(walletId = walletId)
-            navController.navigate(Screen.Startup.route)
+            appViewModel.listAvailableWallets(onDone = { appViewModel.switchToWallet(walletId) })
         })
     }
 }

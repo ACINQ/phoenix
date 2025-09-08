@@ -121,7 +121,7 @@ class RestoreWalletViewModel(override val application: PhoenixApplication) : Ini
                 }
             }
 
-            writeSeed(mnemonics = words, isNewWallet = false, onSeedWritten = onSeedWritten)
+            writeSeed(mnemonics = words, isRestoringWallet = true, onSeedWritten = onSeedWritten)
         }
     }
 

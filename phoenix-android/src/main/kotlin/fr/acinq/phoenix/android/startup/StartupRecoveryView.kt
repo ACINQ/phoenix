@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.startup
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -36,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -46,11 +44,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.buttons.FilledButton
-import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -63,7 +61,7 @@ import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
 @Composable
 fun StartupRecoveryView(
     onBackClick: () -> Unit,
-    onRecoveryDone: () -> Unit,
+    onRecoveryDone: (WalletId) -> Unit,
 ) {
     val vm = viewModel<StartupRecoveryViewModel>(factory = StartupRecoveryViewModel.Factory(application = application))
     val state = vm.state.value

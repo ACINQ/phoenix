@@ -64,7 +64,7 @@ abstract class InitViewModel : ViewModel() {
      */
     fun writeSeed(
         mnemonics: List<String>,
-        isNewWallet: Boolean,
+        isRestoringWallet: Boolean,
         onSeedWritten: (WalletId) -> Unit
     ) {
         if (writingState !is WritingSeedState.Init) return
@@ -98,19 +98,17 @@ abstract class InitViewModel : ViewModel() {
                     val encrypted = EncryptedSeed.V2.encrypt(newSeedMap)
                     SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
-                    if (isNewWallet) {
-                        log.info("wallet successfully created and written to disk")
+                    if (isRestoringWallet) {
+                        log.info("successfully restored wallet=$newWalletId")
                     } else {
-                        log.info("wallet successfully restored and written to disk")
+                        log.info("successfully created wallet=$newWalletId")
                     }
                 }
             }
 
-            viewModelScope.launch(Dispatchers.Main) {
-                application.globalPrefs.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
-                delay(1000)
-                onSeedWritten(newWalletId)
-            }
+            application.globalPrefs.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
+            delay(1000)
+            onSeedWritten(newWalletId)
         }
     }
 }

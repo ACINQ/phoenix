@@ -42,7 +42,7 @@ class CreateWalletViewModel(override val application: PhoenixApplication) : Init
                 entropy = entropy,
                 wordlist = MnemonicLanguage.English.wordlist()
             )
-            writeSeed(mnemonics = mnemonics, isNewWallet = true, onSeedWritten = onSeedWritten)
+            writeSeed(mnemonics = mnemonics, isRestoringWallet = false, onSeedWritten = onSeedWritten)
         }
     }
 

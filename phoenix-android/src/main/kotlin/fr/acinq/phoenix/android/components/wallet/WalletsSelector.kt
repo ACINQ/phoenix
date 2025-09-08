@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.components.wallet
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -25,7 +24,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,8 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,7 +50,6 @@ import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
-import fr.acinq.phoenix.android.utils.positiveColor
 
 @Composable
 fun WalletsSelector(
@@ -147,13 +142,7 @@ private fun AvailableWalletView(
                 WalletAvatar(avatar = metadata.avatar, backgroundColor = Color.Transparent, internalPadding = PaddingValues(4.dp))
                 Spacer(Modifier.width(12.dp))
                 Column {
-                    Row {
-                        Text(text = metadata.nameOrDefault(), modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
-                        Spacer(Modifier.width(6.dp))
-                        if (isCurrent) {
-                            Image(painter = painterResource(R.drawable.ic_check), contentDescription = "Current active wallet", modifier = Modifier.size(18.dp), colorFilter = ColorFilter.tint(positiveColor))
-                        }
-                    }
+                    Text(text = metadata.nameOrDefault(), modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)
                     Spacer(Modifier.height(2.dp))
                     Text(text = userWallet.nodeId, modifier = Modifier, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.subtitle2.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp))
                 }

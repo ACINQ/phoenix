@@ -282,7 +282,7 @@ private fun ColumnScope.ContactNameAndPhoto(
                 Button(
                     text = stringResource(R.string.contact_pay_button),
                     icon = R.drawable.ic_send,
-                    enabled = paymentsCodeList.isNotEmpty(),
+                    enabled = contact != null && paymentsCodeList.isNotEmpty(),
                     padding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                     maxLines = 1,

@@ -62,7 +62,7 @@ class StartupRecoveryViewModel(
      * This method checks if the provided mnemonics matches a channel file in the local files.
      * If so, the key in the keystore is updated and the seed is written to disk.
      */
-    fun recoverSeed(words: List<String>, onRecoveryDone: () -> Unit) {
+    fun recoverSeed(words: List<String>, onRecoveryDone: (WalletId) -> Unit) {
         if (state.value is StartupRecoveryState.CheckingSeed) return
         state.value = StartupRecoveryState.CheckingSeed
 
@@ -83,11 +83,12 @@ class StartupRecoveryViewModel(
                     state.value = StartupRecoveryState.Error.SeedDoesNotMatch
                     return@launch
                 }
-                val encrypted = EncryptedSeed.V2.encrypt(mapOf(WalletId(nodeIdHash) to words))
+                val walletId = WalletId(nodeIdHash)
+                val encrypted = EncryptedSeed.V2.encrypt(mapOf(walletId to words))
                 SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                 delay(1000)
                 viewModelScope.launch(Dispatchers.Main) {
-                    onRecoveryDone()
+                    onRecoveryDone(walletId)
                 }
             } else {
                 state.value = StartupRecoveryState.Error.SeedDoesNotMatch

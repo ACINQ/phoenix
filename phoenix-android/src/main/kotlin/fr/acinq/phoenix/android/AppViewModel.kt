@@ -105,7 +105,7 @@ class AppViewModel(
     private val log = LoggerFactory.getLogger(AppViewModel::class.java)
 
     private val autoLockHandler = Handler(Looper.getMainLooper())
-    private val autoLockRunnable: Runnable = Runnable { resetActiveWallet() }
+    private val autoLockRunnable: Runnable = Runnable { clearActiveWallet() }
 
     val listWalletState = mutableStateOf<ListWalletState>(ListWalletState.Init)
 
@@ -144,7 +144,7 @@ class AppViewModel(
     }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     init {
-        listAvailableWallets()
+        listAvailableWallets(onDone = {})
     }
 
     fun setActiveWallet(walletId: WalletId, business: PhoenixBusiness) {
@@ -155,7 +155,7 @@ class AppViewModel(
         scheduleAutoLock()
     }
 
-    fun listAvailableWallets() {
+    fun listAvailableWallets(onDone: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when initialising startup-view: ", e)
             listWalletState.value = ListWalletState.Error.Generic(e)
@@ -192,6 +192,7 @@ class AppViewModel(
                     }
                     _availableWallets.value = result.userWalletsMap
                     listWalletState.value = ListWalletState.Success
+                    onDone()
                 }
             }
         }
@@ -212,13 +213,19 @@ class AppViewModel(
         }
     }
 
-    /** Will signal the startup screen that the user wishes to use the given [walletId]. */
+    /** Clears the active wallet and signals the startup screen to load the given [walletId]. */
     fun switchToWallet(walletId: WalletId) {
         _desiredWalletId.value = walletId
+        _activeWalletInUI.value = null
     }
 
-    /** Calling this method will clear the active wallet and redirect the UI to the startup screen with the wallets list prompt. */
-    fun resetActiveWallet() {
+    /** Clears the active wallet. It does not affect [desiredWalletId]. The UI may still auto-open a specific wallet, if [desiredWalletId] is not null. */
+    fun clearActiveWallet() {
+        _activeWalletInUI.value = null
+    }
+
+    /** Resets the active wallet and [desiredWalletId]. The UI will redirect to the startup screen with the wallets selector prompt. */
+    fun resetToSelector() {
         _desiredWalletId.value = null
         _activeWalletInUI.value = null
     }

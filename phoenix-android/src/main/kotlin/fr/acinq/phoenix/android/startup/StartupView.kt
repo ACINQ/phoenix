@@ -159,14 +159,13 @@ fun StartupView(
                                         }
                                     )
                                 }
-
                                 when (val wallet = loadingWallet) {
                                     null -> {
                                         WalletsSelector(
                                             wallets = availableWallets,
                                             walletsMetadata = availableWalletMetadata,
                                             activeWalletId = null,
-                                            onWalletClick = { loadingWallet = it },
+                                            onWalletClick = { appViewModel.switchToWallet(it.walletId) ; loadingWallet = it },
                                             canEdit = false,
                                             modifier = Modifier.padding(horizontal = 24.dp),
                                             topContent = {
@@ -209,7 +208,7 @@ fun StartupView(
                             is StartupViewState.Error -> {
                                 StartBusinessError(error = startupState, onTryAgainClick = {
                                     BusinessManager.stopAllBusinesses()
-                                    appViewModel.resetActiveWallet()
+                                    appViewModel.resetToSelector()
                                     startupViewModel.state.value = StartupViewState.Init
                                 })
                             }
@@ -320,7 +319,7 @@ private fun StartErrorShareLogsButton() {
                     subject = context.getString(R.string.logs_share_subject),
                     chooserTitle = context.getString(R.string.logs_share_title)
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Toast.makeText(context, "Failed to export logs...", Toast.LENGTH_SHORT).show()
             }
         },
@@ -415,16 +414,6 @@ private fun BoxScope.ScreenLockPrompt(
         )
     }
 
-    if (promptScreenLockImmediately) {
-        LaunchedEffect(key1 = true) {
-            if (isBiometricLockEnabled == true) {
-                promptBiometricLock()
-            } else if (isCustomPinLockEnabled == true) {
-                showPinLockDialog = true
-            }
-        }
-    }
-
     if (goToWalletSelector != null) {
         BackHandler(enabled = !showPinLockDialog) { goToWalletSelector() }
         TransparentFilledButton(
@@ -435,7 +424,11 @@ private fun BoxScope.ScreenLockPrompt(
         )
     }
 
-    Column(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(
+        modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
         if (isBiometricLockEnabled == true) {
             Button(
                 text = stringResource(id = R.string.lockprompt_biometrics_button),
@@ -474,6 +467,15 @@ private fun BoxScope.ScreenLockPrompt(
             }
         }
 
-        else -> Unit
+        promptScreenLockImmediately -> {
+            LaunchedEffect(key1 = isBiometricLockEnabled, key2 = isCustomPinLockEnabled, ) {
+                if (isBiometricLockEnabled == true) {
+                    promptBiometricLock()
+                } else if (isCustomPinLockEnabled == true) {
+                    showPinLockDialog = true
+                }
+            }
+        }
+        else -> {}
     }
 }
