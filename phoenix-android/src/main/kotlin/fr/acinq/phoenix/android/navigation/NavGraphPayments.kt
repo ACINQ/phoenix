@@ -16,7 +16,11 @@
 
 package fr.acinq.phoenix.android.navigation
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,8 +29,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.LocalUserPrefs
+import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.WalletId
@@ -34,6 +43,7 @@ import fr.acinq.phoenix.android.home.HomeView
 import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.receive.ReceiveView
 import fr.acinq.phoenix.android.payments.send.SendView
+import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 
 fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: AppViewModel) {
@@ -50,8 +60,7 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: App
                 peerManager = business.peerManager,
                 connectionsManager = business.connectionsManager,
             )
-        )
-        //?.also { monitorPermission(it) }
+        ).also { monitorPermission(it) }
 
         HomeView(
             paymentsViewModel = paymentsViewModel,
@@ -68,6 +77,34 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: App
             onShowNotifications = { navController.navigate(Screen.Notifications.route) },
             onRequestLiquidityClick = { navController.navigate(Screen.LiquidityRequest.route) },
         )
+    }
+}
+
+@SuppressLint("ComposableNaming")
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun monitorPermission(noticesViewModel: NoticesViewModel) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val userPrefs = LocalUserPrefs.current
+        val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+        if (!notificationPermission.status.isGranted) {
+            LaunchedEffect(Unit) {
+                if (userPrefs?.getShowNotificationPermissionReminder?.first() == true) {
+                    noticesViewModel.addNotice(Notice.NotificationPermission)
+                }
+            }
+        } else {
+            noticesViewModel.removeNotice<Notice.NotificationPermission>()
+        }
+        LaunchedEffect(userPrefs) {
+            userPrefs?.getShowNotificationPermissionReminder?.collect {
+                if (it && !notificationPermission.status.isGranted) {
+                    noticesViewModel.addNotice(Notice.NotificationPermission)
+                } else {
+                    noticesViewModel.removeNotice<Notice.NotificationPermission>()
+                }
+            }
+        }
     }
 }
 

@@ -16,9 +16,6 @@
 
 package fr.acinq.phoenix.android
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.os.Build
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
@@ -47,9 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.components.dialogs.Dialog
@@ -67,7 +62,7 @@ import fr.acinq.phoenix.android.utils.datastore.getBitcoinUnits
 import fr.acinq.phoenix.android.utils.datastore.getFiatCurrencies
 import fr.acinq.phoenix.android.utils.datastore.getIsAmountInFiat
 import fr.acinq.phoenix.android.utils.logger
-import kotlinx.coroutines.flow.first
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun AppRoot(
@@ -129,7 +124,8 @@ fun AppRoot(
             val lastCompletedPayment = business?.paymentsManager?.lastCompletedPayment?.collectAsState()
             lastCompletedPayment?.value?.let { payment ->
                 LaunchedEffect(key1 = payment.id) {
-                    if (navController.currentDestination?.route == Screen.Home.route) {
+                    val completedAt = payment.completedAt
+                    if (navController.currentDestination?.route == Screen.Home.route && (completedAt != null && (currentTimestampMillis() - completedAt) < 5.seconds.inWholeMilliseconds) ) {
                         navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
                     }
                 }
@@ -138,34 +134,6 @@ fun AppRoot(
             val isUpgradeRequired = business?.peerManager?.upgradeRequired?.collectAsState(false)
             if (isUpgradeRequired?.value == true) {
                 UpgradeRequiredBlockingDialog()
-            }
-        }
-    }
-}
-
-@SuppressLint("ComposableNaming")
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-private fun monitorPermission(noticesViewModel: NoticesViewModel) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        val userPrefs = LocalUserPrefs.current
-        val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-        if (!notificationPermission.status.isGranted) {
-            LaunchedEffect(Unit) {
-                if (userPrefs?.getShowNotificationPermissionReminder?.first() == true) {
-                    noticesViewModel.addNotice(Notice.NotificationPermission)
-                }
-            }
-        } else {
-            noticesViewModel.removeNotice<Notice.NotificationPermission>()
-        }
-        LaunchedEffect(userPrefs) {
-            userPrefs?.getShowNotificationPermissionReminder?.collect {
-                if (it && !notificationPermission.status.isGranted) {
-                    noticesViewModel.addNotice(Notice.NotificationPermission)
-                } else {
-                    noticesViewModel.removeNotice<Notice.NotificationPermission>()
-                }
             }
         }
     }
