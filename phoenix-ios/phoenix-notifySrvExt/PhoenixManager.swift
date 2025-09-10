@@ -46,7 +46,7 @@ class PhoenixManager {
 	// MARK: Public Functions
 	// --------------------------------------------------
 	
-	public func setupBusiness(_ target: SecurityFile.V1.KeyComponents?) -> PhoenixBusiness {
+	public func setupBusiness(_ target: String?) -> PhoenixBusiness {
 		log.trace("setupBusiness()")
 		assertMainThread()
 		
@@ -121,7 +121,7 @@ class PhoenixManager {
 	// MARK: Flow
 	// --------------------------------------------------
 
-	private func startAsyncUnlock(_ target: SecurityFile.V1.KeyComponents?) {
+	private func startAsyncUnlock(_ target: String?) {
 		log.trace("startAsyncUnlock()")
 		
 		let unlockWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
@@ -152,11 +152,11 @@ class PhoenixManager {
 					
 				case .v1(let v1):
 					if let target {
-						sealedBox = v1.getWallet(target)?.keychain
-						id = target.standardKeyId
-					} else if let defaultTarget = v1.defaultKeyComponents() {
-						sealedBox = v1.getWallet(defaultTarget)?.keychain
-						id = defaultTarget.standardKeyId
+						sealedBox = v1.wallets[target]?.keychain
+						id = target
+					} else if let defaultTarget = v1.defaultKey {
+						sealedBox = v1.wallets[defaultTarget]?.keychain
+						id = defaultTarget
 					}
 				}
 				
@@ -186,7 +186,7 @@ class PhoenixManager {
 		} // </DispatchQueue.global().async>
 	}
 	
-	private func unlock(_ recoveryPhrase: RecoveryPhrase?, _ target: SecurityFile.V1.KeyComponents?) {
+	private func unlock(_ recoveryPhrase: RecoveryPhrase?, _ targetNodeIdHash: String?) {
 		log.trace("unlock()")
 		assertMainThread()
 		
@@ -213,13 +213,9 @@ class PhoenixManager {
 		let wid = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
 		walletId = wid
 		
-		if let target {
-			guard target.nodeIdHash == wid.nodeIdHash else {
+		if let targetNodeIdHash {
+			guard targetNodeIdHash == wid.nodeIdHash else {
 				log.warning("unlock(): ignoring: target.nodeIdHash != unlocked.nodeIdHash")
-				return
-			}
-			guard target.chain == wid.chain else {
-				log.warning("unlock(): ignoring: target.chain != unlocked.chain")
 				return
 			}
 		}

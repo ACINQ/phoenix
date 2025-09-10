@@ -571,7 +571,11 @@ struct WalletMetadataView: View {
 				updatedV1 = v1.copyWithDefaultWalletId(self.isDefault ? walletId : nil)
 			}
 			
-			self.metadata = WalletMetadata(wallet: updatedWallet, id: walletId, isDefault: self.isDefault)
+			self.metadata = WalletMetadata(
+				wallet     : updatedWallet,
+				nodeIdHash : walletId.nodeIdHash,
+				isDefault  : self.isDefault
+			)
 			
 			do throws(WriteSecurityFileError) {
 				try await SecurityFileManager.shared.asyncWriteToDisk(updatedV1)

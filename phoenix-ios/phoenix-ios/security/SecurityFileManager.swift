@@ -59,7 +59,7 @@ class SecurityFileManager {
 		}
 		
 		let isDefault = v1.isDefaultWalletId(currentId)
-		return WalletMetadata(wallet: wallet, id: currentId, isDefault: isDefault)
+		return WalletMetadata(wallet: wallet, nodeIdHash: currentId.nodeIdHash, isDefault: isDefault)
 	}
 	
 	func defaultWallet() -> WalletMetadata? {
@@ -67,10 +67,10 @@ class SecurityFileManager {
 		guard case .v1(let v1) = self.currentSecurityFile() else {
 			return nil
 		}
-		guard let wallet = v1.defaultWallet(), let keyComps = v1.defaultKeyComponents() else {
+		guard let wallet = v1.defaultWallet(), let id = v1.defaultKey else {
 			return nil
 		}
-		return WalletMetadata(wallet: wallet, keyComps: keyComps, isDefault: true)
+		return WalletMetadata(wallet: wallet, nodeIdHash: id, isDefault: true)
 	}
 	
 	func hasZeroWallets() -> Bool {
@@ -88,12 +88,8 @@ class SecurityFileManager {
 		}
 	
 		let defaultKey = v1.defaultKey
-		return v1.wallets.compactMap { key, wallet in
-			if let keyComps = SecurityFile.V1.KeyComponents.fromId(key) {
-				WalletMetadata(wallet: wallet, keyComps: keyComps, isDefault: (key == defaultKey))
-			} else {
-				nil
-			}
+		return v1.wallets.map { key, wallet in
+			WalletMetadata(wallet: wallet, nodeIdHash: key, isDefault: (key == defaultKey))
 		}
 	}
 	

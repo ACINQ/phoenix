@@ -97,6 +97,9 @@
 		DC3345D22C2C761800EDD2D4 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */; };
 		DC33C5632A7C15D40053D785 /* MainView_BigPrimary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
+		DC3521032E71F8AD00DAB4F3 /* FcmPushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3521022E71F8A500DAB4F3 /* FcmPushNotification.swift */; };
+		DC3521042E71F8AD00DAB4F3 /* FcmPushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3521022E71F8A500DAB4F3 /* FcmPushNotification.swift */; };
+		DC3521062E71FB7E00DAB4F3 /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3521052E71FB7B00DAB4F3 /* PushManager.swift */; };
 		DC355E1D2A4398A8008E8A8E /* NoticeBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */; };
 		DC355E1F2A44A235008E8A8E /* NotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E1E2A44A235008E8A8E /* NotificationCell.swift */; };
 		DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC355E202A44D838008E8A8E /* NotificationsView.swift */; };
@@ -594,6 +597,8 @@
 		DC3345CF2C2B4C1200EDD2D4 /* ManageContact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageContact.swift; sourceTree = "<group>"; };
 		DC3345D12C2C761800EDD2D4 /* CameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
 		DC33C5622A7C15D40053D785 /* MainView_BigPrimary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_BigPrimary.swift; sourceTree = "<group>"; };
+		DC3521022E71F8A500DAB4F3 /* FcmPushNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FcmPushNotification.swift; sourceTree = "<group>"; };
+		DC3521052E71FB7B00DAB4F3 /* PushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		DC355E1C2A4398A8008E8A8E /* NoticeBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBox.swift; sourceTree = "<group>"; };
 		DC355E1E2A44A235008E8A8E /* NotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCell.swift; sourceTree = "<group>"; };
 		DC355E202A44D838008E8A8E /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
@@ -1398,6 +1403,7 @@
 				DC78A5FA2DF881F6003A7DD8 /* MultiBusinessManager.swift */,
 				DC63BDF329AE44380067A361 /* NotificationsManager.swift */,
 				DC6F04242C38807300627B4F /* PhotosManager.swift */,
+				DC3521052E71FB7B00DAB4F3 /* PushManager.swift */,
 				DC175C1B28F008AE0086B9A6 /* WalletReset.swift */,
 				DCD7E0AE28EC3C0D009C30E5 /* WatchTower.swift */,
 			);
@@ -1693,6 +1699,7 @@
 		DCC4F30C2E4B9D9A00060704 /* notifications */ = {
 			isa = PBXGroup;
 			children = (
+				DC3521022E71F8A500DAB4F3 /* FcmPushNotification.swift */,
 				DCC4F30D2E4B9DA900060704 /* PushNotification.swift */,
 			);
 			path = notifications;
@@ -2207,6 +2214,7 @@
 				DC4864DA29D4E52C00ACD539 /* BgRefreshDisabledPopover.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DC5F96F92E1DA3D60052CDE6 /* PinType.swift in Sources */,
+				DC3521032E71F8AD00DAB4F3 /* FcmPushNotification.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				DC39D4F12874DDF40030F18D /* View+If.swift in Sources */,
 				DC370A8B2B7FFFC70093C56F /* SwapInAddresses.swift in Sources */,
@@ -2294,6 +2302,7 @@
 				C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */,
 				DCFAEFC92A72F48700330088 /* SwapInWalletDetails.swift in Sources */,
 				DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */,
+				DC3521062E71FB7E00DAB4F3 /* PushManager.swift in Sources */,
 				DCFC72042862237400D6B293 /* Asserts.swift in Sources */,
 				DC1771B42ABC99CE00B286C7 /* WebsiteLinkPopover.swift in Sources */,
 				DC5631CA2C597B8600DCB5BF /* SourceInfo.swift in Sources */,
@@ -2518,6 +2527,7 @@
 				DCF9CFD52862656E001AD33F /* Asserts.swift in Sources */,
 				DC641C7C282172BB00862DCD /* DelayedSave.swift in Sources */,
 				DCA6DECE282AB12B0073C658 /* SecurityFile.swift in Sources */,
+				DC3521042E71F8AD00DAB4F3 /* FcmPushNotification.swift in Sources */,
 				DCCFE6BE2B713FB8002FFF11 /* LogFileInfo.swift in Sources */,
 				DC49FE9C2AC49E0400D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
 				DC5F96F82E1DA3D60052CDE6 /* PinType.swift in Sources */,

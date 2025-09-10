@@ -41,7 +41,6 @@ class AppSecurity {
 		
 		let walletInfo = _calculateWalletInfo(chain, recoveryPhrase, knownSeed)
 		let walletId = WalletIdentifier(chain: chain, walletInfo: walletInfo)
-		let nodeId = walletInfo.nodeIdString
 		
 		let securityFile: SecurityFile.V1
 		
@@ -118,7 +117,8 @@ class AppSecurity {
 			keychain: SealedBox_ChaChaPoly(sealedBox),
 			name: name,
 			photo: photo,
-			isHidden: false
+			isHidden: false,
+			chain: chain
 		)
 		
 		// Set this wallet as the default if:
@@ -273,7 +273,8 @@ class AppSecurity {
 			keychain: keyInfo,
 			name: name,
 			photo: photo,
-			isHidden: false
+			isHidden: false,
+			chain: walletId.chain
 		)
 		
 		let newSecurityFile = SecurityFile.V1(wallet: newWallet, id: walletId)

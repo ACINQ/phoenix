@@ -26,18 +26,9 @@ struct WalletMetadata: WalletIdentifiable, Comparable, Identifiable {
 		self.isDefault = isDefault
 	}
 	
-	init(wallet: SecurityFile.V1.Wallet, id: WalletIdentifier, isDefault: Bool) {
-		self.chain = id.chain
-		self.nodeIdHash = id.nodeIdHash
-		self.name = wallet.name
-		self.photo = wallet.photo
-		self.isHidden = wallet.isHidden
-		self.isDefault = isDefault
-	}
-	
-	init(wallet: SecurityFile.V1.Wallet, keyComps: SecurityFile.V1.KeyComponents, isDefault: Bool) {
-		self.chain = keyComps.chain
-		self.nodeIdHash = keyComps.nodeIdHash
+	init(wallet: SecurityFile.V1.Wallet, nodeIdHash: String, isDefault: Bool) {
+		self.chain = wallet.chain
+		self.nodeIdHash = nodeIdHash
 		self.name = wallet.name
 		self.photo = wallet.photo
 		self.isHidden = wallet.isHidden

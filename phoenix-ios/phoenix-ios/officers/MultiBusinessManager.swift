@@ -52,17 +52,9 @@ class MultiBusinessManager {
 		currentBizPublisher.send(newBiz)
 	}
 	
-	func launchBackgroundBiz(_ push: PushNotification) {
+	func launchBackgroundBiz(_ push: FcmPushNotification) {
 		log.trace(#function)
 		
-		guard let nodeId = push.nodeId else {
-			log.warning("launchBackgroundBiz(): invalid parameter: push.nodeId == nil")
-			return
-		}
-		guard let chain = push.chain else {
-			log.warning("launchBackgroundBiz(): invalid parameter: push.chain == nil")
-			return
-		}
 		guard let nodeIdHash = push.nodeIdHash else {
 			log.warning("launchBackgroundBiz(): invalid parameter: push.nodeIdHash == nil")
 			return
@@ -71,13 +63,13 @@ class MultiBusinessManager {
 		// Step 1:
 		// Check to see if the target is already loaded.
 		
-		if let walletInfo = currentBiz.walletInfo, walletInfo.nodeIdString == nodeId {
+		if let walletInfo = currentBiz.walletInfo, walletInfo.nodeIdHash == nodeIdHash {
 			log.debug("launchBackgroundBiz(): already loaded (current)")
 			return
 		}
 		
 		for biz in bgBizList {
-			if let walletInfo = biz.walletInfo, walletInfo.nodeIdString == nodeId {
+			if let walletInfo = biz.walletInfo, walletInfo.nodeIdHash == nodeIdHash {
 				log.debug("launchBackgroundBiz(): already loaded (background)")
 				startOrResetTimerForBiz(biz)
 				return
@@ -96,13 +88,12 @@ class MultiBusinessManager {
 			return
 		}
 		
-		let id = SecurityFile.V1.KeyComponents(chain: chain, nodeIdHash: nodeIdHash)
-		guard let sealedBox = v1.getWallet(id)?.keychain else {
+		guard let sealedBox = v1.wallets[nodeIdHash]?.keychain else {
 			log.warning("launchBackgroundBiz(): SecurityFile.current().getWallet(): nil found")
 			return
 		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(id.standardKeyId, sealedBox)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(nodeIdHash, sealedBox)
 		guard case .success(let cleartextData) = keychainResult else {
 			log.warning("launchBackgroundBiz(): readKeychainEntry(): failed")
 			return

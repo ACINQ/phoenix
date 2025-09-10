@@ -8,42 +8,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct PushNotification {
-	let source: Source
-	let reason: Reason
-	let nodeId: String?
-	let nodeIdHash: String?
-	let chain: Bitcoin_kmpChain?
+enum PushNotification {
+	case fcm(notification: FcmPushNotification)
 	
-	enum Source: CustomStringConvertible {
-		case googleFCM
-		case aws
-		
-		var description: String {
-			return switch self {
-				case .googleFCM : "googleFCM"
-				case .aws       : "aws"
-			}
-		}
-	}
-	
-	enum Reason: CustomStringConvertible {
-		case incomingPayment
-		case incomingOnionMessage
-		case pendingSettlement
-		case unknown
-		
-		var description: String {
-			return switch self {
-				case .incomingPayment      : "incomingPayment"
-				case .incomingOnionMessage : "incomingOnionMessage"
-				case .pendingSettlement    : "pendingSettlement"
-				case .unknown              : "unknown"
-			}
-		}
-	}
-	
-	static func parse(_ userInfo: [AnyHashable: Any]) -> PushNotification {
+	static func parse(_ userInfo: [AnyHashable: Any]) -> PushNotification? {
 		log.trace(#function)
 		
 		// This could be a push notification coming from either:
@@ -101,7 +69,7 @@ struct PushNotification {
 				 userInfo["reason"]             != nil // just in-case google changes format
 	}
 	
-	private static func parse_fcm(_ userInfo: [AnyHashable: Any]) -> PushNotification {
+	private static func parse_fcm(_ userInfo: [AnyHashable: Any]) -> PushNotification? {
 		log.trace(#function)
 		
 		// Example:
@@ -119,7 +87,7 @@ struct PushNotification {
 		//   }
 		// }
 		
-		let reason: Reason
+		let reason: FcmPushNotification.Reason
 		if let reasonStr = userInfo["reason"] as? String {
 			log.debug("userInfo.reason: '\(reasonStr)'")
 			
@@ -141,99 +109,26 @@ struct PushNotification {
 		
 		log.debug("reason = \(reason)")
 		
-		let nodeId: String?
-		if let value = userInfo["nodeId"] as? String {
-			nodeId = value
-		} else if let value = userInfo["node"] as? String {
-			nodeId = value
-		} else if let value = userInfo["n"] as? String {
-			nodeId = value
+		let nodeIdHash: String?
+		if let value = userInfo["node_id_hash"] as? String {
+			nodeIdHash = value
 		} else {
-			nodeId = nil
+			nodeIdHash = nil
 		}
-		log.debug("userInfo.nodeId = \(nodeId ?? "<nil>")")
+		log.debug("userInfo.nodeIdHash = \(nodeIdHash ?? "<nil>")")
 		
-		let chainStr: String?
-		if let value = userInfo["chain"] as? String {
-			chainStr = value
-		} else if let value = userInfo["c"] as? String {
-			chainStr = value
-		} else {
-			chainStr = nil
-		}
-		log.debug("userInfo.chain = \(chainStr ?? "<nil>")")
-		
-		let nodeIdHash: String? = if let nodeId { calculateNodeIdHash(nodeId) } else { nil }
-		
-		let chain: Bitcoin_kmpChain? = if let chainStr {
-			Bitcoin_kmpChain.fromString(chainStr)
-		} else {
-			Bitcoin_kmpChain.Mainnet()
-		}
-		
-		if let chainStr, chain == nil {
-			log.warning("Invalid chain name: \(chainStr)")
-		}
-		
-		return PushNotification(
-			source     : .googleFCM,
+		return PushNotification.fcm(notification: FcmPushNotification(
 			reason     : reason,
-			nodeId     : nodeId?.lowercased(),
-			nodeIdHash : nodeIdHash,
-			chain      : chain
-		)
+			nodeIdHash : nodeIdHash?.lowercased()
+		))
 	}
 	
-	private static func parse_aws(_ userInfo: [AnyHashable: Any]) -> PushNotification {
+	private static func parse_aws(_ userInfo: [AnyHashable: Any]) -> PushNotification? {
+		log.trace(#function)
 		
-		let reason: Reason = .unknown // AWS only used for debugging (e.g. testing new features)
+		// Function reserved for other debugging uses.
+		// We sometimes trigger custom push notifications from AWS during debug sessions.
 		
-		let nodeId: String?
-		if let value = userInfo["n"] as? String {
-			nodeId = value
-		} else {
-			nodeId = nil
-		}
-		log.debug("userInfo.n(odeId) = \(nodeId ?? "<nil>")")
-		
-		let chainStr: String?
-		if let value = userInfo["c"] as? String {
-			chainStr = value
-		} else {
-			chainStr = nil
-		}
-		log.debug("userInfo.c(hain) = \(chainStr ?? "<nil>")")
-		
-		let nodeIdHash: String? = if let nodeId { calculateNodeIdHash(nodeId) } else { nil }
-		
-		let chain: Bitcoin_kmpChain? = if let chainStr {
-			Bitcoin_kmpChain.fromString(chainStr)
-		} else {
-			Bitcoin_kmpChain.Mainnet()
-		}
-		
-		if let chainStr, chain == nil {
-			log.warning("Invalid chain name: \(chainStr)")
-		}
-		
-		return PushNotification(
-			source     : .aws,
-			reason     : reason,
-			nodeId     : nodeId?.lowercased(),
-			nodeIdHash : nodeIdHash,
-			chain      : chain
-		)
-	}
-	
-	private static func calculateNodeIdHash(_ nodeId: String) -> String? {
-		
-		switch hash160(nodeId: nodeId) {
-		case .success(let value):
-			return value
-		
-		case .failure(let reason):
-			log.warning("hash160(): \(reason.description)")
-			return nil
-		}
+		return nil
 	}
 }

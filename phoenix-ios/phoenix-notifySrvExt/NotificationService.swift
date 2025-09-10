@@ -40,8 +40,8 @@ class NotificationService: UNNotificationServiceExtension {
 	private var srvExtDone: Bool = false
 	
 	private var business: PhoenixBusiness? = nil
-	private var pushNotificationReason: PushNotification.Reason = .unknown
-	private var target: SecurityFile.V1.KeyComponents? = nil
+	private var pushNotification: PushNotification? = nil
+	private var targetNodeIdHash: String? = nil
 	
 	private var isConnectedToPeer = false
 	private var receivedPayments: [Lightning_kmpIncomingPayment] = []
@@ -103,24 +103,25 @@ class NotificationService: UNNotificationServiceExtension {
 		// - Google's Firebase Cloud Messaging (FCM)
 		// - Amazon Web Services (AWS) (only used for debugging)
 		
-		let push = PushNotification.parse(userInfo)
-		
-		pushNotificationReason = push.reason
-		if let nodeIdHash = push.nodeIdHash, let chain = push.chain {
-			target = SecurityFile.V1.KeyComponents(chain: chain, nodeIdHash: nodeIdHash)
-		}
-		
-		switch push.source {
-		case .googleFCM:
-			// Nothing else to do here.
-			// These types of requests are handled automatically by the Peer.
-			break
+		if let notification = PushNotification.parse(userInfo) {
+					
+			self.pushNotification = notification
+			switch notification {
+			case .fcm(let notification):
+				processNotification_fcm(notification)
+			}
+					
+		} else {
 			
-		case .aws:
-			// AWS only used for debugging (e.g. testing new features)
-			// Ignore the notification.
+			log.warning("processNotification(): Failed to parse userInfo as PushNotification")
 			finish()
 		}
+	}
+	
+	private func processNotification_fcm(_ notification: FcmPushNotification) {
+		log.trace(#function)
+		
+		targetNodeIdHash = notification.nodeIdHash
 	}
 	
 	// --------------------------------------------------
@@ -300,7 +301,7 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 		phoenixStarted = true
 		
-		let newBusiness = PhoenixManager.shared.setupBusiness(target)
+		let newBusiness = PhoenixManager.shared.setupBusiness(targetNodeIdHash)
 		business = newBusiness
 		
 		newBusiness.connectionsManager.connectionsPublisher().sink {
@@ -396,38 +397,47 @@ class NotificationService: UNNotificationServiceExtension {
 	private func updateRemoteNotificationContent(
 		_ content: UNMutableNotificationContent
 	) {
-		log.trace("updateRemoteNotificationContent()")
+		log.trace(#function)
 		
 		// The first thing we need to do is switch on the type of notification that we received
 		
-		switch pushNotificationReason {
-		case .incomingPayment:
-			// We expected to receive 1 or more incoming payments
-			
-			if let item = NotificationServiceQueue.shared.dequeue() {
-				updateNotificationContent_localNotification(content, item)
-			} else if let payment = popFirstReceivedPayment() {
-				updateNotificationContent_receivedPayment(content, payment)
-			} else {
-				updateNotificationContent_missedPayment(content)
+		if let pushNotification {
+			switch pushNotification {
+			case .fcm(let notification):
+				
+				switch notification.reason {
+				case .incomingPayment:
+					// We expected to receive 1 or more incoming payments
+					
+					if let item = NotificationServiceQueue.shared.dequeue() {
+						updateNotificationContent_localNotification(content, item)
+					} else if let payment = popFirstReceivedPayment() {
+						updateNotificationContent_receivedPayment(content, payment)
+					} else {
+						updateNotificationContent_missedPayment(content)
+					}
+					
+				case .incomingOnionMessage:
+					// This was probably an incoming Bolt 12 payment.
+					// But it could be anything, so let's code defensively.
+					
+					if let item = NotificationServiceQueue.shared.dequeue() {
+						updateNotificationContent_localNotification(content, item)
+					} else if let payment = popFirstReceivedPayment() {
+						updateNotificationContent_receivedPayment(content, payment)
+					} else {
+						updateNotificationContent_unknown(content)
+					}
+					
+				case .pendingSettlement:
+					updateNotificationContent_pendingSettlement(content)
+					
+				case .unknown:
+					updateNotificationContent_unknown(content)
+				}
 			}
-		
-		case .incomingOnionMessage:
-			// This is probably an incoming Bolt 12 payment.
-			// But it could be anything, so let's code defensively.
 			
-			if let item = NotificationServiceQueue.shared.dequeue() {
-				updateNotificationContent_localNotification(content, item)
-			} else if let payment = popFirstReceivedPayment() {
-				updateNotificationContent_receivedPayment(content, payment)
-			} else {
-				updateNotificationContent_unknown(content)
-			}
-			
-		case .pendingSettlement:
-			updateNotificationContent_pendingSettlement(content)
-		
-		case .unknown:
+		} else {
 			updateNotificationContent_unknown(content)
 		}
 	}

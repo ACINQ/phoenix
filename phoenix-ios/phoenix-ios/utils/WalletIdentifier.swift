@@ -2,7 +2,6 @@ import Foundation
 import PhoenixShared
 
 protocol WalletIdentifiable {
-	var chain: Bitcoin_kmpChain { get }
 	var nodeIdHash: String { get }
 }
 
@@ -29,10 +28,6 @@ struct WalletIdentifier: WalletIdentifiable, Equatable {
 extension WalletIdentifiable {
 	
 	var standardKeyId: String {
-		if chain.isMainnet() {
-			return nodeIdHash
-		} else {
-			return "\(nodeIdHash)-\(chain.phoenixName)"
-		}
+		return nodeIdHash
 	}
 }

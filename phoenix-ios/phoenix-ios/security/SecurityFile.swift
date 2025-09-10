@@ -58,11 +58,27 @@ class SecurityFile {
 				return hidden ?? false
 			}
 			
-			init(keychain: SealedBox_ChaChaPoly, name: String, photo: String, isHidden: Bool) {
+			private let chainName: String?
+			var chain: Bitcoin_kmpChain {
+				if let chainName, let chain = Bitcoin_kmpChain.fromString(chainName) {
+					return chain
+				} else {
+					return Bitcoin_kmpChain.Mainnet()
+				}
+			}
+			
+			init(
+				keychain: SealedBox_ChaChaPoly,
+				name: String,
+				photo: String,
+				isHidden: Bool,
+				chain: Bitcoin_kmpChain?
+			) {
 				self.keychain = keychain
 				self.name = name
 				self.photo = photo
 				self.hidden = isHidden ? true : nil
+				self.chainName = chain?.phoenixName
 			}
 			
 			func updated(
@@ -70,7 +86,13 @@ class SecurityFile {
 				photo newPhoto: String,
 				isHidden newIsHidden: Bool
 			) -> Wallet {
-				return Wallet(keychain: self.keychain, name: newName, photo: newPhoto, isHidden: newIsHidden)
+				return Wallet(
+					keychain: self.keychain,
+					name: newName,
+					photo: newPhoto,
+					isHidden: newIsHidden,
+					chain: self.chain
+				)
 			}
 		}
 		
@@ -97,10 +119,8 @@ class SecurityFile {
 			return wallets[id.standardKeyId]
 		}
 		
-		func allKeys() -> [KeyComponents] {
-			return wallets.compactMap { (id: String, _) in
-				KeyComponents.fromId(id)
-			}
+		func allKeys() -> [String] {
+			return Array(wallets.keys)
 		}
 		
 		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifiable) -> V1 {
@@ -128,41 +148,11 @@ class SecurityFile {
 			return id.standardKeyId == self.defaultKey
 		}
 		
-		func defaultKeyComponents() -> KeyComponents? {
-			guard let defaultKey else {
-				return nil
-			}
-			return KeyComponents.fromId(defaultKey)
-		}
-		
 		func defaultWallet() -> Wallet? {
 			guard let defaultKey else {
 				return nil
 			}
 			return wallets[defaultKey]
-		}
-		
-		struct KeyComponents: WalletIdentifiable {
-			let chain: Bitcoin_kmpChain
-			let nodeIdHash: String
-			
-			static func fromId(_ id: String) -> KeyComponents? {
-				
-				let comps = id.split(separator: "-")
-				if comps.count == 1 {
-					return KeyComponents(chain: Bitcoin_kmpChain.Mainnet(), nodeIdHash: id)
-					
-				} else if comps.count == 2 {
-					let chainName = String(comps[1])
-					guard let chain = Bitcoin_kmpChain.fromString(chainName) else {
-						return nil
-					}
-					return KeyComponents(chain: chain, nodeIdHash: String(comps[0]))
-					
-				} else {
-					return nil
-				}
-			}
 		}
 	}
 }

@@ -130,9 +130,9 @@ class WatchTower {
 		}
 		
 		let currentWalletId = Biz.walletId
-		let allTargets: [WatchTowerTarget] = v1.allKeys().map { keyComps in
+		let allTargets: [WatchTowerTarget] = v1.allKeys().map { id in
 			
-			let prefs = Prefs_Wallet(id: keyComps.standardKeyId)
+			let prefs = Prefs_Wallet(id: id)
 			
 			let lastAttemptDate = prefs.watchTower_lastAttemptDate
 			let lastAttemptFailed = prefs.watchTower_lastAttemptFailed
@@ -146,11 +146,11 @@ class WatchTower {
 			
 			var isCurrent: Bool = false
 			if let current = currentWalletId {
-				isCurrent = (current.nodeIdHash == keyComps.nodeIdHash) && (current.chain == keyComps.chain)
+				isCurrent = (current.nodeIdHash == id)
 			}
 			
 			return WatchTowerTarget(
-				keyComps: keyComps,
+				nodeIdHash: id,
 				nextAttemptDate: nextAttemptDate,
 				lastAttemptDate: lastAttemptDate,
 				lastAttemptFailed: lastAttemptFailed,
@@ -262,7 +262,7 @@ class WatchTower {
 	private func performTask(_ task: BGAppRefreshTask, _ target: WatchTowerTarget) {
 		log.trace(#function)
 		
-		let id = target.keyComps
+		let id = target.nodeIdHash
 		let business = PhoenixBusiness(ctx: PlatformContext.default)
 
 		business.currencyManager.disableAutoRefresh()
@@ -275,12 +275,12 @@ class WatchTower {
 			log.warning("SecurityFile.current(): v0 found")
 			return completeTask(task, success: true)
 		}
-		guard let sealedBox = v1.getWallet(id)?.keychain else {
+		guard let sealedBox = v1.wallets[id]?.keychain else {
 			log.warning("SecurityFile.current().getWallet(): nil found")
 			return completeTask(task, success: true)
 		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(id.standardKeyId, sealedBox)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(id, sealedBox)
 		guard case .success(let cleartextData) = keychainResult else {
 			log.warning("readKeychainEntry(): failed")
 			return completeTask(task, success: true)
@@ -332,7 +332,7 @@ class WatchTower {
 		)
 		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
 		
-		performTask(task, business, id.standardKeyId)
+		performTask(task, business, id)
 	}
 	
 	private func performTask(_ task: BGAppRefreshTask, _ business: PhoenixBusiness, _ id: String) {
@@ -620,7 +620,7 @@ class WatchTower {
 }
 
 struct WatchTowerTarget {
-	let keyComps: SecurityFile.V1.KeyComponents
+	let nodeIdHash: String
 	let nextAttemptDate: Date
 	let lastAttemptDate: Date
 	let lastAttemptFailed: Bool
