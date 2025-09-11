@@ -146,16 +146,12 @@ class SharedSecurity {
 			return .failure(.keychainBoxCorrupted(underlying: error))
 		}
 		
-		var mixins = [String: Any]()
-		mixins[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-		
 		// Read the lockingKey from the OS keychain
 		let fetchedKey: SymmetricKey?
 		do {
 			fetchedKey = try SystemKeychain.readItem(
 				account     : Key.lockingKey.account(id),
-				accessGroup : Key.lockingKey.accessGroup.value,
-				mixins      : mixins
+				accessGroup : Key.lockingKey.accessGroup.value
 			)
 		} catch {
 			log.error("readKeychainEntry(): error: readingKey: \(String(describing: error))")

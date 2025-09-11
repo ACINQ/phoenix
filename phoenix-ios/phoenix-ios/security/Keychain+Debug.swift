@@ -21,8 +21,6 @@ extension Keychain {
 		var output: String = ""
 		output += "# \(id ?? "unknown"):\n"
 		
-		let mixins = commonMixins()
-		
 		for key in Key.allCases {
 			
 			let account: String = if let id { key.account(id) } else { key.deprecatedValue }
@@ -31,8 +29,7 @@ extension Keychain {
 			do {
 				let value: Data? = try SystemKeychain.readItem(
 					account     : account,
-					accessGroup : accessGroup,
-					mixins      : mixins
+					accessGroup : accessGroup
 				)
 				if let value {
 					let desc = valueDescription(key.prefix, value)

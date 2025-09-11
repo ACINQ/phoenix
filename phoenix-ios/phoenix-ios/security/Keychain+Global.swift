@@ -101,14 +101,12 @@ class Keychain_Global {
 	func getHiddenWalletInvalidPin() -> InvalidPin? {
 		
 		let key = Key.invalidLockPin
-		let mixins = Keychain.commonMixins()
 		
 		var invalidPin: InvalidPin? = nil
 		do {
 			let value: Data? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
-				accessGroup : key.accessGroup.value,
-				mixins      : mixins
+				accessGroup : key.accessGroup.value
 			)
 			
 			if let value {

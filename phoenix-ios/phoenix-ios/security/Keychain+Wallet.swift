@@ -339,14 +339,12 @@ class Keychain_Wallet {
 		}
 		
 		let key = Key.softBiometrics
-		let mixins = Keychain.commonMixins()
 		
 		var enabled = false
 		do {
 			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
-				accessGroup : key.accessGroup.value,
-				mixins      : mixins
+				accessGroup : key.accessGroup.value
 			)
 			enabled = value != nil
 			
@@ -438,14 +436,12 @@ class Keychain_Wallet {
 		}
 		
 		let key = Key.passcodeFallback
-		let mixins = Keychain.commonMixins()
 		
 		var enabled = false
 		do {
 			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
-				accessGroup : key.accessGroup.value,
-				mixins      : mixins
+				accessGroup : key.accessGroup.value
 			)
 			enabled = value != nil
 			
@@ -552,14 +548,12 @@ class Keychain_Wallet {
 		}
 		
 		let key = type.keyPin
-		let mixins = Keychain.commonMixins()
 		
 		var pin: String? = nil
 		do {
 			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
-				accessGroup : key.accessGroup.value,
-				mixins      : mixins
+				accessGroup : key.accessGroup.value
 			)
 			
 			if let value, value.isValidPIN {
@@ -650,14 +644,12 @@ class Keychain_Wallet {
 	func getInvalidPin(_ type: PinType) -> InvalidPin? {
 		
 		let key = type.keyInvalidPin
-		let mixins = Keychain.commonMixins()
 		
 		var invalidPin: InvalidPin? = nil
 		do {
 			let value: Data? = try SystemKeychain.readItem(
 				account     : key.account(self.id),
-				accessGroup : key.accessGroup.value,
-				mixins      : mixins
+				accessGroup : key.accessGroup.value
 			)
 			
 			if let value {
@@ -765,14 +757,12 @@ class Keychain_Wallet {
 	public func getBip353Address() -> String? {
 		
 		let key = Key.bip353Address
-		let mixins = Keychain.commonMixins()
 		
 		var addr: String? = nil
 		do {
 			let value: String? = try SystemKeychain.readItem(
 				account     : key.account(id),
-				accessGroup : key.accessGroup.value,
-				mixins      : mixins
+				accessGroup : key.accessGroup.value
 			)
 			
 			if let value {
@@ -895,18 +885,15 @@ class Keychain_Wallet {
 		context.localizedReason = prompt ?? self.biometricsPrompt()
 		context.localizedFallbackTitle = "" // passcode fallback disbaled
 		
-		var mixins = [String: Any]()
-		mixins[kSecUseAuthenticationContext as String] = context
-		
 		let account     = KeyDeprecated.lockingKey_biometrics.rawValue
 		let accessGroup = AccessGroup.appOnly.value
 	
-		let fetchedKey: SymmetricKey?
+		var fetchedKey: SymmetricKey? = nil
 		do {
 			fetchedKey = try SystemKeychain.readItem(
 				account     : account,
 				accessGroup : accessGroup,
-				mixins      : mixins
+				context     : context
 			)
 		} catch {
 			return fail(error)

@@ -179,7 +179,7 @@ class SystemKeychain {
 		mixins      : [String: Any] // always required (see notes atop)
 	) throws {
 		
-		let exists = try itemExists(account: account, accessGroup: accessGroup, mixins: mixins)
+		let exists = try itemExists(account: account, accessGroup: accessGroup)
 		if exists {
 			try updateItem(value: value, account: account, accessGroup: accessGroup, mixins: mixins)
 		} else {
@@ -227,14 +227,26 @@ class SystemKeychain {
 	
 	static func itemExists(
 		account     : String,
-		accessGroup : String,       // always required (see notes atop)
-		mixins      : [String: Any] // always required (see notes atop)
+		accessGroup : String  // always required (see notes atop)
 	) throws -> Bool {
+		
+		// Concerning `mixins`:
+		// What seems to be the case is that:
+		// * if this method takes a mixins parameter (like the add/update functions above)
+		// * and the normal `commonMixins` parameter is passed
+		//   i.e.: [kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly]
+		// * then `SecItemCopyMatching` will return `errSecItemNotFound`
+		//
+		// But:
+		// * if you do NOT include `kSecAttrAccessible` in the query
+		// * then `SecItemCopyMatching` will return `errSecSuccess`
+		//
+		// For this reason, this function purposefully does NOT have the `mixins` parameter.
 		
 		let context = LAContext()
 		context.interactionNotAllowed = true // <- don't prompt user
 		
-		var query = mixins
+		var query = [String: Any]()
 		query[kSecClass as String] = kSecClassGenericPassword
 		query[kSecAttrAccount as String] = account
 		query[kSecAttrAccessGroup as String] = accessGroup
@@ -261,18 +273,35 @@ class SystemKeychain {
 	///
 	static func readItem(
 		account     : String,
-		accessGroup : String,       // always required (see notes atop)
-		mixins      : [String: Any] // always required (see notes atop)
+		accessGroup : String,  // always required (see notes atop)
+		context     : LAContext? = nil
 	) throws -> Data? {
 		
+		// Concerning `mixins`:
+		// What seems to be the case is that:
+		// * if this method takes a mixins parameter (like the add/update functions above)
+		// * and the normal `commonMixins` parameter is passed
+		//   i.e.: [kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly]
+		// * then `SecItemCopyMatching` will return `errSecItemNotFound`
+		//
+		// But:
+		// * if you do NOT include `kSecAttrAccessible` in the query
+		// * then `SecItemCopyMatching` will return `errSecSuccess`
+		//
+		// For this reason, this function purposefully does NOT have the `mixins` parameter.
+		
 		// Seek a generic password with the given account.
-		var query = mixins
+		var query = [String: Any]()
 		query[kSecClass as String] = kSecClassGenericPassword
 		query[kSecAttrAccount as String] = account
 		query[kSecAttrAccessGroup as String] = accessGroup
 		query[kSecUseDataProtectionKeychain as String] = true
 		query[kSecReturnData as String] = true
 		query[kSecMatchLimit as String] = kSecMatchLimitOne
+		
+		if let context {
+			query[kSecUseAuthenticationContext as String] = context
+		}
 		
 		// Find item and cast as data.
 		var item: CFTypeRef?
@@ -289,10 +318,10 @@ class SystemKeychain {
 	static func readItem(
 		account     : String,
 		accessGroup : String,
-		mixins      : [String: Any]
+		context     : LAContext? = nil
 	) throws -> String? {
 		
-		if let data: Data = try readItem(account: account, accessGroup: accessGroup, mixins: mixins) {
+		if let data: Data = try readItem(account: account, accessGroup: accessGroup, context: context) {
 			return String(data: data, encoding: .utf8)
 		}
 		return nil
@@ -303,10 +332,10 @@ class SystemKeychain {
 	static func readItem<T: GenericPasswordConvertible>(
 		account     : String,
 		accessGroup : String,
-		mixins      : [String: Any]
+		context     : LAContext? = nil
 	) throws -> T? {
 
-		if let data: Data = try readItem(account: account, accessGroup: accessGroup, mixins: mixins) {
+		if let data: Data = try readItem(account: account, accessGroup: accessGroup, context: context) {
 			return try T(rawRepresentation: data)
 		}
 		return nil

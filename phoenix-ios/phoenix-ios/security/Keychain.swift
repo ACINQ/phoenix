@@ -78,8 +78,7 @@ class Keychain {
 		do {
 			value = try SystemKeychain.readItem(
 				account     : oldAccount,
-				accessGroup : oldAccessGroup,
-				mixins      : mixins
+				accessGroup : oldAccessGroup
 			)
 		} catch {
 			log.error("keychain.read(acct: \(oldAccount), grp: \(oldAccessGroup)): error: \(error)")
