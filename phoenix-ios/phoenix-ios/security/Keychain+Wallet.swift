@@ -571,6 +571,18 @@ class Keychain_Wallet {
 		return pin
 	}
 	
+	func hasPin(_ type: PinType) -> Bool {
+		
+		return queue.sync {
+			_hasPin(type)
+		}
+	}
+	
+	private func _hasPin(_ type: PinType) -> Bool {
+		
+		return _getPin(type) != nil
+	}
+	
 	func setInvalidPin(
 		_ invalidPin : InvalidPin?,
 		_ type       : PinType,
@@ -683,7 +695,7 @@ class Keychain_Wallet {
 	}
 	
 	public func hasLockPin() -> Bool {
-		return getLockPin() != nil
+		return hasPin(.lockPin)
 	}
 	
 	public func setInvalidLockPin(
@@ -713,7 +725,7 @@ class Keychain_Wallet {
 	}
 	
 	public func hasSpendingPin() -> Bool {
-		return getSpendingPin() != nil
+		return hasPin(.spendingPin)
 	}
 	
 	public func setInvalidSpendingPin(
@@ -976,7 +988,7 @@ class Keychain_Wallet {
 			}
 		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(KEYCHAIN_DEFAULT_ID, sealedBox)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(self.id, sealedBox)
 		switch keychainResult {
 		case .failure(let error):
 			fail(error)
@@ -1005,13 +1017,17 @@ class Keychain_Wallet {
 	) -> Void {
 		log.trace(#function)
 		
+		#if DEBUG
+		dispatchPrecondition(condition: .onQueue(queue))
+		#endif
+		
 		let context = LAContext()
 		
 		let policy: LAPolicy
-		if getPasscodeFallbackEnabled() {
+		if self._getPasscodeFallbackEnabled() {
 			// Biometrics + Passcode Fallback
 			policy = .deviceOwnerAuthentication
-		} else if hasLockPin() {
+		} else if _hasPin(.lockPin) {
 			// Biometrics + Lock PIN Fallback
 			policy = .deviceOwnerAuthenticationWithBiometrics
 			context.localizedFallbackTitle = "" // do not show (cancel button ==> custom pin)
