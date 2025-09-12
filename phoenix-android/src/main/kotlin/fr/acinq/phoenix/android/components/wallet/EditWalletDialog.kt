@@ -69,6 +69,7 @@ fun EditWalletDialog(
         val defaultWalletPref by globalPrefs.getDefaultWallet.collectAsState(null)
         val isDefaultWalletInPref = remember(defaultWalletPref) { defaultWalletPref == walletId }
         var isDefaultWalletInput by remember(isDefaultWalletInPref) { mutableStateOf(isDefaultWalletInPref) }
+//        var isHiddenWallet by remember { mutableStateOf(metadata.isHidden) }
 
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
             AvatarPicker(
@@ -78,7 +79,7 @@ fun EditWalletDialog(
             Spacer(Modifier.height(24.dp))
             TextInput(
                 text = nameInput,
-                onTextChange = { nameInput = it.take(48) /* stealthy max chars */ },
+                onTextChange = { nameInput = it.take(32) /* stealthy max chars */ },
                 textStyle = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center),
                 placeholder = { Text(text = stringResource(R.string.contact_name_hint), style = MaterialTheme.typography.h3.copy(textAlign = TextAlign.Center, color = mutedTextColor), modifier = Modifier.fillMaxWidth()) },
                 staticLabel = null,
@@ -94,23 +95,23 @@ fun EditWalletDialog(
                 onCheckedChange = { isDefaultWalletInput = !isDefaultWalletInput }
             )
         }
-        Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-            SwitchView(
-                text = stringResource(R.string.wallet_edit_secret_label),
-                description = stringResource(R.string.wallet_edit_secret_description),
-                checked = false,
-                onCheckedChange = { }
-            )
-        }
+//        Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+//            SwitchView(
+//                text = stringResource(R.string.wallet_edit_secret_label),
+//                description = stringResource(R.string.wallet_edit_secret_description),
+//                checked = isHiddenWallet,
+//                onCheckedChange = { isHiddenWallet = !isHiddenWallet }
+//            )
+//        }
 
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp).align(Alignment.End)) {
             FilledButton(
                 text = stringResource(R.string.btn_save),
                 icon = R.drawable.ic_check,
-                enabled = nameInput != (metadata.name ?: "") || avatarInput != metadata.avatar || isDefaultWalletInput != isDefaultWalletInPref,
+                enabled = nameInput != (metadata.name ?: "") || avatarInput != metadata.avatar || isDefaultWalletInput != isDefaultWalletInPref, // || isHiddenWallet != metadata.isHidden,
                 onClick = {
                     scope.launch {
-                        globalPrefs.saveAvailableWalletMeta(walletId = walletId, name = nameInput.takeIf { it.isNotBlank() }, avatar = avatarInput)
+                        globalPrefs.saveAvailableWalletMeta(walletId = walletId, name = nameInput.takeIf { it.isNotBlank() }, avatar = avatarInput, isHidden = false)
                         when {
                             // we only update the default preferences when relevant: goes from default to not ; or goes from not default to default wallet.
                             defaultWalletPref == walletId && !isDefaultWalletInput -> globalPrefs.clearDefaultWallet()

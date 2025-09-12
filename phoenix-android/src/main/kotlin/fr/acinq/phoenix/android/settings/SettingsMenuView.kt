@@ -47,6 +47,7 @@ import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.buttons.MenuButton
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -104,7 +105,7 @@ fun SettingsView(
             MenuButton(text = stringResource(R.string.settings_converter), icon = R.drawable.ic_world, onClick = { showCurrencyConverter = true })
         }
 
-        // -- general
+        // -- liquidity
         CardHeader(text = stringResource(id = R.string.settings_fees_title))
         Card {
             MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_wand, onClick = { nc.navigate(Screen.LiquidityPolicy.route) })
@@ -185,35 +186,44 @@ private fun AvailableWalletsDialog(
     onWalletClick: (UserWallet) -> Unit,
     onLockWallet: () -> Unit,
 ) {
+    val walletsMetadataFlow = globalPrefs.getAvailableWalletsMeta.collectAsState(null)
     FullScreenDialog(onDismiss = onDismiss) {
-        val metadata by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
-        Box(modifier = Modifier.fillMaxSize().clickable(onClick = onDismiss)) {  }
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable(onClick = onDismiss)) {  }
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 96.dp)) {
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.colors.background, shape = MaterialTheme.shapes.large)
                     .padding(8.dp)
             ) {
-                WalletsSelector(
-                    wallets = availableWallets,
-                    walletsMetadata = metadata,
-                    activeWalletId = activeWalletId,
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    onWalletClick = onWalletClick,
-                    canEdit = true,
-                    bottomContent = {
-                        Spacer(Modifier.height(4.dp))
-                        val navController = navController
-                        FilledButton(
-                            text = stringResource(R.string.wallet_add_new),
-                            icon = R.drawable.ic_plus_circle,
-                            iconTint = MaterialTheme.colors.onPrimary,
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = { navController.navigate(Screen.InitWalletGraph.route) },
+                when (val walletMetadata = walletsMetadataFlow.value) {
+                    null -> {
+                        ProgressView(text = stringResource(R.string.utils_loading_data))
+                    }
+                    else -> {
+                        WalletsSelector(
+                            wallets = availableWallets,
+                            walletsMetadata = walletMetadata,
+                            activeWalletId = activeWalletId,
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            onWalletClick = onWalletClick,
+                            canEdit = true,
+                            bottomContent = {
+                                Spacer(Modifier.height(4.dp))
+                                val navController = navController
+                                FilledButton(
+                                    text = stringResource(R.string.wallet_add_new),
+                                    icon = R.drawable.ic_plus_circle,
+                                    iconTint = MaterialTheme.colors.onPrimary,
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = { navController.navigate(Screen.InitWalletGraph.route) },
+                                )
+                            }
                         )
                     }
-                )
+                }
             }
         }
 

@@ -187,7 +187,7 @@ class AppViewModel(
                     val metadataMap = application.globalPrefs.getAvailableWalletsMeta.first()
                     result.userWalletsMap.forEach { (walletId, _) ->
                         if (metadataMap[walletId] == null) {
-                            application.globalPrefs.saveAvailableWalletMeta(walletId, name = null, avatar = WalletAvatars.list.random())
+                            application.globalPrefs.saveAvailableWalletMeta(walletId, name = null, avatar = WalletAvatars.list.random(), isHidden = false)
                         }
                     }
                     _availableWallets.value = result.userWalletsMap

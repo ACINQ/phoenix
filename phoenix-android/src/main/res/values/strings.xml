@@ -1025,6 +1025,6 @@
     <string name="wallet_edit_default_description">If a default wallet is selected, it will be automatically opened on app launch.</string>
     <string name="wallet_edit_secret_label">Hidden Wallet (WIP)</string>
     <string name="wallet_edit_secret_description">Wallet will not be visible in selector screens. To access the wallet, you must enter its lock PIN.</string>
-
+    <string name="wallet_edit_pick_avatar">Pick an avatar</string>
 
 </resources>

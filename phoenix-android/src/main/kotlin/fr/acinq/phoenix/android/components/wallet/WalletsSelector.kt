@@ -66,7 +66,7 @@ fun WalletsSelector(
 ) {
 
     val currentWallet = remember(wallets) { wallets.entries.firstOrNull { it.key == activeWalletId }?.value }
-    val otherWalletsList = remember(wallets) { wallets.entries.filterNot { it.key == activeWalletId }.toList() }
+    val otherWalletsList = remember(wallets, walletsMetadata) { wallets.entries.filterNot { it.key == activeWalletId || walletsMetadata[it.key]?.isHidden == true }.toList() }
 
     LazyColumn(modifier = modifier, verticalArrangement = verticalArrangement, horizontalAlignment = horizontalAlignment) {
         topContent?.let {

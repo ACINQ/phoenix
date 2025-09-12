@@ -125,7 +125,7 @@ object BusinessManager {
         val nodeId = walletInfo.nodeId.toHex()
         val globalPrefs = application.globalPrefs
         val walletMetadata = globalPrefs.getAvailableWalletsMeta.first()[walletId] ?: run {
-            val metadata = UserWalletMetadata(walletId = walletId, name = null, avatar = WalletAvatars.list.random(), createdAt = currentTimestampMillis())
+            val metadata = UserWalletMetadata(walletId = walletId, name = null, avatar = WalletAvatars.list.random(), createdAt = currentTimestampMillis(), isHidden = false)
             globalPrefs.saveAvailableWalletMeta(metadata)
             metadata
         }
