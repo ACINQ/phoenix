@@ -56,7 +56,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.activeWalletId
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
@@ -94,6 +94,7 @@ object LiquidityLimits {
 
 @Composable
 fun RequestLiquidityView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
@@ -102,7 +103,7 @@ fun RequestLiquidityView(
     val currentInbound = channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()
 
     SplashLayout(
-        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = activeWalletId) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = { RequestLiquidityTopSection(currentInbound) },
         bottomContent = {
             if (channelsState.isNullOrEmpty()) {
@@ -112,7 +113,7 @@ fun RequestLiquidityView(
                 )
             } else {
                 balance?.let {
-                    RequestLiquidityBottomSection(business, it)
+                    RequestLiquidityBottomSection(walletId, business, it)
                 } ?: ProgressView(text = stringResource(id = R.string.utils_loading_data))
             }
         },
@@ -168,6 +169,7 @@ private fun RequestLiquidityTopSection(inboundLiquidity: MilliSatoshi?) {
 
 @Composable
 private fun RequestLiquidityBottomSection(
+    walletId: WalletId,
     business: PhoenixBusiness,
     balance: MilliSatoshi
 ) {
@@ -238,6 +240,7 @@ private fun RequestLiquidityBottomSection(
                 ErrorMessage(header = stringResource(id = R.string.validation_invalid_amount))
             } else {
                 ReviewLiquidityRequest(
+                    walletId = walletId,
                     onConfirm = { vm.requestInboundLiquidity(amount = state.amount, feerate = state.actualFeerate, fundingRate = state.fundingRate) }
                 )
             }
@@ -325,6 +328,7 @@ private fun LeaseEstimationView(
 
 @Composable
 private fun ReviewLiquidityRequest(
+    walletId: WalletId,
     onConfirm: () -> Unit,
 ) {
     var showSheet by remember { mutableStateOf(false) }
@@ -349,7 +353,7 @@ private fun ReviewLiquidityRequest(
 
                 Spacer(modifier = Modifier.height(24.dp))
                 SmartSpendButton(
-                    walletId = activeWalletId,
+                    walletId = walletId,
                     text = stringResource(id = R.string.btn_confirm),
                     icon = R.drawable.ic_check,
                     onSpend = onConfirm,

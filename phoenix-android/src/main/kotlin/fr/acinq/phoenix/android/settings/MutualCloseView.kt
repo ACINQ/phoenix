@@ -60,7 +60,7 @@ import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.activeWalletId
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -87,6 +87,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MutualCloseView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
@@ -256,7 +257,7 @@ fun MutualCloseView(
                                         }
                                         Spacer(modifier = Modifier.height(24.dp))
                                         SmartSpendButton(
-                                            walletId = activeWalletId,
+                                            walletId = walletId,
                                             text = stringResource(id = R.string.btn_confirm),
                                             icon = R.drawable.ic_check,
                                             onSpend = {

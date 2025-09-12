@@ -66,11 +66,6 @@ val globalPrefs: GlobalPrefs
     @Composable
     get() = application.globalPrefs
 
-/** only use if there's an active wallet */
-val activeWalletId: WalletId
-    @Composable
-    get() = LocalWalletId.current ?: error("no wallet active")
-
 val application: PhoenixApplication
     @Composable
     get() = LocalContext.current.applicationContext as? PhoenixApplication ?: error("Application is not of type PhoenixApplication. Are you using appView in preview?")

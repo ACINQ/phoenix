@@ -43,7 +43,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.activeWalletId
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -60,6 +60,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 
 @Composable
 fun CpfpView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     channelId: ByteVector32,
     onSuccess: () -> Unit,
@@ -115,7 +116,7 @@ fun CpfpView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 SmartSpendButton(
-                    walletId = activeWalletId,
+                    walletId = walletId,
                     text = stringResource(id = R.string.cpfp_execute_button),
                     icon = R.drawable.ic_check,
                     enabled = mayDoPayments,

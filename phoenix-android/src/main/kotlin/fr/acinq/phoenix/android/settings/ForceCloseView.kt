@@ -51,6 +51,7 @@ import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
 
 @Composable
 fun ForceCloseView(
+    walletId: WalletId,
     onBackClick: () -> Unit
 ) {
     var showConfirmationDialog by remember { mutableStateOf(false) }
@@ -109,7 +110,7 @@ fun ForceCloseView(
                                 Text(text = stringResource(R.string.forceclose_confirm_details))
                                 Spacer(modifier = Modifier.height(24.dp))
                                 SmartSpendButton(
-                                    walletId = activeWalletId,
+                                    walletId = walletId,
                                     text = stringResource(id = R.string.btn_confirm),
                                     icon = R.drawable.ic_check,
                                     onSpend = {

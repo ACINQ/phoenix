@@ -52,7 +52,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.activeWalletId
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -75,6 +75,7 @@ import fr.acinq.phoenix.utils.Parser
 
 @Composable
 fun SendSwapInRefundView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
@@ -90,7 +91,7 @@ fun SendSwapInRefundView(
             }
 
             else -> {
-                AvailableForRefundView(business = business, availableForRefund = availableForRefund)
+                AvailableForRefundView(walletId = walletId, business = business, availableForRefund = availableForRefund)
             }
         }
     }
@@ -98,6 +99,7 @@ fun SendSwapInRefundView(
 
 @Composable
 private fun AvailableForRefundView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     availableForRefund: Satoshi,
 ) {
@@ -248,7 +250,7 @@ private fun AvailableForRefundView(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         SmartSpendButton(
-                            walletId = activeWalletId,
+                            walletId = walletId,
                             text = stringResource(id = R.string.swapinrefund_send_button),
                             onSpend = { vm.executeRefund(currentState.transaction) },
                             modifier = Modifier.fillMaxWidth(),

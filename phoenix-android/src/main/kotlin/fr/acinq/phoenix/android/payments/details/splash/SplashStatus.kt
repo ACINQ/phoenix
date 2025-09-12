@@ -53,7 +53,9 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBusiness
+import fr.acinq.phoenix.android.LocalWalletId
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -142,7 +144,8 @@ fun SplashConfirmationView(
     onCpfpSuccess: () -> Unit,
 ) {
     val business = LocalBusiness.current
-    if (business == null) {
+    val walletId = LocalWalletId.current
+    if (business == null || walletId == null) {
         ProgressView(
             text = stringResource(id = R.string.paymentdetails_status_unconfirmed_fetching),
             textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
@@ -219,7 +222,7 @@ fun SplashConfirmationView(
                 }
 
                 if (conf == 0 && showBumpTxDialog) {
-                    BumpTransactionDialog(business = business, channelId = channelId, onSuccess = onCpfpSuccess, onDismiss = { showBumpTxDialog = false })
+                    BumpTransactionDialog(walletId = walletId, business = business, channelId = channelId, onSuccess = onCpfpSuccess, onDismiss = { showBumpTxDialog = false })
                 }
             } ?: ProgressView(
                 text = stringResource(id = R.string.paymentdetails_status_unconfirmed_fetching),
@@ -233,6 +236,7 @@ fun SplashConfirmationView(
 
 @Composable
 private fun BumpTransactionDialog(
+    walletId: WalletId,
     business: PhoenixBusiness,
     channelId: ByteVector32,
     onSuccess: () -> Unit,
@@ -243,6 +247,6 @@ private fun BumpTransactionDialog(
         title = stringResource(id = R.string.cpfp_title),
         buttons = null,
     ) {
-        CpfpView(business = business, channelId = channelId, onSuccess = onSuccess)
+        CpfpView(walletId = walletId, business = business, channelId = channelId, onSuccess = onSuccess)
     }
 }

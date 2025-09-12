@@ -60,7 +60,7 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
         SpendFromChannelAddress(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.MutualClose.route, appViewModel) { _, _, business ->
-        MutualCloseView(business = business, onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.MutualClose.route, appViewModel) { _, walletId, business ->
+        MutualCloseView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 }

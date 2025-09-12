@@ -51,7 +51,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.activeWalletId
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -73,6 +73,7 @@ import fr.acinq.phoenix.utils.extensions.confirmed
 
 @Composable
 fun FinalWalletRefundView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
@@ -90,6 +91,7 @@ fun FinalWalletRefundView(
             }
             else -> {
                 AvailableForRefund(
+                    walletId = walletId,
                     business = business,
                     available = available,
                     state = state,
@@ -148,6 +150,7 @@ private fun AddressInputAndFeeSlider(
 
 @Composable
 private fun ColumnScope.AvailableForRefund(
+    walletId: WalletId,
     business: PhoenixBusiness,
     available: Satoshi,
     state: FinalWalletRefundState,
@@ -259,7 +262,7 @@ private fun ColumnScope.AvailableForRefund(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SmartSpendButton(
-                    walletId = activeWalletId,
+                    walletId = walletId,
                     text = stringResource(id = R.string.swapinrefund_send_button),
                     onSpend = { onExecuteRefund(state.transaction) },
                     modifier = Modifier.fillMaxWidth(),

@@ -65,12 +65,12 @@ fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewMode
         SwapInSignerView(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.SwapInRefund.route, appViewModel) { _, _, business ->
-        SendSwapInRefundView(business = business, onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.WalletInfo.SwapInRefund.route, appViewModel) { _, walletId, business ->
+        SendSwapInRefundView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.FinalWalletRefund.route, appViewModel) { _, _, business ->
-        FinalWalletRefundView(business = business, onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.WalletInfo.FinalWalletRefund.route, appViewModel) { _, walletId, business ->
+        FinalWalletRefundView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.WalletInfo.FinalWallet.route, appViewModel) { _, _, business ->
