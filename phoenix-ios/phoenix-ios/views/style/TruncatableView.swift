@@ -5,7 +5,7 @@
 import SwiftUI
 
 fileprivate let filename = "TruncatableView"
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)

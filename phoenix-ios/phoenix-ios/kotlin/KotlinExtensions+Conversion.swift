@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 extension KotlinByteArray {
 	
+	func toByteVector() -> Bitcoin_kmpByteVector {
+		return Bitcoin_kmpByteVector(bytes: self)
+	}
+	
 	func toSwiftData() -> Data {
 		
 		return ByteArray_toNSData(buffer: self)
@@ -70,6 +74,11 @@ extension Data {
 		return result
 	*/
 	}
+	
+	func toKotlinByteVector() -> Bitcoin_kmpByteVector {
+		
+		return Bitcoin_kmpByteVector(bytes: self.toKotlinByteArray())
+	}
 }
 
 extension Array {
@@ -81,5 +90,21 @@ extension Array {
 			shutUpCompiler = (self[i.intValue] as! Item)
 			return shutUpCompiler
 		}
+	}
+}
+
+extension Kotlinx_datetimeInstant {
+	
+	func toDate() -> Date {
+		let milliseconds: Int64 = self.toEpochMilliseconds()
+		return Date(timeIntervalSince1970: TimeInterval(milliseconds) / TimeInterval(1_000))
+	}
+}
+
+extension Date {
+	
+	func toKotlinInstant() -> Kotlinx_datetimeInstant {
+		let milliseconds = Int64(self.timeIntervalSince1970 * 1_000)
+		return Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(epochMilliseconds: milliseconds)
 	}
 }

@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     modified_at INTEGER,
     original_fiat_type TEXT,
     original_fiat_rate REAL,
-    lightning_address TEXT
+    lightning_address TEXT,
+    card_id TEXT
 );
 
 -- queries for payments_metadata table
@@ -46,8 +47,9 @@ INSERT INTO payments_metadata (
             user_description, user_notes,
             modified_at,
             original_fiat_type, original_fiat_rate,
-            lightning_address)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            lightning_address,
+            card_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateUserInfo:
 UPDATE payments_metadata

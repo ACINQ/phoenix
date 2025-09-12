@@ -1,8 +1,8 @@
 import UIKit
+import SwiftUI
 import PhoenixShared
 import BackgroundTasks
 import Combine
-
 
 fileprivate let filename = "BusinessManager"
 #if DEBUG && true
@@ -11,21 +11,25 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-enum WalletRestoreType {
-	case fromManualEntry
-	case fromCloudBackup(name: String?)
+enum LoadWalletTrigger: CustomStringConvertible {
+	case walletUnlock
+	case newWallet
+	case restoreFromManualEntry
+	case restoreFromCloudBackup(name: String?)
+	
+	var description: String {
+		switch self {
+			case .walletUnlock              : return "walletUnlock"
+			case .newWallet                 : return "newWallet"
+			case .restoreFromManualEntry    : return "restoreFromManualEntry"
+			case .restoreFromCloudBackup(_) : return "restoreFromCloudBackup"
+		}
+	}
 }
-
-/// Short-hand for `BusinessManager.shared`
-/// 
-let Biz = BusinessManager.shared
 
 /// Manages the `PhoenixBusiness` instance, which is the shared logic written in Kotlin Multiplatform.
 ///
 class BusinessManager {
-	
-	/// Singleton instance
-	public static let shared = BusinessManager()
 	
 	/// There are some places in the code where we need to access the testnet state from a background thread.
 	/// This is problematic because calling into Kotlin via `business.chain.isTestnet()`
@@ -34,21 +38,14 @@ class BusinessManager {
 	/// So we're caching this value here for background access.
 	/// Also, this makes it easier to test mainnet UI & colors.
 	///
-	private static var _isTestnet: Bool? = nil
-	public static let isTestnet = _isTestnet!
-	public static let showTestnetBackground = _isTestnet!
+	public let isTestnet: Bool
+	public let showTestnetBackground: Bool
 	
-	/// The current business instance.
+	/// The associated business instance.
 	///
-	/// Always fetch this on demand - don't cache it.
-	/// Because it might change if the user closes his/her wallet.
-	///
-	public var business: PhoenixBusiness
+	public let business: PhoenixBusiness
 	
-	/// The current SyncManager instance.
-	///
-	/// Always fetch this on demand - don't cache it.
-	/// Because it might change if the user closes his/her wallet.
+	/// The associated SyncManager instance.
 	///
 	public private(set) var syncManager: SyncManager? = nil
 	
@@ -73,11 +70,12 @@ class BusinessManager {
 	/// 
 	public let mnemonicLanguagePublisher = CurrentValueSubject<MnemonicLanguage, Never>(MnemonicLanguage.english)
 	
-	private var isInBackground = false
+	/// General wallet info (e.g. nodeId)
+	///
+	public var walletInfo: WalletManager.WalletInfo? = nil
 	
-	private var walletInfo: WalletManager.WalletInfo? = nil
-	private var pushToken: String? = nil
-	private var fcmToken: String? = nil
+	private var wasStopped = false
+	private var isInBackground = false
 	private var peerConnectionState: Lightning_kmpConnection? = nil
 	
 	private var longLivedTasks = [String: UIBackgroundTaskIdentifier]()
@@ -90,10 +88,12 @@ class BusinessManager {
 	// MARK: Init
 	// --------------------------------------------------
 	
-	private init() { // must use shared instance
+	init() {
+		log.trace(#function)
 		
 		business = PhoenixBusiness(ctx: PlatformContext.default)
-		BusinessManager._isTestnet = !business.chain.isMainnet()
+		isTestnet = !business.chain.isMainnet()
+		showTestnetBackground = !business.chain.isMainnet()
 		
 		let nc = NotificationCenter.default
 		
@@ -105,6 +105,16 @@ class BusinessManager {
 			self.applicationWillEnterForeground()
 		}.store(in: &appCancellables)
 		
+		let ad = AppDelegate.get()
+		
+		ad.pushTokenPublisher.sink { _ in
+			self.pushTokenChanged()
+		}.store(in: &appCancellables)
+		
+		ad.fcmTokenPublisher.sink { _ in
+			self.fcmTokenChanged()
+		}.store(in: &appCancellables)
+		
 		WatchTower.shared.prepare()
 		
 	#if DEBUG
@@ -114,74 +124,34 @@ class BusinessManager {
 	#endif
 	}
 	
+	deinit {
+		log.trace(#function)
+	}
+	
+	func prepare() { /* Stub function */ }
+	
 	// --------------------------------------------------
 	// MARK: Lifecycle
 	// --------------------------------------------------
-
-	public func start() {
-		
-		if let electrumConfigPrefs = GroupPrefs.shared.electrumConfig {
-			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
-		} else {
-			business.appConfigurationManager.updateElectrumConfig(config: nil)
-		}
-		
-		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
-			primary: GroupPrefs.shared.fiatCurrency,
-			others: GroupPrefs.shared.preferredFiatCurrencies
-		)
-		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-		
-		let startupParams = StartupParams(
-			isTorEnabled: GroupPrefs.shared.isTorEnabled,
-			liquidityPolicy: GroupPrefs.shared.liquidityPolicy.toKotlin()
-		)
-		business.start(startupParams: startupParams)
-		
-		setup()
-		startTasks()
-	}
-
-	public func stop() {
-
-		cancellables.removeAll()
-		business.stop(closeDatabases: true)
-		syncManager?.shutdown()
-	}
-
-	public func reset() {
-
-		business = PhoenixBusiness(ctx: PlatformContext.default)
-		syncManager = nil
-		swapInRejectedPublisher.send(nil)
-		canMergeChannelsForSplicingPublisher.send(false)
-		walletInfo = nil
-		peerConnectionState = nil
-		paymentsPageFetchers.removeAll()
-
-		start()
-	}
 	
-	// --------------------------------------------------
-	// MARK: Setup
-	// --------------------------------------------------
-	
-	private func setup() {
-		log.trace("setup()")
+	private func setup(_ walletId: WalletIdentifier) {
+		log.trace(#function)
+		assertMainThread()
+		
+		let prefs = Prefs.wallet(walletId)
+		let groupPrefs = GroupPrefs.wallet(walletId)
 		
 		// Connection status observer
-		business.connectionsManager.connectionsPublisher()
-			.sink { (connections: Connections) in
-			
-				self.connectionsChanged(connections)
+		Task { @MainActor [self] in
+			for await connections in business.connectionsManager.connectionsSequence() {
+				connectionsChanged(connections)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// In-flight payments observer
-		business.peerManager.peerStatePublisher()
-			.flatMap { $0.eventsFlowPublisher() }
-			.sink { (event: Lightning_kmpPeerEvent) in
-				
+		Task { @MainActor [self] in
+			let peer = try await self.business.peerManager.getPeer()
+			for await event in peer.eventsFlow {
 				if let paymentProgress = event as? Lightning_kmpPaymentProgress {
 					let paymentId = paymentProgress.request.paymentId.description()
 					self.beginLongLivedTask(id: paymentId)
@@ -195,10 +165,28 @@ class BusinessManager {
 					self.endLongLivedTask(id: paymentId)
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
+		
+		// Card payment requests
+		Task { @MainActor [self] in
+			let peer = try await self.business.peerManager.getPeer()
+			for await event in peer.eventsFlow {
+				if let msg = event as? Lightning_kmp_corePaymentRequestReceived {
+					log.debug("found event: PaymentRequestReceived")
+					
+					if let cardRequest = CardRequest.fromOnionMessage(msg) {
+						Task { @MainActor in
+							await self.handleCardRequest(cardRequest)
+						}
+					} else {
+						log.debug("CardRequest.fromOnionMessage() failed")
+					}
+				}
+			}
+		}.store(in: &cancellables)
 		
 		// Tor configuration observer
-		GroupPrefs.shared.isTorEnabledPublisher
+		groupPrefs.isTorEnabledPublisher
 			.sink { (isTorEnabled: Bool) in
 				
 				self.business.appConfigurationManager.updateTorUsage(enabled: isTorEnabled)
@@ -207,20 +195,20 @@ class BusinessManager {
 		
 		// PreferredFiatCurrenies observers
 		Publishers.CombineLatest(
-				GroupPrefs.shared.fiatCurrencyPublisher,
-				GroupPrefs.shared.currencyConverterListPublisher
+				groupPrefs.fiatCurrencyPublisher,
+				groupPrefs.currencyConverterListPublisher
 			).sink { _ in
 			
 				let current = AppConfigurationManager.PreferredFiatCurrencies(
-					primary: GroupPrefs.shared.fiatCurrency,
-					others: GroupPrefs.shared.preferredFiatCurrencies
+					primary: groupPrefs.fiatCurrency,
+					others: groupPrefs.preferredFiatCurrencies
 				)
 				self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
 			}
 			.store(in: &cancellables)
 		
 		// Liquidity policy
-		GroupPrefs.shared.liquidityPolicyPublisher.dropFirst()
+		groupPrefs.liquidityPolicyPublisher.dropFirst()
 			.sink { (policy: LiquidityPolicy) in
 			
 				Task { @MainActor in
@@ -240,18 +228,18 @@ class BusinessManager {
 			.store(in: &cancellables)
 		
 		// NodeEvents
-		business.nodeParamsManager.nodeParamsPublisher()
-			.flatMap { $0.nodeEventsPublisher() }
-			.sink { (event: Lightning_kmpNodeEvents) in
+		Task { @MainActor [self] in
+			let nodeParams = await self.business.nodeParamsManager.getNodeParams()
+			for await event in nodeParams.nodeEventsSequence() {
 				
 				if let rejected = event as? Lightning_kmpLiquidityEventsRejected,
-				   rejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet
+					rejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet
 				{
 					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
 					self.swapInRejectedPublisher.value = rejected
-					
+				
 				} else if let task = event as? Lightning_kmpSensitiveTaskEvents {
-					
+				
 					if let taskStarted = task as? Lightning_kmpSensitiveTaskEventsTaskStarted {
 						if let taskIdentifier = taskStarted.id.asInteractiveTx() {
 							self.beginLongLivedTask(id: taskIdentifier.id)
@@ -264,7 +252,7 @@ class BusinessManager {
 					}
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// LiquidityEvent.Accepted is still missing.
 		// So we're simulating it by monitoring the swapIn wallet balance.
@@ -276,8 +264,8 @@ class BusinessManager {
 		// then the entire confirmed balance is consumed,
 		// and thus the confirmed balance drops to zero.
 		//
-		business.balanceManager.swapInWalletPublisher()
-			.sink { (wallet: Lightning_kmpWalletState.WalletWithConfirmations) in
+		Task { @MainActor [self] in
+			for await wallet in business.balanceManager.swapInWalletSequence() {
 				
 				if wallet.deeplyConfirmedBalance.sat == 0 {
 					if self.swapInRejectedPublisher.value != nil {
@@ -286,21 +274,20 @@ class BusinessManager {
 					}
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// Monitor for unfinished "merge-channels for splicing" upgrade.
 		//
-		business.peerManager.channelsPublisher()
-			.sink { (channels: [LocalChannelInfo]) in
-				
+		Task { @MainActor [self] in
+			for await channels in business.peerManager.channelsArraySequence() {
 				let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// Monitor for notifySrvExt being active & connected to Peer
 		//
-		GroupPrefs.shared.srvExtConnectionPublisher
+		groupPrefs.srvExtConnectionPublisher
 			.sink { (date: Date) in
 			
 				log.debug("srvExtConnectionPublisher.fire()")
@@ -316,9 +303,9 @@ class BusinessManager {
 				if isConnected {
 					let delay = 5.0 - elapsed
 					DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-						if GroupPrefs.shared.srvExtConnection == date {
+						if groupPrefs.srvExtConnection == date {
 							log.debug("srvExtConnection.clear()")
-							GroupPrefs.shared.srvExtConnection = Date(timeIntervalSince1970: 0)
+							groupPrefs.srvExtConnection = Date(timeIntervalSince1970: 0)
 						}
 					}
 				}
@@ -351,30 +338,23 @@ class BusinessManager {
 			}.store(in: &cancellables)
 		
 		// Keep Prefs.shared.swapInAddressIndex up-to-date
-		business.peerManager.peerStatePublisher()
-			.compactMap { $0.swapInWallet }
-			.flatMap { $0.swapInAddressPublisher() }
-			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
-				
+		Task { @MainActor [self] in
+			let peer = try await business.peerManager.getPeer()
+			for await newInfo in peer.phoenixSwapInWallet.swapInAddressSequence() {
 				if let newInfo {
-					if Prefs.shared.swapInAddressIndex < newInfo.index {
-						Prefs.shared.swapInAddressIndex = newInfo.index
+					if prefs.swapInAddressIndex < newInfo.index {
+						prefs.swapInAddressIndex = newInfo.index
 					}
 				}
 			}
-			.store(in: &cancellables)
-	}
-	
-	func startTasks() {
-		log.trace("startTasks()")
+		}.store(in: &cancellables)
 		
 		Task { @MainActor in
-			let channelsStream = self.business.peerManager.channelsPublisher().values
 			do {
-				for try await channels in channelsStream {
+				for try await channels in business.peerManager.channelsArraySequence() {
 					let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 					if !shouldMigrate {
-						let peer = try await Biz.business.peerManager.getPeer()
+						let peer = try await business.peerManager.getPeer()
 						try await peer.startWatchSwapInWallet()
 					}
 					break
@@ -382,7 +362,48 @@ class BusinessManager {
 			} catch {
 				log.error("peer.startWatchSwapInWallet(): error: \(error)")
 			}
-		} // </Task>
+		}.store(in: &cancellables)
+	}
+	
+	private func start(_ walletId: WalletIdentifier) {
+		log.trace(#function)
+		assertMainThread()
+		
+		let groupPrefs = GroupPrefs.wallet(walletId)
+		
+		if let electrumConfigPrefs = groupPrefs.electrumConfig {
+			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
+		} else {
+			business.appConfigurationManager.updateElectrumConfig(config: nil)
+		}
+		
+		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+			primary: groupPrefs.fiatCurrency,
+			others: groupPrefs.preferredFiatCurrencies
+		)
+		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
+		
+		let startupParams = StartupParams(
+			isTorEnabled: groupPrefs.isTorEnabled,
+			liquidityPolicy: groupPrefs.liquidityPolicy.toKotlin()
+		)
+		business.start(startupParams: startupParams)
+	}
+
+	public func stop() {
+		log.trace(#function)
+		assertMainThread()
+		
+		guard !wasStopped else {
+			log.debug("stop(): ignoring: already stopped")
+			return
+		}
+		wasStopped = true
+		
+		cancellables.removeAll()
+		appCancellables.removeAll()
+		business.stop(closeDatabases: true)
+		syncManager?.shutdown()
 	}
 	
 	// --------------------------------------------------
@@ -390,7 +411,7 @@ class BusinessManager {
 	// --------------------------------------------------
 	
 	func applicationDidEnterBackground() {
-		log.trace("### applicationDidEnterBackground()")
+		log.trace(#function)
 		
 		if !isInBackground {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
@@ -401,7 +422,7 @@ class BusinessManager {
 	}
 	
 	func applicationWillEnterForeground() {
-		log.trace("### applicationWillEnterForeground()")
+		log.trace(#function)
 		
 		if isInBackground {
 			business.appConnectionsDaemon?.decrementDisconnectCount(
@@ -423,26 +444,21 @@ class BusinessManager {
 	///           step (i.e. during verification), then pass it here to avoid the duplicate effort.
 	///   - walletRestoreType: If restoring a wallet from a backup, pass the type here.
 	///
-	@discardableResult
 	func loadWallet(
+		trigger: LoadWalletTrigger,
 		recoveryPhrase: RecoveryPhrase,
-		seed knownSeed: KotlinByteArray? = nil,
-		walletRestoreType: WalletRestoreType? = nil
-	) -> Bool {
-		
-		log.trace("loadWallet()")
+		seed knownSeed: KotlinByteArray? = nil
+	) {
+		log.trace("loadWallet(trigger: \(trigger))")
 		assertMainThread()
 		
-		if (business.walletManager.isLoaded()) {
-			return false
+		guard !business.walletManager.isLoaded() else {
+			log.warning("loadWallet(): ignoring: already loaded")
+			return
 		}
-
-		guard walletInfo == nil else {
-			return false
-		}
-		
 		guard let language = recoveryPhrase.language else {
-			return false
+			log.warning("loadWallet(): cannot load wallet: missing recoveryPhrase.language")
+			return
 		}
 		
 		let seed = knownSeed ?? business.walletManager.mnemonicsToSeed(
@@ -454,49 +470,64 @@ class BusinessManager {
 		
 		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()
+		maybeRegisterPushToken()
 		
 		let walletId = WalletIdentifier(chain: business.chain, walletInfo: _walletInfo)
 		
-		if let walletRestoreType = walletRestoreType {
-			switch walletRestoreType {
-			case .fromManualEntry:
-				//
-				// User is restoring wallet after manually typing in the recovery phrase.
-				// So we can mark the manual_backup task as completed.
-				//
-				Prefs.shared.backupSeed.manualBackup_setTaskDone(true, walletId)
-				//
-				// And ensure cloud backup is disabled for the wallet.
-				//
-				Prefs.shared.backupSeed.isEnabled = false
-				Prefs.shared.backupSeed.setName(nil, walletId)
-				Prefs.shared.backupSeed.setHasUploadedSeed(false, walletId)
-				
-			case .fromCloudBackup(let name):
-				//
-				// User is restoring wallet from an existing iCloud backup.
-				// So we can mark the iCloud backpu as completed.
-				//
-				Prefs.shared.backupSeed.isEnabled = true
-				Prefs.shared.backupSeed.setName(name, walletId)
-				Prefs.shared.backupSeed.setHasUploadedSeed(true, walletId)
-				//
-				// And ensure manual backup is diabled for the wallet.
-				//
-				Prefs.shared.backupSeed.manualBackup_setTaskDone(false, walletId)
-			}
+		Prefs.didLoadWallet(walletId)
+		GroupPrefs.didLoadWallet(walletId)
+		AppSecurity.shared.didLoadWallet(walletId)
+	#if DEBUG
+		log.debug("--------------------------------------------------")
+		log.debug("# PREFS: PHASE 2:")
+		Prefs.printAllKeyValues()
+		log.debug("# GROUP_PREFS: PHASE 2:")
+		GroupPrefs.printAllKeyValues()
+		log.debug("# KEYCHAIN(current): PHASE 1:")
+		Keychain.printKeysAndValues(walletId)
+		log.debug("--------------------------------------------------")
+	#endif
+		
+		let prefs = Prefs.wallet(walletId)
+		
+		switch trigger {
+		case .restoreFromManualEntry:
+			//
+			// User is restoring wallet after manually typing in the recovery phrase.
+			// So we can mark the manual_backup task as completed.
+			//
+			prefs.backupSeed.manualBackupDone = true
+			//
+			// And ensure cloud backup is disabled for the wallet.
+			//
+			prefs.backupSeed.isEnabled = false
+			prefs.backupSeed.name = nil
+			prefs.backupSeed.hasUploadedSeed = false
+			
+		case .restoreFromCloudBackup(let name):
+			//
+			// User is restoring wallet from an existing iCloud backup.
+			// So we can mark the iCloud backpu as completed.
+			//
+			prefs.backupSeed.isEnabled = true
+			prefs.backupSeed.name = name
+			prefs.backupSeed.hasUploadedSeed = true
+			//
+			// And ensure manual backup is diabled for the wallet.
+			//
+			prefs.backupSeed.manualBackupDone = false
+		default:
+			break
 		}
+		
+		setup(walletId)
+		start(walletId)
 
 		self.syncManager = SyncManager(
 			chain: business.chain,
 			recoveryPhrase: recoveryPhrase,
 			walletInfo: _walletInfo
 		)
-
-		if LockState.shared.walletExistence == .doesNotExist {
-			LockState.shared.walletExistence = .exists
-		}
-		return true
 	}
 	
 	/// The current walletIdentifier (from the current unlocked wallet).
@@ -504,7 +535,7 @@ class BusinessManager {
 	/// Always fetch this on demand - don't cache it.
 	/// Because it might change if the user closes his/her wallet.
 	///
-	public var walletId: WalletIdentifier? {
+	var walletId: WalletIdentifier? {
 		if let walletInfo {
 			return WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
 		} else {
@@ -512,36 +543,19 @@ class BusinessManager {
 		}
 	}
 
-	/// The current nodeIdHash (from the current unlocked wallet).
-	///
-	/// Always fetch this on demand - don't cache it.
-	/// Because it might change if the user closes his/her wallet.
-	///
-	public var nodeIdHash: String? {
-		return walletInfo?.nodeIdHash
-	}
-	
-	public var nodeId: String? {
-		return walletInfo?.nodeId.toHex()
-	}
-
 	// --------------------------------------------------
 	// MARK: Push Token
 	// --------------------------------------------------
 	
-	public func setPushToken(_ value: String) {
-		log.trace("setPushToken()")
-		assertMainThread()
+	private func pushTokenChanged() {
+		log.trace(#function)
 		
-		self.pushToken = value
-		maybeRegisterFcmToken()
+		maybeRegisterPushToken()
 	}
 	
-	public func setFcmToken(_ value: String) {
-		log.trace("setFcmToken()")
-		assertMainThread()
+	private func fcmTokenChanged() {
+		log.trace(#function)
 		
-		self.fcmToken = value
 		maybeRegisterFcmToken()
 	}
 	
@@ -554,6 +568,7 @@ class BusinessManager {
 		
 		if !oldPeerConnectionState.isEstablished() && newPeerConnectionState.isEstablished() {
 			maybeRegisterFcmToken()
+			maybeRegisterPushToken()
 		}
 	}
 	
@@ -561,22 +576,21 @@ class BusinessManager {
 		log.trace("maybeRegisterFcmToken()")
 		assertMainThread()
 		
-		if walletInfo == nil {
+		guard walletInfo != nil else {
 			log.debug("maybeRegisterFcmToken: walletInfo is nil")
 			return
 		}
-		if fcmToken == nil {
+		guard let fcmToken = AppDelegate.get().fcmTokenPublisher.value else {
 			log.debug("maybeRegisterFcmToken: fcmToken is nil")
 			return
 		}
-		if !(peerConnectionState is Lightning_kmpConnection.ESTABLISHED) {
+		guard (peerConnectionState is Lightning_kmpConnection.ESTABLISHED) else {
 			log.debug("maybeRegisterFcmToken: peerConnection not established")
 			return
 		}
 		
-		let token = self.fcmToken
-		log.debug("registering fcm token: \(token?.description ?? "<nil>")")
-		business.registerFcmToken(token: token) { error in
+		log.debug("registering fcm token: \(fcmToken.description)")
+		business.registerFcmToken(token: fcmToken) { error in
 			if let e = error {
 				log.error("failed to register fcm token: \(e.localizedDescription)")
 			}
@@ -599,6 +613,108 @@ class BusinessManager {
 		//
 		// The ideal solution would be to have the server send some kind of Ack for the
 		// registration. Which we could then use to trigger a storage in UserDefaults.
+	}
+	
+	func maybeRegisterPushToken() -> Void {
+		log.trace("maybeRegisterPushToken()")
+		assertMainThread()
+		
+		guard let walletInfo else {
+			log.debug("maybeRegisterPushToken: walletInfo is nil")
+			return
+		}
+		guard let pushToken = AppDelegate.get().pushTokenPublisher.value else {
+			log.debug("maybeRegisterPushToken: pushToken is nil")
+			return
+		}
+		guard peerConnectionState is Lightning_kmpConnection.ESTABLISHED else {
+			log.debug("maybeRegisterPushToken: peerConnection not established")
+			return
+		}
+		
+		let walletId = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
+		let prefs = Prefs.wallet(walletId)
+			
+		let nodeIdHash = walletInfo.nodeId.hash160().toSwiftData().toHex()
+		assert(nodeIdHash == walletInfo.nodeIdHash)
+		
+		if let prvRegistration = prefs.pushTokenRegistration {
+
+			if prvRegistration.pushToken == pushToken &&
+			   prvRegistration.nodeIdHash == nodeIdHash
+			{
+				// We've already registered our {pushToken, nodeId} tuple.
+
+				if abs(prvRegistration.registrationDate.timeIntervalSinceNow) < 30.days() {
+					// The last registration was recent, so we can skip registration.
+					log.debug("Push token already registered")
+					return
+
+				} else {
+					// It's been awhile since we last registered, so let's re-register.
+					// This is a self-healing mechanism, in case of server problems.
+				}
+			}
+		}
+		
+		let registration = PushTokenRegistration(
+			pushToken: pushToken,
+			nodeIdHash: nodeIdHash,
+			registrationDate: Date()
+		)
+		
+		let url = URL(string: "https://s7r6lsmzk7.execute-api.us-west-2.amazonaws.com/v1/pub/push/register")
+		guard let requestUrl = url else { return }
+		
+		#if DEBUG
+		let platform = "iOS-development"
+		#else
+		// Note: This is actually wrong if you build-and-run using RELEASE mode.
+		let platform = "iOS-production"
+		#endif
+		
+		let body = [
+			"app_id"     : "co.acinq.phoenix",
+			"platform"   : platform,
+			"push_token" : pushToken,
+			"node_id"    : walletInfo.nodeId.value.toHex()
+		]
+		let bodyData = try? JSONSerialization.data(
+			withJSONObject: body,
+			options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+			
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/push/register: success")
+				prefs.pushTokenRegistration = registration
+			}
+			else if let error = error {
+				log.debug("/push/register: error: \(String(describing: error))")
+			} else {
+				log.debug("/push/register: statusCode: \(statusCode)")
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/push/register: response:\n\(dataString)")
+				}
+			}
+		}
+		
+		log.debug("/push/register ...")
+		task.resume()
 	}
 	
 	// --------------------------------------------------
@@ -645,6 +761,43 @@ class BusinessManager {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payments
+	// --------------------------------------------------
+	
+	@MainActor
+	func handleCardRequest(
+		_ cardRequest: CardRequest
+	) async {
+		log.trace("handleCardRequest()")
+		
+		let result: Result<WithdrawRequestStatus, WithdrawRequestError> =
+			await business.checkWithdrawRequest(cardRequest.toWithdrawRequest())
+		
+		switch result {
+		case .failure(let error):
+			log.error("handleCardRequest: error: \(error.description)")
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere(_):
+				log.warning("handleCardReqeust: abort: handled elsewhere")
+				
+			case .continueAndSendPayment(let card, _, _):
+				log.debug("handleCardReqeust: continue: send payment")
+				
+				do {
+					try await business.sendManager.payUnsolicitedInvoice(
+						invoice: cardRequest.invoice,
+						metadata: WalletPaymentMetadata.withCard(card.id)
+					)
+				} catch {
+					log.error("peer.payUnsolicitedInvoice(): error: \(error)")
+				}
+			}
 		}
 	}
 	

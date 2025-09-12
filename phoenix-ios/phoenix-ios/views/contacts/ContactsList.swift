@@ -68,11 +68,11 @@ struct ContactsList: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
-			contactsListChanged($0)
-		}
 		.onChange(of: searchText) { _ in
 			searchTextChanged()
+		}
+		.task {
+			await monitorContactsList()
 		}
 	}
 	
@@ -125,7 +125,7 @@ struct ContactsList: View {
 	func row(_ item: ContactInfo) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
-			ContactPhoto(fileName: item.photoUri, size: 32)
+			ContactPhoto(filename: item.photoUri, size: 32)
 			Text(item.name)
 				.font(.title3)
 				.foregroundColor(.primary)
@@ -272,6 +272,26 @@ struct ContactsList: View {
 			popToDestination = nil
 			presentationMode.wrappedValue.dismiss()
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	@MainActor
+	func monitorContactsList() async {
+		log.trace(#function)
+		
+		do {
+			let contactsDb = try await Biz.business.databaseManager.contactsDb()
+			for await contacts in contactsDb.contactsList {
+				contactsListChanged(contacts)
+			}
+		} catch {
+			log.error("monitorContactsList(): error: \(error)")
+		}
+		
+		log.debug("monitorContactsList(): terminated")
 	}
 	
 	// --------------------------------------------------

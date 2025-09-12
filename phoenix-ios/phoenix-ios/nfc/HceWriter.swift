@@ -1,5 +1,6 @@
 import Foundation
 import CoreNFC
+import DnaCommunicator
 
 fileprivate let filename = "HceWriter"
 #if DEBUG
@@ -320,5 +321,35 @@ class HceWriter {
 			0x6A, // SW1 Status byte 1 - Command processing status
 			0x82  // SW2 Status byte 2 - Command processing qualifier
 		]
+	}
+}
+
+extension CapabilitiesContainer {
+	
+	static func hce_defaultValue() -> CapabilitiesContainer {
+		
+		let file2 = CtrlTLV.hce_defaultFile2()
+		
+		return CapabilitiesContainer(
+			len: 15,
+			version: 0x20,
+			mLe: 256,
+			mLc: 255,
+			files: [file2]
+		)
+	}
+}
+
+extension CtrlTLV {
+	
+	static func hce_defaultFile2() -> CtrlTLV {
+		return CtrlTLV(
+			t: 4,
+			l: 6,
+			fileId: [0xe1, 0x04],
+			fileSize: 512,
+			readAccess: 0x00,
+			writeAccess: 0xFF
+		)
 	}
 }

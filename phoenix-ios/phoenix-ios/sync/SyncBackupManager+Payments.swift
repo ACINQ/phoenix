@@ -40,46 +40,21 @@ fileprivate struct UploadPaymentsOperationInfo {
 extension SyncBackupManager {
 	
 	func startPaymentsQueueCountMonitor() {
-		log.trace("startPaymentsQueueCountMonitor()")
+		log.trace(#function)
 		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.payments.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("payments.queueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
+		let queueCountSequnece = cloudKitDb.payments.queueCountSequence()
+		Task { @MainActor [weak self] in
+			for await count in queueCountSequnece {
+				self?.queueCountChanged(count)
 			}
-			
-			let count = Int(clamping: queueCount)
-			
-			let wait: SyncBackupManager_State_Waiting?
-			if Prefs.shared.backupTransactions.useUploadDelay {
-				let delay = TimeInterval.random(in: 10 ..< 900)
-				wait = SyncBackupManager_State_Waiting(
-					kind: .randomizedUploadDelay,
-					parent: self,
-					delay: delay
-				)
-			} else {
-				wait = nil
-			}
-			
-			Task {
-				if let newState = await self.actor.paymentsQueueCountChanged(count, wait: wait) {
-					self.handleNewState(newState)
-				}
-			}
-
 		}.store(in: &cancellables)
 	}
 	
 	func startPaymentsMigrations() {
 		log.trace("startPaymentsMigrations()")
 		
-		let hasDownloadedPayments = Prefs.shared.backupTransactions.hasDownloadedPayments(walletId)
-		let hasReUploadedPayments = Prefs.shared.backupTransactions.hasReUploadedPayments(walletId)
+		let hasDownloadedPayments = prefs.backupTransactions.hasDownloadedPayments
+		let hasReUploadedPayments = prefs.backupTransactions.hasReUploadedPayments
 		
 		let needsMigration = hasDownloadedPayments && !hasReUploadedPayments
 		
@@ -92,7 +67,35 @@ extension SyncBackupManager {
 		Task { @MainActor in
 		
 			try await self.cloudKitDb.payments.enqueueOutdatedItems()
-			Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
+			prefs.backupTransactions.hasReUploadedPayments = true
+		}
+	}
+	
+	// ----------------------------------------
+	// MARK: Notifications
+	// ----------------------------------------
+	
+	private func queueCountChanged(_ queueCount: Int64) {
+		log.trace("payments.queueCountChanged(): count = \(queueCount)")
+		
+		let count = Int(clamping: queueCount)
+		
+		let wait: SyncBackupManager_State_Waiting?
+		if prefs.backupTransactions.useUploadDelay {
+			let delay = TimeInterval.random(in: 10 ..< 900)
+			wait = SyncBackupManager_State_Waiting(
+				kind: .randomizedUploadDelay,
+				parent: self,
+				delay: delay
+			)
+		} else {
+			wait = nil
+		}
+		
+		Task {
+			if let newState = await self.actor.paymentsQueueCountChanged(count, wait: wait) {
+				self.handleNewState(newState)
+			}
 		}
 	}
 	
@@ -306,8 +309,8 @@ extension SyncBackupManager {
 				
 				log.trace("downloadPayments(): finish: success")
 				
-				Prefs.shared.backupTransactions.markHasDownloadedPayments(walletId)
-				Prefs.shared.backupTransactions.markHasReUploadedPayments(walletId)
+				prefs.backupTransactions.hasDownloadedPayments = true
+				prefs.backupTransactions.hasReUploadedPayments = true
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadPayments() {
@@ -432,7 +435,7 @@ extension SyncBackupManager {
 			let container = CKContainer.default()
 			
 			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = Prefs.shared.backupTransactions.useCellular
+			configuration.allowsCellularAccess = self.prefs.backupTransactions.useCellular
 			
 			return try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
@@ -720,7 +723,7 @@ extension SyncBackupManager {
 		
 		let hashMe = prefix + suffix
 		let digest = SHA256.hash(data: hashMe)
-		let hash = digest.toHex(options: .lowerCase)
+		let hash = digest.toHex(.lowerCase)
 		
 		return CKRecord.ID(recordName: hash, zoneID: recordZoneID())
 	}

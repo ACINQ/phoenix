@@ -53,13 +53,13 @@ struct LiquidityPolicyView: View {
 	)
 	@State var exampleHeight: CGFloat? = nil
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	init() {
 		
-		let userLp = GroupPrefs.shared.liquidityPolicy
+		let userLp = GroupPrefs.current.liquidityPolicy
 		
 		let __isEnabled = userLp.enabled
 		
@@ -980,7 +980,7 @@ struct LiquidityPolicyView: View {
 			log.info("updated.maxFeeSats: \(sats?.description ?? "nil")")
 			log.info("updated.maxFeeBasisPoints: \(basisPoints?.description ?? "nil")")
 					
-			GroupPrefs.shared.liquidityPolicy = LiquidityPolicy(
+			GroupPrefs.current.liquidityPolicy = LiquidityPolicy(
 				enabled: true,
 				maxFeeSats: sats,
 				maxFeeBasisPoints: basisPoints,
@@ -989,7 +989,7 @@ struct LiquidityPolicyView: View {
 			
 		} else {
 			
-			GroupPrefs.shared.liquidityPolicy = LiquidityPolicy(
+			GroupPrefs.current.liquidityPolicy = LiquidityPolicy(
 				enabled: false,
 				maxFeeSats: nil,
 				maxFeeBasisPoints: nil,

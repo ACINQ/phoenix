@@ -15,8 +15,6 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	@State var sharing: String? = nil
-	
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
 	
 	enum CapacityHeight: Preference {}
@@ -32,11 +30,12 @@ struct ChannelsConfigurationView: View {
 	
 	@StateObject var toast = Toast()
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -67,8 +66,10 @@ struct ChannelsConfigurationView: View {
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.sharing($sharing)
-		.onReceive(channelsPublisher) {
-			channels = $0
+		.task {
+			for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+				channels = newChannels
+			}
 		}
 	}
 	
@@ -283,7 +284,7 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	func localBalanceColor() -> Color {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return Color.appAccentTestnet
 		} else {
 			return Color.appAccentMainnet

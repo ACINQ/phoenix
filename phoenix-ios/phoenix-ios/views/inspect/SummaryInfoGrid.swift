@@ -32,8 +32,9 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	let maxKeyColumnWidth: CGFloat = 200
 	// </InfoGridView Protocol>
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.openURL) var openURL
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -60,6 +61,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			recipientRow()
 			paymentTypeRow()
 			channelClosingRow()
+			cardRow()
 			
 			paymentFeesRow_StandardFees()
 			paymentFeesRow_MinerFees()
@@ -363,7 +365,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 				if let contact = paymentInfo.contact {
 					
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						ContactPhoto(fileName: contact.photoUri, size: 32)
+						ContactPhoto(filename: contact.photoUri, size: 32)
 						Text(contact.name)
 					} // <HStack>
 					.onTapGesture {
@@ -414,7 +416,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 				if let contact = paymentInfo.contact {
 					
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
-						ContactPhoto(fileName: contact.photoUri, size: 32)
+						ContactPhoto(filename: contact.photoUri, size: 32)
 						Text(contact.name)
 					} // <HStack>
 					.onTapGesture {
@@ -513,6 +515,29 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 							.padding(.top, 4)
 					}
 				}
+				
+			} // </InfoGridRow>
+		}
+	}
+	
+	@ViewBuilder
+	func cardRow() -> some View {
+		let identifier: String = #function
+		
+		if let cardId = paymentInfo.metadata.cardId,
+		   let card = Biz.business.cardsManager.cardForId(cardId: cardId)
+		{
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				keyColumn("Card")
+				
+			} valueColumn: {
+				Text(card.sanitizedName)
 				
 			} // </InfoGridRow>
 		}

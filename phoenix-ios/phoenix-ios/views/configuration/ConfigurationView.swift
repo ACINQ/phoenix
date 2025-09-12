@@ -22,6 +22,7 @@ struct ConfigurationView: View {
 struct ConfigurationList: View {
 	
 	enum NavLinkTag: String {
+		case WalletMetadata
 		// General
 		case About
 		case WalletCreationOptions
@@ -42,6 +43,7 @@ struct ConfigurationList: View {
 		case WalletInfo
 		case ChannelsConfiguration
 		case LogsConfiguration
+		case BoltCardsList
 		case Experimental
 		// Danger Zone
 		case DrainWallet
@@ -51,14 +53,16 @@ struct ConfigurationList: View {
 	
 	let scrollViewProxy: ScrollViewProxy
 	
-	@State private var notificationPermissions = NotificationsManager.shared.permissions.value
+	@State var walletMetadata: WalletMetadata = WalletMetadata.default()
 	
-	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
+	@State var notificationPermissions = NotificationsManager.shared.permissions.value
+	
+	@State var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
 	@State var didAppear = false
 	
-	@State var biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+	@State var biometricSupport = DeviceInfo.biometricSupport()
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -67,6 +71,7 @@ struct ConfigurationList: View {
 	@State var swiftUiBugWorkaroundIdx = 0
 	// </iOS_16_workarounds>
 	
+	@Namespace var linkID_WalletMetadata
 	@Namespace var linkID_About
 	@Namespace var linkID_WalletCreationOptions
 	@Namespace var linkID_DisplayConfiguration
@@ -83,6 +88,7 @@ struct ConfigurationList: View {
 	@Namespace var linkID_WalletInfo
 	@Namespace var linkID_ChannelsConfiguration
 	@Namespace var linkID_LogsConfiguration
+	@Namespace var linkID_BoltCardsList
 	@Namespace var linkID_Experimental
 	@Namespace var linkID_DrainWallet
 	@Namespace var linkID_ResetWallet
@@ -100,11 +106,7 @@ struct ConfigurationList: View {
 	init(scrollViewProxy: ScrollViewProxy) {
 		
 		self.scrollViewProxy = scrollViewProxy
-		if let walletId = Biz.walletId {
-			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(walletId)
-		} else {
-			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
-		}
+		backupSeedStatePublisher = Prefs.current.backupSeed.statePublisher()
 	}
 	
 	// --------------------------------------------------
@@ -128,6 +130,9 @@ struct ConfigurationList: View {
 		List {
 			let hasWallet = hasWallet()
 			
+			if hasWallet {
+				section_walletInfo()
+			}
 			section_general(hasWallet)
 			if hasWallet {
 				section_fees(hasWallet)
@@ -149,6 +154,9 @@ struct ConfigurationList: View {
 		.onChange(of: navLinkTag) {
 			navLinkTagChanged($0)
 		}
+		.onReceive(SecurityFileManager.shared.currentSecurityFilePublisher) { _ in
+			securityFileChanged()
+		}
 		.onReceive(NotificationsManager.shared.permissions) {(permissions: NotificationPermissions) in
 			notificationPermissionsChanged(permissions)
 		}
@@ -158,9 +166,28 @@ struct ConfigurationList: View {
 	}
 	
 	@ViewBuilder
+	func section_walletInfo() -> some View {
+		
+		Section {
+			navLink_label(.WalletMetadata) {
+				HStack(alignment: VerticalAlignment.center, spacing: 8) {
+					WalletImage(filename: walletMetadata.photo, size: 64)
+					VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+						Text(walletMetadata.name)
+							.font(.title3.weight(.medium))
+						Text("Manage or switch wallets")
+							.font(.subheadline)
+							.foregroundStyle(.secondary)
+					} // </VStack>
+				} // </HStack>
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func section_general(_ hasWallet: Bool) -> some View {
 		
-		Section(header: Text("General")) {
+		Section {
 			
 		#if DEBUG
 			if !hasWallet {
@@ -225,13 +252,16 @@ struct ConfigurationList: View {
 				.id(linkID_Notifications)
 			}
 			
-		} // </Section: General>
+		} header: {
+			Text("General")
+		}
 	}
 	
 	@ViewBuilder
 	func section_fees(_ hasWallet: Bool) -> some View {
 		
-		Section(header: Text("Fees")) {
+		Section {
+			
 			if hasWallet {
 				navLink_label(.ChannelManagement) {
 					Label { Text("Channel management") } icon: {
@@ -258,13 +288,16 @@ struct ConfigurationList: View {
 				}
 				.id(linkID_LiquidityManagement)
 			}
+			
+		} header: {
+			Text("Fees")
 		}
 	}
 	
 	@ViewBuilder
 	func section_privacyAndSecurity(_ hasWallet: Bool) -> some View {
 		
-		Section(header: Text("Privacy & Security")) {
+		Section {
 
 			if hasWallet {
 				navLink_label(.AppAccess) {
@@ -324,15 +357,17 @@ struct ConfigurationList: View {
 					}
 				}
 				.id(linkID_PaymentsBackup)
-			} // </if hasWallet>
+			}
 
-		} // </Section: Privacy & Security>
+		} header: {
+			Text("Privacy & Security")
+		}
 	}
 	
 	@ViewBuilder
 	func section_advanced(_ hasWallet: Bool) -> some View {
 		
-		Section(header: Text("Advanced")) {
+		Section {
 
 			if hasWallet {
 				navLink_label(.WalletInfo) {
@@ -362,6 +397,15 @@ struct ConfigurationList: View {
 			.id(linkID_LogsConfiguration)
 			
 			if hasWallet {
+				navLink_label(.BoltCardsList) {
+					Label { Text("Bolt cards") } icon: {
+						Image(systemName: "creditcard")
+					}
+				}
+				.id(linkID_BoltCardsList)
+			}
+			
+			if hasWallet {
 				navLink_label(.Experimental) {
 					Label { Text("Experimental") } icon: {
 						if #available(iOS 17, *) {
@@ -374,13 +418,15 @@ struct ConfigurationList: View {
 				.id(linkID_Experimental)
 			}
 
-		} // </Section: Advanced>
+		} header: {
+			Text("Advanced")
+		}
 	}
 	
 	@ViewBuilder
 	func section_dangerZone(_ hasWallet: Bool) -> some View {
 		
-		Section(header: Text("Danger Zone")) {
+		Section {
 			
 			if hasWallet {
 				navLink_label(.DrainWallet) {
@@ -409,7 +455,9 @@ struct ConfigurationList: View {
 				}
 				.id(linkID_ForceCloseChannels)
 			}
-		} // </Section: Danger Zone>
+		} header: {
+			Text("Danger Zone")
+		}
 	}
 
 	@ViewBuilder
@@ -434,6 +482,7 @@ struct ConfigurationList: View {
 	private func navLinkView(_ tag: NavLinkTag) -> some View {
 		
 		switch tag {
+			case .WalletMetadata        : WalletMetadataView()
 		// General
 			case .About                 : AboutView()
 			case .WalletCreationOptions : WalletCreationOptions()
@@ -454,6 +503,7 @@ struct ConfigurationList: View {
 			case .WalletInfo            : WalletInfoView(popTo: popTo)
 			case .ChannelsConfiguration : ChannelsConfigurationView()
 			case .LogsConfiguration     : LogsConfigurationView()
+			case .BoltCardsList         : BoltCardsList()
 			case .Experimental          : Experimental()
 		// Danger Zone
 			case .DrainWallet           : DrainWalletView(popTo: popTo)
@@ -467,7 +517,6 @@ struct ConfigurationList: View {
 	// --------------------------------------------------
 	
 	func hasWallet() -> Bool {
-		
 		return Biz.business.walletManager.isLoaded()
 	}
 	
@@ -499,19 +548,24 @@ struct ConfigurationList: View {
 		} else {
 			// Returning from subview
 			
-			biometricSupport = AppSecurity.shared.deviceBiometricSupport()
+			biometricSupport = DeviceInfo.biometricSupport()
 		}
+		
+		walletMetadata = SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
+	}
+	
+	func securityFileChanged() {
+		log.trace(#function)
+		walletMetadata = SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
 	}
 	
 	func notificationPermissionsChanged(_ permissions: NotificationPermissions) {
-		log.trace("notificationPermissionsChanged()")
-		
+		log.trace(#function)
 		notificationPermissions = permissions
 	}
 	
 	func backupSeedStateChanged(_ newState: BackupSeedState) {
-		log.trace("backupSeedStateChanged()")
-		
+		log.trace(#function)
 		backupSeedState = newState
 	}
 	
@@ -532,6 +586,8 @@ struct ConfigurationList: View {
 	func linkID(for navLinkTag: NavLinkTag) -> any Hashable {
 		
 		switch navLinkTag {
+			case .WalletMetadata        : return linkID_WalletMetadata
+			
 			case .About                 : return linkID_About
 			case .WalletCreationOptions : return linkID_WalletCreationOptions
 			case .DisplayConfiguration  : return linkID_DisplayConfiguration
@@ -550,6 +606,7 @@ struct ConfigurationList: View {
 			case .WalletInfo            : return linkID_WalletInfo
 			case .ChannelsConfiguration : return linkID_ChannelsConfiguration
 			case .LogsConfiguration     : return linkID_LogsConfiguration
+			case .BoltCardsList         : return linkID_BoltCardsList
 			case .Experimental          : return linkID_Experimental
 			
 			case .DrainWallet           : return linkID_DrainWallet
@@ -594,6 +651,9 @@ struct ConfigurationList: View {
 					case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
 					case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .WalletInfo           ; delay *= 2
+					case .appAccess          : newNavLinkTag = .AppAccess            ; delay *= 1
+					case .walletMetadata     : newNavLinkTag = .WalletMetadata       ; delay *= 1
+					case .bip353Registration : newNavLinkTag = .Experimental         ; delay *= 1
 				}
 				
 				if let newNavLinkTag {
