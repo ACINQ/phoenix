@@ -60,7 +60,14 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
     }
 
     businessComposable(Screen.TorConfig.route, appViewModel) { _, walletId, _ ->
-        TorConfigView(walletId = walletId, onBackClick = { navController.popBackStack() }, onBusinessTeardown = { navController.popToHome() })
+        TorConfigView(
+            walletId = walletId,
+            onBackClick = { navController.popBackStack() },
+            onBusinessTeardown = {
+                appViewModel.switchToWallet(walletId)
+                navController.popToHome()
+            }
+        )
     }
 
     businessComposable(Screen.DisplayPrefs.route, appViewModel) { _, _, business ->
