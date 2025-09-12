@@ -30,12 +30,8 @@
 		DC0732EC263CA6C3004CB88D /* PaymentOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */; };
 		DC08A51827FB39530041603B /* AnimatedChevron.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08A51727FB39530041603B /* AnimatedChevron.swift */; };
 		DC08A51A27FB6C5F0041603B /* TopTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08A51927FB6C5F0041603B /* TopTab.swift */; };
-		DC08FC232DA978050003E88C /* CapabilitiesContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08FC222DA978050003E88C /* CapabilitiesContainer.swift */; };
-		DC08FC292DA978810003E88C /* Array+Read.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08FC272DA978810003E88C /* Array+Read.swift */; };
 		DC08FC2B2DA978940003E88C /* CommandAPDU.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08FC2A2DA978940003E88C /* CommandAPDU.swift */; };
 		DC08FC2F2DA9796A0003E88C /* HceWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08FC2E2DA9796A0003E88C /* HceWriter.swift */; };
-		DC08FC6E2DA9ABE80003E88C /* Ndef.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08FC6D2DA9ABE80003E88C /* Ndef.swift */; };
-		DC08FC732DAEABC20003E88C /* ByteArrayConversions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC08FC722DAEABB00003E88C /* ByteArrayConversions.swift */; };
 		DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09085725B5E43900A46136 /* String+VersionComparison.swift */; };
 		DC09086325B626B300A46136 /* AppStatusPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09086225B626B300A46136 /* AppStatusPopover.swift */; };
 		DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0994AF263A074C003031CA /* InfoGrid.swift */; };
@@ -231,7 +227,7 @@
 		DC5F97142E2FDBDA0052CDE6 /* WalletInfoReceive.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97132E2FDBD20052CDE6 /* WalletInfoReceive.swift */; };
 		DC5F97162E2FEDA30052CDE6 /* WalletInfoSend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97152E2FED9F0052CDE6 /* WalletInfoSend.swift */; };
 		DC5F971A2E32E4930052CDE6 /* GlobalEnvironmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97192E32E48B0052CDE6 /* GlobalEnvironmentView.swift */; };
-		DC635AA42E4264BF0038ED92 /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
+		DC635AA42E4264BF0038ED92 /* Digest+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Digest+Hexadecimal.swift */; };
 		DC635AA62E429D8B0038ED92 /* LockPinRequired.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC635AA52E429D860038ED92 /* LockPinRequired.swift */; };
 		DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63A3752B965D54008E040E /* InboundFeeSheet.swift */; };
 		DC63BDF429AE44380067A361 /* NotificationsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC63BDF329AE44380067A361 /* NotificationsManager.swift */; };
@@ -300,6 +296,8 @@
 		DC8D94142CA7015F00EE844E /* ChannelFundingProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8D94132CA7015F00EE844E /* ChannelFundingProblem.swift */; };
 		DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC949E6A2B45B1EC00E80BB5 /* LiquidityAdsHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC949E692B45B1EC00E80BB5 /* LiquidityAdsHelp.swift */; };
+		DC9701302E74C29D000B1E59 /* DnaCommunicator in Frameworks */ = {isa = PBXBuildFile; productRef = DC97012F2E74C29D000B1E59 /* DnaCommunicator */; };
+		DC9701322E74C2F6000B1E59 /* DnaCommunicator in Frameworks */ = {isa = PBXBuildFile; productRef = DC9701312E74C2F6000B1E59 /* DnaCommunicator */; };
 		DC98D3962AF170AC005BD177 /* PaymentWarningPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC98D3952AF170AC005BD177 /* PaymentWarningPopover.swift */; };
 		DC98D3982AF2AE41005BD177 /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC98D3972AF2AE41005BD177 /* ReceiveView.swift */; };
 		DC9933322CC03D7500EB3100 /* ContactsListSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9933312CC03D7500EB3100 /* ContactsListSheet.swift */; };
@@ -340,7 +338,7 @@
 		DCA849E02813311D000FADE1 /* aes256Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849DF2813311D000FADE1 /* aes256Tests.swift */; };
 		DCA849E2281333EB000FADE1 /* currencyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */; };
 		DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAC5B6F27726FC80077BB98 /* DeepLink.swift */; };
-		DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
+		DCACF6F02566D0A60009B01E /* Digest+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Digest+Hexadecimal.swift */; };
 		DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */; };
 		DCACF6FB2566D0BA0009B01E /* SystemKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F62566D0BA0009B01E /* SystemKeychain.swift */; };
 		DCACF6FC2566D0BA0009B01E /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F72566D0BA0009B01E /* Keychain.swift */; };
@@ -380,24 +378,6 @@
 		DCBA3A712E6100A9000BC8D3 /* NFCReaderError+Ignore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A6E2E6100A9000BC8D3 /* NFCReaderError+Ignore.swift */; };
 		DCBA3A722E6100A9000BC8D3 /* NfcWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A6F2E6100A9000BC8D3 /* NfcWriter.swift */; };
 		DCBA3A732E6100A9000BC8D3 /* BoltCardScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A6D2E6100A9000BC8D3 /* BoltCardScan.swift */; };
-		DCBA3A742E6100A9000BC8D3 /* Ntag424.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A702E6100A9000BC8D3 /* Ntag424.swift */; };
-		DCBA3A8B2E6100CE000BC8D3 /* CommunicationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A7D2E6100CE000BC8D3 /* CommunicationMode.swift */; };
-		DCBA3A8C2E6100CE000BC8D3 /* FileSpecifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A7F2E6100CE000BC8D3 /* FileSpecifier.swift */; };
-		DCBA3A8D2E6100CE000BC8D3 /* DnaCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A752E6100CE000BC8D3 /* DnaCommunicator.swift */; };
-		DCBA3A8E2E6100CE000BC8D3 /* DnaCommunicator+KeyCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A7A2E6100CE000BC8D3 /* DnaCommunicator+KeyCommands.swift */; };
-		DCBA3A8F2E6100CE000BC8D3 /* EncryptionMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A852E6100CE000BC8D3 /* EncryptionMode.swift */; };
-		DCBA3A902E6100CE000BC8D3 /* DnaCommunicator+ChipInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A772E6100CE000BC8D3 /* DnaCommunicator+ChipInfo.swift */; };
-		DCBA3A912E6100CE000BC8D3 /* DnaCommunicator+Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A762E6100CE000BC8D3 /* DnaCommunicator+Authentication.swift */; };
-		DCBA3A932E6100CE000BC8D3 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A892E6100CE000BC8D3 /* Helper.swift */; };
-		DCBA3A952E6100CE000BC8D3 /* DNACommunicator+FileCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A782E6100CE000BC8D3 /* DNACommunicator+FileCommands.swift */; };
-		DCBA3A962E6100CE000BC8D3 /* AESEncryptionMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A842E6100CE000BC8D3 /* AESEncryptionMode.swift */; };
-		DCBA3A972E6100CE000BC8D3 /* Permission.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A822E6100CE000BC8D3 /* Permission.swift */; };
-		DCBA3A982E6100CE000BC8D3 /* FileSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A7E2E6100CE000BC8D3 /* FileSettings.swift */; };
-		DCBA3A992E6100CE000BC8D3 /* KeySpecifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A802E6100CE000BC8D3 /* KeySpecifier.swift */; };
-		DCBA3A9A2E6100CE000BC8D3 /* DnaCommunicator+Iso.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A792E6100CE000BC8D3 /* DnaCommunicator+Iso.swift */; };
-		DCBA3A9C2E6104BB000BC8D3 /* Ntag424.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A702E6100A9000BC8D3 /* Ntag424.swift */; };
-		DCBA3A9F2E610656000BC8D3 /* SwCrypt in Frameworks */ = {isa = PBXBuildFile; productRef = DCBA3A9E2E610656000BC8D3 /* SwCrypt */; };
-		DCBA3AA12E610894000BC8D3 /* SwCrypt in Frameworks */ = {isa = PBXBuildFile; productRef = DCBA3AA02E610894000BC8D3 /* SwCrypt */; };
 		DCBA3AA32E61F1ED000BC8D3 /* SyncBackupManager+Cards.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AA22E61F1ED000BC8D3 /* SyncBackupManager+Cards.swift */; };
 		DCBA3AA52E61F3BB000BC8D3 /* KotlinExtensions+Cards.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AA42E61F3BB000BC8D3 /* KotlinExtensions+Cards.swift */; };
 		DCBA3AB72E61FE26000BC8D3 /* ResetSuccessSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AB22E61FE26000BC8D3 /* ResetSuccessSheet.swift */; };
@@ -420,8 +400,8 @@
 		DCBA3AC92E621383000BC8D3 /* FcmPushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AC72E62137D000BC8D3 /* FcmPushNotification.swift */; };
 		DCBA3ACA2E6606DC000BC8D3 /* KotlinExtensions+Cards.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AA42E61F3BB000BC8D3 /* KotlinExtensions+Cards.swift */; };
 		DCBA3ACB2E6609BC000BC8D3 /* KotlinEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3780382C04D60400937C8E /* KotlinEnums.swift */; };
-		DCBA3ACC2E660BA4000BC8D3 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3A892E6100CE000BC8D3 /* Helper.swift */; };
 		DCBA3ACE2E660E73000BC8D3 /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3ACD2E660E73000BC8D3 /* PushManager.swift */; };
+		DCBA3CCE2E6F6427000BC8D3 /* DnaCommunicator in Frameworks */ = {isa = PBXBuildFile; productRef = DCBA3CCD2E6F6427000BC8D3 /* DnaCommunicator */; };
 		DCBA60CD2C909C7600878895 /* SendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60CC2C909C7600878895 /* SendView.swift */; };
 		DCBA60CF2C90E41000878895 /* ScanQrCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60CE2C90E41000878895 /* ScanQrCodeView.swift */; };
 		DCBA60D42C93544C00878895 /* InsetGroupBoxStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA60D32C93544C00878895 /* InsetGroupBoxStyle.swift */; };
@@ -493,6 +473,7 @@
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
 		DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA876C260E91E600AE8953 /* IntroContainer.swift */; };
 		DCFAEFC92A72F48700330088 /* SwapInWalletDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */; };
+		DCFB00E82E6F6488002F5282 /* DnaCommunicator in Frameworks */ = {isa = PBXBuildFile; productRef = DCFB00E72E6F6488002F5282 /* DnaCommunicator */; };
 		DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF62A94066100947698 /* Task+Sleep.swift */; };
 		DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */; };
 		DCFBC5592AE2CFEF00E3A418 /* BizNotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */; };
@@ -583,12 +564,8 @@
 		DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentOptionsView.swift; sourceTree = "<group>"; };
 		DC08A51727FB39530041603B /* AnimatedChevron.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedChevron.swift; sourceTree = "<group>"; };
 		DC08A51927FB6C5F0041603B /* TopTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopTab.swift; sourceTree = "<group>"; };
-		DC08FC222DA978050003E88C /* CapabilitiesContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilitiesContainer.swift; sourceTree = "<group>"; };
-		DC08FC272DA978810003E88C /* Array+Read.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Read.swift"; sourceTree = "<group>"; };
 		DC08FC2A2DA978940003E88C /* CommandAPDU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandAPDU.swift; sourceTree = "<group>"; };
 		DC08FC2E2DA9796A0003E88C /* HceWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HceWriter.swift; sourceTree = "<group>"; };
-		DC08FC6D2DA9ABE80003E88C /* Ndef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ndef.swift; sourceTree = "<group>"; };
-		DC08FC722DAEABB00003E88C /* ByteArrayConversions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteArrayConversions.swift; sourceTree = "<group>"; };
 		DC09085725B5E43900A46136 /* String+VersionComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+VersionComparison.swift"; sourceTree = "<group>"; };
 		DC09086225B626B300A46136 /* AppStatusPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusPopover.swift; sourceTree = "<group>"; };
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
@@ -850,7 +827,7 @@
 		DCA849DF2813311D000FADE1 /* aes256Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aes256Tests.swift; sourceTree = "<group>"; };
 		DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currencyFormattingTests.swift; sourceTree = "<group>"; };
 		DCAC5B6F27726FC80077BB98 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLink.swift; sourceTree = "<group>"; };
-		DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Hexadecimal.swift"; sourceTree = "<group>"; };
+		DCACF6EF2566D0A60009B01E /* Digest+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Digest+Hexadecimal.swift"; sourceTree = "<group>"; };
 		DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyStoreError.swift; sourceTree = "<group>"; };
 		DCACF6F62566D0BA0009B01E /* SystemKeychain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemKeychain.swift; sourceTree = "<group>"; };
 		DCACF6F72566D0BA0009B01E /* Keychain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
@@ -888,21 +865,6 @@
 		DCBA3A6D2E6100A9000BC8D3 /* BoltCardScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardScan.swift; sourceTree = "<group>"; };
 		DCBA3A6E2E6100A9000BC8D3 /* NFCReaderError+Ignore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NFCReaderError+Ignore.swift"; sourceTree = "<group>"; };
 		DCBA3A6F2E6100A9000BC8D3 /* NfcWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NfcWriter.swift; sourceTree = "<group>"; };
-		DCBA3A702E6100A9000BC8D3 /* Ntag424.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ntag424.swift; sourceTree = "<group>"; };
-		DCBA3A752E6100CE000BC8D3 /* DnaCommunicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DnaCommunicator.swift; sourceTree = "<group>"; };
-		DCBA3A762E6100CE000BC8D3 /* DnaCommunicator+Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DnaCommunicator+Authentication.swift"; sourceTree = "<group>"; };
-		DCBA3A772E6100CE000BC8D3 /* DnaCommunicator+ChipInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DnaCommunicator+ChipInfo.swift"; sourceTree = "<group>"; };
-		DCBA3A782E6100CE000BC8D3 /* DNACommunicator+FileCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DNACommunicator+FileCommands.swift"; sourceTree = "<group>"; };
-		DCBA3A792E6100CE000BC8D3 /* DnaCommunicator+Iso.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DnaCommunicator+Iso.swift"; sourceTree = "<group>"; };
-		DCBA3A7A2E6100CE000BC8D3 /* DnaCommunicator+KeyCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DnaCommunicator+KeyCommands.swift"; sourceTree = "<group>"; };
-		DCBA3A7D2E6100CE000BC8D3 /* CommunicationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunicationMode.swift; sourceTree = "<group>"; };
-		DCBA3A7E2E6100CE000BC8D3 /* FileSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSettings.swift; sourceTree = "<group>"; };
-		DCBA3A7F2E6100CE000BC8D3 /* FileSpecifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSpecifier.swift; sourceTree = "<group>"; };
-		DCBA3A802E6100CE000BC8D3 /* KeySpecifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySpecifier.swift; sourceTree = "<group>"; };
-		DCBA3A822E6100CE000BC8D3 /* Permission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permission.swift; sourceTree = "<group>"; };
-		DCBA3A842E6100CE000BC8D3 /* AESEncryptionMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AESEncryptionMode.swift; sourceTree = "<group>"; };
-		DCBA3A852E6100CE000BC8D3 /* EncryptionMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionMode.swift; sourceTree = "<group>"; };
-		DCBA3A892E6100CE000BC8D3 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		DCBA3AA22E61F1ED000BC8D3 /* SyncBackupManager+Cards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncBackupManager+Cards.swift"; sourceTree = "<group>"; };
 		DCBA3AA42E61F3BB000BC8D3 /* KotlinExtensions+Cards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Cards.swift"; sourceTree = "<group>"; };
 		DCBA3AA62E61FE26000BC8D3 /* ArchiveCardSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveCardSheet.swift; sourceTree = "<group>"; };
@@ -993,7 +955,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DCBA3A9F2E610656000BC8D3 /* SwCrypt in Frameworks */,
 				DCA5391A29F1DDE7001BD3D5 /* SegmentedPicker in Frameworks */,
 				DC26D0BB2A93BD0F006763B3 /* EffectsLibrary in Frameworks */,
 				DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */,
@@ -1002,6 +963,9 @@
 				DC39D4E5286B4A7E0030F18D /* Popovers in Frameworks */,
 				DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */,
 				DCCFE6AB2B6430AB002FFF11 /* Logging in Frameworks */,
+				DCBA3CCE2E6F6427000BC8D3 /* DnaCommunicator in Frameworks */,
+				DCFB00E82E6F6488002F5282 /* DnaCommunicator in Frameworks */,
+				DC9701302E74C29D000B1E59 /* DnaCommunicator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1024,7 +988,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCCFE6B72B682E22002FFF11 /* Logging in Frameworks */,
-				DCBA3AA12E610894000BC8D3 /* SwCrypt in Frameworks */,
+				DC9701322E74C2F6000B1E59 /* DnaCommunicator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1236,24 +1200,6 @@
 				DCA3B41D2A53434700E6B231 /* danger zone */,
 			);
 			path = configuration;
-			sourceTree = "<group>";
-		};
-		DC08FC6F2DAEAA5E0003E88C /* tools */ = {
-			isa = PBXGroup;
-			children = (
-				DC08FC222DA978050003E88C /* CapabilitiesContainer.swift */,
-				DC08FC2A2DA978940003E88C /* CommandAPDU.swift */,
-				DC08FC6D2DA9ABE80003E88C /* Ndef.swift */,
-			);
-			path = tools;
-			sourceTree = "<group>";
-		};
-		DC08FC712DAEAA790003E88C /* extensions */ = {
-			isa = PBXGroup;
-			children = (
-				DC08FC722DAEABB00003E88C /* ByteArrayConversions.swift */,
-			);
-			path = extensions;
 			sourceTree = "<group>";
 		};
 		DC09FC3A2D5AAA9000E6579A /* updates */ = {
@@ -1703,7 +1649,7 @@
 				DC5895C92E551A4E00CBCCF9 /* AnyAsyncSequence.swift */,
 				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
 				DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */,
-				DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */,
+				DCACF6EF2566D0A60009B01E /* Digest+Hexadecimal.swift */,
 				DC422F3229392ABD00E72253 /* Date+Format.swift */,
 				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
 				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
@@ -1798,60 +1744,6 @@
 				DCBA3A5E2E60F191000BC8D3 /* WithdrawRequest.swift */,
 			);
 			path = withdraw;
-			sourceTree = "<group>";
-		};
-		DCBA3A7B2E6100CE000BC8D3 /* Communicator */ = {
-			isa = PBXGroup;
-			children = (
-				DCBA3A752E6100CE000BC8D3 /* DnaCommunicator.swift */,
-				DCBA3A762E6100CE000BC8D3 /* DnaCommunicator+Authentication.swift */,
-				DCBA3A772E6100CE000BC8D3 /* DnaCommunicator+ChipInfo.swift */,
-				DCBA3A782E6100CE000BC8D3 /* DNACommunicator+FileCommands.swift */,
-				DCBA3A792E6100CE000BC8D3 /* DnaCommunicator+Iso.swift */,
-				DCBA3A7A2E6100CE000BC8D3 /* DnaCommunicator+KeyCommands.swift */,
-			);
-			path = Communicator;
-			sourceTree = "<group>";
-		};
-		DCBA3A832E6100CE000BC8D3 /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-				DCBA3A7D2E6100CE000BC8D3 /* CommunicationMode.swift */,
-				DCBA3A7E2E6100CE000BC8D3 /* FileSettings.swift */,
-				DCBA3A7F2E6100CE000BC8D3 /* FileSpecifier.swift */,
-				DCBA3A802E6100CE000BC8D3 /* KeySpecifier.swift */,
-				DCBA3A822E6100CE000BC8D3 /* Permission.swift */,
-			);
-			path = Configuration;
-			sourceTree = "<group>";
-		};
-		DCBA3A862E6100CE000BC8D3 /* EncryptionModes */ = {
-			isa = PBXGroup;
-			children = (
-				DCBA3A842E6100CE000BC8D3 /* AESEncryptionMode.swift */,
-				DCBA3A852E6100CE000BC8D3 /* EncryptionMode.swift */,
-			);
-			path = EncryptionModes;
-			sourceTree = "<group>";
-		};
-		DCBA3A882E6100CE000BC8D3 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				DC08FC272DA978810003E88C /* Array+Read.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		DCBA3A8A2E6100CE000BC8D3 /* DnaCommunicator */ = {
-			isa = PBXGroup;
-			children = (
-				DCBA3A7B2E6100CE000BC8D3 /* Communicator */,
-				DCBA3A832E6100CE000BC8D3 /* Configuration */,
-				DCBA3A862E6100CE000BC8D3 /* EncryptionModes */,
-				DCBA3A882E6100CE000BC8D3 /* Extensions */,
-				DCBA3A892E6100CE000BC8D3 /* Helper.swift */,
-			);
-			path = DnaCommunicator;
 			sourceTree = "<group>";
 		};
 		DCBA3AB62E61FE26000BC8D3 /* bolt card */ = {
@@ -1954,15 +1846,12 @@
 		DCD1BFD42CE775CE00C2B811 /* nfc */ = {
 			isa = PBXGroup;
 			children = (
-				DCBA3A8A2E6100CE000BC8D3 /* DnaCommunicator */,
 				DCBA3A6D2E6100A9000BC8D3 /* BoltCardScan.swift */,
-				DC08FC712DAEAA790003E88C /* extensions */,
 				DC08FC2E2DA9796A0003E88C /* HceWriter.swift */,
 				DCD1BFD52CE775E500C2B811 /* NfcReader.swift */,
 				DCBA3A6E2E6100A9000BC8D3 /* NFCReaderError+Ignore.swift */,
 				DCBA3A6F2E6100A9000BC8D3 /* NfcWriter.swift */,
-				DCBA3A702E6100A9000BC8D3 /* Ntag424.swift */,
-				DC08FC6F2DAEAA5E0003E88C /* tools */,
+				DC08FC2A2DA978940003E88C /* CommandAPDU.swift */,
 			);
 			path = nfc;
 			sourceTree = "<group>";
@@ -2069,7 +1958,9 @@
 				DC26D0BA2A93BD0F006763B3 /* EffectsLibrary */,
 				DCCFE6AA2B6430AB002FFF11 /* Logging */,
 				DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */,
-				DCBA3A9E2E610656000BC8D3 /* SwCrypt */,
+				DCBA3CCD2E6F6427000BC8D3 /* DnaCommunicator */,
+				DCFB00E72E6F6488002F5282 /* DnaCommunicator */,
+				DC97012F2E74C29D000B1E59 /* DnaCommunicator */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -2127,7 +2018,7 @@
 			name = "phoenix-notifySrvExt";
 			packageProductDependencies = (
 				DCCFE6B62B682E22002FFF11 /* Logging */,
-				DCBA3AA02E610894000BC8D3 /* SwCrypt */,
+				DC9701312E74C2F6000B1E59 /* DnaCommunicator */,
 			);
 			productName = "phoenix-notifySrvExt";
 			productReference = DCB511C7281AED58001BC525 /* phoenix-notifySrvExt.appex */;
@@ -2182,7 +2073,7 @@
 				DC26D0B82A93BA8C006763B3 /* XCRemoteSwiftPackageReference "effects-library" */,
 				DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */,
 				DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				DCBA3A9D2E610656000BC8D3 /* XCRemoteSwiftPackageReference "SwCrypt" */,
+				DC97012E2E74C29D000B1E59 /* XCRemoteSwiftPackageReference "DnaCommunicator" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -2401,10 +2292,8 @@
 				DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */,
 				DC5F97162E2FEDA30052CDE6 /* WalletInfoSend.swift in Sources */,
 				DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */,
-				DC08FC732DAEABC20003E88C /* ByteArrayConversions.swift in Sources */,
 				DCB410892902D5BF00CE4FF9 /* PaymentsSection.swift in Sources */,
 				DCACF6FC2566D0BA0009B01E /* Keychain.swift in Sources */,
-				DC08FC232DA978050003E88C /* CapabilitiesContainer.swift in Sources */,
 				DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */,
 				DC5F96BD2E09D6CB0052CDE6 /* Keychain+Wallet.swift in Sources */,
 				DC2DC86A2906AC620079E570 /* FiatCurrencySelector.swift in Sources */,
@@ -2562,7 +2451,6 @@
 				DCBA3A712E6100A9000BC8D3 /* NFCReaderError+Ignore.swift in Sources */,
 				DCBA3A722E6100A9000BC8D3 /* NfcWriter.swift in Sources */,
 				DCBA3A732E6100A9000BC8D3 /* BoltCardScan.swift in Sources */,
-				DCBA3A742E6100A9000BC8D3 /* Ntag424.swift in Sources */,
 				DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */,
 				53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */,
 				DC5F96CA2E09F3050052CDE6 /* Prefs+Debug.swift in Sources */,
@@ -2593,7 +2481,6 @@
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */,
 				DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */,
-				DC08FC292DA978810003E88C /* Array+Read.swift in Sources */,
 				DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
 				DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */,
@@ -2621,21 +2508,7 @@
 				DC6D26E329E76557006A7814 /* AnimatedClock.swift in Sources */,
 				DC72CEF52C99DCEB00C810A8 /* LnurlFlowErrorNotice.swift in Sources */,
 				DC4CBC8A2D6677A900129BDB /* Details_Incoming_SpliceIn.swift in Sources */,
-				DCBA3A8B2E6100CE000BC8D3 /* CommunicationMode.swift in Sources */,
-				DCBA3A8C2E6100CE000BC8D3 /* FileSpecifier.swift in Sources */,
-				DCBA3A8D2E6100CE000BC8D3 /* DnaCommunicator.swift in Sources */,
-				DCBA3A8E2E6100CE000BC8D3 /* DnaCommunicator+KeyCommands.swift in Sources */,
 				DCBA3AA32E61F1ED000BC8D3 /* SyncBackupManager+Cards.swift in Sources */,
-				DCBA3A8F2E6100CE000BC8D3 /* EncryptionMode.swift in Sources */,
-				DCBA3A902E6100CE000BC8D3 /* DnaCommunicator+ChipInfo.swift in Sources */,
-				DCBA3A912E6100CE000BC8D3 /* DnaCommunicator+Authentication.swift in Sources */,
-				DCBA3A932E6100CE000BC8D3 /* Helper.swift in Sources */,
-				DCBA3A952E6100CE000BC8D3 /* DNACommunicator+FileCommands.swift in Sources */,
-				DCBA3A962E6100CE000BC8D3 /* AESEncryptionMode.swift in Sources */,
-				DCBA3A972E6100CE000BC8D3 /* Permission.swift in Sources */,
-				DCBA3A982E6100CE000BC8D3 /* FileSettings.swift in Sources */,
-				DCBA3A992E6100CE000BC8D3 /* KeySpecifier.swift in Sources */,
-				DCBA3A9A2E6100CE000BC8D3 /* DnaCommunicator+Iso.swift in Sources */,
 				DC5631C52C541E5C00DCB5BF /* Experimental.swift in Sources */,
 				DCF8E3AC2BC4968D009299EE /* LowMinerFeeWarning.swift in Sources */,
 				DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */,
@@ -2644,7 +2517,7 @@
 				DCA3B41F2A5471C900E6B231 /* MinerFeeInfo.swift in Sources */,
 				DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */,
 				DC5F96F32E1D76F00052CDE6 /* WalletMetadataView.swift in Sources */,
-				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
+				DCACF6F02566D0A60009B01E /* Digest+Hexadecimal.swift in Sources */,
 				DC5F96FB2E1DB6620052CDE6 /* WalletIconPicker.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
 				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
@@ -2665,7 +2538,6 @@
 				DCDAA7402971C29700B406A8 /* RecentPaymentsSelector.swift in Sources */,
 				DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */,
 				DCBA3ACE2E660E73000BC8D3 /* PushManager.swift in Sources */,
-				DC08FC6E2DA9ABE80003E88C /* Ndef.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
 				DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */,
 				DC4CBC9C2D68E65500129BDB /* Details_Outgoing_SpliceCpfp.swift in Sources */,
@@ -2727,7 +2599,7 @@
 				DCBA3A632E60F191000BC8D3 /* WithdrawRequest.swift in Sources */,
 				DC641C752821706600862DCD /* Currency.swift in Sources */,
 				DC641C7228208B4D00862DCD /* GroupPrefs.swift in Sources */,
-				DC635AA42E4264BF0038ED92 /* Data+Hexadecimal.swift in Sources */,
+				DC635AA42E4264BF0038ED92 /* Digest+Hexadecimal.swift in Sources */,
 				DC78A5F92DF22ABE003A7DD8 /* NotificationServiceQueue.swift in Sources */,
 				DCEB2798282D7B070096B87E /* KotlinExtensions+Other.swift in Sources */,
 				DC641C7328208B7F00862DCD /* UserDefaults+Codable.swift in Sources */,
@@ -2735,7 +2607,6 @@
 				DC5F96B82E0455760052CDE6 /* GroupPrefs+Global.swift in Sources */,
 				DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */,
 				DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */,
-				DCBA3A9C2E6104BB000BC8D3 /* Ntag424.swift in Sources */,
 				DCCFE6C02B713FBE002FFF11 /* LogFileHandler.swift in Sources */,
 				DCBA3ACA2E6606DC000BC8D3 /* KotlinExtensions+Cards.swift in Sources */,
 				DCCFE6B42B680DF9002FFF11 /* OSLogHandler.swift in Sources */,
@@ -2782,7 +2653,6 @@
 				DC5F96BA2E0457530052CDE6 /* Prefs+Constants.swift in Sources */,
 				DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */,
 				DCBA3ACB2E6609BC000BC8D3 /* KotlinEnums.swift in Sources */,
-				DCBA3ACC2E660BA4000BC8D3 /* Helper.swift in Sources */,
 				DC1B71C62CCBE9A400914D80 /* AddToContactsInfo.swift in Sources */,
 				DCA6DECA2829C31B0073C658 /* KeyStoreError.swift in Sources */,
 				DC49FE9D2AC49E0800D8D2E2 /* KotlinExtensions+Bitcoin.swift in Sources */,
@@ -3229,6 +3099,14 @@
 				version = 9.1.0;
 			};
 		};
+		DC97012E2E74C29D000B1E59 /* XCRemoteSwiftPackageReference "DnaCommunicator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ACINQ/DnaCommunicator/";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.1;
+			};
+		};
 		DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
@@ -3243,14 +3121,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.0.2;
-			};
-		};
-		DCBA3A9D2E610656000BC8D3 /* XCRemoteSwiftPackageReference "SwCrypt" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/soyersoyer/SwCrypt";
-			requirement = {
-				kind = exactVersion;
-				version = 5.1.4;
 			};
 		};
 		DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */ = {
@@ -3284,6 +3154,16 @@
 			package = DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
 		};
+		DC97012F2E74C29D000B1E59 /* DnaCommunicator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC97012E2E74C29D000B1E59 /* XCRemoteSwiftPackageReference "DnaCommunicator" */;
+			productName = DnaCommunicator;
+		};
+		DC9701312E74C2F6000B1E59 /* DnaCommunicator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC97012E2E74C29D000B1E59 /* XCRemoteSwiftPackageReference "DnaCommunicator" */;
+			productName = DnaCommunicator;
+		};
 		DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DC9B15422B7D0DCB0023743B /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
@@ -3294,15 +3174,9 @@
 			package = DCA5391729F1DAA3001BD3D5 /* XCRemoteSwiftPackageReference "SwiftySegmentedPicker" */;
 			productName = SegmentedPicker;
 		};
-		DCBA3A9E2E610656000BC8D3 /* SwCrypt */ = {
+		DCBA3CCD2E6F6427000BC8D3 /* DnaCommunicator */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DCBA3A9D2E610656000BC8D3 /* XCRemoteSwiftPackageReference "SwCrypt" */;
-			productName = SwCrypt;
-		};
-		DCBA3AA02E610894000BC8D3 /* SwCrypt */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DCBA3A9D2E610656000BC8D3 /* XCRemoteSwiftPackageReference "SwCrypt" */;
-			productName = SwCrypt;
+			productName = DnaCommunicator;
 		};
 		DCCFE6AA2B6430AB002FFF11 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -3313,6 +3187,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DCCFE6A92B6430AB002FFF11 /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
+		};
+		DCFB00E72E6F6488002F5282 /* DnaCommunicator */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DnaCommunicator;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

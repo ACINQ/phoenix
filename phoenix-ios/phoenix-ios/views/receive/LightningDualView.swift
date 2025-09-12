@@ -1,6 +1,7 @@
 import SwiftUI
 import PhoenixShared
 import CoreNFC
+import DnaCommunicator
 
 fileprivate let filename = "LightningDualView"
 #if DEBUG && true
@@ -1260,11 +1261,11 @@ struct LightningDualView: View {
 	func startHostCardEmulation(_ url: URL) {
 		log.trace(#function)
 		
-		let file = Ndef.ndefDataForUrl(url)
+		let dataInfo = Ndef.ndefDataForUrl(url)
 		
 		hceActive = true
 		Task { @MainActor in
-			if let error = await HceWriter.shared.start(ndefFile: file) {
+			if let error = await HceWriter.shared.start(ndefFile: dataInfo.data) {
 				handleHceWriterError(error)
 			}
 			hceActive = false

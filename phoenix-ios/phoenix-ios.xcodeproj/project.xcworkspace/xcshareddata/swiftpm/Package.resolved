@@ -1,5 +1,5 @@
 {
-  "originHash" : "d649fbe2be50831fdb28cb2641e76bb148d3b4a074f1350225d4c038ab447877",
+  "originHash" : "8748739a34c7f198eabeaf2257b7dc847a116026ae29688e1c68721fe9db7b7f",
   "pins" : [
     {
       "identity" : "abseil-cpp-swiftpm",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "cffe67e293c6493a489d434e52a19e5627bd904e",
         "version" : "0.4.1"
+      }
+    },
+    {
+      "identity" : "dnacommunicator",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ACINQ/DnaCommunicator/",
+      "state" : {
+        "revision" : "be4589e9403f67fc52fce0872ca7a2712f286c5b",
+        "version" : "1.0.1"
       }
     },
     {
@@ -125,15 +134,6 @@
       "state" : {
         "revision" : "3e4e743631e86c8c70dbc6efdc7beaa6e90fd3bb",
         "version" : "2.1.1"
-      }
-    },
-    {
-      "identity" : "swcrypt",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/soyersoyer/SwCrypt",
-      "state" : {
-        "revision" : "d18cf90973a32dc0d28f94eec91faf14ae8b4443",
-        "version" : "5.1.4"
       }
     },
     {

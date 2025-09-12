@@ -32,6 +32,6 @@ func hash160(nodeId: String) -> Result<String, Hash160Error> {
 		return .failure(.nodeIdNotValidPublicKey)
 	}
 	
-	let result = pubKey.hash160().toSwiftData().toHex(options: .lowerCase)
+	let result = pubKey.hash160().toSwiftData().toHex(.lowerCase)
 	return .success(result)
 }

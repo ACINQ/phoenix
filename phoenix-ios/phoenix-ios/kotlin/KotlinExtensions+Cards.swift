@@ -1,5 +1,6 @@
 import Foundation
 import PhoenixShared
+import DnaCommunicator
 
 extension BoltCardInfo {
 	
@@ -77,8 +78,12 @@ extension BoltCardInfo {
 
 extension BoltCardKeySet {
 	
+	var key0_data: Data {
+		return key0.toSwiftData()
+	}
+	
 	var key0_bytes: [UInt8] {
-		return Helper.bytesFromData(data: key0.toSwiftData())
+		return key0_data.toByteArray()
 	}
 	
 	var piccDataKey_data: Data {
@@ -86,7 +91,7 @@ extension BoltCardKeySet {
 	}
 	
 	var piccDataKey_bytes: [UInt8] {
-		return Helper.bytesFromData(data: piccDataKey_data)
+		return piccDataKey_data.toByteArray()
 	}
 	
 	var cmacKey_data: Data {
@@ -94,6 +99,6 @@ extension BoltCardKeySet {
 	}
 	
 	var cmacKey_bytes: [UInt8] {
-		return Helper.bytesFromData(data: cmacKey_data)
+		return cmacKey_data.toByteArray()
 	}
 }

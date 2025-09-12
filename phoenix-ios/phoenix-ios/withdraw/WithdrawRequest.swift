@@ -1,6 +1,7 @@
 import Foundation
 import PhoenixShared
 import CryptoKit
+import DnaCommunicator
 
 fileprivate let filename = "WithdrawRequest"
 #if DEBUG && true
@@ -37,13 +38,13 @@ struct WithdrawRequest {
 	) -> String {
 		
 		var hashMe = Data()
-		hashMe.append(piccData.toHex(options: .lowerCase).data(using: .utf8)!)
-		hashMe.append(cmac.toHex(options: .lowerCase).data(using: .utf8)!)
+		hashMe.append(piccData.toHex(.lowerCase).data(using: .utf8)!)
+		hashMe.append(cmac.toHex(.lowerCase).data(using: .utf8)!)
 		hashMe.append(method.encode().data(using: .utf8)!)
 		hashMe.append(String(amount.msat).data(using: .utf8)!)
 
 		let digest = SHA256.hash(data: hashMe)
-		return digest.toHex(options: .lowerCase)
+		return digest.toHex(.lowerCase)
 	}
 }
 

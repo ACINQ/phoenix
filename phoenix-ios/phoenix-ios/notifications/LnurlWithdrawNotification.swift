@@ -55,12 +55,12 @@ struct LnurlWithdrawNotification {
 		
 		var hashMe = Data()
 		hashMe.append(nodeId.lowercased().data(using: .utf8)!)
-		hashMe.append(piccData.toHex(options: .lowerCase).data(using: .utf8)!)
-		hashMe.append(cmac.toHex(options: .lowerCase).data(using: .utf8)!)
+		hashMe.append(piccData.toHex(.lowerCase).data(using: .utf8)!)
+		hashMe.append(cmac.toHex(.lowerCase).data(using: .utf8)!)
 		hashMe.append(invoice.data(using: .utf8)!)
 		
 		let digest = SHA256.hash(data: hashMe)
-		return digest.toHex(options: .lowerCase)
+		return digest.toHex(.lowerCase)
 	}
 	
 	func postResponse(errorReason: String?) async -> Bool {

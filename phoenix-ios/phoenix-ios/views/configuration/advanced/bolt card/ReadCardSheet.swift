@@ -1,6 +1,7 @@
 import SwiftUI
 import PhoenixShared
 import CoreNFC
+import DnaCommunicator
 
 fileprivate let filename = "ReadCardSheet"
 #if DEBUG && true
@@ -179,7 +180,7 @@ struct ReadCardSheet: View {
 				Text(" - UID:")
 					.foregroundStyle(.secondary)
 					.gridCellAnchor(.trailing)
-				Text(piccDataInfo.uid.toHex(options: .upperCase))
+				Text(piccDataInfo.uid.toHex(.upperCase))
 					.gridCellAnchor(.leading)
 			}
 			GridRow {

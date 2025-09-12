@@ -567,8 +567,7 @@ struct BoltCardsList: View {
 	) {
 		
 		// Conversion madness: [UInt8] -> Data -> ByteArray -> ByteVector
-		let uidByteArray = Helper.dataFromBytes(bytes: output.chipUid).toKotlinByteArray()
-		let uid = Bitcoin_kmpByteVector(bytes: uidByteArray)
+		let uid: Bitcoin_kmpByteVector = output.chipUid.toData().toKotlinByteVector()
 		
 		let cardInfo = BoltCardInfo(name: "", keys: keys, uid: uid, isForeign: false)
 		

@@ -633,7 +633,7 @@ class NotificationService: UNNotificationServiceExtension {
 					updateNotificationContent_unknown(content)
 				}
 				
-			case .lnurlWithdraw(let notification):
+			case .lnurlWithdraw(_):
 				
 				if let result = withdrawRequestResult {
 					updateNotificationContent_outgoingPayment(content, result)

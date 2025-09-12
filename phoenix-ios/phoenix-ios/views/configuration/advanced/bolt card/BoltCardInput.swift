@@ -1,4 +1,5 @@
 import Foundation
+import DnaCommunicator
 
 /// Versioning information
 enum BoltCardVersion {

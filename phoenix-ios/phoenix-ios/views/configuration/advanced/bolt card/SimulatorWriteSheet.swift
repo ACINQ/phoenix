@@ -225,8 +225,7 @@ struct SimulatorWriteSheet: View {
 	) {
 		
 		// Conversion madness: [UInt8] -> Data -> ByteArray -> ByteVector
-		let uidByteArray = Helper.dataFromBytes(bytes: output.chipUid).toKotlinByteArray()
-		let uid = Bitcoin_kmpByteVector(bytes: uidByteArray)
+		let uid: Bitcoin_kmpByteVector = output.chipUid.toData().toKotlinByteVector()
 		
 		let cardInfo = BoltCardInfo(name: "", keys: keys, uid: uid, isForeign: true)
 		
@@ -235,8 +234,8 @@ struct SimulatorWriteSheet: View {
 				try await Biz.business.cardsManager.saveCard(card: cardInfo)
 				
 				let rawOutput = SimulatorBoltCardInput(
-					key0: keys.key0_bytes.toHex(options: .lowerCase),
-					chipUid: output.chipUid.toHex(options: .lowerCase)
+					key0: keys.key0_bytes.toHex(.lowerCase),
+					chipUid: output.chipUid.toHex(.lowerCase)
 				)
 				let jsonData = try JSONEncoder().encode(rawOutput)
 				jsonOutput = String(data: jsonData, encoding: .utf8) ?? ""

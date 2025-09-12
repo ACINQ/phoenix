@@ -1,11 +1,14 @@
 import Foundation
 import CoreNFC
+import DnaCommunicator
 
 fileprivate let filename = "NfcWriter"
 #if DEBUG
 fileprivate let log = LoggerFactory.shared.logger(filename, .trace)
+fileprivate let dnaLog = LoggerFactory.shared.logger("DnaCommunicator", .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+fileprivate let dnaLog = LoggerFactory.shared.logger("DnaCommunicator", .warning)
 #endif
 
 class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
@@ -114,8 +117,10 @@ class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
 			
 			log.debug("session.connect(): success")
 			
-			let dna = DnaCommunicator(tag: isoTag)
-			dna.debug = true
+			let dnaLogger = {(msg: String) -> Void in
+				dnaLog.debug("\(msg)")
+			}
+			let dna = DnaCommunicator(tag: isoTag, logger: dnaLogger)
 
 			Task {
 				await authenticate(dna)
@@ -291,7 +296,7 @@ class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
 		// Write file2 data.
 		
 		do {
-			let data = Ndef.ndefDataForTemplate(input.template)
+			let data = input.template.data
 			try await writeFile2Data(dna, data, file2Settings).get()
 		} catch {
 			return writeDisconnect(error: .protocolError(.writeFile2Data, error))
@@ -439,8 +444,8 @@ class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
 		
 		do {
 			let url = URL(string: "https://phoenix.acinq.co")!
-			let data = Ndef.ndefDataForUrl(url)
-			try await writeFile2Data(dna, data, file2Settings).get()
+			let dataInfo = Ndef.ndefDataForUrl(url)
+			try await writeFile2Data(dna, dataInfo.data, file2Settings).get()
 		} catch {
 			return resetDisconnect(error: .protocolError(.writeFile2Data, error))
 		}
@@ -695,7 +700,11 @@ class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
 			} else {
 				log.debug("File(1): Could not parse CapabilitiesContainer")
 				
-				let altErr = Helper.makeError(501, "Invalid CapabilitiesContainer file")
+				let altErr = NSError(
+					domain   : "NfcWriter",
+					code     : 501,
+					userInfo : ["message": "Invalid CapabilitiesContainer file"]
+				)
 				return .failure(altErr)
 			}
 		}
@@ -966,9 +975,9 @@ class NfcWriter: NSObject, NFCTagReaderSessionDelegate {
 		settings.sdmOptionUseAscii = true
 		settings.sdmMetaReadPermission = piccDataKeyPosition.toPermission()
 		settings.sdmFileReadPermission = cmacKeyPosition.toPermission()
-		settings.sdmPiccDataOffset = template.piccDataOffset
-		settings.sdmMacOffset = template.cmacOffset
-		settings.sdmMacInputOffset = template.cmacOffset
+		settings.sdmPiccDataOffset = UInt32(template.piccDataOffset)
+		settings.sdmMacOffset = UInt32(template.cmacOffset)
+		settings.sdmMacInputOffset = UInt32(template.cmacOffset)
 
 		return await writeFile2Settings(dna, settings)
 	}
