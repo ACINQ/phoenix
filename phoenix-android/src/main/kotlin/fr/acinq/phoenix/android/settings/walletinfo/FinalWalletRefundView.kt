@@ -49,10 +49,9 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.activeWalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -74,6 +73,7 @@ import fr.acinq.phoenix.utils.extensions.confirmed
 
 @Composable
 fun FinalWalletRefundView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<FinalWalletRefundViewModel>(factory = FinalWalletRefundViewModel.Factory(business.peerManager, business.electrumClient))
@@ -90,6 +90,7 @@ fun FinalWalletRefundView(
             }
             else -> {
                 AvailableForRefund(
+                    business = business,
                     available = available,
                     state = state,
                     onResetState = { vm.state.value = FinalWalletRefundState.Init },
@@ -147,6 +148,7 @@ private fun AddressInputAndFeeSlider(
 
 @Composable
 private fun ColumnScope.AvailableForRefund(
+    business: PhoenixBusiness,
     available: Satoshi,
     state: FinalWalletRefundState,
     onResetState: () -> Unit,

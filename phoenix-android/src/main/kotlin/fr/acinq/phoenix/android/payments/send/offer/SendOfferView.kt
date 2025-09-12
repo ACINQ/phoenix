@@ -44,10 +44,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
@@ -67,6 +67,7 @@ import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 @Composable
 fun SendToOfferView(
     walletId: WalletId,
+    business: PhoenixBusiness,
     offer: OfferTypes.Offer,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,

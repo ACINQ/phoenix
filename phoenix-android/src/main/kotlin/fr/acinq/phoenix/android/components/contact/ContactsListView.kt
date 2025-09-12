@@ -30,7 +30,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,22 +42,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.buttons.Clickable
-import fr.acinq.phoenix.android.components.layouts.ItemCard
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.inputs.TextInput
+import fr.acinq.phoenix.android.components.layouts.ItemCard
 import fr.acinq.phoenix.android.utils.mutedTextFieldColors
 import fr.acinq.phoenix.data.ContactInfo
 
 @Composable
 fun ContactsListView(
+    contactsList: List<ContactInfo>?,
     onContactClick: (ContactInfo) -> Unit,
     isOnSurface: Boolean,
 ) {
-    val contactsList by business.databaseManager.contactsList.collectAsState(null)
-
     contactsList?.let { contacts ->
         var nameFilterInput by remember { mutableStateOf("") }
         TextInput(

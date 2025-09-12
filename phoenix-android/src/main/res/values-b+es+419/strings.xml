@@ -698,7 +698,7 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Restablecer billetera</string>
+    <string name="reset_wallet_title">Eliminar billetera</string>
     <string name="reset_wallet_instructions_header">Borrar todos los datos de la billetera en este dispositivo</string>
     <string name="reset_wallet_instructions_details">Esto restablecerá la aplicación, como si acabaras de instalarla.</string>
     <string name="reset_wallet_review_button">Revisar</string>
@@ -708,7 +708,7 @@
     <string name="reset_wallet_confirm_details">Esto restablecerá la aplicación. Te dirigiremos a la pantalla de introducción, donde te pediremos que crees o restaures una billetera.</string>
     <string name="reset_wallet_confirm_seed_balance">No pierdas tus fondos:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Eres responsable de guardar tu frase de recuperación.</string>
-    <string name="reset_wallet_confirm_button">Borrar billetera</string>
+    <string name="reset_wallet_confirm_button">Eliminar billetera</string>
 
     <string name="reset_wallet_success">La billetera se restableció correctamente</string>
     <string name="reset_wallet_failure_title">Error de restablecimiento</string>

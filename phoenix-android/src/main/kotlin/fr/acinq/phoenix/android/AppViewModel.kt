@@ -192,7 +192,9 @@ class AppViewModel(
                     }
                     _availableWallets.value = result.userWalletsMap
                     listWalletState.value = ListWalletState.Success
-                    onDone()
+                    viewModelScope.launch(Dispatchers.Main) {
+                        onDone()
+                    }
                 }
             }
         }

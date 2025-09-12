@@ -29,8 +29,9 @@ import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddress
 
 fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel: AppViewModel) {
 
-    businessComposable(Screen.Channels.route, appViewModel) { _, _ ,_ ->
+    businessComposable(Screen.Channels.route, appViewModel) { _, _, business ->
         ChannelsView(
+            business = business,
             onBackClick = {
                 navController.navigate(Screen.Settings.route) {
                     popUpTo(Screen.Settings.route) { inclusive = true }
@@ -46,20 +47,20 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
         route = "${Screen.ChannelDetails.route}?id={id}",
         appViewModel = appViewModel,
         arguments = listOf(navArgument("id") { type = NavType.StringType })
-    ) { backStackEntry, _ ,_ ->
+    ) { backStackEntry, _, business ->
         val channelId = backStackEntry.arguments?.getString("id")
-        ChannelDetailsView(onBackClick = { navController.popBackStack() }, channelId = channelId)
+        ChannelDetailsView(business = business, onBackClick = { navController.popBackStack() }, channelId = channelId)
     }
 
-    businessComposable(Screen.ImportChannelsData.route, appViewModel) { _, _ ,_ ->
-        ImportChannelsData(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.ImportChannelsData.route, appViewModel) { _, _, business ->
+        ImportChannelsData(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.SpendChannelAddress.route, appViewModel) { _, _ ,_ ->
-        SpendFromChannelAddress(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.SpendChannelAddress.route, appViewModel) { _, _, business ->
+        SpendFromChannelAddress(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.MutualClose.route, appViewModel) { _, _ ,_ ->
-        MutualCloseView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.MutualClose.route, appViewModel) { _, _, business ->
+        MutualCloseView(business = business, onBackClick = { navController.popBackStack() })
     }
 }

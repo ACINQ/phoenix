@@ -70,7 +70,7 @@
     <string name="settings_list_channels">Chaneli za malipo</string>
     <string name="settings_logs">Magogo</string>
     <string name="settings_electrum">Seva ya Electrum</string>
-    <string name="settings_reset_wallet">Weka upya pochi</string>
+    <string name="settings_reset_wallet">Futa mkoba</string>
     <string name="settings_mutual_close">Funga chaneli</string>
     <string name="settings_force_close">Funga chaneli kwa nguvu</string>
     <string name="settings_tor">Tor</string>

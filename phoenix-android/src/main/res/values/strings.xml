@@ -47,6 +47,7 @@
     <string name="restore_title">Restore my wallet</string>
     <string name="restore_disclaimer_next">Next</string>
     <string name="restore_in_progress">Restoring your wallet…</string>
+    <string name="initwallet_electrum_option">Use a custom Electrum server</string>
 
     <!-- utils: placeholders -->
 
@@ -922,12 +923,12 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Reset wallet</string>
+    <string name="reset_wallet_title">Delete wallet</string>
     <string name="reset_wallet_instructions_header">Delete all wallet data from this device</string>
     <string name="reset_wallet_instructions_details">This will reset the app, as if you had just installed it.</string>
     <string name="reset_wallet_review_button">Review</string>
 
-    <string name="reset_wallet_confirm_title">Confirm reset</string>
+    <string name="reset_wallet_confirm_title">Confirm wallet deletion</string>
     <string name="reset_wallet_confirm_header">The wallet will be completely deleted from <b>this device</b>.</string>
     <string name="reset_wallet_confirm_details">This will reset the app. Your payments history will be lost. You will be taken to the Intro screen, and prompted to create or restore a wallet.</string>
     <string name="reset_wallet_confirm_seed_balance">Don\'t lose your funds:\n%1$s (≈ %2$s).</string>

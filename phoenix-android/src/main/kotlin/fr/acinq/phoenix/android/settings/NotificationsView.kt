@@ -45,6 +45,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.PhoenixIcon
@@ -69,6 +70,7 @@ import java.text.DecimalFormat
 
 @Composable
 fun NotificationsView(
+    business: PhoenixBusiness,
     noticesViewModel: NoticesViewModel,
     onBackClick: () -> Unit,
 ) {

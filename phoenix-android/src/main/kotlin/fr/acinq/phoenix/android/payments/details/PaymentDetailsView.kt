@@ -31,8 +31,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
@@ -94,6 +94,7 @@ class PaymentDetailsViewModel(
 
 @Composable
 fun PaymentDetailsView(
+    business: PhoenixBusiness,
     paymentId: UUID,
     onBackClick: () -> Unit,
     fromEvent: Boolean,

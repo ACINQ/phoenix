@@ -63,7 +63,7 @@
     <string name="settings_list_channels">Zahlungskanäle</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum-Server</string>
-    <string name="settings_reset_wallet">Wallet zurücksetzen</string>
+    <string name="settings_reset_wallet">Wallet löschen</string>
     <string name="settings_mutual_close">Kanäle schließen</string>
     <string name="settings_force_close">Kanäle force-closen</string>
     <string name="settings_tor">Tor</string>

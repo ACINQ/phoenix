@@ -55,12 +55,12 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.activeWalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -87,6 +87,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MutualCloseView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val context = LocalContext.current

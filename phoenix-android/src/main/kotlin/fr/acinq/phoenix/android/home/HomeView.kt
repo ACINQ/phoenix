@@ -47,19 +47,18 @@ import androidx.constraintlayout.compose.layoutId
 import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sat
-import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
-import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.home.releasenotes.ReleaseNoteDialog
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigation.Screen
@@ -71,6 +70,8 @@ import fr.acinq.phoenix.data.inFlightPaymentsCount
 
 @Composable
 fun HomeView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     paymentsViewModel: PaymentsViewModel,
     noticesViewModel: NoticesViewModel,
     onPaymentClick: (UUID) -> Unit,
@@ -113,6 +114,7 @@ fun HomeView(
 
     val payments by paymentsViewModel.homePaymentsFlow.collectAsState()
     val swapInBalance = business.balanceManager.swapInWalletBalance.collectAsState()
+    val swapInNextTimeout = business.peerManager.swapInNextTimeout.collectAsState(null)
     val finalWallet = business.peerManager.finalWallet.collectAsState()
 
     BackHandler {
@@ -214,61 +216,60 @@ fun HomeView(
 
     val progress = 1 - (collapsibleHeight.value - minPx) / (maxPx - minPx)
 
-    MVIView(CF::home) { model, _ ->
-        val balance = model.balance
-        val notices = noticesViewModel.notices
-        val notifications by business.notificationsManager.notifications.collectAsState(emptyList())
+    val balance by business.balanceManager.balance.collectAsState()
+    val notices = noticesViewModel.notices
+    val notifications by business.notificationsManager.notifications.collectAsState(emptyList())
 
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            MotionLayout(
-                motionScene = motionScene,
-                progress = progress
-            ) {
-                Box(
-                    modifier = Modifier
-                        .layoutId("collapsible")
-                        .fillMaxWidth()
-                ) {}
-                TopBar(
-                    modifier = Modifier.layoutId("topBar"),
-                    onConnectionsStateButtonClick = { showConnectionsDialog = true },
-                    connections = connections,
-                    inFlightPaymentsCount = inFlightPaymentsCount,
-                    onTorClick = onTorClick,
-                    isFCMUnavailable = fcmTokenFlow?.value == null || !isFCMAvailable,
-                    isPowerSaverMode = isPowerSaverModeOn,
-                    showRequestLiquidity = channels.canRequestLiquidity(),
-                    onRequestLiquidityClick = onRequestLiquidityClick,
-                )
-                HomeBalance(
-                    modifier = Modifier.layoutId("balance"),
-                    balance = balance,
-                    balanceDisplayMode = balanceDisplayMode,
-                    swapInBalance = swapInBalance.value,
-                    finalWalletBalance = finalWallet.value?.all?.balance ?: 0.sat,
-                    onNavigateToSwapInWallet = onNavigateToSwapInWallet,
-                    onNavigateToFinalWallet = onNavigateToFinalWallet,
-                )
-                PrimarySeparator(modifier = Modifier.layoutId("separator"))
-                HomeNotices(
-                    modifier = Modifier.layoutId("notices"),
-                    notices = notices.toList(),
-                    notifications = notifications,
-                    onNavigateToSwapInWallet = onNavigateToSwapInWallet,
-                    onNavigateToNotificationsList = onShowNotifications,
-                    onShowTorDisconnectedClick = { showTorDisconnectedDialog = true }
-                )
-            }
-
-            LatestPaymentsList(
-                modifier = Modifier.nestedScroll(nestedScrollConnection),
-                balanceDisplayMode = balanceDisplayMode,
-                onPaymentClick = onPaymentClick,
-                onPaymentsHistoryClick = onPaymentsHistoryClick,
-                payments = payments,
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        MotionLayout(
+            motionScene = motionScene,
+            progress = progress
+        ) {
+            Box(
+                modifier = Modifier
+                    .layoutId("collapsible")
+                    .fillMaxWidth()
+            ) {}
+            TopBar(
+                modifier = Modifier.layoutId("topBar"),
+                onConnectionsStateButtonClick = { showConnectionsDialog = true },
+                connections = connections,
+                inFlightPaymentsCount = inFlightPaymentsCount,
+                onTorClick = onTorClick,
+                isFCMUnavailable = fcmTokenFlow.value == null || !isFCMAvailable,
+                isPowerSaverMode = isPowerSaverModeOn,
+                showRequestLiquidity = channels.canRequestLiquidity(),
+                onRequestLiquidityClick = onRequestLiquidityClick,
             )
-            BottomBar(Modifier, onSettingsClick, onReceiveClick, onSendClick)
+            HomeBalance(
+                modifier = Modifier.layoutId("balance"),
+                balance = balance,
+                balanceDisplayMode = balanceDisplayMode,
+                swapInBalance = swapInBalance.value,
+                swapInNextTimeout = swapInNextTimeout.value,
+                finalWalletBalance = finalWallet.value?.all?.balance ?: 0.sat,
+                onNavigateToSwapInWallet = onNavigateToSwapInWallet,
+                onNavigateToFinalWallet = onNavigateToFinalWallet,
+            )
+            PrimarySeparator(modifier = Modifier.layoutId("separator"))
+            HomeNotices(
+                modifier = Modifier.layoutId("notices"),
+                notices = notices.toList(),
+                notifications = notifications,
+                onNavigateToSwapInWallet = onNavigateToSwapInWallet,
+                onNavigateToNotificationsList = onShowNotifications,
+                onShowTorDisconnectedClick = { showTorDisconnectedDialog = true }
+            )
         }
+
+        LatestPaymentsList(
+            modifier = Modifier.nestedScroll(nestedScrollConnection),
+            balanceDisplayMode = balanceDisplayMode,
+            onPaymentClick = onPaymentClick,
+            onPaymentsHistoryClick = onPaymentsHistoryClick,
+            payments = payments,
+        )
+        BottomBar(Modifier, onSettingsClick, onReceiveClick, onSendClick)
     }
 
     val releaseNoteCode = application.globalPrefs.showReleaseNoteSinceCode.collectAsState(initial = null).value

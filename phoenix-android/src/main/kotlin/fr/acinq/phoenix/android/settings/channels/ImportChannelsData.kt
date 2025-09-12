@@ -36,8 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.TextWithIcon
@@ -52,6 +52,7 @@ import fr.acinq.phoenix.utils.channels.ChannelsImportResult
 
 @Composable
 fun ImportChannelsData(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val peerManager = business.peerManager

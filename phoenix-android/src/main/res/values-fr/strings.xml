@@ -759,7 +759,7 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Réinitialiser le wallet</string>
+    <string name="reset_wallet_title">Suppression du wallet</string>
     <string name="reset_wallet_instructions_header">Supprime toutes les données du wallet de cet appareil</string>
     <string name="reset_wallet_instructions_details">L\'application sera réinitialisée, comme si vous veniez de l\'installer.</string>
     <string name="reset_wallet_review_button">Valider</string>

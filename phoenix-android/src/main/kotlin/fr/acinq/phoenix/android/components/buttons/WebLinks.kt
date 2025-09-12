@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.TxId
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.utils.BlockchainExplorer
 
@@ -69,16 +69,18 @@ fun AddressLinkButton(
     modifier: Modifier = Modifier,
     address: String,
 ) {
-    WebLink(
-        text = address,
-        url = addressUrl(address = address),
-        space = 4.dp,
-        maxLines = 1,
-        fontSize = 15.sp,
-        iconSize = 14.dp,
-        onClickLabel = stringResource(id = R.string.accessibility_address_explorer_link),
-        modifier = modifier,
-    )
+    addressUrl(address = address)?.let {
+        WebLink(
+            text = address,
+            url = it,
+            space = 4.dp,
+            maxLines = 1,
+            fontSize = 15.sp,
+            iconSize = 14.dp,
+            onClickLabel = stringResource(id = R.string.accessibility_address_explorer_link),
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
@@ -86,26 +88,28 @@ fun InlineTransactionLink(
     modifier: Modifier = Modifier,
     txId: TxId,
 ) {
-    WebLink(
-        text = txId.toString(),
-        url = txUrl(txId = txId),
-        space = 4.dp,
-        maxLines = 1,
-        fontSize = 15.sp,
-        iconSize = 14.dp,
-        onClickLabel = stringResource(id = R.string.accessibility_explorer_link),
-        modifier = modifier,
-    )
+    txUrl(txId = txId)?.let {
+        WebLink(
+            text = txId.toString(),
+            url = it,
+            space = 4.dp,
+            maxLines = 1,
+            fontSize = 15.sp,
+            iconSize = 14.dp,
+            onClickLabel = stringResource(id = R.string.accessibility_explorer_link),
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
-fun txUrl(txId: TxId): String {
-    return business.blockchainExplorer.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
+fun txUrl(txId: TxId): String? {
+    return LocalBusiness.current?.blockchainExplorer?.txUrl(txId = txId, website = BlockchainExplorer.Website.MempoolSpace)
 }
 
 @Composable
-fun addressUrl(address: String): String {
-    return business.blockchainExplorer.addressUrl(addr = address, website = BlockchainExplorer.Website.MempoolSpace)
+fun addressUrl(address: String): String? {
+    return LocalBusiness.current?.blockchainExplorer?.addressUrl(addr = address, website = BlockchainExplorer.Website.MempoolSpace)
 }
 
 fun openLink(context: Context, link: String) {

@@ -30,8 +30,9 @@ import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 
 fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewModel: AppViewModel) {
 
-    businessComposable(Screen.WalletInfo.route, appViewModel) { _, _ ,_ ->
+    businessComposable(Screen.WalletInfo.route, appViewModel) { _, _, business ->
         WalletInfoView(
+            business = business,
             onBackClick = { navController.popBackStack() },
             onLightningWalletClick = { navController.navigate(Screen.Channels.route) },
             onSwapInWalletClick = { navController.navigate(Screen.WalletInfo.SwapInWallet.route) },
@@ -46,8 +47,9 @@ fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewMode
         deepLinks = listOf(
             navDeepLink { uriPattern = "phoenix:swapinwallet" }
         )
-    ) { _, _ ,_ ->
+    ) { _, _, business ->
         SwapInWallet(
+            business = business,
             onBackClick = { navController.popBackStack() },
             onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
             onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
@@ -55,23 +57,23 @@ fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewMode
         )
     }
 
-    businessComposable(Screen.WalletInfo.SwapInAddresses.route, appViewModel) { _, _ ,_ ->
-        SwapInAddresses(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.WalletInfo.SwapInAddresses.route, appViewModel) { _, _, business ->
+        SwapInAddresses(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.SwapInSigner.route, appViewModel) { _, _ ,_ ->
-        SwapInSignerView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.WalletInfo.SwapInSigner.route, appViewModel) { _, _, business ->
+        SwapInSignerView(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.SwapInRefund.route, appViewModel) { _, _ ,_ ->
-        SendSwapInRefundView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.WalletInfo.SwapInRefund.route, appViewModel) { _, _, business ->
+        SendSwapInRefundView(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.FinalWalletRefund.route, appViewModel) { _, _ ,_ ->
-        FinalWalletRefundView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.WalletInfo.FinalWalletRefund.route, appViewModel) { _, _, business ->
+        FinalWalletRefundView(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.FinalWallet.route, appViewModel) { _, _ ,_ ->
-        FinalWalletInfo(onBackClick = { navController.popBackStack() }, onSpendClick = { navController.navigate(Screen.WalletInfo.FinalWalletRefund.route) })
+    businessComposable(Screen.WalletInfo.FinalWallet.route, appViewModel) { _, _, business ->
+        FinalWalletInfo(business = business, onBackClick = { navController.popBackStack() }, onSpendClick = { navController.navigate(Screen.WalletInfo.FinalWalletRefund.route) })
     }
 }

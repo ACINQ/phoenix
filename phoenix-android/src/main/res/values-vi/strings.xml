@@ -721,7 +721,7 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Đặt lại ví</string>
+    <string name="reset_wallet_title">Xóa ví</string>
     <string name="reset_wallet_instructions_header">Xóa tất cả dữ liệu ví khỏi thiết bị này</string>
     <string name="reset_wallet_instructions_details">Thao tác này sẽ đặt lại ứng dụng về trạng thái ban đầu, như lúc bạn mới cài đặt nó.</string>
     <string name="reset_wallet_review_button">Kiểm tra lại</string>

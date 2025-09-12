@@ -41,8 +41,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountInput
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -57,6 +57,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 
 @Composable
 fun SpendFromChannelAddress(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<SpendFromChannelAddressViewModel>(factory = SpendFromChannelAddressViewModel.Factory(business))

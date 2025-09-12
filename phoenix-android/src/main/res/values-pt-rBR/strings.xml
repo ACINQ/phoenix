@@ -695,7 +695,7 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Redefinir carteira</string>
+    <string name="reset_wallet_title">Excluir carteira</string>
     <string name="reset_wallet_instructions_header">Excluir todos os dados da carteira neste dispositivo</string>
     <string name="reset_wallet_instructions_details">Isso redefinirá o aplicativo, como se você tivesse acabado de instalá-lo.</string>
     <string name="reset_wallet_review_button">Analisar</string>

@@ -33,11 +33,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SendToBolt11View(
     walletId: WalletId,
+    business: PhoenixBusiness,
     invoice: Bolt11Invoice,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,

@@ -73,7 +73,7 @@
     <string name="settings_list_channels">Kênh thanh toán</string>
     <string name="settings_logs">Nhật ký</string>
     <string name="settings_electrum">Máy chủ Electrum</string>
-    <string name="settings_reset_wallet">Đặt lại ví</string>
+    <string name="settings_reset_wallet">Xóa ví</string>
     <string name="settings_mutual_close">Đóng kênh</string>
     <string name="settings_force_close">Buộc đóng kênh</string>
     <string name="settings_tor">Tor</string>

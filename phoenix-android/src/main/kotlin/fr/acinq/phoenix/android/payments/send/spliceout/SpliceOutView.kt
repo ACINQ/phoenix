@@ -42,11 +42,11 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -72,6 +72,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SendSpliceOutView(
     walletId: WalletId,
+    business: PhoenixBusiness,
     requestedAmount: Satoshi?,
     address: String,
     onBackClick: () -> Unit,

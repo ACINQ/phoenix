@@ -21,10 +21,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
@@ -32,31 +34,35 @@ import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.initwallet.WritingSeedState
-import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.navigation.Screen
 
 @Composable
 fun RestoreWalletView(
+    navController: NavController,
     onRestoreDone: (WalletId) -> Unit,
 ) {
-    val nc = navController
-    val vm = viewModel<RestoreWalletViewModel>(factory = RestoreWalletViewModel.Factory(application = application))
+    val initGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.InitWalletGraph.route) }
+    val initViewModel = viewModel<InitViewModel>(factory = InitViewModel.Factory(application), viewModelStoreOwner = initGraphEntry)
 
-    when (val writingState = vm.writingState) {
+    val restoreViewModel = viewModel<RestoreWalletViewModel>(factory = RestoreWalletViewModel.Factory(application = application))
+
+    when (val writingState = initViewModel.writingState) {
         is WritingSeedState.Init -> {
             DefaultScreenLayout {
                 DefaultScreenHeader(
-                    onBackClick = { nc.popBackStack() },
+                    onBackClick = { navController.popBackStack() },
                     title = stringResource(id = R.string.restore_title),
                 )
 
-                when (val state = vm.state) {
+                when (val state = restoreViewModel.state) {
                     is RestoreWalletState.Disclaimer -> {
-                        DisclaimerView(onClickNext = { vm.state = RestoreWalletState.SeedInput.Pending })
+                        DisclaimerView(onClickNext = { restoreViewModel.state = RestoreWalletState.SeedInput.Pending })
                     }
 
                     is RestoreWalletState.SeedInput -> {
-                        SeedInputView(state, vm, onRestoreDone)
+                        SeedInputView(state, restoreViewModel, initViewModel, onRestoreDone)
                     }
                 }
             }

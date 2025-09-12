@@ -38,9 +38,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.CardHeader
@@ -56,6 +56,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun AdvancedIncomingFeePolicy(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()

@@ -71,10 +71,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -99,6 +99,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ReceiveView(
     walletId: WalletId,
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onFeeManagementClick: () -> Unit,
     onScanDataClick: () -> Unit,
@@ -122,7 +123,7 @@ fun ReceiveView(
                 Spacer(modifier = Modifier.width(16.dp))
             },
         )
-        ReceiveViewPages(vm, onFeeManagementClick)
+        ReceiveViewPages(vm, business, onFeeManagementClick)
         HceMonitorDialog()
     }
 }
@@ -130,6 +131,7 @@ fun ReceiveView(
 @Composable
 private fun ReceiveViewPages(
     vm: ReceiveViewModel,
+    business: PhoenixBusiness,
     onFeeManagementClick: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
@@ -170,7 +172,7 @@ private fun ReceiveViewPages(
                             val defaultInvoiceDesc = LocalUserPrefs.current?.getInvoiceDefaultDesc?.collectAsState(null)?.value
                             safeLet(defaultInvoiceDesc, defaultInvoiceExpiry) { desc, expiry ->
                                 LightningInvoiceView(
-                                    vm = vm, onFeeManagementClick = onFeeManagementClick,
+                                    vm = vm, business = business, onFeeManagementClick = onFeeManagementClick,
                                     defaultDescription = desc, defaultExpiry = expiry, columnWidth = columnWidth, isPageActive = pagerState.currentPage == 0
                                 )
                             } ?: ProgressView(text = stringResource(id = R.string.utils_loading_prefs))

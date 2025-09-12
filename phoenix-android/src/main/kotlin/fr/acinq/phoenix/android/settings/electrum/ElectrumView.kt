@@ -169,7 +169,7 @@ fun ElectrumView(
 }
 
 @Composable
-private fun ElectrumServerDialog(
+fun ElectrumServerDialog(
     initialConfig: ElectrumConfig.Custom?,
     onConfirm: (ElectrumConfig.Custom?) -> Unit,
     onDismiss: () -> Unit

@@ -43,11 +43,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -79,7 +79,7 @@ fun CurrencyConverter(
 ) {
     val scope = rememberCoroutineScope()
     val userPrefs = LocalUserPrefs.current ?: return
-    val appConfigManager = business.appConfigurationManager
+    val appConfigManager = LocalBusiness.current?.appConfigurationManager ?: return
 
     val primaryBtcUnit = LocalBitcoinUnits.current.primary
     val otherBtcUnits = LocalBitcoinUnits.current.others

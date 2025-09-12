@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -50,6 +50,7 @@ import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlWithdrawView(
+    business: PhoenixBusiness,
     withdraw: LnurlWithdraw,
     onBackClick: () -> Unit,
     onFeeManagementClick: () -> Unit,

@@ -43,8 +43,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -58,6 +58,7 @@ import fr.acinq.phoenix.android.utils.copyToClipboard
 
 @Composable
 fun SwapInSignerView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<SwapInSignerViewModel>(factory = SwapInSignerViewModel.Factory(business.walletManager, business.electrumClient))

@@ -774,7 +774,7 @@
 
     <!-- Reset wallet -->
 
-    <string name="reset_wallet_title">Futa pochi</string>
+    <string name="reset_wallet_title">Futa mkoba</string>
     <string name="reset_wallet_instructions_header">Futa data zote za pochi kutoka kifaa hiki</string>
     <string name="reset_wallet_instructions_details">Hii itafanya programu irejee kama vile umeisakinisha tu.</string>
     <string name="reset_wallet_review_button">Tathmini</string>

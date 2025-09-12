@@ -35,10 +35,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -121,6 +121,7 @@ class ExperimentalViewModel(val peerManager: PeerManager, private val internalPr
 @Composable
 fun ExperimentalView(
     walletId: WalletId,
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(walletId, business.peerManager))
@@ -133,13 +134,14 @@ fun ExperimentalView(
 
         CardHeader(text = stringResource(id = R.string.bip353_header))
         Card(modifier = Modifier.fillMaxWidth()) {
-            ClaimAddressButton(state = vm.claimAddressState, onClaim = { vm.claimAddress() })
+            ClaimAddressButton(business = business, state = vm.claimAddressState, onClaim = { vm.claimAddress() })
         }
     }
 }
 
 @Composable
 private fun ClaimAddressButton(
+    business: PhoenixBusiness,
     state: ClaimAddressState,
     onClaim: () -> Unit,
 ) {

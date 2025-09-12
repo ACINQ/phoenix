@@ -16,38 +16,45 @@
 
 package fr.acinq.phoenix.android.initwallet.create
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.initwallet.WritingSeedState
+import fr.acinq.phoenix.android.navigation.Screen
 
 
 @Composable
 fun CreateWalletView(
-    onSeedWritten: (WalletId) -> Unit
+    navController: NavController,
+    onWalletCreationDone: (WalletId) -> Unit
 ) {
-    val vm = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory(application = application))
+    val initGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.InitWalletGraph.route) }
+    val initViewModel = viewModel<InitViewModel>(factory = InitViewModel.Factory(application), viewModelStoreOwner = initGraphEntry)
+    val createViewModel = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory(application = application))
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center,
     ) {
         LaunchedEffect(Unit) {
-            vm.createNewWallet(onSeedWritten = onSeedWritten)
+            createViewModel.createNewWallet(writeSeed = { words ->
+                initViewModel.writeSeed(words, isRestoringWallet = false, onSeedWritten = onWalletCreationDone)
+            })
         }
-        when (val writingState = vm.writingState) {
+        when (val writingState = initViewModel.writingState) {
             is WritingSeedState.Init, is WritingSeedState.Writing, is WritingSeedState.WrittenToDisk -> {
                 Text(stringResource(id = R.string.autocreate_generating))
             }

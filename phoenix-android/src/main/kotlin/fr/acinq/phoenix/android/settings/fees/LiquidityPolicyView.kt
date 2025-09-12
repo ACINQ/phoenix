@@ -37,10 +37,10 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.PhoenixIcon
@@ -63,6 +63,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LiquidityPolicyView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,
 ) {

@@ -48,8 +48,8 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -65,6 +65,7 @@ import fr.acinq.phoenix.data.LocalChannelInfo
 
 @Composable
 fun ChannelsView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onChannelClick: (String) -> Unit,
     onImportChannelsDataClick: () -> Unit,

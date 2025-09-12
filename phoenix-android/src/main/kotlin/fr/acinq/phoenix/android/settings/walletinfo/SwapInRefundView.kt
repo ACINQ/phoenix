@@ -48,11 +48,11 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.activeWalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -71,15 +71,14 @@ import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 
 @Composable
 fun SendSwapInRefundView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val peerManager = business.peerManager
-    val swapInWallet by peerManager.swapInWallet.collectAsState()
+    val swapInWallet by business.peerManager.swapInWallet.collectAsState()
     val availableForRefund = swapInWallet?.readyForRefund?.balance
 
     DefaultScreenLayout(isScrollable = false) {
@@ -91,7 +90,7 @@ fun SendSwapInRefundView(
             }
 
             else -> {
-                AvailableForRefundView(peerManager = peerManager, availableForRefund = availableForRefund)
+                AvailableForRefundView(business = business, availableForRefund = availableForRefund)
             }
         }
     }
@@ -99,12 +98,12 @@ fun SendSwapInRefundView(
 
 @Composable
 private fun AvailableForRefundView(
-    peerManager: PeerManager,
+    business: PhoenixBusiness,
     availableForRefund: Satoshi,
 ) {
     val electrumClient = business.electrumClient
     val walletManager = business.walletManager
-    val vm = viewModel<SwapInRefundViewModel>(factory = SwapInRefundViewModel.Factory(peerManager, walletManager, electrumClient))
+    val vm = viewModel<SwapInRefundViewModel>(factory = SwapInRefundViewModel.Factory(business.peerManager, walletManager, electrumClient))
     val state = vm.state
     val keyboardManager = LocalSoftwareKeyboardController.current
 

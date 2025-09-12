@@ -53,10 +53,10 @@ import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.activeWalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
@@ -94,6 +94,7 @@ object LiquidityLimits {
 
 @Composable
 fun RequestLiquidityView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val balance by business.balanceManager.balance.collectAsState(null)
@@ -111,7 +112,7 @@ fun RequestLiquidityView(
                 )
             } else {
                 balance?.let {
-                    RequestLiquidityBottomSection(it)
+                    RequestLiquidityBottomSection(business, it)
                 } ?: ProgressView(text = stringResource(id = R.string.utils_loading_data))
             }
         },
@@ -167,6 +168,7 @@ private fun RequestLiquidityTopSection(inboundLiquidity: MilliSatoshi?) {
 
 @Composable
 private fun RequestLiquidityBottomSection(
+    business: PhoenixBusiness,
     balance: MilliSatoshi
 ) {
 

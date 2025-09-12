@@ -46,10 +46,10 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.CardHeader
@@ -71,6 +71,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun SwapInWallet(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onViewChannelPolicyClick: () -> Unit,
     onAdvancedClick: () -> Unit,
@@ -154,7 +155,7 @@ fun SwapInWallet(
                 }
 
                 if (wallet.deeplyConfirmed.balance > 0.sat) {
-                    ReadyForSwapView(wallet = wallet)
+                    ReadyForSwapView(business = business, wallet = wallet)
                 }
 
                 if (wallet.lockedUntilRefund.balance > 0.sat) {
@@ -197,6 +198,7 @@ private fun WaitingForConfirmations(
 
 @Composable
 private fun ReadyForSwapView(
+    business: PhoenixBusiness,
     wallet: WalletState.WalletWithConfirmations,
 ) {
     val swappableUtxos = wallet.deeplyConfirmed

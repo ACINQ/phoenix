@@ -43,8 +43,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.PhoenixIcon
@@ -52,6 +52,7 @@ import fr.acinq.phoenix.android.components.layouts.SplashClickableContent
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.data.ContactInfo
+import kotlinx.coroutines.flow.flowOf
 
 sealed class OfferContactState {
     data object Init: OfferContactState()
@@ -66,7 +67,8 @@ sealed class OfferContactState {
  */
 @Composable
 fun ContactOrOfferView(offer: OfferTypes.Offer) {
-    val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
+    val contactsDb by (LocalBusiness.current?.databaseManager?.contactsDb ?: flowOf(null)).collectAsState(null)
+
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
     LaunchedEffect(contactsDb) {
         contactsDb?.let {
@@ -154,6 +156,7 @@ private fun SaveOrAttachOfferPickerDialog(
         internalPadding = PaddingValues(0.dp),
         containerColor = MaterialTheme.colors.background
     ) {
+        val contactsList by (LocalBusiness.current?.databaseManager?.contactsList ?: flowOf(null)).collectAsState(null)
         Clickable(onClick = onCreateNewContact) {
             Row(
                 modifier = Modifier
@@ -172,7 +175,7 @@ private fun SaveOrAttachOfferPickerDialog(
         Spacer(Modifier.height(14.dp))
         HSeparator(modifier = Modifier.align(Alignment.CenterHorizontally), width = 100.dp)
         Spacer(Modifier.height(8.dp))
-        ContactsListView(onContactClick = onAddToExistingContact, isOnSurface = false)
+        ContactsListView(contactsList = contactsList, onContactClick = onAddToExistingContact, isOnSurface = false)
         Spacer(Modifier.height(60.dp))
     }
 }

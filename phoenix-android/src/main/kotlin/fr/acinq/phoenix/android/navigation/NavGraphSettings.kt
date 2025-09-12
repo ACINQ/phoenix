@@ -17,12 +17,10 @@
 package fr.acinq.phoenix.android.navigation
 
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import fr.acinq.phoenix.PhoenixBusiness
@@ -50,13 +48,14 @@ import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 
 
-fun NavGraphBuilder.baseSettingsNavGraph(navController: NavController, appViewModel: AppViewModel, business: PhoenixBusiness?) {
-    composable(Screen.Settings.route) {
+fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel: AppViewModel, business: PhoenixBusiness?) {
+
+    businessComposable(Screen.Settings.route, appViewModel) { _, _, _ ->
         val notifications = business?.notificationsManager?.notifications?.collectAsState()
         SettingsView(appViewModel, emptyList(), notifications?.value ?: emptyList())
     }
 
-    composable(Screen.ElectrumServer.route) {
+    businessComposable(Screen.ElectrumServer.route, appViewModel) { _, _, _ ->
         ElectrumView(onBackClick = { navController.popBackStack() })
     }
 
@@ -64,18 +63,18 @@ fun NavGraphBuilder.baseSettingsNavGraph(navController: NavController, appViewMo
         TorConfigView(walletId = walletId, onBackClick = { navController.popBackStack() }, onBusinessTeardown = { navController.popToHome() })
     }
 
-    composable(Screen.DisplayPrefs.route) {
-        DisplayPrefsView()
+    businessComposable(Screen.DisplayPrefs.route, appViewModel) { _, _, business ->
+        DisplayPrefsView(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    composable(Screen.About.route) {
+    businessComposable(Screen.About.route, appViewModel) { _, _, _ ->
         AboutView()
     }
 
-    composable("${Screen.PaymentSettings.route}?showAuthSchemeDialog={showAuthSchemeDialog}", arguments = listOf(
+    businessComposable("${Screen.PaymentSettings.route}?showAuthSchemeDialog={showAuthSchemeDialog}", arguments = listOf(
         navArgument("showAuthSchemeDialog") { type = NavType.BoolType; defaultValue = false }
-    )) {
-        val showAuthSchemeDialog = it.arguments?.getBoolean("showAuthSchemeDialog") ?: false
+    ), appViewModel = appViewModel) { backStackEntry, _, _ ->
+        val showAuthSchemeDialog = backStackEntry.arguments?.getBoolean("showAuthSchemeDialog") ?: false
         PaymentSettingsView(initialShowLnurlAuthSchemeDialog = showAuthSchemeDialog)
     }
 
@@ -83,16 +82,12 @@ fun NavGraphBuilder.baseSettingsNavGraph(navController: NavController, appViewMo
         AppAccessSettings(walletId = walletId, onBackClick = { navController.popBackStack() }, onScheduleAutoLock = appViewModel::scheduleAutoLock)
     }
 
-    composable(Screen.Logs.route) {
+    businessComposable(Screen.Logs.route, appViewModel) { _, _, _ ->
         LogsView()
     }
-}
 
-fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewModel: AppViewModel) {
-
-    businessComposable(Screen.PaymentsHistory.route, appViewModel) { backStackEntry, nodeId, business ->
-        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("main-$nodeId") }
-        val paymentsViewModel = viewModel<PaymentsViewModel>(viewModelStoreOwner = parentEntry, factory = PaymentsViewModel.Factory(business.paymentsManager))
+    businessComposable(Screen.PaymentsHistory.route, appViewModel) { backStackEntry, walletId, business ->
+        val paymentsViewModel = viewModel<PaymentsViewModel>(factory = PaymentsViewModel.Factory(business.paymentsManager))
         PaymentsHistoryView(
             onBackClick = { navController.popBackStack() },
             paymentsViewModel = paymentsViewModel,
@@ -101,12 +96,16 @@ fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewMo
         )
     }
 
-    businessComposable(Screen.PaymentsExport.route, appViewModel) { _, _, _ ->
-        PaymentsExportView(onBackClick = {
-            navController.navigate(Screen.PaymentsHistory.route) {
-                popUpTo(Screen.PaymentsHistory.route) { inclusive = true }
+    businessComposable(Screen.PaymentsExport.route, appViewModel) { _, walletId, business ->
+        PaymentsExportView(
+            walletId = walletId,
+            business = business,
+            onBackClick = {
+                navController.navigate(Screen.PaymentsHistory.route) {
+                    popUpTo(Screen.PaymentsHistory.route) { inclusive = true }
+                }
             }
-        })
+        )
     }
 
     businessComposable(Screen.DisplaySeed.route, appViewModel) { _, walletId, _ ->
@@ -114,9 +113,8 @@ fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewMo
     }
 
     businessComposable(Screen.Notifications.route, appViewModel) { backStackEntry, walletId, business ->
-        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("main-$walletId") }
         val noticesViewModel = viewModel<NoticesViewModel>(
-            viewModelStoreOwner = parentEntry,
+            key = walletId.nodeIdHash,
             factory = NoticesViewModel.Factory(
                 walletId = walletId,
                 appConfigurationManager = business.appConfigurationManager,
@@ -125,39 +123,41 @@ fun NavGraphBuilder.miscSettingsNavGraph(navController: NavController, appViewMo
             )
         )
         NotificationsView(
+            business = business,
             noticesViewModel = noticesViewModel,
             onBackClick = { navController.popBackStack() },
         )
     }
 
-    businessComposable(Screen.LiquidityPolicy.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:liquiditypolicy" })) { _, _, _ ->
+    businessComposable(Screen.LiquidityPolicy.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:liquiditypolicy" })) { _, _, business ->
         LiquidityPolicyView(
+            business = business,
             onBackClick = { navController.popBackStack() },
             onAdvancedClick = { navController.navigate(Screen.AdvancedLiquidityPolicy.route) },
         )
     }
 
-    businessComposable(Screen.LiquidityRequest.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:requestliquidity" })) { _, walletId, _ ->
-        RequestLiquidityView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.LiquidityRequest.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:requestliquidity" })) { _, walletId, business ->
+        RequestLiquidityView(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.AdvancedLiquidityPolicy.route, appViewModel) { _, _, _ ->
-        AdvancedIncomingFeePolicy(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.AdvancedLiquidityPolicy.route, appViewModel) { _, _, business ->
+        AdvancedIncomingFeePolicy(business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable("${Screen.Contacts.route}?showAddContactDialog={showAddContactDialog}", appViewModel, arguments = listOf(
         navArgument("showAddContactDialog") { type = NavType.BoolType; defaultValue = false }
-    )) { backStackEntry, _, _ ->
+    )) { backStackEntry, _, business ->
         val showAddContactDialog = backStackEntry.arguments?.getBoolean("showAddContactDialog") ?: false
-        SettingsContactsView(onBackClick = { navController.popBackStack() }, immediatelyShowAddContactDialog = showAddContactDialog)
+        SettingsContactsView(business = business, onBackClick = { navController.popBackStack() }, immediatelyShowAddContactDialog = showAddContactDialog)
     }
 
-    businessComposable(Screen.Experimental.route, appViewModel) { _, walletId, _ ->
-        ExperimentalView(onBackClick = { navController.popBackStack() }, walletId = walletId)
+    businessComposable(Screen.Experimental.route, appViewModel) { _, walletId, business ->
+        ExperimentalView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.ResetWallet.route, appViewModel) { _, walletId, _ ->
-        ResetWallet(onBackClick = { navController.popBackStack() }, walletId = walletId)
+    businessComposable(Screen.ResetWallet.route, appViewModel) { _, walletId, business ->
+        ResetWallet(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.ForceClose.route, appViewModel) { _, _, _ ->

@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.crypto.LocalKeyManager
@@ -29,6 +30,8 @@ import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +43,7 @@ import org.slf4j.LoggerFactory
 sealed class WritingSeedState {
     data object Init : WritingSeedState()
     data class Writing(val mnemonics: List<String>) : WritingSeedState()
-    data class WrittenToDisk(val encryptedSeed: EncryptedSeed) : WritingSeedState()
+    data class WrittenToDisk(val walletId: WalletId, val encryptedSeed: EncryptedSeed) : WritingSeedState()
     sealed class Error : WritingSeedState() {
         data class Generic(val cause: Throwable) : Error()
         data object CannotLoadSeedMap: Error()
@@ -48,11 +51,13 @@ sealed class WritingSeedState {
     }
 }
 
-abstract class InitViewModel : ViewModel() {
-
-    abstract val application: PhoenixApplication
+class InitViewModel(val application: PhoenixApplication) : ViewModel() {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
+
+    // wallet initialisation options -- to be saved to user prefs once the wallet has been created and we know its walletId
+    var isTorEnabled = mutableStateOf(false)
+    var customElectrumServer = mutableStateOf<ElectrumConfig.Custom?>(null)
 
     /** Monitors the writing of a seed on disk ; used by the restore view and the create view thru [writeSeed]. */
     var writingState by mutableStateOf<WritingSeedState>(WritingSeedState.Init)
@@ -97,7 +102,7 @@ abstract class InitViewModel : ViewModel() {
                     val newSeedMap = existingSeeds + (newWalletId to mnemonics)
                     val encrypted = EncryptedSeed.V2.encrypt(newSeedMap)
                     SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
-                    writingState = WritingSeedState.WrittenToDisk(encrypted)
+                    writingState = WritingSeedState.WrittenToDisk(walletId = newWalletId, encryptedSeed = encrypted)
                     if (isRestoringWallet) {
                         log.info("successfully restored wallet=$newWalletId")
                     } else {
@@ -107,8 +112,21 @@ abstract class InitViewModel : ViewModel() {
             }
 
             application.globalPrefs.saveLastUsedAppCode(BuildConfig.VERSION_CODE)
-            delay(1000)
-            onSeedWritten(newWalletId)
+            val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId = newWalletId)
+            userPrefs.saveIsTorEnabled(isTorEnabled.value)
+            userPrefs.saveElectrumServer(customElectrumServer.value)
+
+            viewModelScope.launch(Dispatchers.Main) {
+                delay(1000)
+                onSeedWritten(newWalletId)
+            }
+        }
+    }
+
+    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return InitViewModel(application) as T
         }
     }
 }

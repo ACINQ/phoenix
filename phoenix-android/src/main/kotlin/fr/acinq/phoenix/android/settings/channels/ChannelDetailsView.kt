@@ -55,10 +55,9 @@ import fr.acinq.lightning.db.NewChannelIncomingPayment
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountWithFiatBeside
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -86,6 +85,7 @@ import fr.acinq.phoenix.data.LocalChannelInfo
 
 @Composable
 fun ChannelDetailsView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     channelId: String?,
 ) {
@@ -100,7 +100,7 @@ fun ChannelDetailsView(
             null -> ProgressView(text = stringResource(id = R.string.channelsview_loading_channels))
             else -> when (val channel = channels.values.firstOrNull { it.channelId == channelId }) {
                 null -> NoChannelFound()
-                else -> ChannelSummaryView(channel = channel)
+                else -> ChannelSummaryView(business, channel)
             }
         }
     }
@@ -116,7 +116,8 @@ private fun NoChannelFound() {
 
 @Composable
 private fun ChannelSummaryView(
-    channel: LocalChannelInfo
+    business: PhoenixBusiness,
+    channel: LocalChannelInfo,
 ) {
     var showJsonDialog by remember { mutableStateOf(false) }
 
@@ -155,7 +156,7 @@ private fun ChannelSummaryView(
             }
             itemsIndexed(channel.commitmentsInfo) { index, commitment ->
                 ItemCard(index = index, maxItemsCount = channel.commitmentsInfo.size) {
-                    CommitmentDetailsView(commitment)
+                    CommitmentDetailsView(business, commitment)
                 }
             }
         }
@@ -166,7 +167,7 @@ private fun ChannelSummaryView(
             }
             itemsIndexed(channel.inactiveCommitmentsInfo) { index, commitment ->
                 ItemCard(index = index, maxItemsCount = channel.inactiveCommitmentsInfo.size) {
-                    CommitmentDetailsView(commitment)
+                    CommitmentDetailsView(business, commitment)
                 }
             }
         }
@@ -176,12 +177,12 @@ private fun ChannelSummaryView(
 
 @Composable
 private fun CommitmentDetailsView(
-    commitment: LocalChannelInfo.CommitmentInfo
+    business: PhoenixBusiness,
+    commitment: LocalChannelInfo.CommitmentInfo,
 ) {
     val btcUnit = LocalBitcoinUnits.current.primary
-    val paymentsManager = business.paymentsManager
-    val linkedPayments by produceState<List<WalletPayment>>(initialValue = emptyList()) {
-        value = paymentsManager.listPaymentsForTxId(commitment.fundingTxId)
+    val linkedPayments by produceState(initialValue = emptyList()) {
+        value = business.paymentsManager.listPaymentsForTxId(commitment.fundingTxId)
     }
 
     Setting(

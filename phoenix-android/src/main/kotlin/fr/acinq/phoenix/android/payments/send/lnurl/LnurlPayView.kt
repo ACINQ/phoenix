@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -67,6 +67,7 @@ import fr.acinq.phoenix.managers.SendManager
 @Composable
 fun LnurlPayView(
     walletId: WalletId,
+    business: PhoenixBusiness,
     pay: SendManager.ParseResult.Lnurl.Pay,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,

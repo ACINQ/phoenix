@@ -127,7 +127,7 @@
     <string name="settings_list_channels">Canales de pago</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum server</string>
-    <string name="settings_reset_wallet">Reiniciar cartera</string>
+    <string name="settings_reset_wallet">Eliminar billetera</string>
     <string name="settings_mutual_close">Cerrar canales</string>
     <string name="settings_force_close">Canales de cierre forzado</string>
     <string name="settings_tor">Tor</string>

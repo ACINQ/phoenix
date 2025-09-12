@@ -36,8 +36,8 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 typealias CF = ControllerFactory
 
 val LocalTheme = staticCompositionLocalOf { UserTheme.SYSTEM }
-val LocalWalletId = staticCompositionLocalOf<WalletId?> { null }
-val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
+val LocalWalletId = compositionLocalOf<WalletId?> { null }
+val LocalBusiness = compositionLocalOf<PhoenixBusiness?> { null }
 val LocalUserPrefs = staticCompositionLocalOf<UserPrefs?> { null }
 val LocalInternalPrefs = staticCompositionLocalOf<InternalPrefs?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
@@ -62,21 +62,10 @@ val primaryFiatRate: ExchangeRate.BitcoinPriceRate?
     @Composable
     get() = LocalFiatCurrencies.current.primary.let { prefFiat -> LocalExchangeRatesMap.current[prefFiat] }
 
-val internalPrefs: InternalPrefs
-    @Composable
-    get() = LocalInternalPrefs.current ?: error("internal prefs are not available")
-
 val globalPrefs: GlobalPrefs
     @Composable
     get() = application.globalPrefs
 
-val controllerFactory: ControllerFactory
-    @Composable
-    get() = LocalControllerFactory.current ?: error("No controller factory set. Please use appView or mockView.")
-
-val business: PhoenixBusiness
-    @Composable
-    get() = LocalBusiness.current ?: error("business is not available")
 /** only use if there's an active wallet */
 val activeWalletId: WalletId
     @Composable

@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
@@ -52,7 +53,6 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.dialogs.Dialog
@@ -73,6 +73,7 @@ fun HomeBalance(
     modifier: Modifier = Modifier,
     balance: MilliSatoshi?,
     swapInBalance: WalletBalance,
+    swapInNextTimeout: Pair<WalletState.Utxo, Int>?,
     finalWalletBalance: Satoshi,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToFinalWallet: () -> Unit,
@@ -105,7 +106,7 @@ fun HomeBalance(
                     }
                 }
             )
-            OnChainBalance(swapInBalance, finalWalletBalance, onNavigateToSwapInWallet, onNavigateToFinalWallet, balanceDisplayMode)
+            OnChainBalance(swapInBalance, swapInNextTimeout, finalWalletBalance, onNavigateToSwapInWallet, onNavigateToFinalWallet, balanceDisplayMode)
         }
     }
 }
@@ -113,6 +114,7 @@ fun HomeBalance(
 @Composable
 private fun OnChainBalance(
     swapInBalance: WalletBalance,
+    swapInNextTimeout: Pair<WalletState.Utxo, Int>?,
     finalWalletBalance: Satoshi,
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToFinalWallet: () -> Unit,
@@ -122,7 +124,6 @@ private fun OnChainBalance(
     val availableOnchainBalance = swapInBalance.total.toMilliSatoshi() + finalWalletBalance.toMilliSatoshi()
 
     if (availableOnchainBalance > 0.msat) {
-        val nextSwapTimeout by business.peerManager.swapInNextTimeout.collectAsState(initial = null)
 
         Clickable(
             modifier = Modifier.clip(CircleShape),
@@ -179,7 +180,7 @@ private fun OnChainBalance(
                             // 2) confirmed swaps that are not yet swapped
                             val fundsConfirmedNotLocked = swapInBalance.deeplyConfirmed
                             if (fundsConfirmedNotLocked > 0.sat) {
-                                val expiringSoon = nextSwapTimeout?.let { it.second < 7 * 144 } ?: false // expiring in less than a week
+                                val expiringSoon = swapInNextTimeout?.let { it.second < 7 * 144 } ?: false // expiring in less than a week
                                 OnChainBalanceEntry(
                                     label = stringResource(id = R.string.home_swapin_ready_title),
                                     icon = if (expiringSoon) R.drawable.ic_alert_triangle else R.drawable.ic_sleep,

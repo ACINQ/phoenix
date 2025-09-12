@@ -70,7 +70,7 @@
     <string name="settings_list_channels">Platební kanály</string>
     <string name="settings_logs">Logy</string>
     <string name="settings_electrum">Electrum server</string>
-    <string name="settings_reset_wallet">Obnovení peněženky</string>
+    <string name="settings_reset_wallet">Odstranění peněženky</string>
     <string name="settings_mutual_close">Uzavření kanálů</string>
     <string name="settings_force_close">Vynucené zavření kanálů</string>
     <string name="settings_tor">Tor</string>

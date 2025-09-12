@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.activeWalletId
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -60,6 +60,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 
 @Composable
 fun CpfpView(
+    business: PhoenixBusiness,
     channelId: ByteVector32,
     onSuccess: () -> Unit,
 ) {
@@ -88,7 +89,7 @@ fun CpfpView(
         }
     }
 
-    val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
+    val mayDoPayments by peerManager.mayDoPayments.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()

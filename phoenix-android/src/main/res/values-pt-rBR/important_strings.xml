@@ -66,7 +66,7 @@
     <string name="settings_list_channels">Canais de pagamento</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum servers</string>
-    <string name="settings_reset_wallet">Redefinir carteira</string>
+    <string name="settings_reset_wallet">Excluir carteira</string>
     <string name="settings_mutual_close">Fechar canais</string>
     <string name="settings_force_close">Fechar canais à força</string>
     <string name="settings_tor">Tor</string>

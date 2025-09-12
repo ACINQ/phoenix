@@ -41,9 +41,9 @@ import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.Clickable
@@ -65,6 +65,7 @@ import fr.acinq.phoenix.managers.finalOnChainWalletPath
 
 @Composable
 fun WalletInfoView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onLightningWalletClick: () -> Unit,
     onSwapInWalletClick: () -> Unit,
@@ -73,14 +74,17 @@ fun WalletInfoView(
 ) {
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.walletinfo_title))
-        OffChainWalletView(onLightningWalletClick)
-        SwapInWalletView(onSwapInWalletClick, onSwapInWalletInfoClick)
-        FinalWalletView(onFinalWalletClick)
+        OffChainWalletView(business = business, onLightningWalletClick)
+        SwapInWalletView(business = business, onSwapInWalletClick, onSwapInWalletInfoClick)
+        FinalWalletView(business = business, onFinalWalletClick)
     }
 }
 
 @Composable
-private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
+private fun OffChainWalletView(
+    business: PhoenixBusiness,
+    onLightningWalletClick: () -> Unit
+) {
     val nodeParams by business.nodeParamsManager.nodeParams.collectAsState()
     var showLegacyNodeId by remember { mutableStateOf(false) }
 
@@ -115,6 +119,7 @@ private fun OffChainWalletView(onLightningWalletClick: () -> Unit) {
 
 @Composable
 private fun SwapInWalletView(
+    business: PhoenixBusiness,
     onSwapInWalletClick: () -> Unit,
     onSwapInWalletInfoClick: () -> Unit,
 ) {
@@ -162,7 +167,10 @@ private fun SwapInWalletView(
 }
 
 @Composable
-private fun FinalWalletView(onFinalWalletClick: () -> Unit) {
+private fun FinalWalletView(
+    business: PhoenixBusiness,
+    onFinalWalletClick: () -> Unit
+) {
     val finalWallet by business.peerManager.finalWallet.collectAsState()
     val keyManager by business.walletManager.keyManager.collectAsState()
 
@@ -248,7 +256,7 @@ fun UtxoRow(utxo: WalletState.Utxo, progress: Pair<Int?, Int>?) {
     Row(
         modifier = Modifier
             .clickable(role = Role.Button, onClickLabel = stringResource(id = R.string.accessibility_explorer_link)) {
-                openLink(context, link = txUrl)
+                txUrl?.let { openLink(context, link = txUrl) }
             }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

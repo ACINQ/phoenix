@@ -16,7 +16,7 @@
 
 package fr.acinq.phoenix.android.navigation
 
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -24,6 +24,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navOptions
+import androidx.navigation.navigation
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.initwallet.InitNewWallet
@@ -51,11 +52,10 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
             appViewModel = appViewModel,
             startupViewModel = startupViewModel,
             onShowIntro = { navController.navigate(Screen.Intro.route) },
-            onSeedNotFound = { navController.navigate(Screen.InitWallet.route) },
+            onSeedNotFound = { navController.navigate(Screen.InitWalletGraph.route) },
             onManualRecoveryClick = { navController.navigate(Screen.StartupRecovery.route) },
             onWalletReady = {
-                val next = nextScreenLink?.takeUnless { it.isBlank() }?.let { Uri.parse(it) }
-
+                val next = nextScreenLink?.takeUnless { it.isBlank() }?.toUri()
                 if (next == null) {
                     log.debug("redirecting from startup to home")
                     navController.popToHome()
@@ -76,8 +76,10 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
         StartupRecoveryView(
             onBackClick = { navController.popBackStack() },
             onRecoveryDone = { walletId ->
-                navController.navigate(Screen.Startup.route)
-                appViewModel.listAvailableWallets(onDone = { appViewModel.switchToWallet(walletId) })
+                appViewModel.listAvailableWallets(onDone = {
+                    appViewModel.switchToWallet(walletId)
+                    navController.navigate(Screen.Startup.route)
+                })
             },
         )
     }
@@ -86,23 +88,37 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
         IntroView(onFinishClick = { navController.navigate(Screen.Startup.route) })
     }
 
-    composable(Screen.InitWallet.route) {
-        InitNewWallet(
-            onCreateWalletClick = { navController.navigate(Screen.CreateWallet.route) },
-            onRestoreWalletClick = { navController.navigate(Screen.RestoreWallet.route) },
-            onSettingsClick = { navController.navigate(Screen.Settings.route) }
-        )
-    }
+    navigation(startDestination = Screen.InitWalletGraph.InitWallet.route, route = Screen.InitWalletGraph.route) {
+        composable(Screen.InitWalletGraph.InitWallet.route) {
+            InitNewWallet(
+                navController = navController,
+                onCreateWalletClick = { navController.navigate(Screen.InitWalletGraph.CreateWallet.route) },
+                onRestoreWalletClick = { navController.navigate(Screen.InitWalletGraph.RestoreWallet.route) },
+            )
+        }
 
-    composable(Screen.CreateWallet.route) {
-        CreateWalletView(onSeedWritten = { walletId ->
-            appViewModel.listAvailableWallets(onDone = { appViewModel.switchToWallet(walletId) })
-        })
-    }
+        composable(Screen.InitWalletGraph.CreateWallet.route) {
+            CreateWalletView(
+                navController = navController,
+                onWalletCreationDone = { walletId ->
+                    appViewModel.listAvailableWallets(onDone = {
+                        appViewModel.switchToWallet(walletId)
+                        navController.navigate(Screen.Startup.route)
+                    }
+                )
+            })
+        }
 
-    composable(Screen.RestoreWallet.route) {
-        RestoreWalletView(onRestoreDone = { walletId ->
-            appViewModel.listAvailableWallets(onDone = { appViewModel.switchToWallet(walletId) })
-        })
+        composable(Screen.InitWalletGraph.RestoreWallet.route) {
+            RestoreWalletView(
+                navController=  navController,
+                onRestoreDone = { walletId ->
+                    appViewModel.listAvailableWallets(onDone = {
+                        appViewModel.switchToWallet(walletId)
+                        navController.navigate(Screen.Startup.route)
+                    }
+                )
+            })
+        }
     }
 }

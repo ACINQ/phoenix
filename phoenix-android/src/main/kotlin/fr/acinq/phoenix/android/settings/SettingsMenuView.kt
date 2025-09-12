@@ -210,7 +210,7 @@ private fun AvailableWalletsDialog(
                             iconTint = MaterialTheme.colors.onPrimary,
                             shape = RoundedCornerShape(16.dp),
                             modifier = Modifier.fillMaxWidth(),
-                            onClick = { navController.navigate(Screen.InitWallet.route) },
+                            onClick = { navController.navigate(Screen.InitWalletGraph.route) },
                         )
                     }
                 )

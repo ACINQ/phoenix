@@ -64,10 +64,10 @@ import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.navigation.Screen
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
@@ -182,9 +182,9 @@ fun Bolt12InvoiceSection(
     }
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_payerkey_label)) {
         Text(text = payerKey.toHex())
-        val nodeParamsManager = business.nodeParamsManager
-        val offerPayerKey by produceState<PrivateKey?>(initialValue = null) {
-            value = nodeParamsManager.defaultOffer().payerKey
+        val nodeParamsManager = LocalBusiness.current?.nodeParamsManager
+        val offerPayerKey by produceState<PrivateKey?>(initialValue = null, key1 = nodeParamsManager) {
+            value = nodeParamsManager?.defaultOffer()?.payerKey
         }
         if (offerPayerKey != null && payerKey == offerPayerKey) {
             Spacer(modifier = Modifier.heightIn(4.dp))
@@ -356,7 +356,7 @@ fun TransactionRow(txId: TxId) {
     val link = txUrl(txId = txId)
     TechnicalRowClickable(
         label = stringResource(id = R.string.paymentdetails_tx_id_label),
-        onClick = { openLink(context, link) },
+        onClick = { link?.let { openLink(context, link) } },
         onLongClick = { copyToClipboard(context, txId.toString()) }
     ) {
         TextWithIcon(text = txId.toString(), icon = R.drawable.ic_external_link, maxLines = 1, textOverflow = TextOverflow.MiddleEllipsis, space = 4.dp)

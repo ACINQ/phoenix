@@ -40,6 +40,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
@@ -47,7 +49,6 @@ import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -58,7 +59,6 @@ import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.wallet.ClickableWalletView
 import fr.acinq.phoenix.android.components.wallet.WalletView
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
@@ -68,9 +68,11 @@ import fr.acinq.phoenix.android.utils.negativeColor
 @Composable
 fun ResetWallet(
     walletId: WalletId,
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<ResetWalletViewModel>(factory = ResetWalletViewModel.Factory(application = application, walletId = walletId))
+    val balance by business.balanceManager.balance.collectAsState()
 
     DefaultScreenLayout {
         when (vm.state.value) {
@@ -93,7 +95,7 @@ fun ResetWallet(
                 InitReset(walletId = walletId, onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
             }
             ResetWalletStep.Confirm -> {
-                ReviewReset(onConfirmClick = vm::deleteWalletData)
+                ReviewReset(balance = balance, onConfirmClick = vm::deleteWalletData)
             }
             is ResetWalletStep.Deleting -> {
                 DeletingWallet(state)
@@ -136,6 +138,7 @@ private fun InitReset(
 
 @Composable
 private fun ReviewReset(
+    balance: MilliSatoshi?,
     onConfirmClick: () -> Unit
 ) {
     var backupChecked by remember { mutableStateOf(false) }
@@ -156,7 +159,6 @@ private fun ReviewReset(
         modifier = Modifier.fillMaxWidth(),
         internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        val balance by business.balanceManager.balance.collectAsState()
         balance?.let {
             WarningMessage(
                 header = stringResource(

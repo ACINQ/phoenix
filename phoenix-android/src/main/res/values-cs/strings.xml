@@ -918,7 +918,7 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Resetovat peněženku</string>
+    <string name="reset_wallet_title">Odstranění peněženky</string>
     <string name="reset_wallet_instructions_header">Smazat veškerá data peněženky z tohoto zařízení</string>
     <string name="reset_wallet_instructions_details">Toto resetuje aplikaci tak, jako byste ji právě nainstalovali.</string>
     <string name="reset_wallet_review_button">Pokračovat</string>
@@ -928,7 +928,7 @@
     <string name="reset_wallet_confirm_details">Toto resetuje aplikaci. Zobrazí se úvodní obrazovka s výzvou k vytvoření nebo obnovení peněženky.</string>
     <string name="reset_wallet_confirm_seed_balance">Neztraťte své prostředky:\n%1$s (≈ %2$s).</string>
     <string name="reset_wallet_confirm_seed_responsibility">Za uložení obnovovací fráze jste zodpovědní vy.</string>
-    <string name="reset_wallet_confirm_button">Smazat peněženku</string>
+    <string name="reset_wallet_confirm_button">Odstranění peněženky</string>
     <string name="reset_wallet_shutting_down">Vypínání…</string>
     <string name="reset_wallet_deleting_prefs">Mazání předvoleb…</string>
     <string name="reset_wallet_deleting_seed">Mazání seedu…</string>

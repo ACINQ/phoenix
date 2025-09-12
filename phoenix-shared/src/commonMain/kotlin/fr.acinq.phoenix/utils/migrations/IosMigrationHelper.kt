@@ -58,7 +58,7 @@ object IosMigrationHelper {
 
     private fun ChannelState.isLegacy(): Boolean {
         return this is ChannelStateWithCommitments
-            && this !is ShuttingDown && this !is Negotiating && this !is Closing && this !is Closed && this !is Aborted
+            && this !is ShuttingDown && this !is Negotiating && this !is Closing && this !is Closed
             && !this.commitments.params.channelFeatures.hasFeature(Feature.DualFunding)
     }
 

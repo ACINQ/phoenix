@@ -22,16 +22,16 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.Lightning
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.utils.MnemonicLanguage
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 
-class CreateWalletViewModel(override val application: PhoenixApplication) : InitViewModel() {
+class CreateWalletViewModel(val application: PhoenixApplication) : ViewModel() {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun createNewWallet(onSeedWritten: (WalletId) -> Unit) {
+    fun createNewWallet(writeSeed: (List<String>) -> Unit) {
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when creating new wallet: ", e)
             throw e
@@ -42,7 +42,7 @@ class CreateWalletViewModel(override val application: PhoenixApplication) : Init
                 entropy = entropy,
                 wordlist = MnemonicLanguage.English.wordlist()
             )
-            writeSeed(mnemonics = mnemonics, isRestoringWallet = false, onSeedWritten = onSeedWritten)
+            writeSeed(mnemonics)
         }
     }
 

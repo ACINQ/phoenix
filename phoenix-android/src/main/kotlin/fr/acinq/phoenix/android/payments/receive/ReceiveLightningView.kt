@@ -57,11 +57,12 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountInput
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -87,6 +88,7 @@ import java.text.DecimalFormat
 @Composable
 fun ColumnScope.LightningInvoiceView(
     vm: ReceiveViewModel,
+    business: PhoenixBusiness,
     onFeeManagementClick: () -> Unit,
     defaultDescription: String,
     defaultExpiry: Long,
@@ -421,6 +423,7 @@ fun EvaluateLiquidityIssuesForPayment(
     showDialogImmediately: Boolean,
     onDialogShown: () -> Unit,
 ) {
+    val business = LocalBusiness.current ?: return
     val channelsMap by business.peerManager.channelsFlow.collectAsState()
     val canRequestLiquidity = remember(channelsMap) { channelsMap.canRequestLiquidity() }
     val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }

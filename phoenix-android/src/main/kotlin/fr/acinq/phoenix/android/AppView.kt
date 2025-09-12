@@ -50,12 +50,11 @@ import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.navigation.baseNavGraph
-import fr.acinq.phoenix.android.navigation.baseSettingsNavGraph
 import fr.acinq.phoenix.android.navigation.channelsNavGraph
 import fr.acinq.phoenix.android.navigation.homeNavGraph
-import fr.acinq.phoenix.android.navigation.miscSettingsNavGraph
 import fr.acinq.phoenix.android.navigation.navigateToPaymentDetails
 import fr.acinq.phoenix.android.navigation.paymentsNavGraph
+import fr.acinq.phoenix.android.navigation.settingsNavGraph
 import fr.acinq.phoenix.android.navigation.walletInfoNavGraph
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.getBitcoinUnits
@@ -70,9 +69,9 @@ fun AppRoot(
     appViewModel: AppViewModel,
 ) {
     val log = logger("AppRoot")
-    log.debug("entering app root")
 
     val activeWallet by appViewModel.activeWalletInUI.collectAsState(null)
+    log.debug("entering app root with active_wallet={}", activeWallet)
     val activeWalletId = activeWallet?.id
     val business = activeWallet?.business
     val activeUserPrefs = activeWallet?.userPrefs
@@ -107,14 +106,11 @@ fun AppRoot(
                     startDestination = "${Screen.Startup.route}?next={next}",
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None },
-                    route = "main-$activeWalletId" // works like an id, can be used to scope view models with `navController.getBackStackEntry("main")`
                 ) {
                     baseNavGraph(navController, appViewModel)
-                    baseSettingsNavGraph(navController, appViewModel, business)
-
+                    // nav graphs below depends on the business, and will redirect to /startup if no wallet is active
+                    settingsNavGraph(navController, appViewModel, business)
                     homeNavGraph(navController, appViewModel)
-                    miscSettingsNavGraph(navController, appViewModel)
-
                     paymentsNavGraph(navController, appViewModel)
                     walletInfoNavGraph(navController, appViewModel)
                     channelsNavGraph(navController, appViewModel)

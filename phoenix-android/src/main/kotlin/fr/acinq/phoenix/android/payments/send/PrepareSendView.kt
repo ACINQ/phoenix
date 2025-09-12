@@ -70,10 +70,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.navigation.Screen
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -115,6 +115,7 @@ import fr.acinq.phoenix.managers.SendManager
 @Composable
 fun SendView(
     walletId: WalletId,
+    business: PhoenixBusiness,
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
     fromDeepLink: Boolean,
@@ -146,22 +147,22 @@ fun SendView(
             LocalViewModelStoreOwner.current?.viewModelStore?.clear()
             when (val data = parseState.data) {
                 is SendManager.ParseResult.Bolt11Invoice -> {
-                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
+                    SendToBolt11View(walletId = walletId, business = business, invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Bolt12Offer -> {
-                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
+                    SendToOfferView(walletId = walletId, business = business, offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Uri -> {
-                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() }, walletId = walletId)
+                    SendSpliceOutView(walletId = walletId, business = business, requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Pay -> {
-                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() }, walletId = walletId)
+                    LnurlPayView(walletId = walletId, business = business, pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
-                    LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
+                    LnurlWithdrawView(business = business, withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Auth -> {
-                    LnurlAuthView(auth = data.auth, onBackClick = onBackClick, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
+                    LnurlAuthView(business = business, auth = data.auth, onBackClick = onBackClick, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
                         onAuthDone = { navController.popToHome() },)
                 }
             }
@@ -169,6 +170,7 @@ fun SendView(
         is ParsePaymentState.Ready, is ParsePaymentState.Processing, is ParsePaymentState.Error, is ParsePaymentState.ChoosePaymentMode -> {
             PrepareSendView(
                 onBackClick = onBackClick,
+                business = business,
                 vm = vm,
                 onShowScanner = {
                     vm.resetParsing()
@@ -226,6 +228,7 @@ fun SendView(
 
 @Composable
 private fun PrepareSendView(
+    business: PhoenixBusiness,
     vm: PrepareSendViewModel,
     onBackClick: () -> Unit,
     onShowScanner: () -> Unit,

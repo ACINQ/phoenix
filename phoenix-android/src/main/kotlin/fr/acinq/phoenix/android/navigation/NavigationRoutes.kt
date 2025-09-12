@@ -18,9 +18,11 @@ package fr.acinq.phoenix.android.navigation
 
 sealed class Screen(val route: String) {
     data object Intro : Screen("intro")
-    data object InitWallet : Screen("initwallet")
-    data object CreateWallet : Screen("createwallet")
-    data object RestoreWallet : Screen("restorewallet")
+    data object InitWalletGraph : Screen("initwalletgraph") {
+        data object InitWallet : Screen("initwallet")
+        data object CreateWallet : Screen("createwallet")
+        data object RestoreWallet : Screen("restorewallet")
+    }
     data object Startup : Screen("startup")
     data object StartupRecovery : Screen("startuprecovery")
     data object Home : Screen("home")
