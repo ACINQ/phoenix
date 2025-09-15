@@ -197,7 +197,7 @@ struct WalletMetadataView: View {
 		
 		Section {
 			options_default()
-			options_hidden()
+		//	options_hidden()
 		}
 	}
 	

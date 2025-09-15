@@ -30,7 +30,7 @@ struct WalletSelector: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			walletGrid()
-			footer()
+		//	footer()
 		}
 	}
 	
