@@ -159,10 +159,10 @@ fun SendView(
                     LnurlPayView(walletId = walletId, business = business, pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
-                    LnurlWithdrawView(business = business, withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
+                    LnurlWithdrawView(business = business, withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Auth -> {
-                    LnurlAuthView(business = business, auth = data.auth, onBackClick = onBackClick, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
+                    LnurlAuthView(business = business, auth = data.auth, onBackClick = onBackClick, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.BusinessNavGraph.PaymentSettings.route}?showAuthSchemeDialog=true") },
                         onAuthDone = { navController.popToHome() },)
                 }
             }

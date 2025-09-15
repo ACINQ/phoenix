@@ -30,19 +30,19 @@ import fr.acinq.phoenix.android.settings.walletinfo.WalletInfoView
 
 fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewModel: AppViewModel) {
 
-    businessComposable(Screen.WalletInfo.route, appViewModel) { _, _, business ->
+    businessComposable(Screen.BusinessNavGraph.WalletInfo.route, appViewModel) { _, _, business ->
         WalletInfoView(
             business = business,
             onBackClick = { navController.popBackStack() },
-            onLightningWalletClick = { navController.navigate(Screen.Channels.route) },
-            onSwapInWalletClick = { navController.navigate(Screen.WalletInfo.SwapInWallet.route) },
-            onSwapInWalletInfoClick = { navController.navigate(Screen.WalletInfo.SwapInAddresses.route) },
-            onFinalWalletClick = { navController.navigate(Screen.WalletInfo.FinalWallet.route) },
+            onLightningWalletClick = { navController.navigate(Screen.BusinessNavGraph.Channels.route) },
+            onSwapInWalletClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route) },
+            onSwapInWalletInfoClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInAddresses.route) },
+            onFinalWalletClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.FinalWallet.route) },
         )
     }
 
     businessComposable(
-        route = Screen.WalletInfo.SwapInWallet.route,
+        route = Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route,
         appViewModel = appViewModel,
         deepLinks = listOf(
             navDeepLink { uriPattern = "phoenix:swapinwallet" }
@@ -51,29 +51,29 @@ fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewMode
         SwapInWallet(
             business = business,
             onBackClick = { navController.popBackStack() },
-            onViewChannelPolicyClick = { navController.navigate(Screen.LiquidityPolicy.route) },
-            onAdvancedClick = { navController.navigate(Screen.WalletInfo.SwapInSigner.route) },
-            onSpendRefundable = { navController.navigate(Screen.WalletInfo.SwapInRefund.route) },
+            onViewChannelPolicyClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) },
+            onAdvancedClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInSigner.route) },
+            onSpendRefundable = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInRefund.route) },
         )
     }
 
-    businessComposable(Screen.WalletInfo.SwapInAddresses.route, appViewModel) { _, _, business ->
+    businessComposable(Screen.BusinessNavGraph.WalletInfo.SwapInAddresses.route, appViewModel) { _, _, business ->
         SwapInAddresses(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.SwapInSigner.route, appViewModel) { _, _, business ->
+    businessComposable(Screen.BusinessNavGraph.WalletInfo.SwapInSigner.route, appViewModel) { _, _, business ->
         SwapInSignerView(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.SwapInRefund.route, appViewModel) { _, walletId, business ->
+    businessComposable(Screen.BusinessNavGraph.WalletInfo.SwapInRefund.route, appViewModel) { _, walletId, business ->
         SendSwapInRefundView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.FinalWalletRefund.route, appViewModel) { _, walletId, business ->
+    businessComposable(Screen.BusinessNavGraph.WalletInfo.FinalWalletRefund.route, appViewModel) { _, walletId, business ->
         FinalWalletRefundView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.WalletInfo.FinalWallet.route, appViewModel) { _, _, business ->
-        FinalWalletInfo(business = business, onBackClick = { navController.popBackStack() }, onSpendClick = { navController.navigate(Screen.WalletInfo.FinalWalletRefund.route) })
+    businessComposable(Screen.BusinessNavGraph.WalletInfo.FinalWallet.route, appViewModel) { _, _, business ->
+        FinalWalletInfo(business = business, onBackClick = { navController.popBackStack() }, onSpendClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.FinalWalletRefund.route) })
     }
 }

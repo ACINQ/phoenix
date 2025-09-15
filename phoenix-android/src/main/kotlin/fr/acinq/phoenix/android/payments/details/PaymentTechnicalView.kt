@@ -369,7 +369,7 @@ fun ChannelIdRow(channelId: ByteVector32, label: String = stringResource(id = R.
     val navController = navController
     TechnicalRowClickable(
         label = label,
-        onClick = { navController.navigate("${Screen.ChannelDetails.route}?id=${channelId.toHex()}") },
+        onClick = { navController.navigate("${Screen.BusinessNavGraph.ChannelDetails.route}?id=${channelId.toHex()}") },
         onLongClick = { copyToClipboard(context, channelId.toHex()) }
     ) {
         TextWithIcon(text = channelId.toHex(), icon = R.drawable.ic_zap, maxLines = 1, textOverflow = TextOverflow.MiddleEllipsis, space = 4.dp)

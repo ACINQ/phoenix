@@ -146,7 +146,7 @@ private fun PermamentNotice(
                 icon = R.drawable.ic_key,
                 message = stringResource(id = R.string.inappnotif_backup_seed_message),
                 actionText = stringResource(id = R.string.inappnotif_backup_seed_action),
-                onActionClick = { nc?.navigate(Screen.DisplaySeed.route) }
+                onActionClick = { nc?.navigate(Screen.BusinessNavGraph.DisplaySeed.route) }
             )
         }
 
@@ -232,7 +232,7 @@ private fun PermamentNotice(
                 icon = R.drawable.ic_alert_triangle,
                 message = stringResource(id = R.string.inappnotif_swapin_timeout_message),
                 actionText = stringResource(id = R.string.inappnotif_swapin_timeout_action),
-                onActionClick = { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) },
+                onActionClick = { nc?.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route) },
             )
         }
 
@@ -304,9 +304,9 @@ private fun PaymentNotification(
                 extraActionClick = when (notification) {
                     is Notification.FeePolicyDisabled, is Notification.OverAbsoluteFee, is Notification.OverRelativeFee -> {
                         if (notification.source == LiquidityEvents.Source.OnChainWallet) {
-                            { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) }
+                            { nc?.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route) }
                         } else {
-                            { nc?.navigate(Screen.LiquidityPolicy.route) }
+                            { nc?.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) }
                         }
                     }
 

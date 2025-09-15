@@ -85,6 +85,7 @@ fun MutedFilledButton(
         backgroundColor = mutedBgColor,
         textStyle = MaterialTheme.typography.button,
         iconTint = iconTint,
+        shape = shape,
         modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,
         enabledEffect = enabledEffect, space = space, padding = padding, onClick = onClick,
         horizontalArrangement = horizontalArrangement,

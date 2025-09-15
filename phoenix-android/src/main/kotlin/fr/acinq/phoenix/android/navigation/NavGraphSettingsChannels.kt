@@ -29,22 +29,22 @@ import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddress
 
 fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel: AppViewModel) {
 
-    businessComposable(Screen.Channels.route, appViewModel) { _, _, business ->
+    businessComposable(Screen.BusinessNavGraph.Channels.route, appViewModel) { _, _, business ->
         ChannelsView(
             business = business,
             onBackClick = {
-                navController.navigate(Screen.Settings.route) {
-                    popUpTo(Screen.Settings.route) { inclusive = true }
+                navController.navigate(Screen.BusinessNavGraph.Settings.route) {
+                    popUpTo(Screen.BusinessNavGraph.Settings.route) { inclusive = true }
                 }
             },
-            onChannelClick = { navController.navigate("${Screen.ChannelDetails.route}?id=$it") },
-            onImportChannelsDataClick = { navController.navigate(Screen.ImportChannelsData.route) },
-            onSpendFromChannelBalance = { navController.navigate(Screen.SpendChannelAddress.route) },
+            onChannelClick = { navController.navigate("${Screen.BusinessNavGraph.ChannelDetails.route}?id=$it") },
+            onImportChannelsDataClick = { navController.navigate(Screen.BusinessNavGraph.ImportChannelsData.route) },
+            onSpendFromChannelBalance = { navController.navigate(Screen.BusinessNavGraph.SpendChannelAddress.route) },
         )
     }
 
     businessComposable(
-        route = "${Screen.ChannelDetails.route}?id={id}",
+        route = "${Screen.BusinessNavGraph.ChannelDetails.route}?id={id}",
         appViewModel = appViewModel,
         arguments = listOf(navArgument("id") { type = NavType.StringType })
     ) { backStackEntry, _, business ->
@@ -52,15 +52,15 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
         ChannelDetailsView(business = business, onBackClick = { navController.popBackStack() }, channelId = channelId)
     }
 
-    businessComposable(Screen.ImportChannelsData.route, appViewModel) { _, _, business ->
+    businessComposable(Screen.BusinessNavGraph.ImportChannelsData.route, appViewModel) { _, _, business ->
         ImportChannelsData(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.SpendChannelAddress.route, appViewModel) { _, _, business ->
+    businessComposable(Screen.BusinessNavGraph.SpendChannelAddress.route, appViewModel) { _, _, business ->
         SpendFromChannelAddress(business = business, onBackClick = { navController.popBackStack() })
     }
 
-    businessComposable(Screen.MutualClose.route, appViewModel) { _, walletId, business ->
+    businessComposable(Screen.BusinessNavGraph.MutualClose.route, appViewModel) { _, walletId, business ->
         MutualCloseView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 }

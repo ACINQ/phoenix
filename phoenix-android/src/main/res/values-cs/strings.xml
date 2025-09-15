@@ -820,7 +820,7 @@
     <string name="payments_export_csv_no_payments">Zatím žádné úspěšné platby</string>
     <string name="payments_export_csv_invalid_timestamps">Vyberte prosím platné od/do datum</string>
     <string name="payments_export_csv_in_progress">Exportování platby #%1$d</string>
-    <string name="payments_export_csv_copy_button">Zkopírovat data Phoenix plateb do schránky…</string>
+    <string name="payments_export_csv_copy_button">Zkopírovat data do schránky…</string>
     <string name="payments_export_csv_share_subject">Phoenix - platby od %1$s do %2$s</string>
     <string name="payments_export_csv_share_title">Sdílet Phoenix platby…</string>
     <string name="payments_export_csv_share_button">Sdílet soubor</string>

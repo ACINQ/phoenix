@@ -278,7 +278,7 @@ private fun ColumnScope.ContactNameAndPhoto(
                     .background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
             ) {
                 val paymentCodes = paymentsCodeList.values.toList()
-                val onSendClick: (String) -> Unit = { navController.navigate("${Screen.Send.route}?input=$it&forceNavOnBack=true") }
+                val onSendClick: (String) -> Unit = { navController.navigate("${Screen.BusinessNavGraph.Send.route}?input=$it&forceNavOnBack=true") }
                 var showSendToAddressPickerDialog by remember { mutableStateOf(false) }
 
                 if (showSendToAddressPickerDialog) {

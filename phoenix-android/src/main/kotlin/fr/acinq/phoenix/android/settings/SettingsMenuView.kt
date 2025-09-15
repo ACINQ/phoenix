@@ -78,7 +78,7 @@ fun SettingsView(
     var showCurrencyConverter by remember { mutableStateOf(false) }
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.navigate(Screen.Home.route) }) {
+        DefaultScreenHeader(onBackClick = { nc.navigate(Screen.BusinessNavGraph.Home.route) }) {
             Text(
                 text = stringResource(id = R.string.menu_settings),
                 modifier = Modifier.padding(vertical = 12.dp)
@@ -90,16 +90,16 @@ fun SettingsView(
         // -- general
         CardHeader(text = stringResource(id = R.string.settings_general_title))
         Card {
-            MenuButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.About.route) })
-            MenuButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.DisplayPrefs.route) })
-            MenuButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings.route) })
-            MenuButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.PaymentsHistory.route) })
-            MenuButton(text = stringResource(R.string.settings_contacts), icon = R.drawable.ic_user, onClick = { nc.navigate(Screen.Contacts.route) })
+            MenuButton(text = stringResource(R.string.settings_about), icon = R.drawable.ic_help_circle, onClick = { nc.navigate(Screen.BusinessNavGraph.About.route) })
+            MenuButton(text = stringResource(R.string.settings_display_prefs), icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.BusinessNavGraph.DisplayPrefs.route) })
+            MenuButton(text = stringResource(R.string.settings_payment_settings), icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.BusinessNavGraph.PaymentSettings.route) })
+            MenuButton(text = stringResource(R.string.settings_payment_history), icon = R.drawable.ic_list, onClick = { nc.navigate(Screen.BusinessNavGraph.PaymentsHistory.route) })
+            MenuButton(text = stringResource(R.string.settings_contacts), icon = R.drawable.ic_user, onClick = { nc.navigate(Screen.BusinessNavGraph.Contacts.route) })
             val notifsCount = (notifications + notices).size
             MenuButton(
                 text = stringResource(R.string.settings_notifications) + (notifsCount.takeIf { it > 0 }?.let { " ($it)" } ?: ""),
                 icon = R.drawable.ic_notification,
-                onClick = { nc.navigate(Screen.Notifications.route) },
+                onClick = { nc.navigate(Screen.BusinessNavGraph.Notifications.route) },
                 textStyle = if (notifsCount > 0) MaterialTheme.typography.body2 else MaterialTheme.typography.body1
             )
             MenuButton(text = stringResource(R.string.settings_converter), icon = R.drawable.ic_world, onClick = { showCurrencyConverter = true })
@@ -108,41 +108,41 @@ fun SettingsView(
         // -- liquidity
         CardHeader(text = stringResource(id = R.string.settings_fees_title))
         Card {
-            MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_wand, onClick = { nc.navigate(Screen.LiquidityPolicy.route) })
+            MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_wand, onClick = { nc.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) })
             val channelsState = LocalBusiness.current?.peerManager?.channelsFlow?.collectAsState()
             if (channelsState?.value?.canRequestLiquidity() == true) {
-                MenuButton(text = stringResource(R.string.settings_add_liquidity), icon = R.drawable.ic_bucket, onClick = { nc.navigate(Screen.LiquidityRequest.route) })
+                MenuButton(text = stringResource(R.string.settings_add_liquidity), icon = R.drawable.ic_bucket, onClick = { nc.navigate(Screen.BusinessNavGraph.LiquidityRequest.route) })
             }
         }
 
         // -- privacy & security
         CardHeader(text = stringResource(id = R.string.settings_security_title))
         Card {
-            MenuButton(text = stringResource(R.string.settings_access_control), icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppAccess.route) })
-            MenuButton(text = stringResource(R.string.settings_display_seed), icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.DisplaySeed.route) })
-            MenuButton(text = stringResource(R.string.settings_electrum), icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer.route) })
-            MenuButton(text = stringResource(R.string.settings_tor), icon = R.drawable.ic_tor_shield, onClick = { nc.navigate(Screen.TorConfig.route) })
+            MenuButton(text = stringResource(R.string.settings_access_control), icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.BusinessNavGraph.AppAccess.route) })
+            MenuButton(text = stringResource(R.string.settings_display_seed), icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.BusinessNavGraph.DisplaySeed.route) })
+            MenuButton(text = stringResource(R.string.settings_electrum), icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.BusinessNavGraph.ElectrumServer.route) })
+            MenuButton(text = stringResource(R.string.settings_tor), icon = R.drawable.ic_tor_shield, onClick = { nc.navigate(Screen.BusinessNavGraph.TorConfig.route) })
         }
 
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_advanced_title))
         Card {
-            MenuButton(text = stringResource(R.string.settings_wallet_info), icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.WalletInfo.route) })
-            MenuButton(text = stringResource(R.string.settings_list_channels), icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels.route) })
-            MenuButton(text = stringResource(R.string.experimental_title), icon = R.drawable.ic_experimental, onClick = { nc.navigate(Screen.Experimental.route) })
-            MenuButton(text = stringResource(R.string.settings_logs), icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.Logs.route) })
+            MenuButton(text = stringResource(R.string.settings_wallet_info), icon = R.drawable.ic_box, onClick = { nc.navigate(Screen.BusinessNavGraph.WalletInfo.route) })
+            MenuButton(text = stringResource(R.string.settings_list_channels), icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.BusinessNavGraph.Channels.route) })
+            MenuButton(text = stringResource(R.string.experimental_title), icon = R.drawable.ic_experimental, onClick = { nc.navigate(Screen.BusinessNavGraph.Experimental.route) })
+            MenuButton(text = stringResource(R.string.settings_logs), icon = R.drawable.ic_text, onClick = { nc.navigate(Screen.BusinessNavGraph.Logs.route) })
         }
         // -- advanced
         CardHeader(text = stringResource(id = R.string.settings_danger_title))
         Card {
-            MenuButton(text = stringResource(R.string.settings_mutual_close), icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose.route) })
-            MenuButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_remove, onClick = { nc.navigate(Screen.ResetWallet.route) })
+            MenuButton(text = stringResource(R.string.settings_mutual_close), icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.BusinessNavGraph.MutualClose.route) })
+            MenuButton(text = stringResource(id = R.string.settings_reset_wallet), icon = R.drawable.ic_remove, onClick = { nc.navigate(Screen.BusinessNavGraph.ResetWallet.route) })
             MenuButton(
                 text = stringResource(R.string.settings_force_close),
                 textStyle = MaterialTheme.typography.button.copy(color = negativeColor),
                 icon = R.drawable.ic_alert_triangle,
                 iconTint = negativeColor,
-                onClick = { nc.navigate(Screen.ForceClose.route) },
+                onClick = { nc.navigate(Screen.BusinessNavGraph.ForceClose.route) },
             )
         }
 

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navigation
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.openLink
@@ -109,11 +110,13 @@ fun AppRoot(
                 ) {
                     baseNavGraph(navController, appViewModel)
                     // nav graphs below depends on the business, and will redirect to /startup if no wallet is active
-                    settingsNavGraph(navController, appViewModel, business)
-                    homeNavGraph(navController, appViewModel)
-                    paymentsNavGraph(navController, appViewModel)
-                    walletInfoNavGraph(navController, appViewModel)
-                    channelsNavGraph(navController, appViewModel)
+                    navigation(startDestination = Screen.BusinessNavGraph.Home.route, route = Screen.BusinessNavGraph.route) {
+                        settingsNavGraph(navController, appViewModel, business)
+                        homeNavGraph(navController, appViewModel)
+                        paymentsNavGraph(navController, appViewModel)
+                        walletInfoNavGraph(navController, appViewModel)
+                        channelsNavGraph(navController, appViewModel)
+                    }
                 }
             }
 
@@ -121,7 +124,7 @@ fun AppRoot(
             lastCompletedPayment?.value?.let { payment ->
                 LaunchedEffect(key1 = payment.id) {
                     val completedAt = payment.completedAt
-                    if (navController.currentDestination?.route == Screen.Home.route && (completedAt != null && (currentTimestampMillis() - completedAt) < 5.seconds.inWholeMilliseconds) ) {
+                    if (navController.currentDestination?.route == Screen.BusinessNavGraph.Home.route && (completedAt != null && (currentTimestampMillis() - completedAt) < 5.seconds.inWholeMilliseconds) ) {
                         navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
                     }
                 }

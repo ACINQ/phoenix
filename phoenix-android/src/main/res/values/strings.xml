@@ -825,7 +825,7 @@
     <string name="payments_export_csv_no_payments">No successful payments yet</string>
     <string name="payments_export_csv_invalid_timestamps">Please pick a valid start/end date</string>
     <string name="payments_export_csv_in_progress">Exporting payments…</string>
-    <string name="payments_export_csv_copy_button">Copy data to clipboard Phoenix payments…</string>
+    <string name="payments_export_csv_copy_button">Copy data to clipboard…</string>
     <string name="payments_export_csv_share_subject">Phoenix - payments from %1$s to %2$s</string>
     <string name="payments_export_csv_share_title">Share Phoenix payments…</string>
     <string name="payments_export_csv_share_button">Share file</string>

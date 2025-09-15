@@ -104,7 +104,7 @@ private fun FirstNoticeView(
     val onClick = if (messagesCount == 1) {
         when (notice) {
             is Notice.BackupSeedReminder -> {
-                { navController?.navigate(Screen.DisplaySeed.route) ?: Unit }
+                { navController?.navigate(Screen.BusinessNavGraph.DisplaySeed.route) ?: Unit }
             }
 
             is Notice.CriticalUpdateAvailable, is Notice.UpdateAvailable -> {

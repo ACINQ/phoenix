@@ -38,7 +38,7 @@ import io.ktor.http.encodeURLParameter
 /** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
 fun NavController.popToHome() {
     val navController = this
-    navigate(Screen.Home.route) {
+    navigate(Screen.BusinessNavGraph.Home.route) {
         popUpTo(navController.graph.id) { inclusive = true }
     }
 }
@@ -92,6 +92,6 @@ fun NavGraphBuilder.businessComposable(
 
 fun navigateToPaymentDetails(navController: NavController, id: UUID, isFromEvent: Boolean) {
     try {
-        navController.navigate("${Screen.PaymentDetails.route}?id=${id}&fromEvent=${isFromEvent}")
+        navController.navigate("${Screen.BusinessNavGraph.PaymentDetails.route}?id=${id}&fromEvent=${isFromEvent}")
     } catch (_: Exception) { }
 }

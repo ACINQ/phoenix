@@ -296,7 +296,7 @@ fun TorDisconnectedDialog(
         MutedFilledButton(
             text = stringResource(R.string.tor_disconnected_dialog_open_settings),
             icon = R.drawable.ic_settings,
-            onClick = { navController.navigate(Screen.TorConfig.route) },
+            onClick = { navController.navigate(Screen.BusinessNavGraph.TorConfig.route) },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1
         )

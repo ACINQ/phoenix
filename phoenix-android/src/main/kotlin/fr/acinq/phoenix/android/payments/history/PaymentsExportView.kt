@@ -185,6 +185,7 @@ private fun ExportAsCsvView(
                         icon = R.drawable.ic_copy,
                         onClick = { copyToClipboard(context, data = state.content) },
                         modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
                     )
                 }
             }

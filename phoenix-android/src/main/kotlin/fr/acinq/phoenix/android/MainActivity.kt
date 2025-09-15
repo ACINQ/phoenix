@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity() {
             if (navController != null) {
                 runOnUiThread {
                     log.info("nfc reader found valid ndef data, redirecting to send-screen with input=$it")
-                    navController?.navigate("${Screen.Send.route}?input=$it")
+                    navController?.navigate("${Screen.BusinessNavGraph.Send.route}?input=$it")
                 }
             } else {
                 log.warn("ignoring nfc start command, nav controller is not initialized yet")
