@@ -111,7 +111,7 @@ class AppSecurity {
 		}
 		
 		let name = randomWalletName()
-		let photo = WalletIcon.random().filename
+		let photo = WalletEmoji.random().filename
 		
 		let newWallet = SecurityFile.V1.Wallet(
 			keychain: SealedBox_ChaChaPoly(sealedBox),
@@ -215,7 +215,7 @@ class AppSecurity {
 		}
 		
 		let photo = metadata.photo
-		if !WalletIcon.isValidFilename(photo) {
+		if !WalletEmoji.isValidFilename(photo) {
 			await PhotosManager.shared.deleteFromDisk(fileName: photo)
 		}
 		
@@ -267,7 +267,7 @@ class AppSecurity {
 		Keychain.didLoadWallet(walletId)
 		
 		let name = randomWalletName()
-		let photo = WalletIcon.random().filename
+		let photo = WalletEmoji.random().filename
 		
 		let newWallet = SecurityFile.V1.Wallet(
 			keychain: keyInfo,

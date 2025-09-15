@@ -219,8 +219,6 @@
 		DC5F96F32E1D76F00052CDE6 /* WalletMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96F22E1D76EB0052CDE6 /* WalletMetadataView.swift */; };
 		DC5F96F82E1DA3D60052CDE6 /* PinType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96F72E1DA3D30052CDE6 /* PinType.swift */; };
 		DC5F96F92E1DA3D60052CDE6 /* PinType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96F72E1DA3D30052CDE6 /* PinType.swift */; };
-		DC5F96FB2E1DB6620052CDE6 /* WalletIconPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96FA2E1DB6520052CDE6 /* WalletIconPicker.swift */; };
-		DC5F96FD2E1EB2ED0052CDE6 /* WalletIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96FC2E1EB2EA0052CDE6 /* WalletIcon.swift */; };
 		DC5F96FF2E1F168A0052CDE6 /* HiddenWalletRequirements.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F96FE2E1F16760052CDE6 /* HiddenWalletRequirements.swift */; };
 		DC5F97022E2069860052CDE6 /* WalletMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97002E2069820052CDE6 /* WalletMetadata.swift */; };
 		DC5F97062E2810E80052CDE6 /* Keychain+Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5F97052E2810E30052CDE6 /* Keychain+Global.swift */; };
@@ -435,6 +433,8 @@
 		DCEB2799282D7B260096B87E /* KotlinExtensions+Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */; };
 		DCEC6A1827A82A98002C20BA /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEC6A1727A82A98002C20BA /* ImagePicker.swift */; };
 		DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */; };
+		DCED1C1E2E78A6E100B506B0 /* WalletEmoji.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED1C1D2E78A6DD00B506B0 /* WalletEmoji.swift */; };
+		DCED1C202E78AB8500B506B0 /* WalletEmojiPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED1C1F2E78AB8100B506B0 /* WalletEmojiPicker.swift */; };
 		DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */; };
 		DCEE8998288605FD00FE42DD /* PaymentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEE8997288605FD00FE42DD /* PaymentCell.swift */; };
 		DCEFD922276A796800001767 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEFD921276A796800001767 /* SyncManager.swift */; };
@@ -701,8 +701,6 @@
 		DC5F96EF2E1D61690052CDE6 /* WalletImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletImage.swift; sourceTree = "<group>"; };
 		DC5F96F22E1D76EB0052CDE6 /* WalletMetadataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletMetadataView.swift; sourceTree = "<group>"; };
 		DC5F96F72E1DA3D30052CDE6 /* PinType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinType.swift; sourceTree = "<group>"; };
-		DC5F96FA2E1DB6520052CDE6 /* WalletIconPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIconPicker.swift; sourceTree = "<group>"; };
-		DC5F96FC2E1EB2EA0052CDE6 /* WalletIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletIcon.swift; sourceTree = "<group>"; };
 		DC5F96FE2E1F16760052CDE6 /* HiddenWalletRequirements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenWalletRequirements.swift; sourceTree = "<group>"; };
 		DC5F97002E2069820052CDE6 /* WalletMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletMetadata.swift; sourceTree = "<group>"; };
 		DC5F97052E2810E30052CDE6 /* Keychain+Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Keychain+Global.swift"; sourceTree = "<group>"; };
@@ -882,6 +880,8 @@
 		DCEAE5B82943D64B00320C46 /* MsatRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MsatRange.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
+		DCED1C1D2E78A6DD00B506B0 /* WalletEmoji.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletEmoji.swift; sourceTree = "<group>"; };
+		DCED1C1F2E78AB8100B506B0 /* WalletEmojiPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletEmojiPicker.swift; sourceTree = "<group>"; };
 		DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collections+AsInt.swift"; sourceTree = "<group>"; };
 		DCEE8997288605FD00FE42DD /* PaymentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCell.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
@@ -951,6 +951,7 @@
 		53BEF0E7A62D4973FCC99476 /* widgets */ = {
 			isa = PBXGroup;
 			children = (
+				DCED1C1D2E78A6DD00B506B0 /* WalletEmoji.swift */,
 				DC08A51727FB39530041603B /* AnimatedChevron.swift */,
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
 				DC67E40A27F3798600496C04 /* AnimatedMenu.swift */,
@@ -967,7 +968,6 @@
 				DC08A51927FB6C5F0041603B /* TopTab.swift */,
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
 				DC0E31BA26EFDED4002071C6 /* VSlider.swift */,
-				DC5F96FC2E1EB2EA0052CDE6 /* WalletIcon.swift */,
 				DC5F96EF2E1D61690052CDE6 /* WalletImage.swift */,
 			);
 			path = widgets;
@@ -1378,7 +1378,7 @@
 			children = (
 				DC5F97112E2EA8730052CDE6 /* DuressPinOption.swift */,
 				DC5F96FE2E1F16760052CDE6 /* HiddenWalletRequirements.swift */,
-				DC5F96FA2E1DB6520052CDE6 /* WalletIconPicker.swift */,
+				DCED1C1F2E78AB8100B506B0 /* WalletEmojiPicker.swift */,
 				DC5F96F22E1D76EB0052CDE6 /* WalletMetadataView.swift */,
 			);
 			path = "wallet metadata";
@@ -2179,6 +2179,7 @@
 				DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */,
 				DC37803B2C050F7000937C8E /* SpendOnChainFunds.swift in Sources */,
 				DCB876322735AAB500657570 /* UserDefaults+Codable.swift in Sources */,
+				DCED1C202E78AB8500B506B0 /* WalletEmojiPicker.swift in Sources */,
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
 				DCEE3E542931446A00EB4DFF /* Collections+AsInt.swift in Sources */,
 				DCCFE6B92B69A4FA002FFF11 /* LogFileInfo.swift in Sources */,
@@ -2286,6 +2287,7 @@
 				DC16965F27FE0FAC003DE1DD /* KotlinExtensions+Currency.swift in Sources */,
 				DC4CBC902D677AA700129BDB /* DetailsInfoGrid+ViewHelpers.swift in Sources */,
 				DC65BBF22A58A40700EBA651 /* CpfpView.swift in Sources */,
+				DCED1C1E2E78A6E100B506B0 /* WalletEmoji.swift in Sources */,
 				DC422F3329392ABD00E72253 /* Date+Format.swift in Sources */,
 				DC9AD1F12C9B81450019BEE9 /* PaymentRequestedView.swift in Sources */,
 				DCEFD922276A796800001767 /* SyncManager.swift in Sources */,
@@ -2382,7 +2384,6 @@
 				DC1E75722B73DD500026F36E /* LogFileParser.swift in Sources */,
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
 				DCAEF8D9275E69B000015993 /* SyncSeedManager_State.swift in Sources */,
-				DC5F96FD2E1EB2ED0052CDE6 /* WalletIcon.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */,
 				DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */,
@@ -2421,7 +2422,6 @@
 				DC6F04232C35EB9900627B4F /* SummaryInfoGrid.swift in Sources */,
 				DC5F96F32E1D76F00052CDE6 /* WalletMetadataView.swift in Sources */,
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
-				DC5F96FB2E1DB6620052CDE6 /* WalletIconPicker.swift in Sources */,
 				DCE3C7AB2A6AD3CC00F4D385 /* MempoolMonitor.swift in Sources */,
 				DC3780392C04D60400937C8E /* KotlinEnums.swift in Sources */,
 				DC5F971A2E32E4930052CDE6 /* GlobalEnvironmentView.swift in Sources */,

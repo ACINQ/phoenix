@@ -34295,7 +34295,7 @@
         }
       }
     },
-    "Select built-in icon" : {
+    "Select emoji" : {
 
     },
     "Select image" : {
@@ -34379,6 +34379,9 @@
       }
     },
     "Select photo" : {
+
+    },
+    "Select wallet emoji" : {
 
     },
     "Send" : {

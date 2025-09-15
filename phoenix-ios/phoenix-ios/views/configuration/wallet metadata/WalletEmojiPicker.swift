@@ -1,15 +1,15 @@
 import SwiftUI
 
-fileprivate let filename = "WalletIconPicker"
+fileprivate let filename = "WalletEmojiPicker"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-struct WalletIconPicker: View {
+struct WalletEmojiPicker: View {
 	
-	let didSelect: (WalletIcon) -> Void
+	let didSelect: (WalletEmoji) -> Void
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -27,7 +27,7 @@ struct WalletIconPicker: View {
 	func header() -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Text("Select built-in icon")
+			Text("Select wallet emoji")
 				.font(.title3)
 				.accessibilityAddTraits(.isHeader)
 				.accessibilitySortPriority(100)
@@ -54,10 +54,10 @@ struct WalletIconPicker: View {
 		
 		ScrollView {
 			LazyVGrid(columns: [GridItem(.adaptive(minimum: (48+(8*2))))], spacing: 0) {
-				ForEach(WalletIcon.allCases, id: \.self) { icon in
-					WalletImage(filename: icon.filename, size: 48)
+				ForEach(WalletEmoji.list(), id: \.self) { item in
+					WalletImage(filename: item.filename, size: 48)
 						.onTapGesture {
-							select(icon)
+							select(item)
 						}
 						.padding(8)
 				}
@@ -85,10 +85,10 @@ struct WalletIconPicker: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func select(_ icon: WalletIcon) {
-		log.trace("select(\(icon))")
+	func select(_ item: WalletEmoji) {
+		log.trace("select(\(item.emoji))")
 		
-		didSelect(icon)
+		didSelect(item)
 		smartModalState.close()
 	}
 	

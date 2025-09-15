@@ -72,12 +72,12 @@ fileprivate struct _WalletImage: View {
 					.resizable()
 					.aspectRatio(contentMode: .fill) // FILL !
 					
-			} else if let icon = asWalletIcon() {
-				walletIconImage(icon)
+			} else if let emoji = asWalletEmoji() {
+				walletEmojiImage(emoji)
 			} else if let systemImage = asSystemImage() {
 				systemIconImage(systemImage)
 			} else {
-				walletIconImage(WalletIcon.default)
+				walletEmojiImage(WalletEmoji.default)
 			}
 		}
 		.frame(width: size, height: size)
@@ -88,9 +88,28 @@ fileprivate struct _WalletImage: View {
 	}
 	
 	@ViewBuilder
-	func walletIconImage(_ icon: WalletIcon) -> some View {
+	func walletEmojiImage(_ emoji: WalletEmoji) -> some View {
 		
-		systemIconImage(icon.systemName)
+		ZStack(alignment: Alignment.center) {
+			Image(systemName: "circle.fill")
+				.resizable()
+				.aspectRatio(contentMode: .fit)
+				.frame(width: size, height: size)
+				.foregroundColor(Color(UIColor.systemGray5))
+			
+			Image(systemName: "circle.fill")
+				.resizable()
+				.aspectRatio(contentMode: .fit)
+				.frame(width: size-1, height: size-1)
+				.foregroundColor(Color(UIColor.systemGray6))
+			
+			let ss = squareSize()
+			Text(emoji.emoji)
+				.font(.system(size: 100))
+				.minimumScaleFactor(0.1)
+				.frame(width: ss, height: ss)
+			
+		} // </ZStack>
 	}
 	
 	@ViewBuilder
@@ -128,12 +147,12 @@ fileprivate struct _WalletImage: View {
 		return (squareSize - buffer)
 	}
 	
-	func asWalletIcon() -> WalletIcon? {
+	func asWalletEmoji() -> WalletEmoji? {
 		
 		guard let filename else {
 			return nil
 		}
-		return WalletIcon.fromFilename(filename)
+		return WalletEmoji.fromFilename(filename)
 	}
 	
 	func asSystemImage() -> String? {
@@ -153,7 +172,7 @@ fileprivate struct _WalletImage: View {
 		guard !filename.isEmpty else {
 			return
 		}
-		guard asWalletIcon() == nil else {
+		guard asWalletEmoji() == nil else {
 			return
 		}
 		guard asSystemImage() == nil else {

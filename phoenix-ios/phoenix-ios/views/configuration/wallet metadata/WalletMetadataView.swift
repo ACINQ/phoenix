@@ -140,9 +140,9 @@ struct WalletMetadataView: View {
 			titleVisibility: .automatic
 		) {
 			Button {
-				selectIconOptionSelected()
+				selectEmojiOptionSelected()
 			} label: {
-				Text("Select built-in icon")
+				Text("Select emoji")
 			}
 			Button {
 				selectPhotoOptionSelected()
@@ -337,12 +337,12 @@ struct WalletMetadataView: View {
 		}
 	}
 	
-	func walletIconPickerDidSelect(_ icon: WalletIcon) {
+	func walletEmojiPickerDidSelect(_ emoji: WalletEmoji) {
 		log.trace(#function)
 		
 		pickerResult = nil
 		ignorePickerResultChange = true
-		photo = icon.filename
+		photo = emoji.filename
 	}
 	
 	// --------------------------------------------------
@@ -363,22 +363,22 @@ struct WalletMetadataView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func selectIconOptionSelected() {
-		log.trace("selectIconOptionSelected()")
+	func selectEmojiOptionSelected() {
+		log.trace(#function)
 		
 		smartModalState.display(dismissable: true) {
-			WalletIconPicker(didSelect: walletIconPickerDidSelect)
+			WalletEmojiPicker(didSelect: walletEmojiPickerDidSelect)
 		}
 	}
 	
 	func selectPhotoOptionSelected() {
-		log.trace("selectPhotoOptionSelected()")
+		log.trace(#function)
 		
 		activeSheet = .imagePicker
 	}
 	
 	func takePhotoOptionSelected() {
-		log.trace("takePhotoOptionSelected()")
+		log.trace(#function)
 		
 	#if targetEnvironment(simulator)
 		toast.pop(
@@ -558,7 +558,7 @@ struct WalletMetadataView: View {
 				log.debug("oldPhoto: \(oldPhoto)")
 				log.debug("newPhoto: \(newPhoto)")
 				
-				if oldPhoto != newPhoto, !WalletIcon.isValidFilename(oldPhoto) {
+				if oldPhoto != newPhoto, !WalletEmoji.isValidFilename(oldPhoto) {
 					photoToDelete = oldPhoto
 				}
 				

@@ -72,7 +72,7 @@ struct WalletMetadata: WalletIdentifiable, Comparable, Identifiable {
 			chain      : Bitcoin_kmpChain.Mainnet(),
 			nodeIdHash : "",
 			name       : "?",
-			photo      : WalletIcon.default.filename,
+			photo      : WalletEmoji.default.filename,
 			isHidden   : false,
 			isDefault  : false
 		)
