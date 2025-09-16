@@ -30,8 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
-import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
@@ -48,6 +48,7 @@ import fr.acinq.phoenix.utils.extensions.state
 
 @Composable
 fun SplashAutoLiquidityPurchase(
+    business: PhoenixBusiness,
     payment: AutomaticLiquidityPurchasePayment,
 ) {
     SplashAmount(amount = payment.amount, state = payment.state(), isOutgoing = true)
@@ -56,10 +57,10 @@ fun SplashAutoLiquidityPurchase(
     }
 
     val navController = navController
-    val paymentsManager = LocalBusiness.current?.paymentsManager
-    val relatedPayment by produceState<WalletPayment?>(null, key1 = paymentsManager) {
+    val paymentsManager = business.paymentsManager
+    val relatedPayment by produceState<WalletPayment?>(null) {
         if (payment.incomingPaymentReceivedAt != null) {
-            value = paymentsManager?.getIncomingPaymentForTxId(payment.txId)
+            value = paymentsManager.getIncomingPaymentForTxId(payment.txId)
         }
     }
     relatedPayment?.let {

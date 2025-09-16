@@ -43,7 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.android.LocalBusiness
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
@@ -52,7 +52,6 @@ import fr.acinq.phoenix.android.components.layouts.SplashClickableContent
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.data.ContactInfo
-import kotlinx.coroutines.flow.flowOf
 
 sealed class OfferContactState {
     data object Init: OfferContactState()
@@ -66,8 +65,8 @@ sealed class OfferContactState {
  * encoded offer with a button to save a new contact.
  */
 @Composable
-fun ContactOrOfferView(offer: OfferTypes.Offer) {
-    val contactsDb by (LocalBusiness.current?.databaseManager?.contactsDb ?: flowOf(null)).collectAsState(null)
+fun ContactOrOfferView(business: PhoenixBusiness, offer: OfferTypes.Offer) {
+    val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
 
     val contactState = remember { mutableStateOf<OfferContactState>(OfferContactState.Init) }
     LaunchedEffect(contactsDb) {
@@ -93,7 +92,7 @@ fun ContactOrOfferView(offer: OfferTypes.Offer) {
             )
         }
         is OfferContactState.NotFound -> {
-            DetachedOfferView(offer = offer, onContactSaved = {
+            DetachedOfferView(business = business, offer = offer, onContactSaved = {
                 contactState.value = OfferContactState.Found(it)
             })
         }
@@ -102,6 +101,7 @@ fun ContactOrOfferView(offer: OfferTypes.Offer) {
 
 @Composable
 private fun DetachedOfferView(
+    business: PhoenixBusiness,
     offer: OfferTypes.Offer,
     onContactSaved: (ContactInfo) -> Unit,
 ) {
@@ -123,6 +123,7 @@ private fun DetachedOfferView(
 
     when {
         showContactPickerDialog -> SaveOrAttachOfferPickerDialog(
+            business = business,
             onDismiss = { showContactPickerDialog = false },
             onCreateNewContact = { showContactPickerDialog = false ; isCreatingNewContact = true },
             onAddToExistingContact = { showContactPickerDialog = false ; addToExistingContact = it },
@@ -144,6 +145,7 @@ private fun DetachedOfferView(
 
 @Composable
 private fun SaveOrAttachOfferPickerDialog(
+    business: PhoenixBusiness,
     onDismiss: () -> Unit,
     onCreateNewContact: () -> Unit,
     onAddToExistingContact: (ContactInfo) -> Unit,
@@ -156,7 +158,7 @@ private fun SaveOrAttachOfferPickerDialog(
         internalPadding = PaddingValues(0.dp),
         containerColor = MaterialTheme.colors.background
     ) {
-        val contactsList by (LocalBusiness.current?.databaseManager?.contactsList ?: flowOf(null)).collectAsState(null)
+        val contactsList by business.databaseManager.contactsList.collectAsState(null)
         Clickable(onClick = onCreateNewContact) {
             Row(
                 modifier = Modifier

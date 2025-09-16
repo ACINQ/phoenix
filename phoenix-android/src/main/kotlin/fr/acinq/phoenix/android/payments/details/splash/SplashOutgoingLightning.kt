@@ -36,6 +36,7 @@ import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
@@ -131,7 +132,7 @@ private fun SplashDestination(payment: LightningOutgoingPayment, metadata: Walle
     if (details is LightningOutgoingPayment.Details.Blinded) {
         val offer = details.paymentRequest.invoiceRequest.offer
         SplashLabelRow(label = stringResource(id = R.string.paymentdetails_destination_label)) {
-            ContactOrOfferView(offer = offer)
+            LocalBusiness.current?.let { ContactOrOfferView(business = it, offer = offer) }
         }
     }
 }

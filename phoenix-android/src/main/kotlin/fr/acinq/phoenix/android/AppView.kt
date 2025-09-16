@@ -111,7 +111,7 @@ fun AppRoot(
                     baseNavGraph(navController, appViewModel)
                     // nav graphs below depends on the business, and will redirect to /startup if no wallet is active
                     navigation(startDestination = Screen.BusinessNavGraph.Home.route, route = Screen.BusinessNavGraph.route) {
-                        settingsNavGraph(navController, appViewModel, business)
+                        settingsNavGraph(navController, appViewModel)
                         homeNavGraph(navController, appViewModel)
                         paymentsNavGraph(navController, appViewModel)
                         walletInfoNavGraph(navController, appViewModel)

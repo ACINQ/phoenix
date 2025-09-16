@@ -40,9 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.LocalBitcoinUnits
-import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
@@ -69,12 +69,12 @@ import fr.acinq.phoenix.data.canRequestLiquidity
 
 @Composable
 fun SettingsView(
+    business: PhoenixBusiness,
     appViewModel: AppViewModel,
     notices: List<Notice>,
     notifications: List<Pair<Set<UUID>, Notification>>,
 ) {
     val nc = navController
-
     var showCurrencyConverter by remember { mutableStateOf(false) }
 
     DefaultScreenLayout {
@@ -109,8 +109,8 @@ fun SettingsView(
         CardHeader(text = stringResource(id = R.string.settings_fees_title))
         Card {
             MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_wand, onClick = { nc.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) })
-            val channelsState = LocalBusiness.current?.peerManager?.channelsFlow?.collectAsState()
-            if (channelsState?.value?.canRequestLiquidity() == true) {
+            val channelsState = business.peerManager.channelsFlow.collectAsState()
+            if (channelsState.value?.canRequestLiquidity() == true) {
                 MenuButton(text = stringResource(R.string.settings_add_liquidity), icon = R.drawable.ic_bucket, onClick = { nc.navigate(Screen.BusinessNavGraph.LiquidityRequest.route) })
             }
         }

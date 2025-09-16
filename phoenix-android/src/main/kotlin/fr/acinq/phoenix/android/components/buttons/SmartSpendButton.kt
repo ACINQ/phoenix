@@ -37,7 +37,6 @@ import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 /**
@@ -61,7 +60,7 @@ fun SmartSpendButton(
     val scope = rememberCoroutineScope()
     val needPinCodeToPayFlow = LocalUserPrefs.current?.getSpendingPinEnabled?.collectAsState(null)
     val needPinCodeToPay = needPinCodeToPayFlow?.value
-    val mayDoPayments by (LocalBusiness.current?.peerManager?.mayDoPayments ?: flowOf(false)).collectAsState(false)
+    val mayDoPayments by LocalBusiness.current!!.peerManager.mayDoPayments.collectAsState(false)
 
     var showSendingPinCheck by remember { mutableStateOf(false) }
     if (showSendingPinCheck) {

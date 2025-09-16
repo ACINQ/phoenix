@@ -49,11 +49,11 @@ import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
 import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
 
 
-fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel: AppViewModel, business: PhoenixBusiness?) {
+fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel: AppViewModel) {
 
-    businessComposable(Screen.BusinessNavGraph.Settings.route, appViewModel) { _, _, _ ->
-        val notifications = business?.notificationsManager?.notifications?.collectAsState()
-        SettingsView(appViewModel, emptyList(), notifications?.value ?: emptyList())
+    businessComposable(Screen.BusinessNavGraph.Settings.route, appViewModel) { _, _, business ->
+        val notifications = business.notificationsManager.notifications.collectAsState()
+        SettingsView(business, appViewModel, emptyList(), notifications.value)
     }
 
     businessComposable(Screen.BusinessNavGraph.ElectrumServer.route, appViewModel) { _, _, _ ->

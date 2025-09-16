@@ -113,30 +113,32 @@ fun ContactDetailsView(
     onContactChange: (ContactInfo?) -> Unit,
     newOffer: OfferTypes.Offer? = null,
 ) {
-    val contactsDb by (LocalBusiness.current?.databaseManager?.contactsDb ?: flowOf(null)).collectAsState(null)
+    LocalBusiness.current?.let { business ->
+        val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
 
-    ModalBottomSheet(
-        onDismiss = onDismiss,
-        skipPartiallyExpanded = true,
-        isContentScrollable = false,
-        contentHeight = 550.dp,
-        contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal) },
-        internalPadding = PaddingValues(0.dp),
-        containerColor = Color.Transparent,
-        dragHandle = null
-    ) {
-        ContactNameAndPhoto(
-            contact = contact,
-            newOffer = newOffer,
-            saveContactToDb = { contactsDb?.saveContact(it) },
-            deleteContactFromDb = { contactsDb?.deleteContact(it) },
-            getContactForOfferInDb = { contactsDb?.contactForOffer(it) },
-            getContactForAddressInDb = { contactsDb?.contactForLightningAddress(it) },
-            onContactChange = { newContact ->
-                onContactChange(newContact)
-                onDismiss()
-            },
-        )
+        ModalBottomSheet(
+            onDismiss = onDismiss,
+            skipPartiallyExpanded = true,
+            isContentScrollable = false,
+            contentHeight = 550.dp,
+            contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal) },
+            internalPadding = PaddingValues(0.dp),
+            containerColor = Color.Transparent,
+            dragHandle = null
+        ) {
+            ContactNameAndPhoto(
+                contact = contact,
+                newOffer = newOffer,
+                saveContactToDb = { contactsDb?.saveContact(it) },
+                deleteContactFromDb = { contactsDb?.deleteContact(it) },
+                getContactForOfferInDb = { contactsDb?.contactForOffer(it) },
+                getContactForAddressInDb = { contactsDb?.contactForLightningAddress(it) },
+                onContactChange = { newContact ->
+                    onContactChange(newContact)
+                    onDismiss()
+                },
+            )
+        }
     }
 }
 

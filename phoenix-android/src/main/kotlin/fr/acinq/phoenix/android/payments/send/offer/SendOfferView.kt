@@ -121,7 +121,7 @@ fun SendToOfferView(
         }
 
         SplashLabelRow(label = stringResource(id = R.string.send_destination_label)) {
-            ContactOrOfferView(offer = offer)
+            ContactOrOfferView(business = business, offer = offer)
         }
 
         SplashLabelRow(label = stringResource(id = R.string.send_offer_payer_note_label)) {

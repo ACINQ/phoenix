@@ -122,6 +122,7 @@ fun PaymentDetailsView(
         }
         is PaymentDetailsState.Success.Splash -> DefaultScreenLayout(isScrollable = false) {
             PaymentDetailsSplashView(
+                business = business,
                 onBackClick = onBackClick,
                 data = state.payment,
                 onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },
