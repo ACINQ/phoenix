@@ -13,15 +13,18 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.minutes
@@ -92,10 +95,14 @@ class PaymentsForegroundService : Service() {
                     }
                     is DecryptSeedResult.Failure -> {
                         log.info("unable to read seed, ignoring background message (reason=$reason)")
-                        when (reason) {
-                            "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
-                            "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
-                            else -> Unit
+                        serviceScope.launch {
+                            val walletMetadataMap = (application as PhoenixApplication).globalPrefs.getAvailableWalletsMeta.first()
+                            val metadata = walletMetadataMap.getByWalletIdOrDefault(walletId)
+                            when (reason) {
+                                "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext, metadata)
+                                "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext, metadata)
+                                else -> Unit
+                            }
                         }
                         false
                     }

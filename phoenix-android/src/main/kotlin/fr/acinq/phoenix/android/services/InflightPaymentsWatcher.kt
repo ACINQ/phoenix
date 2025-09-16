@@ -29,11 +29,14 @@ import fr.acinq.lightning.channel.states.Syncing
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +85,8 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
         }
 
         val watchResult = userWallets.map { (walletId, wallet) ->
-            watchWallet(walletId, wallet.words)
+            val walletMetadata = (applicationContext as PhoenixApplication).globalPrefs.getAvailableWalletsMeta.first().getByWalletIdOrDefault(walletId)
+            watchWallet(walletId, walletMetadata, wallet.words)
         }
 
         BusinessManager.stopAllHeadlessBusinesses()
@@ -96,7 +100,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
         }
     }
 
-    private suspend fun watchWallet(walletId: WalletId, words: List<String>): Boolean {
+    private suspend fun watchWallet(walletId: WalletId, walletMetadata: UserWalletMetadata, words: List<String>): Boolean {
         try {
             val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId = walletId)
             val inFlightPaymentsCount = internalPrefs.getInFlightPaymentsCount.first()
@@ -125,7 +129,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                     delay(2.minutes)
                     log.info("stopping $name-$walletId after 2 minutes without resolution - show notification")
                     scheduleOnce(applicationContext)
-                    SystemNotificationHelper.notifyInFlightHtlc(applicationContext)
+                    SystemNotificationHelper.notifyInFlightHtlc(applicationContext, walletMetadata)
                     stopJobs.value = true
                 }
 

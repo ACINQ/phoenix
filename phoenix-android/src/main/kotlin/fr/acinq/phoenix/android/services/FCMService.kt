@@ -5,10 +5,12 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 
 class FCMService : FirebaseMessagingService() {
@@ -44,10 +46,14 @@ class FCMService : FirebaseMessagingService() {
             remoteMessage.priority != RemoteMessage.PRIORITY_HIGH -> {
                 // cannot start foreground service from low/normal priority message
                 log.warn("ignoring FCM message with low/normal priority, show notification with reason=$reason")
-                when (reason) {
-                    "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
-                    "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
-                    else -> {}
+                serviceScope.launch {
+                    val walletId = WalletId(nodeIdHash)
+                    val walletMetadata = (application as PhoenixApplication).globalPrefs.getAvailableWalletsMeta.first().getByWalletIdOrDefault(walletId)
+                    when (reason) {
+                        "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext, walletMetadata)
+                        "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext, walletMetadata)
+                        else -> {}
+                    }
                 }
             }
             else -> {

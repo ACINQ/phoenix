@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.navigation
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,10 +25,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.payments.history.PaymentsExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.send.liquidity.RequestLiquidityView
@@ -99,7 +100,7 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
         val paymentsViewModel = viewModel<PaymentsViewModel>(factory = PaymentsViewModel.Factory(business.paymentsManager), viewModelStoreOwner = homeGraphEntry)
         PaymentsHistoryView(
             onBackClick = { navController.popBackStack() },
-            paymentsViewModel = paymentsViewModel,
+            paymentsViewModel  = paymentsViewModel,
             onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },
             onCsvExportClick = { navController.navigate(Screen.BusinessNavGraph.PaymentsExport.route) },
         )
@@ -121,21 +122,26 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
         DisplaySeedView(onBackClick = { navController.popBackStack() }, walletId = walletId)
     }
 
-    businessComposable(Screen.BusinessNavGraph.Notifications.route, appViewModel) { backStackEntry, walletId, business ->
-        val noticesViewModel = viewModel<NoticesViewModel>(
-            key = walletId.nodeIdHash,
-            factory = NoticesViewModel.Factory(
-                walletId = walletId,
-                appConfigurationManager = business.appConfigurationManager,
-                peerManager = business.peerManager,
-                connectionsManager = business.connectionsManager,
+    businessComposable(Screen.BusinessNavGraph.Notifications.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:notifications/{walletId}" })) { backStackEntry, walletId, business ->
+        val walletIdDeeplink = backStackEntry.arguments?.getString("walletid")?.let { WalletId(it) }
+        if (walletIdDeeplink != null && walletIdDeeplink != walletId) {
+            LaunchedEffect(Unit) { navController.popToHome() }
+        } else {
+            val noticesViewModel = viewModel<NoticesViewModel>(
+                key = walletId.nodeIdHash,
+                factory = NoticesViewModel.Factory(
+                    walletId = walletId,
+                    appConfigurationManager = business.appConfigurationManager,
+                    peerManager = business.peerManager,
+                    connectionsManager = business.connectionsManager,
+                )
             )
-        )
-        NotificationsView(
-            business = business,
-            noticesViewModel = noticesViewModel,
-            onBackClick = { navController.popBackStack() },
-        )
+            NotificationsView(
+                business = business,
+                noticesViewModel = noticesViewModel,
+                onBackClick = { navController.popBackStack() },
+            )
+        }
     }
 
     businessComposable(Screen.BusinessNavGraph.LiquidityPolicy.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:liquiditypolicy" })) { _, _, business ->

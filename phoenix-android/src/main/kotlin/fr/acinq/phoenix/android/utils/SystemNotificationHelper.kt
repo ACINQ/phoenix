@@ -109,9 +109,9 @@ object SystemNotificationHelper {
         }
     }
 
-    private fun notifyPaymentFailed(context: Context, title: String, message: String, deepLink: String?): Notification {
+    private fun notifyPaymentFailed(context: Context, walletMetadata: UserWalletMetadata, title: String, message: String, deepLink: String?): Notification {
         return NotificationCompat.Builder(context, PAYMENT_FAILED_NOTIF_CHANNEL).apply {
-            setContentTitle(title)
+            setContentTitle(getTitleForWallet(walletMetadata, title))
             setContentText(message)
             setStyle(NotificationCompat.BigTextStyle().bigText(message))
             setSmallIcon(R.drawable.ic_phoenix_outline)
@@ -133,7 +133,11 @@ object SystemNotificationHelper {
         }
     }
 
-    fun notifyPaymentRejectedPolicyDisabled(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, nextTimeoutRemainingBlocks: Int?): Notification {
+    private fun getTitleForWallet(walletMetadata: UserWalletMetadata, title: String): String {
+        return "${walletMetadata.avatar} $title"
+    }
+
+    fun notifyPaymentRejectedPolicyDisabled(context: Context, walletId: WalletId, walletMetadata: UserWalletMetadata, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, nextTimeoutRemainingBlocks: Int?): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
@@ -147,15 +151,16 @@ object SystemNotificationHelper {
                     context.getString(R.string.notif_rejected_policy_disabled)
                 }
             },
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
+            walletMetadata = walletMetadata,
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
         )
     }
 
-    fun notifyPaymentRejectedOverAbsolute(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, absoluteMax: Satoshi, nextTimeoutRemainingBlocks: Int?): Notification {
+    fun notifyPaymentRejectedOverAbsolute(context: Context, walletId: WalletId, walletMetadata: UserWalletMetadata, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, absoluteMax: Satoshi, nextTimeoutRemainingBlocks: Int?): Notification {
         return notifyPaymentFailed(
             context = context,
-            title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
-                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
+            title = getTitleForWallet(walletMetadata, context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
+                amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true))),
             message = when {
                 source == LiquidityEvents.Source.OnChainWallet && nextTimeoutRemainingBlocks != null && nextTimeoutRemainingBlocks < SWAP_TIMEOUT_THRESHOLD_IN_BLOCKS -> {
                     val remainingTimeMillis = nextTimeoutRemainingBlocks * 10 * DateUtils.MINUTE_IN_MILLIS
@@ -168,11 +173,12 @@ object SystemNotificationHelper {
                         absoluteMax.toPrettyString(BitcoinUnit.Sat, withUnit = true))
                 }
             },
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
+            walletMetadata = walletMetadata,
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
         )
     }
 
-    fun notifyPaymentRejectedOverRelative(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, percentMax: Int, nextTimeoutRemainingBlocks: Int?): Notification {
+    fun notifyPaymentRejectedOverRelative(context: Context, walletId: WalletId, walletMetadata: UserWalletMetadata, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi, fee: MilliSatoshi, percentMax: Int, nextTimeoutRemainingBlocks: Int?): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
@@ -189,42 +195,46 @@ object SystemNotificationHelper {
                         DecimalFormat("0.##").format(percentMax.toDouble() / 100))
                 }
             },
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
+            walletMetadata = walletMetadata,
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
         )
     }
 
-    fun notifyPaymentRejectedAmountTooLow(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
+    fun notifyPaymentRejectedAmountTooLow(context: Context, walletId: WalletId, walletMetadata: UserWalletMetadata, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif_rejected_amount_too_low),
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
+            walletMetadata = walletMetadata,
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
         )
     }
 
-    fun notifyPaymentRejectedFundingError(context: Context, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
+    fun notifyPaymentRejectedFundingError(context: Context, walletId: WalletId, walletMetadata: UserWalletMetadata, source: LiquidityEvents.Source, amountIncoming: MilliSatoshi): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(if (source == LiquidityEvents.Source.OnChainWallet) R.string.notif_rejected_deposit_title else R.string.notif_rejected_payment_title,
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif_rejected_generic_error),
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:liquiditypolicy",
+            walletMetadata = walletMetadata,
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
         )
     }
 
-    fun notifyPaymentMissedAppUnavailable(context: Context): Notification {
+    fun notifyPaymentMissedAppUnavailable(context: Context, walletMetadata: UserWalletMetadata): Notification {
         return notifyPaymentFailed(
             context = context,
             title = context.getString(R.string.notif_missed_title),
             message = context.getString(R.string.notif_missed_unavailable),
+            walletMetadata = walletMetadata,
             deepLink = null
         )
     }
 
-    fun notifyPendingSettlement(context: Context): Notification {
+    fun notifyPendingSettlement(context: Context, walletMetadata: UserWalletMetadata): Notification {
         return NotificationCompat.Builder(context, SETTLEMENT_PENDING_NOTIF_CHANNEL).apply {
-            setContentTitle(context.getString(R.string.notif_pending_settlement_title))
+            setContentTitle(getTitleForWallet(walletMetadata, context.getString(R.string.notif_pending_settlement_title)))
             setContentText(context.getString(R.string.notif_pending_settlement_message))
             setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notif_pending_settlement_message)))
             setSmallIcon(R.drawable.ic_phoenix_outline)
@@ -237,9 +247,9 @@ object SystemNotificationHelper {
         }
     }
 
-    fun notifyInFlightHtlc(context: Context): Notification {
+    fun notifyInFlightHtlc(context: Context, walletMetadata: UserWalletMetadata): Notification {
         return NotificationCompat.Builder(context, SETTLEMENT_PENDING_NOTIF_CHANNEL).apply {
-            setContentTitle(context.getString(R.string.notif_inflight_payment_title))
+            setContentTitle(getTitleForWallet(walletMetadata, context.getString(R.string.notif_inflight_payment_title)))
             setContentText(context.getString(R.string.notif_inflight_payment_message))
             setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.notif_inflight_payment_message)))
             setSmallIcon(R.drawable.ic_phoenix_outline)

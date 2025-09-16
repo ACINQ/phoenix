@@ -32,6 +32,7 @@ import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
@@ -159,7 +160,7 @@ object BusinessManager {
                 monitorHeadlessPaymentsJob = if (isHeadless) {
                     scope.launch { monitorPaymentsWhenHeadless(walletId, walletMetadata, business.nodeParamsManager, business.currencyManager, userPrefs) }
                 } else null,
-                monitorNodeEventsJob = scope.launch { monitorNodeEvents(business.peerManager, business.nodeParamsManager, internalPrefs) },
+                monitorNodeEventsJob = scope.launch { monitorNodeEvents(walletId, business.peerManager, business.nodeParamsManager, internalPrefs) },
                 monitorFcmTokenJob = scope.launch { monitorFcmToken(business) },
                 monitorInFlightPaymentsJob = scope.launch { monitorInFlightPayments(business.peerManager, internalPrefs) },
             )
@@ -251,7 +252,7 @@ object BusinessManager {
         business.registerFcmToken(token)
     }
 
-    private suspend fun monitorNodeEvents(peerManager: PeerManager, nodeParamsManager: NodeParamsManager, internalPrefs: InternalPrefs) {
+    private suspend fun monitorNodeEvents(walletId: WalletId, peerManager: PeerManager, nodeParamsManager: NodeParamsManager, internalPrefs: InternalPrefs) {
         val monitoringStartedAt = currentTimestampMillis()
         combine(peerManager.swapInNextTimeout, nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents) { nextTimeout, nodeEvent ->
             nextTimeout to nodeEvent
@@ -276,24 +277,25 @@ object BusinessManager {
                             internalPrefs.saveLastRejectedOnchainSwap(event)
                         }
                     }
+                    val walletMetadata = application.globalPrefs.getAvailableWalletsMeta.first().getByWalletIdOrDefault(walletId)
                     when (val reason = event.reason) {
                         is LiquidityEvents.Rejected.Reason.PolicySetToDisabled -> {
-                            SystemNotificationHelper.notifyPaymentRejectedPolicyDisabled(appContext, event.source, event.amount, nextTimeout?.second)
+                            SystemNotificationHelper.notifyPaymentRejectedPolicyDisabled(appContext, walletId, walletMetadata, event.source, event.amount, nextTimeout?.second)
                         }
                         is LiquidityEvents.Rejected.Reason.TooExpensive.OverAbsoluteFee -> {
-                            SystemNotificationHelper.notifyPaymentRejectedOverAbsolute(appContext, event.source, event.amount, event.fee, reason.maxAbsoluteFee, nextTimeout?.second)
+                            SystemNotificationHelper.notifyPaymentRejectedOverAbsolute(appContext, walletId, walletMetadata, event.source, event.amount, event.fee, reason.maxAbsoluteFee, nextTimeout?.second)
                         }
                         is LiquidityEvents.Rejected.Reason.TooExpensive.OverRelativeFee -> {
-                            SystemNotificationHelper.notifyPaymentRejectedOverRelative(appContext, event.source, event.amount, event.fee, reason.maxRelativeFeeBasisPoints, nextTimeout?.second)
+                            SystemNotificationHelper.notifyPaymentRejectedOverRelative(appContext, walletId, walletMetadata, event.source, event.amount, event.fee, reason.maxRelativeFeeBasisPoints, nextTimeout?.second)
                         }
                         is LiquidityEvents.Rejected.Reason.MissingOffChainAmountTooLow -> {
-                            SystemNotificationHelper.notifyPaymentRejectedAmountTooLow(appContext, event.source, event.amount)
+                            SystemNotificationHelper.notifyPaymentRejectedAmountTooLow(appContext, walletId, walletMetadata, event.source, event.amount)
                         }
                         // Temporary errors
                         is LiquidityEvents.Rejected.Reason.ChannelFundingInProgress,
                         is LiquidityEvents.Rejected.Reason.NoMatchingFundingRate,
                         is LiquidityEvents.Rejected.Reason.TooManyParts -> {
-                            SystemNotificationHelper.notifyPaymentRejectedFundingError(appContext, event.source, event.amount)
+                            SystemNotificationHelper.notifyPaymentRejectedFundingError(appContext, walletId, walletMetadata, event.source, event.amount)
                         }
                     }
                 }

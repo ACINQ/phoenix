@@ -56,7 +56,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
         ),
         deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{walletid}/{id}" })
     ) { backstackEntry, walletId, business ->
-        val walletIdDeeplink = backstackEntry.arguments!!.getString("walletid")?.let { WalletId(it) }
+        val walletIdDeeplink = backstackEntry.arguments?.getString("walletid")?.let { WalletId(it) }
         val paymentId = try {
             UUID.fromString(backstackEntry.arguments!!.getString("id")!!)
         } catch (_: Exception) {
