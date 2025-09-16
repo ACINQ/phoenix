@@ -78,6 +78,7 @@
     <string name="startup_error_start_business">Could not start the wallet</string>
     <string name="startup_error_generic">Unable to read wallet data.</string>
     <string name="startup_error_try_again">Try again</string>
+    <string name="startup_error_serialisation">Unhandled file serialisation</string>
     <string name="startup_error_decryption_general">Decryption failure:\n%1$s</string>
     <string name="startup_error_decryption_keystore" translatable="false">Android keystore failure:\n%1$s</string>
     <string name="startup_error_recovery_button">Manual recover</string>

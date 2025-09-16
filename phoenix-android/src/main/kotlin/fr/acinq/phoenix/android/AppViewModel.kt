@@ -58,6 +58,7 @@ sealed class ListWalletState {
     data object Success: ListWalletState()
     sealed class Error: ListWalletState() {
         data class Generic(val cause: Throwable?): Error()
+        data object Serialization: Error()
 
         sealed class DecryptionError : Error() {
             data class GeneralException(val cause: Throwable): DecryptionError()
@@ -161,6 +162,10 @@ class AppViewModel(
             listWalletState.value = ListWalletState.Error.Generic(e)
         }) {
             when (val result = SeedManager.loadAndDecrypt(context = application.applicationContext)) {
+                is DecryptSeedResult.Failure.SerializationError -> {
+                    log.error("cannot deserialize seed file: ")
+                    listWalletState.value = ListWalletState.Error.Serialization
+                }
                 is DecryptSeedResult.Failure.DecryptionError -> {
                     log.error("cannot decrypt seed file: ", result.cause)
                     listWalletState.value = ListWalletState.Error.DecryptionError.GeneralException(result.cause)

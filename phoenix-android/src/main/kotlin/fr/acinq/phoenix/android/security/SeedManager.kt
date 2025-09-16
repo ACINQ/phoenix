@@ -22,10 +22,9 @@ import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.android.UserWallet
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.security.EncryptedSeed.Companion.toMnemonics
-import fr.acinq.phoenix.android.security.EncryptedSeed.Companion.toMnemonicsSafe
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.managers.NodeParamsManager
+import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.security.KeyStoreException
@@ -34,6 +33,7 @@ sealed class DecryptSeedResult {
     data class Success(val userWalletsMap: Map<WalletId, UserWallet>): DecryptSeedResult()
     sealed class Failure: DecryptSeedResult() {
         data object SeedFileNotFound: Failure()
+        data object SerializationError: Failure()
         data class KeyStoreFailure(val cause: KeyStoreException): Failure()
         data class DecryptionError(val cause: Exception): Failure()
         data object SeedFileUnreadable: Failure()
@@ -71,7 +71,7 @@ object SeedManager {
                         else -> DecryptSeedResult.Failure.DecryptionError(e)
                     }
                 }
-                val words = toMnemonicsSafe(payload) ?: return DecryptSeedResult.Failure.SeedInvalid
+                val words = EncryptedSeed.V2.SingleSeed.toMnemonicsSafe(payload) ?: return DecryptSeedResult.Failure.SeedInvalid
 
                 val seed = MnemonicCode.toSeed(words, "").toByteVector()
                 val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
@@ -89,18 +89,26 @@ object SeedManager {
                 val seedMap = try {
                     encryptedSeed.decryptAndGetSeedMap()
                 } catch (e: Exception) {
-                    log.error("failed to decrypt [V2.MultipleSeed]: ", e)
                     return when (e) {
-                        is KeyStoreException -> DecryptSeedResult.Failure.KeyStoreFailure(e)
-                        else -> DecryptSeedResult.Failure.DecryptionError(e)
+                        is SerializationException, is IllegalArgumentException -> {
+                            log.error("failed to decrypt [V2.MultipleSeed]: ${e.javaClass.simpleName}")
+                            DecryptSeedResult.Failure.SerializationError
+                        }
+                        is KeyStoreException -> {
+                            log.error("failed to decrypt [V2.MultipleSeed]: ", e)
+                            DecryptSeedResult.Failure.KeyStoreFailure(e)
+                        }
+                        else -> {
+                            log.error("failed to decrypt [V2.MultipleSeed]: ", e)
+                            DecryptSeedResult.Failure.DecryptionError(e)
+                        }
                     }
                 }
 
                 return when {
                     seedMap.isEmpty() -> DecryptSeedResult.Failure.SeedFileNotFound
                     else -> {
-                        seedMap.map { (walletId, payload) ->
-                            val words = toMnemonics(payload)
+                        seedMap.map { (walletId, words) ->
                             val seed = MnemonicCode.toSeed(words, "").toByteVector()
                             val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
                             val nodeId = keyManager.nodeKeys.nodeKey.publicKey

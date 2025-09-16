@@ -278,6 +278,7 @@ private fun ListWalletsError(state: ListWalletState.Error, onManualRecoveryClick
             header = stringResource(id = R.string.startup_error_generic),
             details = when (state) {
                 is ListWalletState.Error.Generic -> state.cause?.message
+                is ListWalletState.Error.Serialization -> stringResource(id = R.string.startup_error_serialisation)
                 is ListWalletState.Error.DecryptionError.GeneralException -> stringResource(id = R.string.startup_error_decryption_general,
                     "[${state.cause::class.java.simpleName}] ${state.cause.localizedMessage ?: ""}"
                 )

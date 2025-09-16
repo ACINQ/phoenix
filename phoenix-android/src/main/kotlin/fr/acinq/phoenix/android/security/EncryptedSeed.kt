@@ -45,12 +45,26 @@ sealed class EncryptedSeed {
         abstract val ciphertext: ByteArray
 
         @Deprecated("Obsolete, do not use. Instead use [MultipleSeed] that supports multiple wallets.")
-        class SingleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2()
+        class SingleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2() {
+            companion object {
+                /** Returns a mnemonics from a byte array, or null if it's invalid. */
+                fun toMnemonicsSafe(array: ByteArray): List<String>? {
+                    return try {
+                        val mnemonics = String(Hex.decode(String(array, Charsets.UTF_8)), Charsets.UTF_8).split(" ")
+                        MnemonicCode.validate(mnemonics = mnemonics, wordlist = MnemonicLanguage.English.wordlist())
+                        mnemonics
+                    } catch (e: Exception) {
+                        log.error("seed is invalid", e)
+                        null
+                    }
+                }
+            }
+        }
 
         class MultipleSeed(override val iv: ByteArray, override val ciphertext: ByteArray) : V2() {
-            fun decryptAndGetSeedMap(): Map<WalletId, ByteArray> {
+            fun decryptAndGetSeedMap(): Map<WalletId, List<String>> {
                 val payload = decrypt().decodeToString()
-                val json = Json.decodeFromString<Map<String, ByteArray>>(payload)
+                val json = Json.decodeFromString<Map<String, List<String>>>(payload)
                 return json.map { WalletId(it.key) to it.value }.toMap()
             }
         }
@@ -97,9 +111,7 @@ sealed class EncryptedSeed {
 
             fun encrypt(seedMap: Map<WalletId, List<String>>): MultipleSeed = tryWith(GeneralSecurityException()) {
                 val json = Json.encodeToString(
-                    seedMap.map { (id, words) ->
-                        id.nodeIdHash to fromMnemonics(words)
-                    }.toMap()
+                    seedMap.map { (id, words) -> id.nodeIdHash to words }.toMap()
                 )
                 val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
                 MultipleSeed(cipher.iv, cipher.doFinal(json.encodeToByteArray()))
@@ -121,19 +133,5 @@ sealed class EncryptedSeed {
                 else -> throw IllegalArgumentException("unhandled seed file version=$version")
             }
         }
-
-        /** Returns a mnemonics from a byte array, or null if it's invalid. */
-        fun toMnemonicsSafe(array: ByteArray): List<String>? {
-            return try {
-                val mnemonics = toMnemonics(array)
-                MnemonicCode.validate(mnemonics = mnemonics, wordlist = MnemonicLanguage.English.wordlist())
-                mnemonics
-            } catch (e: Exception) {
-                log.error("seed is invalid", e)
-                null
-            }
-        }
-        fun toMnemonics(array: ByteArray): List<String> = String(Hex.decode(String(array, Charsets.UTF_8)), Charsets.UTF_8).split(" ")
-        fun fromMnemonics(words: List<String>): ByteArray = Hex.encode(words.joinToString(" ").encodeToByteArray()).encodeToByteArray()
     }
 }
