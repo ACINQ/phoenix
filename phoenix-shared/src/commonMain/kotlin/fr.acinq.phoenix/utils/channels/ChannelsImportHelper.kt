@@ -7,6 +7,8 @@ import fr.acinq.lightning.serialization.channel.Serialization
 import fr.acinq.lightning.wire.EncryptedChannelData
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -19,14 +21,16 @@ object ChannelsImportHelper {
         biz: PhoenixBusiness,
     ): ChannelsImportResult {
 
+        val loggerFactory = biz.loggerFactory
+        val log = loggerFactory.newLogger(this::class)
         try {
-            val loggerFactory = biz.loggerFactory
-            val log = loggerFactory.newLogger(this::class)
+
+            log.info { "initiating channels-data import" }
 
             val nodeParams = biz.nodeParamsManager.nodeParams.filterNotNull().first()
             val peer = biz.peerManager.getPeer()
 
-            val deserializedData = try {
+            val encryptedChannelData = try {
                 EncryptedChannelData(ByteVector(Hex.decode(data)))
             } catch(e: Exception) {
                 log.error(e) { "failed to deserialize data blob" }
@@ -34,7 +38,7 @@ object ChannelsImportHelper {
             }
 
             return PersistedChannelState
-                .from(nodeParams.nodePrivateKey, deserializedData)
+                .from(nodeParams.nodePrivateKey, encryptedChannelData)
                 .fold(
                     onFailure = {
                         log.error(it) { "failed to decrypt channel state" }
@@ -43,7 +47,10 @@ object ChannelsImportHelper {
                     onSuccess = {
                         when (it) {
                             is Serialization.DeserializationResult.Success -> {
+                                log.info { "successfully imported channel=${it.state.channelId}" }
                                 peer.db.channels.addOrUpdateChannel(it.state)
+                                val channel = (peer.db.channels as? SqliteChannelsDb)?.getChannel(it.state.channelId)
+                                log.info { "channel added/updated to database, is_closed=${channel?.third}" }
                                 ChannelsImportResult.Success(it.state)
                             }
                             is Serialization.DeserializationResult.UnknownVersion -> {
@@ -55,6 +62,7 @@ object ChannelsImportHelper {
                 )
 
         } catch (e: Exception) {
+            log.error(e) { "error when importing channels" }
             return ChannelsImportResult.Failure.Generic(e)
         }
     }
