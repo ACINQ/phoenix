@@ -439,8 +439,8 @@ class NotificationService: UNNotificationServiceExtension {
 		Task { @MainActor [newBusiness, weak self] in
 			let peer = try await newBusiness.peerManager.getPeer()
 			for await event in peer.eventsFlow {
-				if let msg = event as? Lightning_kmp_corePaymentRequestReceived {
-					log.debug("found event: PaymentRequestReceived")
+				if let msg = event as? Lightning_kmp_coreCardPaymentRequestReceived {
+					log.debug("found event: CardPaymentRequestReceived")
 					
 					if let cardRequest = CardRequest.fromOnionMessage(msg) {
 						Task { @MainActor [weak self] in

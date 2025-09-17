@@ -120,6 +120,11 @@ struct LightningDualView: View {
 				lastIncomingPaymentChanged(payment)
 			}
 		}
+		.task {
+			for await response in Biz.cardResponsePublisher.values {
+				cardResponseReceived(response)
+			}
+		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
 		}
@@ -959,6 +964,12 @@ struct LightningDualView: View {
 				bip353Address = Keychain.current.getBip353Address()
 			}
 		}
+	}
+	
+	func cardResponseReceived(_ response: CardResponse) {
+		log.trace(#function)
+		
+		// Todo...
 	}
 	
 	// --------------------------------------------------

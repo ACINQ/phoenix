@@ -168,6 +168,8 @@ extension PhoenixBusiness {
 			}
 		}
 		
+		return .failure(.unknownCard)
+		
 		guard let matchingCard, let piccDataInfo else {
 			return .failure(.unknownCard)
 		}

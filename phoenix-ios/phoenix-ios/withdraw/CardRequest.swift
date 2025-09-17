@@ -7,7 +7,7 @@ struct CardRequest {
 	let invoice: Lightning_kmpBolt12Invoice
 	let amount: Lightning_kmpMilliSatoshi
 	
-	static func fromOnionMessage(_ msg: Lightning_kmp_corePaymentRequestReceived) -> CardRequest? {
+	static func fromOnionMessage(_ msg: Lightning_kmp_coreCardPaymentRequestReceived) -> CardRequest? {
 		
 		var piccStr: String? = nil
 		var cmacStr: String? = nil

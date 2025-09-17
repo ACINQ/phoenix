@@ -70,6 +70,10 @@ class BusinessManager {
 	/// 
 	public let mnemonicLanguagePublisher = CurrentValueSubject<MnemonicLanguage, Never>(MnemonicLanguage.english)
 	
+	/// Reports incoming CardResponse messages.
+	///
+	public let cardResponsePublisher = PassthroughSubject<CardResponse, Never>()
+	
 	/// General wallet info (e.g. nodeId)
 	///
 	public var walletInfo: WalletManager.WalletInfo? = nil
@@ -171,8 +175,8 @@ class BusinessManager {
 		Task { @MainActor [self] in
 			let peer = try await self.business.peerManager.getPeer()
 			for await event in peer.eventsFlow {
-				if let msg = event as? Lightning_kmp_corePaymentRequestReceived {
-					log.debug("found event: PaymentRequestReceived")
+				if let msg = event as? Lightning_kmp_coreCardPaymentRequestReceived {
+					log.debug("found event: CardPaymentRequestReceived")
 					
 					if let cardRequest = CardRequest.fromOnionMessage(msg) {
 						Task { @MainActor in
@@ -181,6 +185,12 @@ class BusinessManager {
 					} else {
 						log.debug("CardRequest.fromOnionMessage() failed")
 					}
+					
+				} else if let msg = event as? Lightning_kmp_coreCardPaymentResponseReceived {
+					log.debug("found event: CardPaymentResponseReceived")
+					
+					let response = CardResponse.fromOnionMessage(msg)
+					cardResponsePublisher.send(response)
 				}
 			}
 		}.store(in: &cancellables)
@@ -780,6 +790,18 @@ class BusinessManager {
 		switch result {
 		case .failure(let error):
 			log.error("handleCardRequest: error: \(error.description)")
+			do {
+				let response = CardResponse.fromWithdrawRequestError(error)
+				
+				let peer = try await business.peerManager.getPeer()
+				try await peer.sendCardResponse(
+					request : cardRequest.invoice,
+					msg     : response.message,
+					code    : response.code
+				)
+			} catch {
+				log.error("peer.sendCardResponse(): error: \(error)")
+			}
 			
 		case .success(let status):
 			switch status {

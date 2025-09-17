@@ -458,6 +458,8 @@
 		DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */; };
 		DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */; };
 		DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */; };
+		DCE8EC5B2E79E58A0091B6F0 /* CardResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE8EC5A2E79E5860091B6F0 /* CardResponse.swift */; };
+		DCE8EC5C2E79E58A0091B6F0 /* CardResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE8EC5A2E79E5860091B6F0 /* CardResponse.swift */; };
 		DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B82943D64B00320C46 /* MsatRange.swift */; };
 		DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */; };
 		DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
@@ -930,6 +932,7 @@
 		DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager_Actor.swift; sourceTree = "<group>"; };
 		DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLSConnectionCheck.swift; sourceTree = "<group>"; };
 		DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectrumAddressSheet.swift; sourceTree = "<group>"; };
+		DCE8EC5A2E79E5860091B6F0 /* CardResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResponse.swift; sourceTree = "<group>"; };
 		DCEAE5B82943D64B00320C46 /* MsatRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MsatRange.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
@@ -1741,6 +1744,7 @@
 			isa = PBXGroup;
 			children = (
 				DCBA3A5D2E60F191000BC8D3 /* CardRequest.swift */,
+				DCE8EC5A2E79E5860091B6F0 /* CardResponse.swift */,
 				DCBA3A5E2E60F191000BC8D3 /* WithdrawRequest.swift */,
 			);
 			path = withdraw;
@@ -2481,6 +2485,7 @@
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */,
 				DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */,
+				DCE8EC5C2E79E58A0091B6F0 /* CardResponse.swift in Sources */,
 				DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
 				DCA5391C29F7202F001BD3D5 /* ChannelInfoPopup.swift in Sources */,
@@ -2595,6 +2600,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCE8EC5B2E79E58A0091B6F0 /* CardResponse.swift in Sources */,
 				DCBA3A622E60F191000BC8D3 /* CardRequest.swift in Sources */,
 				DCBA3A632E60F191000BC8D3 /* WithdrawRequest.swift in Sources */,
 				DC641C752821706600862DCD /* Currency.swift in Sources */,
