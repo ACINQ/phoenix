@@ -16,13 +16,24 @@
 
 package fr.acinq.phoenix.android.components.inputs
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +43,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.Dialog
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.MempoolFeerate
 
@@ -62,18 +74,21 @@ fun FeerateSlider(
                     )
                 }
             }
+            Spacer(Modifier.height(2.dp))
             FilledButton(
                 text = stringResource(id = R.string.mempool_unknown_feerate_title),
                 icon = R.drawable.ic_alert_triangle,
-                textStyle = MaterialTheme.typography.body1.copy(color = negativeColor, fontSize = 14.sp),
+                textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
                 iconTint = negativeColor,
                 maxLines = 1,
                 space = 6.dp,
-                backgroundColor = Color.Transparent,
-                padding = PaddingValues(6.dp),
+                shape = RoundedCornerShape(10.dp),
+                backgroundColor = mutedBgColor,
+                padding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                 modifier = Modifier.offset(x = (-6).dp),
                 onClick = { showUnknownMempoolStateDialog = true }
             )
+            Spacer(Modifier.height(2.dp))
         } else {
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.body1.copy(fontSize = 14.sp)) {
                 when {
