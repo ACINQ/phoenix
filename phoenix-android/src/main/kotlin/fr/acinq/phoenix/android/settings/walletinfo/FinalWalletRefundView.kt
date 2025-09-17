@@ -105,7 +105,7 @@ fun FinalWalletRefundView(
 private fun AddressInputAndFeeSlider(
     address: String,
     onAddressChange: (String) -> Unit,
-    feerate: Satoshi?,
+    feerate: Satoshi,
     onFeerateChange: (Satoshi) -> Unit,
     onShowScanner: () -> Unit,
     mempoolFeerate: MempoolFeerate?,
@@ -130,14 +130,12 @@ private fun AddressInputAndFeeSlider(
     Spacer(modifier = Modifier.height(16.dp))
 
     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_feerate_label)) {
-        feerate?.let { currentFeerate ->
-            FeerateSlider(
-                feerate = currentFeerate,
-                onFeerateChange = onFeerateChange,
-                mempoolFeerate = mempoolFeerate,
-                enabled = isEnabled
-            )
-        } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
+        FeerateSlider(
+            feerate = feerate,
+            onFeerateChange = onFeerateChange,
+            mempoolFeerate = mempoolFeerate,
+            enabled = isEnabled
+        )
     }
 }
 
@@ -154,7 +152,7 @@ private fun ColumnScope.AvailableForRefund(
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
 
     var address by remember { mutableStateOf("") }
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate) }
+    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 3.sat) }
 
     var showScannerView by remember { mutableStateOf(false) }
 
@@ -206,10 +204,8 @@ private fun ColumnScope.AvailableForRefund(
                 if (showLowFeerateDialog) {
                     ConfirmLowFeerate(
                         onConfirm = {
-                            feerate?.let {
-                                onEstimateRefundFee(address, FeeratePerByte(it))
-                                showLowFeerateDialog = false
-                            }
+                            onEstimateRefundFee(address, FeeratePerByte(feerate))
+                            showLowFeerateDialog = false
                         },
                         onCancel = { showLowFeerateDialog = false }
                     )
@@ -218,17 +214,14 @@ private fun ColumnScope.AvailableForRefund(
                 Button(
                     text = stringResource(id = R.string.swapinrefund_estimate_button),
                     icon = R.drawable.ic_inspect,
-                    enabled = feerate != null && address.isNotBlank(),
+                    enabled = address.isNotBlank(),
                     onClick = {
                         keyboardManager?.hide()
-                        val finalFeerate = feerate
-                        if (finalFeerate != null) {
-                            val recommendedFeerate = mempoolFeerate?.hour
-                            if (recommendedFeerate != null && finalFeerate < recommendedFeerate.feerate) {
-                                showLowFeerateDialog = true
-                            } else {
-                                onEstimateRefundFee(address, FeeratePerByte(finalFeerate))
-                            }
+                        val recommendedFeerate = mempoolFeerate?.hour
+                        if (recommendedFeerate != null && feerate < recommendedFeerate.feerate) {
+                            showLowFeerateDialog = true
+                        } else {
+                            onEstimateRefundFee(address, FeeratePerByte(feerate))
                         }
                     },
                     backgroundColor = MaterialTheme.colors.primary,

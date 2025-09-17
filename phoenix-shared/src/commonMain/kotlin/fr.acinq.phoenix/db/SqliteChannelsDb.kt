@@ -42,6 +42,14 @@ class SqliteChannelsDb(val driver: SqlDriver, database: ChannelsDatabase) : Chan
         }
     }
 
+    suspend fun getChannel(channelId: ByteVector32): Triple<ByteVector32, PersistedChannelState, Boolean>? {
+        return withContext(Dispatchers.Default) {
+            queries.getChannel(channelId, mapper = { channelId, data, isClosed ->
+                Triple(channelId, data, isClosed)
+            }).executeAsOneOrNull()
+        }
+    }
+
     override suspend fun removeChannel(channelId: ByteVector32) {
         withContext(Dispatchers.Default) {
             queries.deleteHtlcInfo(channel_id = channelId)

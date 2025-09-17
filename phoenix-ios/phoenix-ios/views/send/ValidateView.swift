@@ -1025,7 +1025,7 @@ struct ValidateView: View {
 			}
 			
 			if let model = flow as? SendManager.ParseResult_Uri,
-				model.uri.paymentRequest != nil,
+				(model.uri.paymentRequest != nil || model.uri.offer != nil),
 				!hasPickedSwapOutMode
 			{
 				log.debug("triggering popover w/PaymentLayerChoice")
@@ -1116,15 +1116,23 @@ struct ValidateView: View {
 	func paymentLayerChoice_didChooseL2() {
 		log.trace("paymentLayerChoice_didChooseL2()")
 		
-		guard
-			let model = flow as? SendManager.ParseResult_Uri,
-			let paymentRequest = model.uri.paymentRequest
-		else {
+		guard let model = flow as? SendManager.ParseResult_Uri else {
 			return
 		}
 		
-		parseUserInput(paymentRequest.write())
-		popoverState.close()
+		if let offer = model.uri.offer {
+			parseUserInput(offer.encode())
+			popoverState.close()
+			
+		} else if let paymentRequest = model.uri.paymentRequest {
+			parseUserInput(paymentRequest.write())
+			popoverState.close()
+			
+		} else {
+			log.error("Flow doesn't contain a valid L2 payment option")
+		}
+		
+		
 	}
 	
 	// --------------------------------------------------
