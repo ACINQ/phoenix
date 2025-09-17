@@ -628,6 +628,12 @@
     <string name="payments_export_csv_error">Error de exportación.</string>
     <string name="payments_export_csv_no_data">No se encontraron pagos.</string>
 
+    <string name="payments_export_database_header">Exportar base de datos</string>
+    <string name="payments_export_database_instructions">Cifra y exporta la base de datos de pagos, lo que permite migrar su historial de pagos desde este teléfono a otro.</string>
+    <string name="payments_export_database_button">Exportar la base de datos</string>
+    <string name="payments_export_database_failed">Error en la exportación</string>
+    <string name="payments_export_database_success">El archivo se encontrará en las carpetas públicas de su teléfono.</string>
+
     <!-- components -->
 
     <string name="component_calendar_inclusive">(incluso)</string>
@@ -699,15 +705,17 @@
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Eliminar billetera</string>
-    <string name="reset_wallet_instructions_header">Borrar todos los datos de la billetera en este dispositivo</string>
-    <string name="reset_wallet_instructions_details">Esto restablecerá la aplicación, como si acabaras de instalarla.</string>
+    <string name="reset_wallet_instructions_header">Esta pantalla le permite eliminar esta billetera de su teléfono.</string>
+    <string name="reset_wallet_instructions_details">Se eliminarán todos los datos de esta billetera. Esto incluye su historial de pagos.</string>
+    <string name="reset_wallet_payments_history_button">Guardar historial de pagos</string>
     <string name="reset_wallet_review_button">Revisar</string>
 
     <string name="reset_wallet_confirm_title">Confirmar restablecimiento</string>
     <string name="reset_wallet_confirm_header">La billetera se borrará completamente en <b>este dispositivo</b>.</string>
-    <string name="reset_wallet_confirm_details">Esto restablecerá la aplicación. Te dirigiremos a la pantalla de introducción, donde te pediremos que crees o restaures una billetera.</string>
-    <string name="reset_wallet_confirm_seed_balance">No pierdas tus fondos:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Eres responsable de guardar tu frase de recuperación.</string>
+    <string name="reset_wallet_confirm_details">La semilla de esta cartera y su historial de pagos se eliminarán del disco. Se le pedirá que utilice otra cartera o que cree una nueva.</string>
+    <string name="reset_wallet_confirm_details2">Las demás carteras que ya haya importado no se eliminarán.</string>
+    <string name="reset_wallet_confirm_seed_balance">No pierda sus fondos</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Entiendo que si pierdo la frase de recuperación después de eliminar la cartera, cualquier fondo restante se perderá de forma permanente.</string>
     <string name="reset_wallet_confirm_button">Eliminar billetera</string>
 
     <string name="reset_wallet_success">La billetera se restableció correctamente</string>

@@ -45,7 +45,6 @@ import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
-import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.buttons.Checkbox
@@ -104,7 +103,6 @@ fun TorConfigView(
     if (showConfirmTorDialog) {
         var hasReadMessage by remember { mutableStateOf(false) }
         val isTorEnabled = torEnabledState.value == true
-        val application = application
         Dialog(
             onDismiss = { showConfirmTorDialog = false },
             properties = DialogProperties(dismissOnClickOutside = false, dismissOnBackPress = false, usePlatformDefaultWidth = false),

@@ -60,7 +60,6 @@ class UserPrefs(private val data: DataStore<Preferences>) {
             throw exception
         }
     }
-
     suspend fun clear() = data.edit { it.clear() }
 
     private companion object {

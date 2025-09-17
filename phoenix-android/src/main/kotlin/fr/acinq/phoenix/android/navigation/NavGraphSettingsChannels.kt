@@ -33,8 +33,12 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
         ChannelsView(
             business = business,
             onBackClick = {
-                navController.navigate(Screen.BusinessNavGraph.Settings.route) {
-                    popUpTo(Screen.BusinessNavGraph.Settings.route) { inclusive = true }
+                if (navController.previousBackStackEntry == null) {
+                    navController.navigate(Screen.BusinessNavGraph.Settings.route) {
+                        popUpTo(Screen.BusinessNavGraph.Settings.route) { inclusive = true }
+                    }
+                } else {
+                    navController.popBackStack()
                 }
             },
             onChannelClick = { navController.navigate("${Screen.BusinessNavGraph.ChannelDetails.route}?id=$it") },

@@ -722,15 +722,17 @@
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Xóa ví</string>
-    <string name="reset_wallet_instructions_header">Xóa tất cả dữ liệu ví khỏi thiết bị này</string>
-    <string name="reset_wallet_instructions_details">Thao tác này sẽ đặt lại ứng dụng về trạng thái ban đầu, như lúc bạn mới cài đặt nó.</string>
+    <string name="reset_wallet_instructions_header">Màn hình này cho phép bạn xóa ví này khỏi điện thoại.</string>
+    <string name="reset_wallet_instructions_details">Tất cả dữ liệu của ví này sẽ bị xóa, bao gồm cả lịch sử thanh toán của bạn.</string>
+    <string name="reset_wallet_payments_history_button">Lưu lịch sử thanh toán</string>
     <string name="reset_wallet_review_button">Kiểm tra lại</string>
 
     <string name="reset_wallet_confirm_title">Xác nhận đặt lại</string>
     <string name="reset_wallet_confirm_header">Ví sẽ bị xóa hoàn toàn khỏi <b>thiết bị này</b>.</string>
-    <string name="reset_wallet_confirm_details">Thao tác này sẽ đặt lại ứng dụng. Mọi lịch sử thanh toán của bạn sẽ bị xoá. Một màn hình Giới thiệu sẽ hiện ra và nhắc bạn tạo ví mới hoặc khôi phục lại ví.</string>
-    <string name="reset_wallet_confirm_seed_balance">Đừng để mất quỹ vốn của bạn:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Bạn có trách nhiệm lưu trữ cụm từ khôi phục của mình.</string>
+    <string name="reset_wallet_confirm_details">Seed của ví này và lịch sử thanh toán của nó sẽ bị xóa khỏi ổ đĩa. Bạn sẽ được nhắc sử dụng ví khác hoặc tạo ví mới.</string>
+    <string name="reset_wallet_confirm_details2">Các ví khác mà bạn đã nhập sẽ không bị xóa.</string>
+    <string name="reset_wallet_confirm_seed_balance">Đừng để mất tiền của bạn</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Tôi hiểu rằng nếu tôi mất cụm từ khôi phục sau khi xóa ví, mọi số tiền còn lại sẽ bị mất vĩnh viễn.</string>
     <string name="reset_wallet_confirm_button">Xóa ví</string>
     <string name="reset_wallet_shutting_down">Đang tắt…</string>
     <string name="reset_wallet_deleting_prefs">Đang xóa tùy chọn…</string>

@@ -111,8 +111,12 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
             walletId = walletId,
             business = business,
             onBackClick = {
-                navController.navigate(Screen.BusinessNavGraph.PaymentsHistory.route) {
-                    popUpTo(Screen.BusinessNavGraph.PaymentsHistory.route) { inclusive = true }
+                if (navController.previousBackStackEntry == null) {
+                    navController.navigate(Screen.BusinessNavGraph.PaymentsHistory.route) {
+                        popUpTo(Screen.BusinessNavGraph.PaymentsHistory.route) { inclusive = true }
+                    }
+                } else {
+                    navController.popBackStack()
                 }
             }
         )
@@ -172,7 +176,15 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
     }
 
     businessComposable(Screen.BusinessNavGraph.ResetWallet.route, appViewModel) { _, walletId, business ->
-        ResetWallet(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
+        ResetWallet(
+            walletId = walletId,
+            business = business,
+            onBackClick = { navController.popBackStack() },
+            onExportPaymentsClick = { navController.navigate(Screen.BusinessNavGraph.PaymentsExport.route ) },
+            onLightningBalanceClick = { navController.navigate(Screen.BusinessNavGraph.Channels.route) },
+            onSwapInBalanceClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route) },
+            onFinalBalanceClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.FinalWallet.route) },
+        )
     }
 
     businessComposable(Screen.BusinessNavGraph.ForceClose.route, appViewModel) { _, walletId, _ ->

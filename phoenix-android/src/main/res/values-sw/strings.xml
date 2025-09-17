@@ -775,15 +775,17 @@
     <!-- Reset wallet -->
 
     <string name="reset_wallet_title">Futa mkoba</string>
-    <string name="reset_wallet_instructions_header">Futa data zote za pochi kutoka kifaa hiki</string>
-    <string name="reset_wallet_instructions_details">Hii itafanya programu irejee kama vile umeisakinisha tu.</string>
+    <string name="reset_wallet_instructions_header">Skrini hii hukuruhusu kufuta pochi hii kutoka kwa simu yako.</string>
+    <string name="reset_wallet_instructions_details">Data yote ya pochi hii itafutwa. Hii inajumuisha historia yako ya malipo.</string>
+    <string name="reset_wallet_payments_history_button">Hifadhi historia ya malipo</string>
     <string name="reset_wallet_review_button">Tathmini</string>
 
     <string name="reset_wallet_confirm_title">Thibitisha kufuta</string>
     <string name="reset_wallet_confirm_header">Pochi itafutwa kabisa kutoka <b>kifaa hiki</b>.</string>
-    <string name="reset_wallet_confirm_details">Hii itafanya programu irejee. Historia yako ya malipo itapotea. Utapelekwa kwenye skrini ya Utangulizi, na utaombwa kuunda au kurejesha pochi.</string>
-    <string name="reset_wallet_confirm_seed_balance">Usipoteze fedha zako:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Wewe ndiye mwenye jukumu la kuhifadhi sentensi yako ya urejeleaji.</string>
+    <string name="reset_wallet_confirm_details">Mbegu za pochi hii na historia yake ya malipo itafutwa kutoka kwenye diski. Utaombwa utumie pochi nyingine, au uunde mpya.</string>
+    <string name="reset_wallet_confirm_details2">Pochi zingine ambazo tayari umeingiza hazitafutwa.</string>
+    <string name="reset_wallet_confirm_seed_balance">Usipoteze pesa zako</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Ninaelewa kuwa nikipoteza maneno ya kurejesha akaunti baada ya kufuta pochi, pesa zozote zilizosalia zitapotea kabisa.</string>
     <string name="reset_wallet_confirm_button">Futa pochi</string>
     <string name="reset_wallet_shutting_down">Inazima…</string>
     <string name="reset_wallet_deleting_prefs">Ikifuta mapendeleo…</string>

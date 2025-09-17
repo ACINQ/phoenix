@@ -61,12 +61,15 @@ import kotlinx.coroutines.flow.flowOf
 fun WalletView(
     walletId: WalletId,
     modifier: Modifier = Modifier,
+    internalPadding: PaddingValues = PaddingValues(12.dp),
+    avatarBackgroundColor: Color = MaterialTheme.colors.surface,
+    avatarInternalPadding: PaddingValues = PaddingValues(10.dp),
 ) {
     val metadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(emptyMap())
     val metadata = metadataMap.getByWalletIdOrDefault(walletId)
 
-    Row(modifier = modifier.padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        WalletAvatar(metadata.avatar)
+    Row(modifier = modifier.padding(internalPadding), verticalAlignment = Alignment.CenterVertically) {
+        WalletAvatar(metadata.avatar, backgroundColor = avatarBackgroundColor, internalPadding = avatarInternalPadding)
         Spacer(Modifier.width(12.dp))
         Column {
             Text(text = metadata.nameOrDefault(), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.body2)

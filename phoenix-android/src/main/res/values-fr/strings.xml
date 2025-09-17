@@ -676,6 +676,12 @@
     <string name="payments_export_csv_error">Échec de l\'export.</string>
     <string name="payments_export_csv_no_data">Aucun paiements trouvés.</string>
 
+    <string name="payments_export_database_header">Export de base de données</string>
+    <string name="payments_export_database_instructions">Chiffre et exporte la base de données des paiements, ce qui permet de migrer votre historique de paiements depuis ce téléphone vers un autre.</string>
+    <string name="payments_export_database_button">Exporter la base</string>
+    <string name="payments_export_database_failed">Échec de l\'export</string>
+    <string name="payments_export_database_success">Le fichier pourra être trouvé dans les dossiers publics de votre téléphone.</string>
+
     <!-- components -->
 
     <string name="component_calendar_inclusive">(inclus)</string>
@@ -760,15 +766,17 @@
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Suppression du wallet</string>
-    <string name="reset_wallet_instructions_header">Supprime toutes les données du wallet de cet appareil</string>
-    <string name="reset_wallet_instructions_details">L\'application sera réinitialisée, comme si vous veniez de l\'installer.</string>
+    <string name="reset_wallet_instructions_header">Cet écran vous permet de supprimer ce portefeuille de votre téléphone.</string>
+    <string name="reset_wallet_instructions_details">Toutes les données de ce portefeuille seront supprimées. Cela inclut votre historique de paiements.</string>
+    <string name="reset_wallet_payments_history_button">Sauvegarder l\'historique des paiements</string>
     <string name="reset_wallet_review_button">Valider</string>
 
     <string name="reset_wallet_confirm_title">cConfirmer la réinitialisation</string>
     <string name="reset_wallet_confirm_header">Le wallet sera complètement supprimé de <b>cet appareil</b>.</string>
-    <string name="reset_wallet_confirm_details">L\'application sera réinitialisée. Votre historique de paiements sera perdu. Vous serez redirigé vers l\'écran de création du wallet..</string>
-    <string name="reset_wallet_confirm_seed_balance">Ne perdez pas vos fonds :\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Vous êtes responsable de la conservation de votre clé de sauvegarde.</string>
+    <string name="reset_wallet_confirm_details">La seed de ce portefeuille et son historique de paiements seront supprimés du disque. Vous serez invité à utiliser un autre portefeuille ou à en créer un nouveau.</string>
+    <string name="reset_wallet_confirm_details2">Les autres portefeuilles que vous avez déjà importés ne seront pas supprimés.</string>
+    <string name="reset_wallet_confirm_seed_balance">Ne perdez pas vos fonds</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Je comprends que si je perds la phrase de sauvegarde après avoir supprimé le portefeuille, tous les fonds restants seront définitivement perdus.</string>
     <string name="reset_wallet_confirm_button">Supprimer le wallet</string>
     <string name="reset_wallet_shutting_down">Extinction…</string>
     <string name="reset_wallet_deleting_prefs">Suppression des préférences…</string>

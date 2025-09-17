@@ -70,33 +70,13 @@ object DataStoreManager {
         return newInternalPrefs
     }
 
-    private fun unloadUserPrefs(id: WalletId) {
-        val newUserPrefsMap = _userPrefsMapFlow.value.toMutableMap()
-        newUserPrefsMap.remove(id)
-        _userPrefsMapFlow.value = newUserPrefsMap
-    }
-
-    private fun unloadInternalPrefs(id: WalletId) {
-        val newInternalPrefsMap = _internalPrefsMapFlow.value.toMutableMap()
-        newInternalPrefsMap.remove(id)
-        _internalPrefsMapFlow.value = newInternalPrefsMap
-    }
-
     /** Deletes the preferences files for a given wallet id, and removes the preferences from the map flow. */
     fun deleteNodeUserPrefs(context: Context, id: WalletId): Boolean {
         val userPrefsFile = userPrefsFile(context, id)
         val userPrefsFileDeleted = userPrefsFile.delete()
 
-        if (userPrefsFileDeleted) {
-            unloadUserPrefs(id)
-        }
-
         val internalPrefsFile = internalPrefsFile(context, id)
         val internalPrefsFileDeleted = internalPrefsFile.delete()
-
-        if (internalPrefsFileDeleted) {
-            unloadInternalPrefs(id)
-        }
 
         return userPrefsFileDeleted && internalPrefsFileDeleted
     }

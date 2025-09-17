@@ -762,15 +762,17 @@
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Odstrániť peňaženku</string>
-    <string name="reset_wallet_instructions_header">Vymazať všetky údaje peňaženky z tohto zariadenia</string>
-    <string name="reset_wallet_instructions_details">Toto resetuje aplikáciu, ako keby ste ju práve nainštalovali.</string>
+    <string name="reset_wallet_instructions_header">Na tejto obrazovke môžete túto peňaženku odstrániť zo svojho telefónu.</string>
+    <string name="reset_wallet_instructions_details">Všetky údaje týkajúce sa tejto peňaženky budú odstránené. To zahŕňa aj históriu vašich platieb.</string>
+    <string name="reset_wallet_payments_history_button">Uložiť históriu platieb</string>
     <string name="reset_wallet_review_button">Preskúmať</string>
 
     <string name="reset_wallet_confirm_title">Potvrdiť reset</string>
     <string name="reset_wallet_confirm_header">Peňaženka bude úplne vymazaná z <b>tohto zariadenia</b>.</string>
-    <string name="reset_wallet_confirm_details">Toto resetuje aplikáciu. Zobrazí sa úvodná obrazovka s výzvou na vytvorenie alebo obnovenie peňaženky.</string>
-    <string name="reset_wallet_confirm_seed_balance">Nestrácajte svoje prostriedky:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Za uloženie obnovovacej frázy (seedu) ste zodpovední vy.</string>
+    <string name="reset_wallet_confirm_details">Seed tejto peňaženky a jej história platieb budú vymazané z disku. Budete vyzvaní, aby ste použili inú peňaženku alebo vytvorili novú.</string>
+    <string name="reset_wallet_confirm_details2">Ostatné peňaženky, ktoré ste už importovali, nebudú vymazané.</string>
+    <string name="reset_wallet_confirm_seed_balance">Nestrácajte svoje prostriedky</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Rozumiem, že ak po vymazaní peňaženky stratím obnovovaciu frázu, všetky zostávajúce prostriedky budú natrvalo stratené.</string>
     <string name="reset_wallet_confirm_button">Odstrániť peňaženku</string>
     <string name="reset_wallet_shutting_down">Vypínam sa…</string>
     <string name="reset_wallet_deleting_prefs">Vymazávanie nastavení…</string>

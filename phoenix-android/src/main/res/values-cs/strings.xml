@@ -919,15 +919,17 @@
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Odstranění peněženky</string>
-    <string name="reset_wallet_instructions_header">Smazat veškerá data peněženky z tohoto zařízení</string>
-    <string name="reset_wallet_instructions_details">Toto resetuje aplikaci tak, jako byste ji právě nainstalovali.</string>
+    <string name="reset_wallet_instructions_header">Na této obrazovce můžete tuto peněženku ze svého zařízení odstranit.</string>
+    <string name="reset_wallet_instructions_details">Všechna data této peněženky budou odstraněna. To zahrnuje i historii vašich plateb.</string>
+    <string name="reset_wallet_payments_history_button">Uložit historii plateb</string>
     <string name="reset_wallet_review_button">Pokračovat</string>
 
     <string name="reset_wallet_confirm_title">Potvrdit reset</string>
     <string name="reset_wallet_confirm_header">Peněženka bude kompletně smazána z <b>tohoto zařízení</b>.</string>
-    <string name="reset_wallet_confirm_details">Toto resetuje aplikaci. Zobrazí se úvodní obrazovka s výzvou k vytvoření nebo obnovení peněženky.</string>
-    <string name="reset_wallet_confirm_seed_balance">Neztraťte své prostředky:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Za uložení obnovovací fráze jste zodpovědní vy.</string>
+    <string name="reset_wallet_confirm_details">Seed této peněženky a její platební historie budou smazány z disku. Budete vyzváni k použití jiné peněženky nebo k vytvoření nové. </string>
+    <string name="reset_wallet_confirm_details2">Ostatní peněženky, které jste již importovali, nebudou smazány. </string>
+    <string name="reset_wallet_confirm_seed_balance">Neztraťte své prostředky</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Beru na vědomí, že pokud po smazání peněženky ztratím obnovovací frázi, všechny zbývající prostředky budou trvale ztraceny.</string>
     <string name="reset_wallet_confirm_button">Odstranění peněženky</string>
     <string name="reset_wallet_shutting_down">Vypínání…</string>
     <string name="reset_wallet_deleting_prefs">Mazání předvoleb…</string>

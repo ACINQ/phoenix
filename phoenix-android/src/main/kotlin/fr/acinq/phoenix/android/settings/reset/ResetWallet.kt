@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -35,24 +36,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BusinessManager
-import fr.acinq.phoenix.android.LocalBitcoinUnits
-import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.MainActivity
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
+import fr.acinq.phoenix.android.components.AmountWithFiatBeside
 import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.buttons.BorderButton
-import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.Checkbox
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.buttons.SurfaceFilledButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
@@ -60,8 +66,7 @@ import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.wallet.WalletView
-import fr.acinq.phoenix.android.primaryFiatRate
-import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
 
 
@@ -70,32 +75,36 @@ fun ResetWallet(
     walletId: WalletId,
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
+    onExportPaymentsClick: () -> Unit,
+    onLightningBalanceClick: () -> Unit,
+    onSwapInBalanceClick: () -> Unit,
+    onFinalBalanceClick: () -> Unit,
 ) {
     val vm = viewModel<ResetWalletViewModel>(factory = ResetWalletViewModel.Factory(application = application, walletId = walletId))
-    val balance by business.balanceManager.balance.collectAsState()
 
     DefaultScreenLayout {
         when (vm.state.value) {
             is ResetWalletStep.Deleting, is ResetWalletStep.Result.Success -> {
                 BackHandler {}
             }
+            is ResetWalletStep.Confirm -> {
+                DefaultScreenHeader(onBackClick = { vm.state.value = ResetWalletStep.Init }, title = stringResource(id = R.string.reset_wallet_confirm_title))
+            }
             else -> {
-                DefaultScreenHeader(
-                    onBackClick = onBackClick,
-                    title = when (vm.state.value) {
-                        ResetWalletStep.Confirm -> stringResource(id = R.string.reset_wallet_confirm_title)
-                        else -> stringResource(id = R.string.reset_wallet_title)
-                    }
-                )
+                DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.reset_wallet_title))
             }
         }
 
         when (val state = vm.state.value) {
             ResetWalletStep.Init -> {
-                InitReset(walletId = walletId, onReviewClick = { vm.state.value = ResetWalletStep.Confirm })
+                InitReset(walletId = walletId, onReviewClick = { vm.state.value = ResetWalletStep.Confirm }, onExportPaymentsClick = onExportPaymentsClick)
             }
             ResetWalletStep.Confirm -> {
-                ReviewReset(balance = balance, onConfirmClick = vm::deleteWalletData)
+                ReviewWalletBeforeDeletion(
+                    business = business,
+                    onConfirmClick = vm::deleteWalletData,
+                    onLightningBalanceClick = onLightningBalanceClick, onSwapInBalanceClick = onSwapInBalanceClick, onFinalBalanceClick = onFinalBalanceClick
+                )
             }
             is ResetWalletStep.Deleting -> {
                 DeletingWallet(state)
@@ -113,23 +122,34 @@ fun ResetWallet(
 @Composable
 private fun InitReset(
     walletId: WalletId,
-    onReviewClick: () -> Unit
+    onReviewClick: () -> Unit,
+    onExportPaymentsClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Text(text = "Do you want to delete this wallet from your device ?")
-        Spacer(modifier = Modifier.height(4.dp))
-        WalletView(walletId)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "All data for this wallet will be removed, including the payments history.")
+        Text(text = stringResource(R.string.reset_wallet_instructions_header))
+        Spacer(modifier = Modifier.height(16.dp))
+        WalletView(walletId, avatarBackgroundColor = mutedBgColor, internalPadding = PaddingValues(0.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = stringResource(R.string.reset_wallet_instructions_details))
     }
 
     Card {
-        Button(
+        SurfaceFilledButton(
+            text = stringResource(R.string.reset_wallet_payments_history_button),
+            icon = R.drawable.ic_arrow_down_circle,
+            onClick = onExportPaymentsClick,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
+    Card {
+        FilledButton(
             text = stringResource(id = R.string.reset_wallet_review_button),
             icon = R.drawable.ic_arrow_next,
+            shape = RectangleShape,
             modifier = Modifier.fillMaxWidth(),
             onClick = onReviewClick,
         )
@@ -137,9 +157,12 @@ private fun InitReset(
 }
 
 @Composable
-private fun ReviewReset(
-    balance: MilliSatoshi?,
-    onConfirmClick: () -> Unit
+private fun ReviewWalletBeforeDeletion(
+    business: PhoenixBusiness,
+    onConfirmClick: () -> Unit,
+    onLightningBalanceClick: () -> Unit,
+    onSwapInBalanceClick: () -> Unit,
+    onFinalBalanceClick: () -> Unit,
 ) {
     var backupChecked by remember { mutableStateOf(false) }
     var disclaimerChecked by remember { mutableStateOf(false) }
@@ -149,53 +172,82 @@ private fun ReviewReset(
         internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Text(text = stringResource(id = R.string.reset_wallet_confirm_header))
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(id = R.string.reset_wallet_confirm_details),
+            style = MaterialTheme.typography.subtitle2
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(id = R.string.reset_wallet_confirm_details2),
             style = MaterialTheme.typography.subtitle2
         )
     }
     Card(
         modifier = Modifier.fillMaxWidth(),
-        internalPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+        internalPadding = PaddingValues(12.dp),
     ) {
-        balance?.let {
-            WarningMessage(
-                header = stringResource(
-                    id = R.string.reset_wallet_confirm_seed_balance,
-                    it.toPrettyString(LocalBitcoinUnits.current.primary, withUnit = true),
-                    it.toPrettyString(LocalFiatCurrencies.current.primary, rate = primaryFiatRate, withUnit = true)
-                ),
-                details = stringResource(id = R.string.reset_wallet_confirm_seed_responsibility),
-                padding = PaddingValues(start = 2.dp),
-                space = 14.dp,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Checkbox(
-                text = stringResource(id = R.string.displayseed_backup_checkbox),
-                padding = PaddingValues(0.dp),
-                checked = backupChecked,
-                onCheckedChange = { backupChecked = it },
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Checkbox(
-                text = stringResource(id = R.string.displayseed_loss_disclaimer_checkbox),
-                padding = PaddingValues(0.dp),
-                checked = disclaimerChecked,
-                onCheckedChange = { disclaimerChecked = it }
-            )
-        } ?: ProgressView(text = stringResource(id = R.string.utils_loading_data))
+        WarningMessage(
+            header = stringResource(id = R.string.reset_wallet_confirm_seed_balance),
+            details = null,
+            padding = PaddingValues(start = 2.dp),
+            space = 14.dp,
+            modifier = Modifier.fillMaxWidth(),
+            alignment = Alignment.CenterHorizontally
+        )
+        Spacer(Modifier.height(8.dp))
+
+        val balance by business.balanceManager.balance.collectAsState()
+        DeleteWalletBalanceView(text = stringResource(R.string.walletinfo_lightning), icon = R.drawable.ic_zap, amount = balance, onClick = onLightningBalanceClick)
+
+        val swapInBalance by business.balanceManager.swapInWalletBalance.collectAsState()
+        DeleteWalletBalanceView(text = stringResource(R.string.walletinfo_onchain_swapin), icon = R.drawable.ic_chain, amount = swapInBalance.total.toMilliSatoshi(), onClick = onSwapInBalanceClick)
+
+        val finalWallet by business.peerManager.finalWallet.collectAsState()
+        DeleteWalletBalanceView(text = stringResource(R.string.walletinfo_onchain_final), icon = R.drawable.ic_chain, amount = finalWallet?.all?.balance?.toMilliSatoshi(), onClick = onFinalBalanceClick)
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Checkbox(
+            text = stringResource(id = R.string.displayseed_backup_checkbox),
+            padding = PaddingValues(0.dp),
+            checked = backupChecked,
+            onCheckedChange = { backupChecked = it },
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Checkbox(
+            text = stringResource(id = R.string.reset_wallet_confirm_seed_disclaimer),
+            padding = PaddingValues(0.dp),
+            checked = disclaimerChecked,
+            onCheckedChange = { disclaimerChecked = it }
+        )
     }
 
     Card {
-        Button(
+        FilledButton(
             text = stringResource(id = R.string.reset_wallet_confirm_button),
             icon = R.drawable.ic_remove,
-            iconTint = negativeColor,
+            backgroundColor = negativeColor,
+            shape = RectangleShape,
             onClick = onConfirmClick,
             enabled = backupChecked && disclaimerChecked,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Composable
+private fun DeleteWalletBalanceView(text: String, icon: Int, amount: MilliSatoshi?, onClick: () -> Unit) {
+    Clickable(
+        backgroundColor = mutedBgColor,
+        shape = RoundedCornerShape(8.dp),
+        onClick = onClick,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            TextWithIcon(text = text, icon = icon, iconSize = 16.dp, textStyle = MaterialTheme.typography.subtitle2)
+            Spacer(Modifier.height(4.dp))
+            amount?.let { AmountWithFiatBeside(amount = it, amountTextStyle = MaterialTheme.typography.body2) } ?: ProgressView(text = stringResource(R.string.utils_loading_data), padding = PaddingValues(0.dp))
+        }
     }
 }
 

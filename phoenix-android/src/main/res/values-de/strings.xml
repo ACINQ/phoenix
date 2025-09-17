@@ -645,6 +645,12 @@
     <string name="payments_export_csv_error">Export ist fehlgeschlagen.</string>
     <string name="payments_export_csv_no_data">Keine Zahlungen gefunden.</string>
 
+    <string name="payments_export_database_header">Datenbank exportieren</string>
+    <string name="payments_export_database_instructions">Verschlüsselt und exportiert die Zahlungsdatenbank, sodass Sie Ihren Zahlungsverlauf von diesem Telefon auf ein anderes übertragen können.</string>
+    <string name="payments_export_database_button">Datenbank exportieren</string>
+    <string name="payments_export_database_failed">Export fehlgeschlagen</string>
+    <string name="payments_export_database_success">Die Datei befindet sich im öffentlichen Ordner Ihres Telefons.</string>
+
     <!-- components -->
 
     <string name="component_calendar_inclusive">(inklusive)</string>
@@ -729,15 +735,17 @@
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Wallet löschen</string>
-    <string name="reset_wallet_instructions_header">Alle Wallet-Daten von diesem Gerät löschen</string>
-    <string name="reset_wallet_instructions_details">Dadurch wird die Anwendung zurückgesetzt, als ob Sie sie gerade erst installiert hätten.</string>
+    <string name="reset_wallet_instructions_header">Auf diesem Bildschirm können Sie diese Wallet von Ihrem Smartphone löschen.</string>
+    <string name="reset_wallet_instructions_details">Alle Daten dieser Wallet werden gelöscht. Dazu gehört auch Ihr Zahlungsverlauf.</string>
+    <string name="reset_wallet_payments_history_button">Zahlungsverlauf speichern</string>
     <string name="reset_wallet_review_button">Überprüfen</string>
 
     <string name="reset_wallet_confirm_title">Zurücksetzen bestätigen</string>
     <string name="reset_wallet_confirm_header">Die Wallet wird vollständig von <b>diesem Gerät</b> gelöscht.</string>
-    <string name="reset_wallet_confirm_details">Dadurch wird die App zurückgesetzt. Es erscheint der Start-Bildschirm mit der Aufforderung, eine Wallet zu erstellen oder wiederherzustellen.</string>
-    <string name="reset_wallet_confirm_seed_balance">Verlieren Sie Ihr Guthaben nicht:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Sie sind für die Speicherung Ihrer Wiederherstellungsphrase verantwortlich.</string>
+    <string name="reset_wallet_confirm_details">Der Seed dieser Wallet und ihre Zahlungshistorie werden von der Festplatte gelöscht. Sie werden aufgefordert, eine andere Wallet zu verwenden oder eine neue zu erstellen.</string>
+    <string name="reset_wallet_confirm_details2">Andere Wallets, die Sie bereits importiert haben, werden nicht gelöscht.</string>
+    <string name="reset_wallet_confirm_seed_balance">Verlieren Sie nicht Ihr Guthaben</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Ich verstehe, dass ich mein verbleibendes Guthaben dauerhaft verliere, wenn ich die Wiederherstellungsphrase nach dem Löschen der Wallet verliere.</string>
     <string name="reset_wallet_confirm_button">Wallet löschen</string>
     <string name="reset_wallet_shutting_down">Abschalten..</string>
     <string name="reset_wallet_deleting_prefs">Löschen von Voreinstellungen..</string>

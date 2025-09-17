@@ -625,6 +625,12 @@
     <string name="payments_export_csv_error">Erro de exportação.</string>
     <string name="payments_export_csv_no_data">Nenhum pagamento encontrado.</string>
 
+    <string name="payments_export_database_header">Exportar banco de dados</string>
+    <string name="payments_export_database_instructions">Criptografa e exporta o banco de dados de pagamentos, permitindo migrar seu histórico de pagamentos deste telefone para outro.</string>
+    <string name="payments_export_database_button">Exportar banco de dados</string>
+    <string name="payments_export_database_failed">Falha na exportação</string>
+    <string name="payments_export_database_success">O arquivo poderá ser encontrado nas pastas públicas do seu telefone.</string>
+
     <!-- components -->
 
     <string name="component_calendar_inclusive">(par)</string>
@@ -696,15 +702,17 @@
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Excluir carteira</string>
-    <string name="reset_wallet_instructions_header">Excluir todos os dados da carteira neste dispositivo</string>
-    <string name="reset_wallet_instructions_details">Isso redefinirá o aplicativo, como se você tivesse acabado de instalá-lo.</string>
+    <string name="reset_wallet_instructions_header">Esta tela permite que você exclua esta carteira do seu telefone.</string>
+    <string name="reset_wallet_instructions_details">Todos os dados desta carteira serão excluídos. Isso inclui seu histórico de pagamentos.</string>
+    <string name="reset_wallet_payments_history_button">Salvar histórico de pagamentos</string>
     <string name="reset_wallet_review_button">Analisar</string>
 
     <string name="reset_wallet_confirm_title">Confirmar redefinição</string>
     <string name="reset_wallet_confirm_header">A carteira será completamente excluída <b>neste dispositivo</b>.</string>
-    <string name="reset_wallet_confirm_details">Isso redefinirá o aplicativo. Iremos direcioná-lo para a tela de introdução, onde solicitaremos que você crie ou restaure uma carteira.</string>
-    <string name="reset_wallet_confirm_seed_balance">Não perca seus fundos:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Você é responsável por salvar sua frase de recuperação.</string>
+    <string name="reset_wallet_confirm_details">A semente desta carteira e seu histórico de pagamentos serão excluídos do disco. Você será solicitado a usar outra carteira ou criar uma nova.</string>
+    <string name="reset_wallet_confirm_details2">Outras carteiras que você já importou não serão excluídas.</string>
+    <string name="reset_wallet_confirm_seed_balance">Não perca seus fundos</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Entendo que, se perder a frase de recuperação após excluir a carteira, quaisquer fundos restantes serão perdidos permanentemente.</string>
     <string name="reset_wallet_confirm_button">Excluir carteira</string>
 
     <string name="reset_wallet_success">A carteira foi redefinida com sucesso</string>
