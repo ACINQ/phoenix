@@ -60,7 +60,10 @@ class MainActivity : AppCompatActivity() {
     private val screenStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_SCREEN_OFF -> appViewModel.clearActiveWallet()
+                Intent.ACTION_SCREEN_OFF -> {
+                    appViewModel.clearActiveWallet()
+                    appViewModel.startWalletImmediately.value = true
+                }
                 else -> Unit
             }
         }

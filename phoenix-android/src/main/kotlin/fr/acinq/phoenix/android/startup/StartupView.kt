@@ -114,13 +114,7 @@ fun StartupView(
             is ListWalletState.Success -> {
                 val availableWallets by appViewModel.availableWallets.collectAsState()
                 val defaultWallet = globalPrefs.getDefaultWallet.collectAsState(null)
-                // the default wallet should be immediately started only *once* ; to keep track of that, we use a state in the app VM
-                var startDefaultImmediately by remember { mutableStateOf(appViewModel.startDefaultImmediately.value) }
-                LaunchedEffect(Unit) {
-                    if (appViewModel.startDefaultImmediately.value) {
-                        appViewModel.startDefaultImmediately.value = false
-                    }
-                }
+                val startWalletImmediately by appViewModel.startWalletImmediately.collectAsState()
 
                 val availableWalletMetadataPrefs = globalPrefs.getAvailableWalletsMeta.collectAsState(null)
                 val availableWalletMetadata = availableWalletMetadataPrefs.value
@@ -152,9 +146,10 @@ fun StartupView(
                                 var loadingWallet by remember {
                                     mutableStateOf(
                                         when {
+                                            !startWalletImmediately -> null
                                             availableWallets.size == 1 -> availableWallets.entries.firstOrNull()?.value
                                             desiredNodeId != null -> availableWallets[desiredNodeId]
-                                            startDefaultImmediately -> availableWallets[defaultWallet.value]
+                                            startWalletImmediately -> availableWallets[defaultWallet.value]
                                             else -> null
                                         }
                                     )
@@ -183,7 +178,7 @@ fun StartupView(
                                         LoadWallet(
                                             userWallet = wallet,
                                             metadata = metadata,
-                                            promptScreenLockImmediately = startDefaultImmediately,
+                                            promptScreenLockImmediately = startWalletImmediately,
                                             doLoadWallet = { userWallet ->
                                                 startupViewModel.startupNode(walletId = userWallet.walletId, words = userWallet.words, onStartupSuccess = {
                                                     appViewModel.setActiveWallet(walletId = userWallet.walletId, business = it)
@@ -193,7 +188,7 @@ fun StartupView(
                                             },
                                             // only show back-to-selector button if there's more than one wallet
                                             goToWalletSelector = availableWallets.takeIf { it.size > 1 }?.let {
-                                                { loadingWallet = null; startDefaultImmediately = false }
+                                                { loadingWallet = null; appViewModel.startWalletImmediately.value = false }
                                             }
                                         )
                                     }

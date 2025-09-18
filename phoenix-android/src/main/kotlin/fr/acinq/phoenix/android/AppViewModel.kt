@@ -115,7 +115,7 @@ class AppViewModel(
 
     private val _desiredWalletId = MutableStateFlow<WalletId?>(null)
     val desiredWalletId = _desiredWalletId.asStateFlow()
-    val startDefaultImmediately = MutableStateFlow(true)
+    val startWalletImmediately = MutableStateFlow(true)
 
     private val _activeWalletInUI = MutableStateFlow<ActiveWallet?>(null)
     val activeWalletInUI = _activeWalletInUI.asStateFlow()
@@ -235,6 +235,7 @@ class AppViewModel(
     fun resetToSelector() {
         _desiredWalletId.value = null
         _activeWalletInUI.value = null
+        startWalletImmediately.value = false
     }
 
     override fun onCleared() {
