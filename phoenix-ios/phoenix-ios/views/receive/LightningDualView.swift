@@ -63,6 +63,7 @@ struct LightningDualView: View {
 	}
 	@State var cardState: CardState? = nil
 	@State var cardOfferId: Bitcoin_kmpByteVector32? = nil
+	@State var cardRequestId: Bitcoin_kmpByteVector? = nil
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -147,11 +148,23 @@ struct LightningDualView: View {
 		}
 		.task {
 			// Don't show HCE (host card emulation) button unless their device is eligible to use it
+		#if DEBUG
+			if DEVELOPER == "robbie_hanson" {
+				hceEligible = true
+			} else {
+				if #available(iOS 17.4, *) {
+					if await CardSession.isEligible {
+						hceEligible = true
+					}
+				}
+			}
+		#else
 			if #available(iOS 17.4, *) {
 				if await CardSession.isEligible {
 					hceEligible = true
 				}
 			}
+		#endif
 		}
 	}
 	
@@ -194,6 +207,10 @@ struct LightningDualView: View {
 			
 			qrCodeWrapperView()
 			
+			detailedInfo()
+				.padding(.top)
+				.padding(.horizontal, 20)
+			
 			if let warning = inboundFeeState.calculateInboundFeeWarning(invoiceAmount: invoiceAmount()) {
 				inboundFeeInfo(warning)
 					.padding(.top)
@@ -201,29 +218,43 @@ struct LightningDualView: View {
 			}
 			
 			typePicker()
+				.padding(.top)
 				.padding(.horizontal, 20)
-				.padding(.vertical)
 			
 			actionButtons()
+				.padding(.top)
 			
-			detailedInfo()
-				.padding(.horizontal, 20)
-				.padding(.vertical)
-
-			if activeType == .bolt12_offer, let address = bip353Address {
-				bip353AddressView(address)
-					.lineLimit(2)
-					.multilineTextAlignment(.center)
-					.font(.callout)
-					.padding(.top)
-			}
+			// Screen real estate is at a premium here.
+			// So if the user is doing NFC stuff,
+			// we really don't have to show other things that don't pertain to the current action.
 			
-			if activeType == .bolt12_offer {
-				howToUseButton()
+			if hceActive {
+				hceActivity()
 					.padding(.top)
+				
+			} else if let state = cardState {
+				cardActivity(state)
+					.padding(.top)
+				
+			} else {
+				
+				if let msg = cardErrorMessage {
+					cardError(msg)
+						.padding(.top)
+				}
+				
+				if activeType == .bolt12_offer {
+					if let address = bip353Address {
+						bip353AddressView(address)
+							.lineLimit(2)
+							.multilineTextAlignment(.center)
+							.font(.callout)
+							.padding(.top)
+					}
+					howToUseButton()
+						.padding(.top)
+				}
 			}
-
-			nfcActivity()
 			
 			if notificationPermissions == .disabled {
 				backgroundPaymentsDisabledWarning()
@@ -367,12 +398,12 @@ struct LightningDualView: View {
 		VStack(alignment: .center, spacing: 10) {
 		
 			invoiceAmountView()
-				.font(.callout)
+				.font(.body)
 				.foregroundColor(.secondary)
 			
 			invoiceDescriptionView()
 				.lineLimit(1)
-				.font(.callout)
+				.font(.body)
 				.foregroundColor(.secondary)
 			
 		} // </VStack>
@@ -429,16 +460,75 @@ struct LightningDualView: View {
 	@ViewBuilder
 	func actionButtons() -> some View {
 		
-		HStack(alignment: VerticalAlignment.center, spacing: 30) {
+		ViewThatFits {
+			actionButtons_standard()
+			actionButtons_compact()
+			actionButtons_accessibility()
+		}
+		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
+	}
+	
+	@ViewBuilder
+	func actionButtons_standard() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Spacer()
 			copyButton()
+			Spacer()
 			shareButton()
+			Spacer()
 			editButton()
+			Spacer()
 			if hceEligible {
 				hceButton()
+				Spacer()
+			}
+			cardButton()
+			Spacer()
+		}
+	}
+	
+	@ViewBuilder
+	func actionButtons_compact() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			copyButton()
+			Spacer()
+			shareButton()
+			Spacer()
+			editButton()
+			Spacer()
+			if hceEligible {
+				hceButton()
+				Spacer()
 			}
 			cardButton()
 		}
-		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
+	}
+	
+	@ViewBuilder
+	func actionButtons_accessibility() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 20) {
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer()
+				copyButton()
+				Spacer()
+				shareButton()
+				Spacer()
+				editButton()
+				Spacer()
+			}
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer()
+				if hceEligible {
+					hceButton()
+					Spacer()
+				}
+				cardButton()
+				Spacer()
+			}
+		}
 	}
 	
 	@ViewBuilder
@@ -572,36 +662,47 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
-	func nfcActivity() -> some View {
+	func hceActivity() -> some View {
 		
-		if hceActive || (cardState != nil) {
-			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
-					.frame(width: 240, height: 10)
-					.padding(.horizontal)
-					.padding(.bottom, 4)
-				
-				if let cardState {
-					Group {
-						switch cardState {
-						case .scanning:
-							Text("Reading card…")
-						case .parsing:
-							Text("Communicating with card's host…")
-						case .requesting:
-							Text("Requesting payment…")
-						case .receiving:
-							Text("Awaiting payment…")
-						}
-					}
-					.multilineTextAlignment(.center)
-				}
-				
-			} // </VStack>
-			.padding(.top)
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
+				.frame(width: 240, height: 10)
 		}
+	}
+	
+	@ViewBuilder
+	func cardActivity(_ state: CardState) -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
+				.frame(width: 240, height: 10)
+				.padding(.bottom, 4)
+				
+			Group {
+				switch state {
+				case .scanning:
+					Text("Reading card…")
+				case .parsing:
+					Text("Communicating with card's host…")
+				case .requesting:
+					Text("Requesting payment…")
+				case .receiving:
+					Text("Awaiting payment…")
+				}
+			}
+			.multilineTextAlignment(.center)
+			
+		} // </VStack>
+	}
+
+	@ViewBuilder
+	func cardError(_ errorMsg: String) -> some View {
+		
+		Text(errorMsg)
+			.multilineTextAlignment(.center)
+			.foregroundColor(.appNegative)
+			.padding(.horizontal, 10)
 	}
 	
 	@ViewBuilder
@@ -969,7 +1070,33 @@ struct LightningDualView: View {
 	func cardResponseReceived(_ response: CardResponse) {
 		log.trace(#function)
 		
-		// Todo...
+		guard let cardRequestId else {
+			// We don't have a cardRequest pending; Doesn't pertain to us
+			return
+		}
+		guard cardRequestId == response.requestId else {
+			log.info("CardResponse.requestId mismatch: ignoring")
+			return
+		}
+		
+		self.cardState = nil
+		self.cardOfferId = nil
+		self.cardRequestId = nil
+		
+		if let errorCode = response.errorCode { // standardized error code
+			cardErrorMessage = String(localized:
+				"""
+				Card's wallet rejected payment request.
+				Error code: \(errorCode.rawValue)
+				Message: \(response.message)
+				""")
+		} else {
+			cardErrorMessage = String(localized:
+				"""
+				Card's wallet rejected payment request.
+				Message: \(response.message)
+				""")
+		}
 	}
 	
 	// --------------------------------------------------
@@ -1563,7 +1690,7 @@ struct LightningDualView: View {
 		cardState = .requesting
 		Task { @MainActor in
 			do {
-				let tuple: KotlinPair<Lightning_kmpBolt12Invoice, Bitcoin_kmpByteVector32> =
+				let paymentInfo: Lightning_kmp_corePeer.CardPaymentInfo =
 					try await peer.requestCardPayment(
 						amount: msat,
 						cardHolderOffer: bolt12Offer.offer,
@@ -1571,7 +1698,8 @@ struct LightningDualView: View {
 					)
 				
 				cardState = .receiving
-				cardOfferId = tuple.second
+				cardOfferId = paymentInfo.offerId
+				cardRequestId = paymentInfo.requestId
 				
 			} catch {
 				log.error("handleV2_ParseResult: error: \(error)")

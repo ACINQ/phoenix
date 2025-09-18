@@ -16,6 +16,7 @@ local.properties
 
 # XCode
 xcuserdata/
+phoenix-ios/phoenix-ios/logging/PerUserLogLevels.swift
 
 # Android
 phoenix-android/debug/

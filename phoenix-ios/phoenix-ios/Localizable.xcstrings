@@ -8859,6 +8859,19 @@
     "Card options" : {
 
     },
+    "Card's wallet rejected payment request.\nError code: %lld\nMessage: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Card's wallet rejected payment request.\nError code: %1$lld\nMessage: %2$@"
+          }
+        }
+      }
+    },
+    "Card's wallet rejected payment request.\nMessage: %@" : {
+
+    },
     "Caused by" : {
       "localizations" : {
         "ar" : {

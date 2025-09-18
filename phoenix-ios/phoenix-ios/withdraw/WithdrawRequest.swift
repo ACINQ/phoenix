@@ -94,16 +94,44 @@ enum WithdrawRequestError: Error, CustomStringConvertible {
 	case internalError(card: BoltCardInfo, details: String)
 	
 	var description: String {
-		switch self {
-			case .unknownCard                   : return "unknown card"
-			case .replayDetected                : return "replay detected"
-			case .frozenCard                    : return "frozen card"
-			case .dailyLimitExceeded            : return "daily limit exceeded"
-			case .monthlyLimitExceeded          : return "monthly limit exceeded"
-			case .badInvoice(_, let details)    : return "bad invoice: \(details)"
-			case .alreadyPaidInvoice            : return "already paid invoice"
-			case .paymentPending                : return "payment pending"
-			case .internalError(_, let details) : return "internal error: \(details)"
+		return switch self {
+			case .unknownCard                   : "unknown card"
+			case .replayDetected                : "replay detected"
+			case .frozenCard                    : "frozen card"
+			case .dailyLimitExceeded            : "daily limit exceeded"
+			case .monthlyLimitExceeded          : "monthly limit exceeded"
+			case .badInvoice(_, let details)    : "bad invoice: \(details)"
+			case .alreadyPaidInvoice            : "already paid invoice"
+			case .paymentPending                : "payment pending"
+			case .internalError(_, let details) : "internal error: \(details)"
+		}
+	}
+	
+	var cardResponseMessage: String {
+		return switch self {
+			case .unknownCard                : "unknown card"
+			case .replayDetected             : "replay detected"
+			case .frozenCard                 : "frozen card"
+			case .dailyLimitExceeded         : "limit exceeded" // don't expose daily/monthly type
+			case .monthlyLimitExceeded       : "limit exceeded" // don't expose daily/monthly type
+			case .badInvoice(_, let details) : "bad invoice: \(details)"
+			case .alreadyPaidInvoice         : "already paid invoice"
+			case .paymentPending             : "payment pending"
+			case .internalError(_, _)        : "internal error" // don't expose internal error details
+		}
+	}
+	
+	var cardResponseCode: CardResponse.ErrorCode {
+		return switch self {
+			case .unknownCard                : CardResponse.ErrorCode.unknownCard
+			case .replayDetected(_)          : CardResponse.ErrorCode.replayDetected
+			case .frozenCard(_)              : CardResponse.ErrorCode.frozenCard
+			case .dailyLimitExceeded(_, _)   : CardResponse.ErrorCode.limitExceeded
+			case .monthlyLimitExceeded(_, _) : CardResponse.ErrorCode.limitExceeded
+			case .badInvoice(_, _)           : CardResponse.ErrorCode.badInvoice
+			case .alreadyPaidInvoice(_)      : CardResponse.ErrorCode.alreadyPaidInvoice
+			case .paymentPending(_)          : CardResponse.ErrorCode.paymentPending
+			case .internalError(_, _)        : CardResponse.ErrorCode.internalError
 		}
 	}
 }
@@ -167,8 +195,6 @@ extension PhoenixBusiness {
 				break
 			}
 		}
-		
-		return .failure(.unknownCard)
 		
 		guard let matchingCard, let piccDataInfo else {
 			return .failure(.unknownCard)

@@ -76,6 +76,8 @@
 		DC27E4CC2791D17A00C777CC /* CloudBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */; };
 		DC27E4CF2792079600C777CC /* CenterTopLineAlignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4CE2792079500C777CC /* CenterTopLineAlignment.swift */; };
 		DC27E4D1279753EC00C777CC /* TextFieldNumberStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4D0279753EC00C777CC /* TextFieldNumberStyler.swift */; };
+		DC28EE142E7C5FAD0097E830 /* PerUserLogLevels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC28EE132E7C5FAD0097E830 /* PerUserLogLevels.swift */; };
+		DC28EE152E7C5FAD0097E830 /* PerUserLogLevels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC28EE132E7C5FAD0097E830 /* PerUserLogLevels.swift */; };
 		DC2ABAD52BEC092B00C11C9C /* InvalidPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */; };
 		DC2ABAD72BED081400C11C9C /* VibrationFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */; };
 		DC2ABAD92BED142900C11C9C /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */; };
@@ -610,6 +612,7 @@
 		DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudBackupView.swift; sourceTree = "<group>"; };
 		DC27E4CE2792079500C777CC /* CenterTopLineAlignment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterTopLineAlignment.swift; sourceTree = "<group>"; };
 		DC27E4D0279753EC00C777CC /* TextFieldNumberStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldNumberStyler.swift; sourceTree = "<group>"; };
+		DC28EE132E7C5FAD0097E830 /* PerUserLogLevels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerUserLogLevels.swift; sourceTree = "<group>"; };
 		DC2ABAD42BEC092B00C11C9C /* InvalidPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvalidPin.swift; sourceTree = "<group>"; };
 		DC2ABAD62BED081400C11C9C /* VibrationFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VibrationFeedback.swift; sourceTree = "<group>"; };
 		DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
@@ -1818,6 +1821,7 @@
 		DCCFE6AC2B6430BD002FFF11 /* logging */ = {
 			isa = PBXGroup;
 			children = (
+				DC28EE132E7C5FAD0097E830 /* PerUserLogLevels.swift */,
 				DCCFE6AD2B64310E002FFF11 /* LoggerFactory.swift */,
 				DCCFE6AF2B64326F002FFF11 /* OSLogHandler.swift */,
 				DCCFE6BA2B69A502002FFF11 /* fileLogging */,
@@ -1941,6 +1945,7 @@
 			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "phoenix-ios" */;
 			buildPhases = (
 				DCA538EB2CA5AE7700B17C8B /* ShellScript */,
+				DC28EE122E7C58F20097E830 /* ShellScript */,
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
@@ -2136,6 +2141,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		DC28EE122E7C58F20097E830 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "#!/bin/bash\n\n# Create `PerUserLogLevels.swift` file if it doesn't already exist.\n\nsrc_filepath=\"${SRCROOT}/phoenix-ios/logging/PerUserLogLevels.template.swift\"\ndst_filepath=\"${SRCROOT}/phoenix-ios/logging/PerUserLogLevels.swift\"\n\nif [ ! -f ${dst_filepath} ]; then\n\tcp -f ${src_filepath} ${dst_filepath}\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 		DC6089372D5E459600D80222 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -2485,6 +2509,7 @@
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */,
 				DC4CBC822D6619B700129BDB /* Details_Incoming_Bolt12.swift in Sources */,
+				DC28EE142E7C5FAD0097E830 /* PerUserLogLevels.swift in Sources */,
 				DCE8EC5C2E79E58A0091B6F0 /* CardResponse.swift in Sources */,
 				DCB30E522A0A948000E7D7A2 /* WalletInfoView.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
@@ -2656,6 +2681,7 @@
 				DC5F96D22E0AFF050052CDE6 /* GroupPrefs+Keys.swift in Sources */,
 				DC5F96A62E00AD3D0052CDE6 /* RunOnMainThread.swift in Sources */,
 				DC5895CB2E551A7800CBCCF9 /* AnyAsyncSequence.swift in Sources */,
+				DC28EE152E7C5FAD0097E830 /* PerUserLogLevels.swift in Sources */,
 				DC5F96BA2E0457530052CDE6 /* Prefs+Constants.swift in Sources */,
 				DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */,
 				DCBA3ACB2E6609BC000BC8D3 /* KotlinEnums.swift in Sources */,

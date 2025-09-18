@@ -790,14 +790,14 @@ class BusinessManager {
 		switch result {
 		case .failure(let error):
 			log.error("handleCardRequest: error: \(error.description)")
+			
+			// Send error message to merchant
 			do {
-				let response = CardResponse.fromWithdrawRequestError(error)
-				
 				let peer = try await business.peerManager.getPeer()
 				try await peer.sendCardResponse(
 					request : cardRequest.invoice,
-					msg     : response.message,
-					code    : response.code
+					msg     : error.cardResponseMessage,
+					code    : error.cardResponseCode.rawValue
 				)
 			} catch {
 				log.error("peer.sendCardResponse(): error: \(error)")
@@ -811,6 +811,7 @@ class BusinessManager {
 			case .continueAndSendPayment(let card, _, _):
 				log.debug("handleCardReqeust: continue: send payment")
 				
+				// Send payment to merchant
 				do {
 					try await business.sendManager.payUnsolicitedInvoice(
 						invoice: cardRequest.invoice,

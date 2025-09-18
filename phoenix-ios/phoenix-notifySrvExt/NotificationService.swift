@@ -516,6 +516,19 @@ class NotificationService: UNNotificationServiceExtension {
 		switch result {
 		case .failure(let error):
 			log.error("\(#function): error: \(error.description)")
+			
+			// Send error message to merchant
+			do {
+				let peer = try await business.peerManager.getPeer()
+				try await peer.sendCardResponse(
+					request : cardRequest.invoice,
+					msg     : error.cardResponseMessage,
+					code    : error.cardResponseCode.rawValue
+				)
+			} catch {
+				log.error("peer.sendCardResponse(): error: \(error)")
+			}
+			
 			await reject(error)
 			
 		case .success(let status):
@@ -526,7 +539,7 @@ class NotificationService: UNNotificationServiceExtension {
 			case .continueAndSendPayment(let card, _, _):
 				log.debug("\(#function): continue: send payment")
 				
-				// Send the payment
+				// Send payment to merchant
 				do {
 					try await business.sendManager.payUnsolicitedInvoice(
 						invoice: cardRequest.invoice,
