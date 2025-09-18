@@ -66,7 +66,8 @@ fun CpfpView(
     val vm = viewModel<CpfpViewModel>(factory = CpfpViewModel.Factory(peerManager))
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
 
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 10.sat) }
+    val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()
+    var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
 
     Column(
         modifier = Modifier.padding(horizontal = 24.dp),

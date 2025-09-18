@@ -29,7 +29,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -72,12 +71,13 @@ fun SendSpliceOutView(
     val keyboardManager = LocalSoftwareKeyboardController.current
 
     val peerManager = business.peerManager
+    val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val balance = business.balanceManager.balance.collectAsState(null).value
     val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
     val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))
 
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 3.sat) }
+    var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
