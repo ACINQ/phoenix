@@ -114,7 +114,7 @@ private fun AvailableForRefundView(
     var showScannerView by remember { mutableStateOf(false) }
 
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate) }
+    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 3.sat) }
 
     if (showScannerView) {
         SwapInRefundScanner(
@@ -178,19 +178,17 @@ private fun AvailableForRefundView(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SplashLabelRow(label = stringResource(id = R.string.send_spliceout_feerate_label)) {
-                        feerate?.let { currentFeerate ->
-                            FeerateSlider(
-                                feerate = currentFeerate,
-                                onFeerateChange = { newFeerate ->
-                                    if (vm.state != SwapInRefundState.Init && feerate != newFeerate) {
-                                        vm.state = SwapInRefundState.Init
-                                    }
-                                    feerate = newFeerate
-                                },
-                                mempoolFeerate = mempoolFeerate,
-                                enabled = !(vm.state is SwapInRefundState.Publishing || vm.state is SwapInRefundState.Publishing || vm.state is SwapInRefundState.Done.Success),
-                            )
-                        } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
+                        FeerateSlider(
+                            feerate = feerate,
+                            onFeerateChange = { newFeerate ->
+                                if (vm.state != SwapInRefundState.Init && feerate != newFeerate) {
+                                    vm.state = SwapInRefundState.Init
+                                }
+                                feerate = newFeerate
+                            },
+                            mempoolFeerate = mempoolFeerate,
+                            enabled = !(vm.state is SwapInRefundState.Publishing || vm.state is SwapInRefundState.Publishing || vm.state is SwapInRefundState.Done.Success),
+                        )
                     }
                 }
             }
@@ -204,10 +202,8 @@ private fun AvailableForRefundView(
                             if (showLowFeerateDialog) {
                                 ConfirmLowFeerate(
                                     onConfirm = {
-                                        feerate?.let {
-                                            vm.getFeeForRefund(address = address, feerate = FeeratePerByte(it))
-                                            showLowFeerateDialog = false
-                                        }
+                                        vm.getFeeForRefund(address = address, feerate = FeeratePerByte(feerate))
+                                        showLowFeerateDialog = false
                                     },
                                     onCancel = { showLowFeerateDialog = false }
                                 )
@@ -216,17 +212,14 @@ private fun AvailableForRefundView(
                             Button(
                                 text = stringResource(id = R.string.swapinrefund_estimate_button),
                                 icon = R.drawable.ic_inspect,
-                                enabled = feerate != null && address.isNotBlank(),
+                                enabled = address.isNotBlank(),
                                 onClick = {
                                     keyboardManager?.hide()
-                                    val finalFeerate = feerate
-                                    if (finalFeerate != null) {
-                                        val recommendedFeerate = mempoolFeerate?.hour
-                                        if (recommendedFeerate != null && finalFeerate < recommendedFeerate.feerate) {
-                                            showLowFeerateDialog = true
-                                        } else {
-                                            vm.getFeeForRefund(address = address, feerate = FeeratePerByte(finalFeerate))
-                                        }
+                                    val recommendedFeerate = mempoolFeerate?.hour
+                                    if (recommendedFeerate != null && feerate < recommendedFeerate.feerate) {
+                                        showLowFeerateDialog = true
+                                    } else {
+                                        vm.getFeeForRefund(address = address, feerate = FeeratePerByte(feerate))
                                     }
                                 },
                                 padding = PaddingValues(16.dp),

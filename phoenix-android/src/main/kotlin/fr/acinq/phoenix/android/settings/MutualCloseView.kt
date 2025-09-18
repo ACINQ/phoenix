@@ -97,7 +97,7 @@ fun MutualCloseView(
     var address by remember { mutableStateOf("") }
     var addressErrorMessage by remember { mutableStateOf<String?>(null) }
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate) }
+    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 3.sat) }
 
     var showScannerView by remember { mutableStateOf(false) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
@@ -163,15 +163,13 @@ fun MutualCloseView(
                                 Row(modifier = Modifier) {
                                     Text(text = stringResource(R.string.send_spliceout_feerate_label), style = MaterialTheme.typography.body2, fontSize = 14.sp, modifier = Modifier.alignByBaseline())
                                     Spacer(modifier = Modifier.width(16.dp))
-                                    feerate?.let { currentFeerate ->
-                                        FeerateSlider(
-                                            modifier = Modifier.alignByBaseline(),
-                                            feerate = currentFeerate,
-                                            onFeerateChange = { feerate = it },
-                                            mempoolFeerate = mempoolFeerate,
-                                            enabled = true
-                                        )
-                                    } ?: ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
+                                    FeerateSlider(
+                                        modifier = Modifier.alignByBaseline(),
+                                        feerate = feerate,
+                                        onFeerateChange = { feerate = it },
+                                        mempoolFeerate = mempoolFeerate,
+                                        enabled = true
+                                    )
                                 }
                             } else {
                                 Text(text = stringResource(id = R.string.mutualclose_no_channels))
@@ -195,8 +193,8 @@ fun MutualCloseView(
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = peer != null && address.isNotBlank() && model.channels.isNotEmpty() && !isEstimatingFee,
                                 onClick = {
-                                    if (peer == null || feerate == null) return@Button
-                                    val feeratePerKw = FeeratePerKw(FeeratePerByte(feerate!!))
+                                    if (peer == null) return@Button
+                                    val feeratePerKw = FeeratePerKw(FeeratePerByte(feerate))
                                     totalFeeEstimate = null
                                     isEstimatingFee = true
 

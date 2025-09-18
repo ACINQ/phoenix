@@ -88,7 +88,7 @@ fun SendSpliceOutView(
     val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
     val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))
 
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate) }
+    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 3.sat) }
     var amount by remember { mutableStateOf(requestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
@@ -128,22 +128,17 @@ fun SendSpliceOutView(
         }
     ) {
         SplashLabelRow(label = stringResource(id = R.string.send_spliceout_feerate_label)) {
-            feerate?.let { currentFeerate ->
-                FeerateSlider(
-                    feerate = currentFeerate,
-                    onFeerateChange = { newFeerate ->
-                        if (vm.state != SpliceOutState.Init && feerate != newFeerate) {
-                            vm.state = SpliceOutState.Init
-                        }
-                        feerate = newFeerate
-                    },
-                    mempoolFeerate = mempoolFeerate,
-                    enabled = vm.state !is SpliceOutState.Executing || vm.state !is SpliceOutState.Preparing
-                )
-            } ?: run {
-                ProgressView(text = stringResource(id = R.string.send_spliceout_feerate_waiting_for_value), padding = PaddingValues(0.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            FeerateSlider(
+                feerate = feerate,
+                onFeerateChange = { newFeerate ->
+                    if (vm.state != SpliceOutState.Init && feerate != newFeerate) {
+                        vm.state = SpliceOutState.Init
+                    }
+                    feerate = newFeerate
+                },
+                mempoolFeerate = mempoolFeerate,
+                enabled = vm.state !is SpliceOutState.Executing || vm.state !is SpliceOutState.Preparing
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -163,14 +158,11 @@ fun SendSpliceOutView(
                     enabled = mayDoPayments && amountErrorMessage.isBlank(),
                     onClick = {
                         val finalAmount = amount
-                        val finalFeerate = feerate
                         if (finalAmount == null) {
                             amountErrorMessage = context.getString(R.string.send_error_amount_invalid)
-                        } else if (finalFeerate == null) {
-                            amountErrorMessage = context.getString(R.string.send_spliceout_error_invalid_feerate)
                         } else {
                             keyboardManager?.hide()
-                            vm.prepareSpliceOut(finalAmount, finalFeerate, address)
+                            vm.prepareSpliceOut(finalAmount, feerate, address)
                         }
                     }
                 )
