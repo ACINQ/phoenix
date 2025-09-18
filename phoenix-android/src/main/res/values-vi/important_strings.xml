@@ -219,6 +219,7 @@
     <string name="inappnotif_backup_seed_message">Sao lưu ví của bạn để tránh bị mất Bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Sao lưu ví của tôi</string>
 
+    <string name="inappnotif_notification_permission_message_short">Bật thông báo Android</string>
     <string name="inappnotif_notification_permission_message">Chức năng thông báo đã bị tắt trong mục cài đặt Android. Phoenix sẽ không thể thông báo cho bạn khi một thanh toán nào đó đang được xử lý.</string>
     <string name="inappnotif_notification_permission_enable">Bật chức năng</string>
 

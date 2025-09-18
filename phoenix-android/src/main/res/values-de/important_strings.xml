@@ -209,6 +209,7 @@
     <string name="inappnotif_backup_seed_message">Erstellen Sie ein Backup Ihrer Wallet, um keine Bitcoins zu verlieren.</string>
     <string name="inappnotif_backup_seed_action">Wallet-Backup erstellen</string>
 
+    <string name="inappnotif_notification_permission_message_short">Android-Benachrichtigungen aktivieren</string>
     <string name="inappnotif_notification_permission_message">Benachrichtigungen sind in den Android-Einstellungen deaktiviert. Phoenix kann Sie nicht benachrichtigen, wenn eine Zahlung durchgeführt wird.</string>
     <string name="inappnotif_notification_permission_enable">Aktivieren</string>
 

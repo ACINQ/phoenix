@@ -214,6 +214,7 @@
     <string name="inappnotif_backup_seed_message">Zálohujte svou peněženku, abyste zabránili ztrátě bitcoinů.</string>
     <string name="inappnotif_backup_seed_action">Zálohování peněženky</string>
 
+    <string name="inappnotif_notification_permission_message_short">Povolit oznámení Androidu</string>
     <string name="inappnotif_notification_permission_message">Oznámení jsou v nastavení systému Android zakázána. Phoenix vás nebude moci upozornit na zpracování platby.</string>
     <string name="inappnotif_notification_permission_enable">Povolit</string>
 

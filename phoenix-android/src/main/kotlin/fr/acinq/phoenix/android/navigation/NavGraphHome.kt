@@ -48,7 +48,8 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: App
                 appConfigurationManager = business.appConfigurationManager,
                 peerManager = business.peerManager,
                 connectionsManager = business.connectionsManager,
-            )
+            ),
+            viewModelStoreOwner = homeGraphEntry
         ).also { monitorPermission(it) }
 
         HomeView(

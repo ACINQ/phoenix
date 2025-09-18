@@ -174,7 +174,7 @@ private fun FirstNoticeView(
             }
 
             Notice.NotificationPermission -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_notification_permission_message), icon = R.drawable.ic_notification)
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_notification_permission_message_short), icon = R.drawable.ic_notification)
             }
 
             is Notice.SwapInCloseToTimeout -> {

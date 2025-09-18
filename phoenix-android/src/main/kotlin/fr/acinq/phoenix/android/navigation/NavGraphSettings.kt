@@ -131,14 +131,15 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
         if (walletIdDeeplink != null && walletIdDeeplink != walletId) {
             LaunchedEffect(Unit) { navController.popToHome() }
         } else {
+            val homeGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.BusinessNavGraph.route) }
             val noticesViewModel = viewModel<NoticesViewModel>(
-                key = walletId.nodeIdHash,
                 factory = NoticesViewModel.Factory(
                     walletId = walletId,
                     appConfigurationManager = business.appConfigurationManager,
                     peerManager = business.peerManager,
                     connectionsManager = business.connectionsManager,
-                )
+                ),
+                viewModelStoreOwner = homeGraphEntry
             )
             NotificationsView(
                 business = business,

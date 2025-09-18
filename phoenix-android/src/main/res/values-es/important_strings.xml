@@ -213,6 +213,7 @@
     <string name="inappnotif_backup_seed_message">Realiza una copia de seguridad de tu cartera para no perder tus bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Copia de seguridad de mi cartera</string>
 
+    <string name="inappnotif_notification_permission_message_short">Habilitar notificaciones de Android</string>
     <string name="inappnotif_notification_permission_message">Las notificaciones están desactivadas en los ajustes de Android. Phoenix no podrá notificarte cuando se esté procesando un pago.</string>
     <string name="inappnotif_notification_permission_enable">Activar</string>
 

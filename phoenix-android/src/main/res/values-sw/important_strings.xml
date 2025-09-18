@@ -215,6 +215,7 @@
     <string name="inappnotif_backup_seed_message">Hifadhi nakala ya pochi yako ili kuepuka kupoteza bitcoins zako.</string>
     <string name="inappnotif_backup_seed_action">Hifadhi pochi yangu</string>
 
+    <string name="inappnotif_notification_permission_message_short">Washa arifa za Android</string>
     <string name="inappnotif_notification_permission_message">Arifa zimelemazwa katika mipangilio ya Android. Phoenix haitakuwa na uwezo wa kukutaarifu wakati malipo yanashughulikiwa.</string>
     <string name="inappnotif_notification_permission_enable">Wezesha</string>
 

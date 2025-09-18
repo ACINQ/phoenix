@@ -52,10 +52,10 @@ sealed class Notice() {
     data object CriticalUpdateAvailable : ShowInHome(2)
     data object TorDisconnected : ShowInHome(3)
     data object SwapInCloseToTimeout : ShowInHome(4)
-    data object BackupSeedReminder : ShowInHome(5)
+    data object NotificationPermission : ShowInHome(5)
+    data object BackupSeedReminder : ShowInHome(6)
     data object MempoolFull : ShowInHome(10)
     data object UpdateAvailable : ShowInHome(20)
-    data object NotificationPermission : ShowInHome(30)
 
     // less important notices
     sealed class DoNotShowInHome(override val priority: Int = 999) : Notice()

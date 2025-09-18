@@ -214,6 +214,7 @@
     <string name="inappnotif_backup_seed_message">Backup your wallet to prevent losing your bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Backup my wallet</string>
 
+    <string name="inappnotif_notification_permission_message_short">Enable Android notifications</string>
     <string name="inappnotif_notification_permission_message">Notifications are disabled in Android settings. Phoenix won\'t be able to notify you when a payment is processing.</string>
     <string name="inappnotif_notification_permission_enable">Enable</string>
 
