@@ -43,6 +43,8 @@ fun NavController.popToHome() {
     }
 }
 
+fun NavController.popBackStackOrHome() = if (previousBackStackEntry == null) popToHome() else popBackStack()
+
 /**
  * This extension of the regular composable method checks that the business is started when attempting to navigate to [route].
  *
@@ -73,7 +75,7 @@ fun NavGraphBuilder.businessComposable(
                 @Suppress("DEPRECATION")
                 val intent = try {
                     entry.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     null
                 }
                 intent?.data?.let { "$deepLinkPrefix${it.toString()}" } ?: route

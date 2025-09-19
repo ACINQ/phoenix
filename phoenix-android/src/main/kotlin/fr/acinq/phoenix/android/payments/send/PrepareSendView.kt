@@ -89,6 +89,7 @@ import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.navigation.popBackStackOrHome
 import fr.acinq.phoenix.android.payments.send.bolt11.SendToBolt11View
 import fr.acinq.phoenix.android.payments.send.lnurl.LnurlAuthView
 import fr.acinq.phoenix.android.payments.send.lnurl.LnurlPayView
@@ -108,18 +109,13 @@ import fr.acinq.phoenix.data.ContactPaymentCode
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.managers.SendManager
 
-/**
- * @param fromDeepLink Default false. If true, the back button always pops to Home.
- * @param forceNavOnBack Default false. If true, the back button always pops the backstack. Otherwise, be smart and maybe reset the parser instead.
- */
 @Composable
 fun SendView(
     walletId: WalletId,
     business: PhoenixBusiness,
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
-    fromDeepLink: Boolean,
-    forceNavOnBack: Boolean,
+    fromRoute: String?
 ) {
     val navController = navController
     val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(sendManager = business.sendManager))
@@ -128,9 +124,11 @@ fun SendView(
 
     val onBackClick: () -> Unit = {
         when {
-            fromDeepLink -> navController.popToHome()
-            forceNavOnBack -> navController.popBackStack()
-            vm.parsePaymentState is ParsePaymentState.Ready -> navController.popBackStack()
+            fromRoute == "back" || fromRoute == Screen.BusinessNavGraph.Home.route -> navController.popBackStackOrHome()
+            fromRoute != null -> navController.navigate(fromRoute) {
+                popUpTo(fromRoute) { inclusive = true }
+            }
+            vm.parsePaymentState is ParsePaymentState.Ready -> navController.popBackStackOrHome()
             else -> vm.resetParsing()
         }
     }
@@ -220,7 +218,19 @@ fun SendView(
             }
 
             if (showScanner) {
-                ScannerBox(state = vm.parsePaymentState, onDismiss = { vm.resetParsing() ; showScanner = false }, onReset = vm::resetParsing, onSubmit = vm::parsePaymentData)
+                ScannerBox(
+                    state = vm.parsePaymentState,
+                    onDismiss = {
+                        if (immediatelyOpenScanner && fromRoute != null) {
+                            onBackClick()
+                        } else {
+                            vm.resetParsing()
+                            showScanner = false
+                        }
+                    },
+                    onReset = vm::resetParsing,
+                    onSubmit = vm::parsePaymentData
+                )
             }
         }
     }

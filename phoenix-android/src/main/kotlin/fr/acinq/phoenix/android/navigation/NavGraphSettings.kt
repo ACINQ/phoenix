@@ -144,7 +144,7 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
             NotificationsView(
                 business = business,
                 noticesViewModel = noticesViewModel,
-                onBackClick = { navController.popBackStack() },
+                onBackClick = { navController.popBackStackOrHome() },
             )
         }
     }
@@ -152,13 +152,13 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
     businessComposable(Screen.BusinessNavGraph.LiquidityPolicy.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:liquiditypolicy" })) { _, _, business ->
         LiquidityPolicyView(
             business = business,
-            onBackClick = { navController.popBackStack() },
+            onBackClick = { navController.popBackStackOrHome() },
             onAdvancedClick = { navController.navigate(Screen.BusinessNavGraph.AdvancedLiquidityPolicy.route) },
         )
     }
 
     businessComposable(Screen.BusinessNavGraph.LiquidityRequest.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:requestliquidity" })) { _, walletId, business ->
-        RequestLiquidityView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
+        RequestLiquidityView(walletId = walletId, business = business, onBackClick = { navController.popBackStackOrHome() })
     }
 
     businessComposable(Screen.BusinessNavGraph.AdvancedLiquidityPolicy.route, appViewModel) { _, _, business ->

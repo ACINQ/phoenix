@@ -39,7 +39,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
             walletId = walletId,
             business = business,
             onBackClick = { navController.popBackStack() },
-            onScanDataClick = { navController.navigate("${Screen.BusinessNavGraph.Send.route}?openScanner=true&forceNavOnBack=true") },
+            onScanDataClick = { navController.navigate("${Screen.BusinessNavGraph.Send.route}?openScanner=true&fromRoute=${Screen.BusinessNavGraph.Receive.route}") },
             onFeeManagementClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) },
         )
     }
@@ -73,10 +73,8 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
                     val previousNav = navController.previousBackStackEntry
                     if (fromEvent && previousNav?.destination?.route == Screen.BusinessNavGraph.Send.route) {
                         navController.popToHome()
-                    } else if (navController.previousBackStackEntry != null) {
-                        navController.popBackStack()
                     } else {
-                        navController.popToHome()
+                        navController.popBackStackOrHome()
                     }
                 },
                 fromEvent = fromEvent
@@ -85,13 +83,13 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
     }
 
     businessComposable(
-        route = "${Screen.BusinessNavGraph.Send.route}?input={input}&openScanner={openScanner}&forceNavOnBack={forceNavOnBack}",
+        route = "${Screen.BusinessNavGraph.Send.route}?input={input}&openScanner={openScanner}&fromRoute={fromRoute}",
         appViewModel = appViewModel,
         deepLinkPrefix = "scanview:",
         arguments = listOf(
             navArgument("input") { type = NavType.StringType ; nullable = true },
             navArgument("openScanner") { type = NavType.BoolType ; defaultValue = false },
-            navArgument("forceNavOnBack") { type = NavType.BoolType ; defaultValue = false },
+            navArgument("fromRoute") { type = NavType.StringType ; nullable = true ; defaultValue = null },
         ),
         deepLinks = listOf(
             navDeepLink { uriPattern = "lightning:{data}" },
@@ -126,9 +124,12 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
             walletId = walletId,
             business = business,
             initialInput = input,
-            fromDeepLink = !isIntentFromNavigation,
             immediatelyOpenScanner = backStackEntry.arguments?.getBoolean("openScanner") ?: false,
-            forceNavOnBack = backStackEntry.arguments?.getBoolean("forceNavOnBack") ?: false,
+            fromRoute = backStackEntry.arguments?.getString("fromRoute") ?: run {
+                if (!isIntentFromNavigation) {
+                    Screen.BusinessNavGraph.Home.route
+                } else null
+            }
         )
     }
 }
