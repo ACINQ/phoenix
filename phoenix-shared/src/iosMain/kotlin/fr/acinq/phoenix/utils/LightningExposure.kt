@@ -39,6 +39,7 @@ import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.io.PayOffer
 import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.io.Peer.CardPaymentInfo
 import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.payment.Bolt11Invoice
@@ -414,5 +415,19 @@ suspend fun Peer._createInvoice(
         amount = amount,
         description = Either.Left(description),
         expiry = expiryInSeconds.seconds
+    )
+}
+
+suspend fun Peer._requestCardPayment(
+    amount: MilliSatoshi,
+    timeoutInSeconds: Long,
+    cardHolderOffer: OfferTypes.Offer,
+    cardParams: String
+): CardPaymentInfo {
+    return requestCardPayment(
+        amount = amount,
+        timeout = timeoutInSeconds.seconds,
+        cardHolderOffer = cardHolderOffer,
+        cardParams = cardParams
     )
 }

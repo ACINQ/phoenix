@@ -8859,6 +8859,9 @@
     "Card options" : {
 
     },
+    "Card's wallet didn't respond to payment request." : {
+
+    },
     "Card's wallet rejected payment request.\nError code: %lld\nMessage: %@" : {
       "localizations" : {
         "en" : {

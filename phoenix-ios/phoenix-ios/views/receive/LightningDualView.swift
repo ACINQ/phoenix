@@ -64,6 +64,8 @@ struct LightningDualView: View {
 	@State var cardState: CardState? = nil
 	@State var cardOfferId: Bitcoin_kmpByteVector32? = nil
 	@State var cardRequestId: Bitcoin_kmpByteVector? = nil
+	@State var cardRequestExpiration: Date? = nil
+	@State var currentDate = Date()
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -693,6 +695,13 @@ struct LightningDualView: View {
 			}
 			.multilineTextAlignment(.center)
 			
+			if let remaining = cardRequestRemainingTime() {
+				Text(remaining)
+					.font(.subheadline)
+					.foregroundStyle(.secondary)
+					.padding(.bottom, 8)
+			}
+			
 		} // </VStack>
 	}
 
@@ -810,13 +819,38 @@ struct LightningDualView: View {
 			return "..."
 		}
 	}
+	
+	func cardRequestRemainingTime() -> String? {
+		
+		guard let expiration = cardRequestExpiration else {
+			return nil
+		}
+		
+		let remaining = max(0.0, expiration.timeIntervalSince(currentDate))
+		
+		// For the first 10 seconds, we just show the HorizontalActivity animation.
+		// Then, after we're down to 20 seconds left, we'll switch and show the timer countdown.
+		// 
+		guard remaining < 21 else {
+			return nil
+		}
+		
+		let minutes = Int(remaining / 60.0)
+		let seconds = Int(remaining) % 60
+		
+		let nf = NumberFormatter()
+		nf.minimumIntegerDigits = 2
+		let secondsStr = nf.string(from: NSNumber(value: seconds)) ?? "00"
+		
+		return "\(minutes):\(secondsStr)"
+	}
 
 	// --------------------------------------------------
 	// MARK: View Transitions
 	// --------------------------------------------------
 	
 	func onAppear() {
-		log.trace("onAppear()")
+		log.trace(#function)
 		
 		// Careful: this function may be called multiple times
 		guard !didAppear else {
@@ -832,7 +866,7 @@ struct LightningDualView: View {
 	// --------------------------------------------------
 	
 	func updateInvoiceOrOffer() {
-		log.trace("updateInvoiceOrOffer()")
+		log.trace(#function)
 		
 		let trimmedDesc = trimmedDescription()
 		
@@ -870,7 +904,7 @@ struct LightningDualView: View {
 	}
 	
 	func updateQRCode() {
-		log.trace("updateQRCode()")
+		log.trace(#function)
 		
 		switch activeType {
 		case .bolt11_invoice:
@@ -1352,6 +1386,37 @@ struct LightningDualView: View {
 		)
 	}
 	
+	func startTimerForCardRequest() {
+		log.trace(#function)
+		
+		guard let requestId = cardRequestId else {
+			return
+		}
+		guard let expiration = cardRequestExpiration else {
+			return
+		}
+		
+		Task {
+			while true {
+				try await Task.sleep(seconds: 0.5)
+				
+				if cardRequestId != requestId {
+					break
+				}
+				
+				currentDate = Date.now
+				if expiration < currentDate {
+					cardState = nil
+					cardOfferId = nil
+					cardRequestId = nil
+					cardRequestExpiration = nil
+					cardErrorMessage = String(localized:"Card's wallet didn't respond to payment request.")
+					break
+				}
+			}
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
@@ -1691,8 +1756,9 @@ struct LightningDualView: View {
 		Task { @MainActor in
 			do {
 				let paymentInfo: Lightning_kmp_corePeer.CardPaymentInfo =
-					try await peer.requestCardPayment(
+					try await peer._requestCardPayment(
 						amount: msat,
+						timeoutInSeconds: 30,
 						cardHolderOffer: bolt12Offer.offer,
 						cardParams: v2.parametersText
 					)
@@ -1700,6 +1766,9 @@ struct LightningDualView: View {
 				cardState = .receiving
 				cardOfferId = paymentInfo.offerId
 				cardRequestId = paymentInfo.requestId
+				cardRequestExpiration = Date.now.addingTimeInterval(30)
+				
+				startTimerForCardRequest()
 				
 			} catch {
 				log.error("handleV2_ParseResult: error: \(error)")
