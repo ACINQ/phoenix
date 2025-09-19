@@ -72,6 +72,7 @@ fun MutedFilledButton(
     text: String? = null,
     icon: Int? = null,
     iconTint: Color = MaterialTheme.colors.onSurface,
+    textStyle: TextStyle = MaterialTheme.typography.button,
     maxLines: Int = Int.MAX_VALUE,
     enabled: Boolean = true,
     enabledEffect: Boolean = true,
@@ -83,7 +84,7 @@ fun MutedFilledButton(
 ) {
     FilledButton(
         backgroundColor = mutedBgColor,
-        textStyle = MaterialTheme.typography.button,
+        textStyle = textStyle,
         iconTint = iconTint,
         shape = shape,
         modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,

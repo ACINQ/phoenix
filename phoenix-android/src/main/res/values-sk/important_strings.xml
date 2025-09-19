@@ -94,6 +94,7 @@
 
     <string name="home_final_title">Konečná peňaženka</string>
     <string name="home_final_desc">Tieto prostriedky pochádzajú z uzavretých kanálov Lightning. Musia sa minúť manuálne.</string>
+    <string name="home_onchain_balance_only">Zostatok v reťazci</string>
 
     <string name="home_background_restriction_title">Omedzené spracovanie pozadia</string>
     <string name="home_background_restriction_body_1">Fénix nebude môcť prijímať platby, keď je na pozadí alebo keď je zatvorený.</string>

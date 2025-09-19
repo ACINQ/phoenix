@@ -98,6 +98,7 @@
 
     <string name="home_final_title">Mkoba wa mwisho</string>
     <string name="home_final_desc">Fedha hizi hutoka kwa vituo vya umeme vilivyofungwa. Ni lazima zitumike mwenyewe.</string>
+    <string name="home_onchain_balance_only">Salio la mtandaoni</string>
 
     <string name="home_background_restriction_title">Usindikaji wa nyuma umepunguzwa</string>
     <string name="home_background_restriction_body_1">Phoenix haitaweza kupokea malipo wakati iko nyuma, au wakati imefungwa.</string>

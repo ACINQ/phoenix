@@ -684,6 +684,7 @@
     <string name="walletinfo_legacy_nodeid">Legacy-Node-ID</string>
 
     <string name="walletinfo_onchain_final">Finale Wallet</string>
+    <string name="walletinfo_onchain_final_spend_button">Ausgeben</string>
 
     <!-- settings: liquidity policy for channels creation -->
 

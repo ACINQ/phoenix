@@ -711,6 +711,7 @@
     <string name="walletinfo_legacy_nodeid">ID staršieho uzla</string>
 
     <string name="walletinfo_onchain_final">Konečná peňaženka</string>
+    <string name="walletinfo_onchain_final_spend_button">Minúť</string>
 
     <!-- settings: liquidity policy for channels creation -->
 

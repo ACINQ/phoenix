@@ -91,6 +91,7 @@
 
     <string name="home_final_title">Final wallet</string>
     <string name="home_final_desc">Diese Gelder stammen aus geschlossenen Lightning-Kanäle. Sie müssen manuell ausgegeben werden.</string>
+    <string name="home_onchain_balance_only">On-Chain-Guthaben</string>
 
     <string name="home_background_restriction_title">Hintergrundverarbeitung eingeschränkt</string>
     <string name="home_background_restriction_body_1">Phoenix kann keine Zahlungen empfangen, wenn es im Hintergrund läuft oder geschlossen ist.</string>

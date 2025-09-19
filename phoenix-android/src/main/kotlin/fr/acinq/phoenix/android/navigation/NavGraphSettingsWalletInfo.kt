@@ -50,7 +50,7 @@ fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewMode
     ) { _, _, business ->
         SwapInWallet(
             business = business,
-            onBackClick = { navController.popBackStack() },
+            onBackClick = { navController.popBackStackOrHome() },
             onViewChannelPolicyClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) },
             onAdvancedClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInSigner.route) },
             onSpendRefundable = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInRefund.route) },

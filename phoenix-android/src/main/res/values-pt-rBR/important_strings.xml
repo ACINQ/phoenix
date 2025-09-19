@@ -94,6 +94,7 @@
 
     <string name="home_final_title">Carteira final</string>
     <string name="home_final_desc">Esses fundos vêm de canais Lightning fechados. Eles devem ser gastos manualmente.</string>
+    <string name="home_onchain_balance_only">On-chain saldo</string>
 
     <string name="home_background_restriction_title">Processamento em segundo plano restrito</string>
     <string name="home_background_restriction_body_1">O Phoenix não poderá receber pagamentos quando estiver em segundo plano ou quando estiver fechado.</string>

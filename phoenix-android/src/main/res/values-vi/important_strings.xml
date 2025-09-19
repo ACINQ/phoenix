@@ -101,6 +101,7 @@
 
     <string name="home_final_title">Ví cuối cùng</string>
     <string name="home_final_desc">Những quỹ này đến từ các kênh Lightning đã đóng. Chúng phải được chi tiêu thủ công.</string>
+    <string name="home_onchain_balance_only">Số dư trên chuỗi</string>
 
     <string name="home_background_restriction_title">Hạn chế xử lý nền</string>
     <string name="home_background_restriction_body_1">Phoenix sẽ không thể nhận thanh toán khi nó ở chế độ nền hoặc khi nó bị đóng.</string>

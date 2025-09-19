@@ -866,6 +866,7 @@
     <string name="walletinfo_legacy_nodeid">ID legacy uzlu</string>
 
     <string name="walletinfo_onchain_final">Konečná peněženka</string>
+    <string name="walletinfo_onchain_final_spend_button">Utratit</string>
 
     <!-- settings: liquidity policy for channels creation -->
 

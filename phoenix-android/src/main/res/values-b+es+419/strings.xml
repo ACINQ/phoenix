@@ -657,6 +657,7 @@
     <string name="walletinfo_legacy_nodeid">Identificador de nodo heredado</string>
 
     <string name="walletinfo_onchain_final">Billetera final</string>
+    <string name="walletinfo_onchain_final_spend_button">Gastar</string>
 
     <!-- settings: liquidity policy for channels creation -->
 

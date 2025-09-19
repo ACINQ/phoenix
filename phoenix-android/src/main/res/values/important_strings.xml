@@ -98,6 +98,7 @@
 
     <string name="home_final_title">Final wallet</string>
     <string name="home_final_desc">These funds come from closed Lightning channels. They must be spent manually.</string>
+    <string name="home_onchain_balance_only">On-chain balance</string>
 
     <string name="home_background_restriction_title">Background processing restricted</string>
     <string name="home_background_restriction_body_1">Phoenix may not be able to receive payments when it is in the background, or when it is closed.</string>

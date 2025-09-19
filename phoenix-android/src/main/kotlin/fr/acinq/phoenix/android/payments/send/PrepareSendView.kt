@@ -70,6 +70,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
@@ -82,6 +84,7 @@ import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.nfc.NfcReaderMonitor
@@ -250,6 +253,18 @@ private fun PrepareSendView(
 
     DefaultScreenLayout(isScrollable = false, navBarColor = MaterialTheme.colors.surface) {
         DefaultScreenHeader(title = stringResource(id = R.string.preparesend_title), onBackClick = onBackClick)
+
+        val channels by business.peerManager.channelsFlow.collectAsState()
+        val finalWallet by business.peerManager.finalWallet.collectAsState()
+        val finalWalletBalance = finalWallet?.deeplyConfirmed?.balance
+        var showFinalWalletDialog by remember { mutableStateOf(false) }
+
+        LaunchedEffect(finalWalletBalance, channels) {
+            showFinalWalletDialog = channels?.all { it.value.isTerminated } == true && finalWalletBalance != null && finalWalletBalance > 0.sat
+        }
+        if (showFinalWalletDialog) {
+            FinalWalletDialog(onDismiss = { showFinalWalletDialog = false })
+        }
 
         // show error message when reading an image from disk fails
         when (vm.readImageState) {
@@ -532,5 +547,23 @@ private fun ChoosePaymentModeDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FinalWalletDialog(onDismiss: () -> Unit) {
+    Dialog(onDismiss = onDismiss, buttons = null, internalPadding = PaddingValues(20.dp)) {
+        val navController = navController
+        TextWithIcon(text = stringResource(R.string.preparesend_funds_final_wallet), icon = R.drawable.ic_info, space = 12.dp)
+        Spacer(Modifier.height(24.dp))
+        MutedFilledButton(
+            text = stringResource(R.string.preparesend_funds_final_wallet_button),
+            icon = R.drawable.ic_arrow_next,
+            onClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.FinalWallet.route) },
+            padding = PaddingValues(12.dp),
+            space = 8.dp,
+            iconTint = MaterialTheme.colors.primary,
+            modifier = Modifier.align(Alignment.End)
+        )
     }
 }

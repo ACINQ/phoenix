@@ -91,6 +91,7 @@
 
     <string name="home_final_title">Billetera final</string>
     <string name="home_final_desc">Estos fondos provienen de canales Lightning cerrados. Deben gastarse manualmente.</string>
+    <string name="home_onchain_balance_only">On-chain saldo</string>
 
     <string name="home_background_restriction_title">Procesamiento en segundo plano restringido</string>.
     <string name="home_background_restriction_body_1">Phoenix no podrá recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>

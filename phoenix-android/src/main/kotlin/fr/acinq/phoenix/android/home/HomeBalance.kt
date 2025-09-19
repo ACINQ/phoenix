@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +61,7 @@ import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
 import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.preferredAmountUnit
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
@@ -90,23 +93,43 @@ fun HomeBalance(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AmountView(
-                amount = balance,
-                amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
-                unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light, color = MaterialTheme.colors.primary),
-                isRedacted = isAmountRedacted,
-                onClick = { userPrefs, inFiat ->
-                    val mode = userPrefs.getHomeAmountDisplayMode.firstOrNull()
-                    when {
-                        inFiat && mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
-                        mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.FIAT)
-                        mode == HomeAmountDisplayMode.FIAT -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
-                        mode == HomeAmountDisplayMode.REDACTED -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.BTC)
-                        else -> Unit
+            if (balance == 0.msat && (swapInBalance.total > 0.sat || finalWalletBalance > 0.sat)) {
+                Text(text = stringResource(R.string.home_onchain_balance_only), style = MaterialTheme.typography.caption)
+                OnChainBalance(
+                    swapInBalance = swapInBalance,
+                    swapInNextTimeout = swapInNextTimeout,
+                    finalWalletBalance = finalWalletBalance,
+                    onNavigateToSwapInWallet = onNavigateToSwapInWallet,
+                    onNavigateToFinalWallet = onNavigateToFinalWallet,
+                    balanceDisplayMode = balanceDisplayMode,
+                    textStyle = MaterialTheme.typography.body2.copy(fontSize = 20.sp),
+                )
+            } else {
+                AmountView(
+                    amount = balance,
+                    amountTextStyle = MaterialTheme.typography.body2.copy(fontSize = 40.sp),
+                    unitTextStyle = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light, color = MaterialTheme.colors.primary),
+                    isRedacted = isAmountRedacted,
+                    onClick = { userPrefs, inFiat ->
+                        val mode = userPrefs.getHomeAmountDisplayMode.firstOrNull()
+                        when {
+                            inFiat && mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
+                            mode == HomeAmountDisplayMode.BTC -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.FIAT)
+                            mode == HomeAmountDisplayMode.FIAT -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.REDACTED)
+                            mode == HomeAmountDisplayMode.REDACTED -> userPrefs.saveHomeAmountDisplayMode(HomeAmountDisplayMode.BTC)
+                            else -> Unit
+                        }
                     }
-                }
-            )
-            OnChainBalance(swapInBalance, swapInNextTimeout, finalWalletBalance, onNavigateToSwapInWallet, onNavigateToFinalWallet, balanceDisplayMode)
+                )
+                OnChainBalance(
+                    swapInBalance = swapInBalance,
+                    swapInNextTimeout = swapInNextTimeout,
+                    finalWalletBalance = finalWalletBalance,
+                    onNavigateToSwapInWallet = onNavigateToSwapInWallet,
+                    onNavigateToFinalWallet = onNavigateToFinalWallet,
+                    balanceDisplayMode = balanceDisplayMode
+                )
+            }
         }
     }
 }
@@ -119,12 +142,12 @@ private fun OnChainBalance(
     onNavigateToSwapInWallet: () -> Unit,
     onNavigateToFinalWallet: () -> Unit,
     balanceDisplayMode: HomeAmountDisplayMode,
+    textStyle: TextStyle = MaterialTheme.typography.caption,
 ) {
     var showOnchainDialog by remember { mutableStateOf(false) }
     val availableOnchainBalance = swapInBalance.total.toMilliSatoshi() + finalWalletBalance.toMilliSatoshi()
 
     if (availableOnchainBalance > 0.msat) {
-
         Clickable(
             modifier = Modifier.clip(CircleShape),
             onClick = { showOnchainDialog = true },
@@ -137,9 +160,9 @@ private fun OnChainBalance(
                     text = if (balanceDisplayMode == HomeAmountDisplayMode.REDACTED) "****" else {
                         stringResource(id = R.string.home_onchain_incoming, availableOnchainBalance.toPrettyString(preferredAmountUnit, primaryFiatRate, withUnit = true))
                     },
-                    textStyle = MaterialTheme.typography.caption,
+                    textStyle = textStyle,
                     icon = R.drawable.ic_chain,
-                    iconTint = MaterialTheme.typography.caption.color,
+                    iconTint = textStyle.color,
                     space = 4.dp,
                 )
                 Spacer(modifier = Modifier.width(6.dp))
@@ -227,7 +250,18 @@ private fun OnChainBalance(
                                     label = stringResource(id = R.string.home_final_title),
                                     icon = R.drawable.ic_chain,
                                     amount = finalWalletBalance.toMilliSatoshi(),
-                                    description = { Text(text = stringResource(id = R.string.home_final_desc), style = MaterialTheme.typography.subtitle2) },
+                                    description = {
+                                        Text(text = stringResource(id = R.string.home_final_desc), style = MaterialTheme.typography.subtitle2)
+                                        Spacer(Modifier.height(8.dp))
+                                        MutedFilledButton(
+                                            text = stringResource(R.string.walletinfo_onchain_final_spend_button),
+                                            icon = R.drawable.ic_send,
+                                            onClick = onNavigateToFinalWallet,
+                                            padding = PaddingValues(12.dp, 8.dp),
+                                            space = 8.dp,
+                                            iconTint = MaterialTheme.colors.primary,
+                                        )
+                                    },
                                     onClick = onNavigateToFinalWallet,
                                 )
                             }

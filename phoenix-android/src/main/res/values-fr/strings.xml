@@ -715,6 +715,7 @@
     <string name="walletinfo_legacy_nodeid">Identifiant legacy</string>
 
     <string name="walletinfo_onchain_final">Wallet final</string>
+    <string name="walletinfo_onchain_final_spend_button">Dépenser</string>
 
     <!-- settings: liquidity policy for channels creation -->
 

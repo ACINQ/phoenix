@@ -70,7 +70,7 @@ private fun ConfirmedBalanceView(
         if (balance != null && balance > 0.msat) {
             Spacer(modifier = Modifier.height(12.dp))
             FilledButton(
-                text = "Spend",
+                text = stringResource(R.string.walletinfo_onchain_final_spend_button),
                 icon = R.drawable.ic_send,
                 onClick = onSpendClick,
             )

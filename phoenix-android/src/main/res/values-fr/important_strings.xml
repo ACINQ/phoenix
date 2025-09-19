@@ -94,6 +94,7 @@
 
     <string name="home_final_title">Wallet final</string>
     <string name="home_final_desc">Ces fonds proviennent de canaux Lightning fermés. Ils doivent être dépensés manuellement.</string>
+    <string name="home_onchain_balance_only">Solde on-chain</string>
 
     <string name="home_background_restriction_title">Fonctionnement en arrière plan restreint</string>
     <string name="home_background_restriction_body_1">Phoenix ne pourra pas recevoir de paiements quand l\'application est en arrière plan ou est fermée.</string>

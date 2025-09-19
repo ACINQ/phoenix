@@ -223,6 +223,9 @@
     <string name="preparesend_lnurl_fetching">Fetching data from service…</string>
     <string name="preparesend_bip353_resolving">Resolving payment request over DNS…</string>
 
+    <string name="preparesend_funds_final_wallet">You have on-chain funds on the final wallet, but none on Lightning.</string>
+    <string name="preparesend_funds_final_wallet_button">View final wallet</string>
+
     <!-- utils: misc strings -->
 
     <string name="utils_rounded">≈</string>
@@ -872,6 +875,7 @@
     <string name="walletinfo_legacy_nodeid">Legacy node id</string>
 
     <string name="walletinfo_onchain_final">Final wallet</string>
+    <string name="walletinfo_onchain_final_spend_button">Spend</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
