@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -91,7 +93,7 @@ fun NotificationsView(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         } else {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 // -- notices
                 if (notices.isNotEmpty()) {
                     item {
@@ -115,9 +117,8 @@ fun NotificationsView(
                         CardHeader(text = stringResource(id = R.string.inappnotif_payments_title))
                     }
                 }
-                items(notifications) {
-                    val relatedNotifications = it.first
-                    PaymentNotification(it.second, onNotificationRead = { notificationsManager.dismissNotifications(relatedNotifications) })
+                items(notifications) { (relatedNotifications, notification) ->
+                    PaymentNotification(notification, onNotificationRead = { notificationsManager.dismissNotifications(relatedNotifications) })
                 }
             }
         }
@@ -381,18 +382,10 @@ private fun DimissibleNotification(
     onRead: () -> Unit,
     extraActionClick: (() -> Unit)? = null,
 ) {
-    val dismissState = rememberDismissState(
-        confirmStateChange = {
-            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                onRead()
-            }
-            true
-        }
-    )
-    SwipeToDismiss(
-        state = dismissState,
-        background = {},
-        dismissThresholds = { FractionalThreshold(0.8f) }
+    val dismissBoxState = rememberSwipeToDismissBoxState(confirmValueChange = { onRead(); true })
+    SwipeToDismissBox(
+        state = dismissBoxState,
+        backgroundContent = {},
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
