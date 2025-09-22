@@ -260,7 +260,7 @@ fun MutualCloseView(
                                             icon = R.drawable.ic_check,
                                             onSpend = {
                                                 addressErrorMessage = ""
-                                                feerate?.let { postIntent(CloseChannelsConfiguration.Intent.MutualCloseAllChannels(address, FeeratePerKw(FeeratePerByte(it)))) }
+                                                feerate.let { postIntent(CloseChannelsConfiguration.Intent.MutualCloseAllChannels(address, FeeratePerKw(FeeratePerByte(it)))) }
                                                 showConfirmationDialog = false
                                             },
                                             shape = RoundedCornerShape(12.dp),

@@ -248,6 +248,7 @@ private fun AvailableForRefundView(
                             onSpend = { vm.executeRefund(currentState.transaction) },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = true,
+                            ignoreChannelsState = true,
                         )
                     }
 

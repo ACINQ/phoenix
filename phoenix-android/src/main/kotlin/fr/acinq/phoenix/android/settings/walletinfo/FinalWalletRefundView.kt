@@ -261,7 +261,8 @@ private fun ColumnScope.AvailableForRefund(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = true,
                     padding = PaddingValues(16.dp),
-                    shape = RectangleShape
+                    shape = RectangleShape,
+                    ignoreChannelsState = true,
                 )
             }
             is FinalWalletRefundState.Publishing -> {
