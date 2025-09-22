@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.InvoiceDefaultRoutingFees
@@ -18,6 +17,7 @@ import fr.acinq.lightning.blockchain.electrum.IElectrumClient
 import fr.acinq.lightning.blockchain.electrum.SwapInManager
 import fr.acinq.lightning.blockchain.electrum.SwapInWallet
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.channel.states.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.states.Normal
 import fr.acinq.lightning.channel.states.Offline
@@ -28,8 +28,6 @@ import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.wire.InitTlv
-import fr.acinq.lightning.wire.TlvStream
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.utils.extensions.isTerminated
@@ -124,6 +122,23 @@ class PeerManager(
         scope = this,
         started = SharingStarted.Lazily,
         initialValue = null,
+    )
+
+    /**
+     * Provides a recommended fee rate for various user operations in the app (e.g., splice-out, simple close, cpfp).
+     * Returns the mempool.space half-hour estimation if available, falls back to the peer funding feerate if not, and worst case, returns a static base value of 3s/vb.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val recommendedFeerateFlow = peerState.filterNotNull().flatMapLatest { peer ->
+        combine(configurationManager.mempoolFeerate, peer.peerFeeratesFlow) { mempoolFeerate, peerFeerates ->
+            mempoolFeerate?.halfHour
+                ?: peerFeerates?.fundingFeerate?.let { FeeratePerByte(it) }
+                ?: FeeratePerByte(3.sat)
+        }
+    }.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = FeeratePerByte(3.sat)
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)

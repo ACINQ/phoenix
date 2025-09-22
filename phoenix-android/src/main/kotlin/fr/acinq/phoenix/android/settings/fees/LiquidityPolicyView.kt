@@ -212,7 +212,6 @@ private fun EditMaxFee(
                         )
                     }
                 }
-
             }
             Spacer(Modifier.width(12.dp))
             InlineSatoshiInput(
