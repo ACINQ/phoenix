@@ -43,7 +43,6 @@ struct ConfigurationList: View {
 		case WalletInfo
 		case ChannelsConfiguration
 		case LogsConfiguration
-		case BoltCardsList
 		case Experimental
 		// Danger Zone
 		case DrainWallet
@@ -88,7 +87,6 @@ struct ConfigurationList: View {
 	@Namespace var linkID_WalletInfo
 	@Namespace var linkID_ChannelsConfiguration
 	@Namespace var linkID_LogsConfiguration
-	@Namespace var linkID_BoltCardsList
 	@Namespace var linkID_Experimental
 	@Namespace var linkID_DrainWallet
 	@Namespace var linkID_ResetWallet
@@ -397,15 +395,6 @@ struct ConfigurationList: View {
 			.id(linkID_LogsConfiguration)
 			
 			if hasWallet {
-				navLink_label(.BoltCardsList) {
-					Label { Text("Bolt cards") } icon: {
-						Image(systemName: "creditcard")
-					}
-				}
-				.id(linkID_BoltCardsList)
-			}
-			
-			if hasWallet {
 				navLink_label(.Experimental) {
 					Label { Text("Experimental") } icon: {
 						if #available(iOS 17, *) {
@@ -503,7 +492,6 @@ struct ConfigurationList: View {
 			case .WalletInfo            : WalletInfoView(popTo: popTo)
 			case .ChannelsConfiguration : ChannelsConfigurationView()
 			case .LogsConfiguration     : LogsConfigurationView()
-			case .BoltCardsList         : BoltCardsList()
 			case .Experimental          : Experimental()
 		// Danger Zone
 			case .DrainWallet           : DrainWalletView(popTo: popTo)
@@ -606,7 +594,6 @@ struct ConfigurationList: View {
 			case .WalletInfo            : return linkID_WalletInfo
 			case .ChannelsConfiguration : return linkID_ChannelsConfiguration
 			case .LogsConfiguration     : return linkID_LogsConfiguration
-			case .BoltCardsList         : return linkID_BoltCardsList
 			case .Experimental          : return linkID_Experimental
 			
 			case .DrainWallet           : return linkID_DrainWallet

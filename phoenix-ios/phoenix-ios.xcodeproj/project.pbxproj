@@ -159,7 +159,6 @@
 		DC4CF3CE2BE96C36003A957F /* DisablePinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */; };
 		DC4CF3D02BEA8C13003A957F /* EditPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */; };
 		DC5567452C2F1A6900008E11 /* ContactsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5567442C2F1A6900008E11 /* ContactsList.swift */; };
-		DC5631C52C541E5C00DCB5BF /* Experimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C42C541E5C00DCB5BF /* Experimental.swift */; };
 		DC5631C72C5944CF00DCB5BF /* KotlinExtensions+Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */; };
 		DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */; };
 		DC5631CA2C597B8600DCB5BF /* SourceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C92C597B8600DCB5BF /* SourceInfo.swift */; };
@@ -294,6 +293,7 @@
 		DC808E9D2D554A430019AE30 /* DisablingTorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC82EED629789853007A5853 /* TxHistoryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82EED529789853007A5853 /* TxHistoryExporter.swift */; };
+		DC87582A2E81B01000A166EB /* Experimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8758292E81B00900A166EB /* Experimental.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
 		DC8D94142CA7015F00EE844E /* ChannelFundingProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8D94132CA7015F00EE844E /* ChannelFundingProblem.swift */; };
 		DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
@@ -391,7 +391,6 @@
 		DCBA3ABD2E61FE26000BC8D3 /* BoltCardsHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AA82E61FE26000BC8D3 /* BoltCardsHelp.swift */; };
 		DCBA3ABE2E61FE26000BC8D3 /* DeleteCardSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AAB2E61FE26000BC8D3 /* DeleteCardSheet.swift */; };
 		DCBA3ABF2E61FE26000BC8D3 /* SimulatorWriteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AB42E61FE26000BC8D3 /* SimulatorWriteSheet.swift */; };
-		DCBA3AC02E61FE26000BC8D3 /* BoltCardsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AA92E61FE26000BC8D3 /* BoltCardsList.swift */; };
 		DCBA3AC12E61FE26000BC8D3 /* SimulatorPasteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AB32E61FE26000BC8D3 /* SimulatorPasteSheet.swift */; };
 		DCBA3AC22E61FE26000BC8D3 /* CardOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AAA2E61FE26000BC8D3 /* CardOptionsSheet.swift */; };
 		DCBA3AC32E61FE26000BC8D3 /* BoltCardInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBA3AA72E61FE26000BC8D3 /* BoltCardInput.swift */; };
@@ -689,7 +688,6 @@
 		DC4CF3CD2BE96C36003A957F /* DisablePinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisablePinView.swift; sourceTree = "<group>"; };
 		DC4CF3CF2BEA8C13003A957F /* EditPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPinView.swift; sourceTree = "<group>"; };
 		DC5567442C2F1A6900008E11 /* ContactsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsList.swift; sourceTree = "<group>"; };
-		DC5631C42C541E5C00DCB5BF /* Experimental.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Experimental.swift; sourceTree = "<group>"; };
 		DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Manager.swift"; sourceTree = "<group>"; };
 		DC5631C92C597B8600DCB5BF /* SourceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceInfo.swift; sourceTree = "<group>"; };
 		DC5895C92E551A4E00CBCCF9 /* AnyAsyncSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyAsyncSequence.swift; sourceTree = "<group>"; };
@@ -798,6 +796,7 @@
 		DC808E9C2D554A3E0019AE30 /* DisablingTorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisablingTorSheet.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC82EED529789853007A5853 /* TxHistoryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxHistoryExporter.swift; sourceTree = "<group>"; };
+		DC8758292E81B00900A166EB /* Experimental.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Experimental.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
 		DC8D94132CA7015F00EE844E /* ChannelFundingProblem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelFundingProblem.swift; sourceTree = "<group>"; };
 		DC949E692B45B1EC00E80BB5 /* LiquidityAdsHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidityAdsHelp.swift; sourceTree = "<group>"; };
@@ -875,7 +874,6 @@
 		DCBA3AA62E61FE26000BC8D3 /* ArchiveCardSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveCardSheet.swift; sourceTree = "<group>"; };
 		DCBA3AA72E61FE26000BC8D3 /* BoltCardInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardInput.swift; sourceTree = "<group>"; };
 		DCBA3AA82E61FE26000BC8D3 /* BoltCardsHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardsHelp.swift; sourceTree = "<group>"; };
-		DCBA3AA92E61FE26000BC8D3 /* BoltCardsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoltCardsList.swift; sourceTree = "<group>"; };
 		DCBA3AAA2E61FE26000BC8D3 /* CardOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardOptionsSheet.swift; sourceTree = "<group>"; };
 		DCBA3AAB2E61FE26000BC8D3 /* DeleteCardSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteCardSheet.swift; sourceTree = "<group>"; };
 		DCBA3AAC2E61FE26000BC8D3 /* LnurlwRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LnurlwRegistration.swift; sourceTree = "<group>"; };
@@ -1520,6 +1518,13 @@
 			path = tor;
 			sourceTree = "<group>";
 		};
+		DC8758262E81AFDB00A166EB /* experimental */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = experimental;
+			sourceTree = "<group>";
+		};
 		DC949E6B2B45FC5E00E80BB5 /* fees */ = {
 			isa = PBXGroup;
 			children = (
@@ -1618,10 +1623,11 @@
 			isa = PBXGroup;
 			children = (
 				DCBA3AB62E61FE26000BC8D3 /* bolt card */,
-				DCFAEFC72A72F46D00330088 /* wallet */,
 				DCFFAADC2900218B004E3C11 /* channels */,
+				DC8758262E81AFDB00A166EB /* experimental */,
 				53BEF0A8669F9379E4E4596F /* logs */,
-				DC5631C42C541E5C00DCB5BF /* Experimental.swift */,
+				DCFAEFC72A72F46D00330088 /* wallet */,
+				DC8758292E81B00900A166EB /* Experimental.swift */,
 			);
 			path = advanced;
 			sourceTree = "<group>";
@@ -1759,7 +1765,6 @@
 				DCBA3AA62E61FE26000BC8D3 /* ArchiveCardSheet.swift */,
 				DCBA3AA72E61FE26000BC8D3 /* BoltCardInput.swift */,
 				DCBA3AA82E61FE26000BC8D3 /* BoltCardsHelp.swift */,
-				DCBA3AA92E61FE26000BC8D3 /* BoltCardsList.swift */,
 				DCBA3AAA2E61FE26000BC8D3 /* CardOptionsSheet.swift */,
 				DCBA3AAB2E61FE26000BC8D3 /* DeleteCardSheet.swift */,
 				DCBA3AAC2E61FE26000BC8D3 /* LnurlwRegistration.swift */,
@@ -2265,7 +2270,6 @@
 				DCBA3ABD2E61FE26000BC8D3 /* BoltCardsHelp.swift in Sources */,
 				DCBA3ABE2E61FE26000BC8D3 /* DeleteCardSheet.swift in Sources */,
 				DCBA3ABF2E61FE26000BC8D3 /* SimulatorWriteSheet.swift in Sources */,
-				DCBA3AC02E61FE26000BC8D3 /* BoltCardsList.swift in Sources */,
 				DCBA3AC12E61FE26000BC8D3 /* SimulatorPasteSheet.swift in Sources */,
 				DCBA3AC22E61FE26000BC8D3 /* CardOptionsSheet.swift in Sources */,
 				DCBA3AC32E61FE26000BC8D3 /* BoltCardInput.swift in Sources */,
@@ -2442,6 +2446,7 @@
 				DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */,
 				C8D7A84CCF914B08BDB03BE6 /* ManualRestoreView.swift in Sources */,
 				DCCD046327EE04E1007D57A5 /* WalletPaymentExtensions.swift in Sources */,
+				DC87582A2E81B01000A166EB /* Experimental.swift in Sources */,
 				DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */,
 				53BEFFEBEA9EBE7B27B53AF4 /* PaymentView.swift in Sources */,
 				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
@@ -2539,7 +2544,6 @@
 				DC72CEF52C99DCEB00C810A8 /* LnurlFlowErrorNotice.swift in Sources */,
 				DC4CBC8A2D6677A900129BDB /* Details_Incoming_SpliceIn.swift in Sources */,
 				DCBA3AA32E61F1ED000BC8D3 /* SyncBackupManager+Cards.swift in Sources */,
-				DC5631C52C541E5C00DCB5BF /* Experimental.swift in Sources */,
 				DCF8E3AC2BC4968D009299EE /* LowMinerFeeWarning.swift in Sources */,
 				DC808E9B2D5541F50019AE30 /* UsingTorSheet.swift in Sources */,
 				DC65D86428E2F7D700686355 /* ResetWalletView_Action.swift in Sources */,
