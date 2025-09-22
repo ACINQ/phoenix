@@ -260,7 +260,7 @@ private fun PrepareSendView(
         var showFinalWalletDialog by remember { mutableStateOf(false) }
 
         LaunchedEffect(finalWalletBalance, channels) {
-            showFinalWalletDialog = channels?.all { it.value.isTerminated } == true && finalWalletBalance != null && finalWalletBalance > 0.sat
+            showFinalWalletDialog = (channels?.isEmpty() == true || channels?.all { it.value.isTerminated } == true) && finalWalletBalance != null && finalWalletBalance > 0.sat
         }
         if (showFinalWalletDialog) {
             FinalWalletDialog(onDismiss = { showFinalWalletDialog = false })

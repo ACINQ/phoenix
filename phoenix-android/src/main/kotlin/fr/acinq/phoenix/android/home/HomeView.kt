@@ -243,6 +243,7 @@ fun HomeView(
             )
             HomeBalance(
                 modifier = Modifier.layoutId("balance"),
+                channels = channels,
                 balance = balance,
                 balanceDisplayMode = balanceDisplayMode,
                 swapInBalance = swapInBalance.value,

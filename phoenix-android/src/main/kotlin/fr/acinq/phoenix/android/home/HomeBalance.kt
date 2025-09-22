@@ -45,6 +45,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.blockchain.electrum.WalletState
@@ -68,12 +69,14 @@ import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.HomeAmountDisplayMode
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.managers.WalletBalance
 import kotlinx.coroutines.flow.firstOrNull
 
 @Composable
 fun HomeBalance(
     modifier: Modifier = Modifier,
+    channels: Map<ByteVector32, LocalChannelInfo>?,
     balance: MilliSatoshi?,
     swapInBalance: WalletBalance,
     swapInNextTimeout: Pair<WalletState.Utxo, Int>?,
@@ -93,7 +96,8 @@ fun HomeBalance(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (balance == 0.msat && (swapInBalance.total > 0.sat || finalWalletBalance > 0.sat)) {
+            val hasNoActiveChannels = remember(channels) { (channels?.isEmpty() == true || channels?.all { it.value.isTerminated } == true) }
+            if (hasNoActiveChannels && (swapInBalance.total > 0.sat || finalWalletBalance > 0.sat)) {
                 Text(text = stringResource(R.string.home_onchain_balance_only), style = MaterialTheme.typography.caption)
                 OnChainBalance(
                     swapInBalance = swapInBalance,
