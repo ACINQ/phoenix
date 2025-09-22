@@ -94,6 +94,7 @@ fun StartupView(
     onSeedNotFound: () -> Unit,
     onManualRecoveryClick: () -> Unit,
     onWalletReady: () -> Unit,
+    forceWalletId: WalletId?,
 ) {
     val showIntro = application.globalPrefs.getShowIntro.collectAsState(initial = null)
     if (showIntro.value == true) {
@@ -120,8 +121,8 @@ fun StartupView(
                 val availableWalletMetadata = availableWalletMetadataPrefs.value
 
                 // we may already have a desired node id and thus may not need user input to know which wallet to load
-                val desiredNodeIdFlow = appViewModel.desiredWalletId.collectAsState()
-                val desiredNodeId = desiredNodeIdFlow.value
+                val desiredWalletIdFlow = appViewModel.desiredWalletId.collectAsState()
+                val desiredWalletId = desiredWalletIdFlow.value
 
                 val activeWalletFlow = appViewModel.activeWalletInUI.collectAsState()
                 val activeWallet = activeWalletFlow.value
@@ -146,9 +147,10 @@ fun StartupView(
                                 var loadingWallet by remember {
                                     mutableStateOf(
                                         when {
+                                            forceWalletId != null -> availableWallets[forceWalletId]
                                             !startWalletImmediately -> null
                                             availableWallets.size == 1 -> availableWallets.entries.firstOrNull()?.value
-                                            desiredNodeId != null -> availableWallets[desiredNodeId]
+                                            desiredWalletId != null -> availableWallets[desiredWalletId]
                                             startWalletImmediately -> availableWallets[defaultWallet.value]
                                             else -> null
                                         }

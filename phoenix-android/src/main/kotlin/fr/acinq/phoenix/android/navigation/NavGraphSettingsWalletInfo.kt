@@ -16,10 +16,12 @@
 
 package fr.acinq.phoenix.android.navigation
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navDeepLink
 import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletInfo
 import fr.acinq.phoenix.android.settings.walletinfo.FinalWalletRefundView
 import fr.acinq.phoenix.android.settings.walletinfo.SendSwapInRefundView
@@ -45,16 +47,21 @@ fun NavGraphBuilder.walletInfoNavGraph(navController: NavController, appViewMode
         route = Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route,
         appViewModel = appViewModel,
         deepLinks = listOf(
-            navDeepLink { uriPattern = "phoenix:swapinwallet" }
+            navDeepLink { uriPattern = "phoenix:swapinwallet/{walletId}" }
         )
-    ) { _, _, business ->
-        SwapInWallet(
-            business = business,
-            onBackClick = { navController.popBackStackOrHome() },
-            onViewChannelPolicyClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) },
-            onAdvancedClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInSigner.route) },
-            onSpendRefundable = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInRefund.route) },
-        )
+    ) { backStackEntry, walletId, business ->
+        val walletIdDeeplink = backStackEntry.arguments?.getString("walletid")?.let { WalletId(it) }
+        if (walletIdDeeplink != null && walletIdDeeplink != walletId) {
+            LaunchedEffect(Unit) { navController.popToHome() }
+        } else {
+            SwapInWallet(
+                business = business,
+                onBackClick = { navController.popBackStackOrHome() },
+                onViewChannelPolicyClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) },
+                onAdvancedClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInSigner.route) },
+                onSpendRefundable = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInRefund.route) },
+            )
+        }
     }
 
     businessComposable(Screen.BusinessNavGraph.WalletInfo.SwapInAddresses.route, appViewModel) { _, _, business ->

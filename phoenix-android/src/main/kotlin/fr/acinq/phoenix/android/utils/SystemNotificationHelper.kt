@@ -152,7 +152,7 @@ object SystemNotificationHelper {
                 }
             },
             walletMetadata = walletMetadata,
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet/$walletId" else "phoenix:notifications/$walletId",
         )
     }
 
@@ -174,7 +174,7 @@ object SystemNotificationHelper {
                 }
             },
             walletMetadata = walletMetadata,
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet/$walletId" else "phoenix:notifications/$walletId",
         )
     }
 
@@ -196,7 +196,7 @@ object SystemNotificationHelper {
                 }
             },
             walletMetadata = walletMetadata,
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet/$walletId" else "phoenix:notifications/$walletId",
         )
     }
 
@@ -207,7 +207,7 @@ object SystemNotificationHelper {
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif_rejected_amount_too_low),
             walletMetadata = walletMetadata,
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet/$walletId" else "phoenix:notifications/$walletId",
         )
     }
 
@@ -218,7 +218,7 @@ object SystemNotificationHelper {
                 amountIncoming.toPrettyString(BitcoinUnit.Sat, withUnit = true)),
             message = context.getString(R.string.notif_rejected_generic_error),
             walletMetadata = walletMetadata,
-            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet" else "phoenix:notifications/$walletId",
+            deepLink = if (source == LiquidityEvents.Source.OnChainWallet) "phoenix:swapinwallet/$walletId" else "phoenix:notifications/$walletId",
         )
     }
 

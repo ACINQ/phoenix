@@ -92,9 +92,6 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
 
             state.value = ResetWalletStep.Deleting.Prefs
             DataStoreManager.deleteNodeUserPrefs(application.applicationContext, walletId)
-            FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener { task ->
-                if (task.isSuccessful) BusinessManager.refreshFcmToken()
-            }
 
             delay(400)
 

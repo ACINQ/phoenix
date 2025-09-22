@@ -26,6 +26,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.initwallet.InitNewWallet
 import fr.acinq.phoenix.android.initwallet.create.CreateWalletView
@@ -47,6 +48,15 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
         ),
     ) {
         val nextScreenLink = it.arguments?.getString("next")
+
+        val nextWalletId = when {
+            nextScreenLink == null -> null
+            nextScreenLink.startsWith("phoenix:swapinwallet") -> nextScreenLink.split("/").lastOrNull()
+            nextScreenLink.contains("phoenix:notifications") -> nextScreenLink.split("/").lastOrNull()
+            nextScreenLink.contains("phoenix:payments") -> nextScreenLink.split("/").takeIf { it.size == 3 }?.get(1)
+            else -> null
+        }?.let { WalletId(it) }
+
         val startupViewModel = viewModel<StartupViewModel>(viewModelStoreOwner = it, factory = StartupViewModel.Factory(application))
         StartupView(
             appViewModel = appViewModel,
@@ -68,7 +78,8 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
                         popUpTo(navController.graph.id) { inclusive = true }
                     })
                 }
-            }
+            },
+            forceWalletId = nextWalletId
         )
     }
 
