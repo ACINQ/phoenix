@@ -112,7 +112,8 @@ private fun AvailableForRefundView(
     var showScannerView by remember { mutableStateOf(false) }
 
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 3.sat) }
+    val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()
+    var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
 
     if (showScannerView) {
         SwapInRefundScanner(

@@ -152,7 +152,8 @@ private fun ColumnScope.AvailableForRefund(
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
 
     var address by remember { mutableStateOf("") }
-    var feerate by remember { mutableStateOf(mempoolFeerate?.halfHour?.feerate ?: 3.sat) }
+    val recommendedFeerate by business.peerManager.recommendedFeerateFlow.collectAsState()
+    var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
 
     var showScannerView by remember { mutableStateOf(false) }
 
