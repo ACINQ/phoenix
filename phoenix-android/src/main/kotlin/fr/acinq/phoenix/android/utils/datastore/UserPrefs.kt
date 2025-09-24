@@ -31,6 +31,7 @@ import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.PreferredFiatCurrencies
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
 import fr.acinq.phoenix.managers.AppConfigurationManager
@@ -120,21 +121,21 @@ class UserPrefs(private val data: DataStore<Preferences>) {
         }
     }
 
-    val getFiatCurrencies: Flow<AppConfigurationManager.PreferredFiatCurrencies> = safeData.map {
+    val getFiatCurrencies: Flow<PreferredFiatCurrencies> = safeData.map {
         it[FIAT_CURRENCIES]?.let {
             try {
-                Json.decodeFromString<AppConfigurationManager.PreferredFiatCurrencies>(it)
+                Json.decodeFromString<PreferredFiatCurrencies>(it)
             } catch (e: Exception) {
                 log.error("failed to decode fiat currencies list: $it: ${e.message}")
                 null
             }
-        } ?: AppConfigurationManager.PreferredFiatCurrencies(
+        } ?: PreferredFiatCurrencies(
             // fallback to the legacy property
             primary = it[FIAT_CURRENCY]?.let { FiatCurrency.valueOfOrNull(it) } ?: FiatCurrency.USD,
             others = emptySet()
         )
     }
-    suspend fun saveFiatCurrencyList(preferredCurrencies: AppConfigurationManager.PreferredFiatCurrencies) = data.edit {
+    suspend fun saveFiatCurrencyList(preferredCurrencies: PreferredFiatCurrencies) = data.edit {
         try {
             it[FIAT_CURRENCIES] = Json.encodeToString(preferredCurrencies)
         } catch (e: Exception) {

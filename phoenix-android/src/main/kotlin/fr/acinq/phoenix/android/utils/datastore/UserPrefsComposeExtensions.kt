@@ -21,6 +21,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.PreferredFiatCurrencies
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.flow.flowOf
 
@@ -37,5 +38,5 @@ fun UserPrefs?.getBitcoinUnits(): State<PreferredBitcoinUnits> =
     (this?.getBitcoinUnits ?: flowOf(PreferredBitcoinUnits(primary = BitcoinUnit.Sat))).collectAsState(initial = PreferredBitcoinUnits(primary = BitcoinUnit.Sat))
 
 @Composable
-fun UserPrefs?.getFiatCurrencies(): State<AppConfigurationManager.PreferredFiatCurrencies> =
-    (this?.getFiatCurrencies ?: flowOf(AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))).collectAsState(initial = AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))
+fun UserPrefs?.getFiatCurrencies(): State<PreferredFiatCurrencies> =
+    (this?.getFiatCurrencies ?: flowOf(PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))).collectAsState(initial = PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()))

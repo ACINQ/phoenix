@@ -45,11 +45,11 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 class PhoenixBusiness(
-    internal val ctx: PlatformContext
+    val phoenixGlobal: PhoenixGlobal,
 ) {
     // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
     // create new [Logger] instances, and output logs to platform dependent writers.
-    val loggerFactory = LoggerFactory(PhoenixLoggerConfig(ctx))
+    val loggerFactory = LoggerFactory(PhoenixLoggerConfig(phoenixGlobal.ctx))
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
@@ -72,8 +72,7 @@ class PhoenixBusiness(
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-    val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
+    val networkMonitor by lazy { NetworkMonitor(loggerFactory, phoenixGlobal.ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
     val databaseManager by lazy { DatabaseManager(this) }
@@ -81,7 +80,9 @@ class PhoenixBusiness(
     val paymentsManager by lazy { PaymentsManager(this) }
     val balanceManager by lazy { BalanceManager(this) }
     val appConfigurationManager by lazy { AppConfigurationManager(this) }
-    val currencyManager by lazy { CurrencyManager(this) }
+
+    val currencyManager = phoenixGlobal.currencyManager
+
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnurlManager by lazy { LnurlManager(this) }
     val notificationsManager by lazy { NotificationsManager(this) }
@@ -110,14 +111,13 @@ class PhoenixBusiness(
         appConnectionsDaemon?.cancel()
         networkMonitor.stop()
         notificationsManager.cancel()
-        currencyManager.cancel()
+        currencyManager.scope.cancel()
         paymentsManager.cancel()
         walletManager.cancel()
         nodeParamsManager.cancel()
         peerManager.peerState.value?.cancel()
         peerManager.cancel()
         appConfigurationManager.cancel()
-        appDb.close()
         databaseManager.close()
         databaseManager.cancel()
         lnurlManager.cancel()

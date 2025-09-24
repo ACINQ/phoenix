@@ -36,10 +36,10 @@ import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.data.inFlightPaymentsCount
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import fr.acinq.phoenix.managers.CurrencyManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
+import fr.acinq.phoenix.managers.fiatcurrencies.CurrencyManager
 import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
@@ -111,7 +111,7 @@ object BusinessManager {
      */
     suspend fun startNewBusiness(words: List<String>, isHeadless: Boolean): StartBusinessResult = startupMutex.withLock {
 
-        val business = PhoenixBusiness(PlatformContext(appContext))
+        val business = PhoenixBusiness(application.phoenixGlobal)
 
         val walletInfo = try {
             log.debug("loading wallet before starting a new business")
@@ -153,7 +153,7 @@ object BusinessManager {
 
             // update app configuration with user preferences
             business.appConfigurationManager.updateElectrumConfig(userPrefs.getElectrumServer.first())
-            business.appConfigurationManager.updatePreferredFiatCurrencies(userPrefs.getFiatCurrencies.first())
+            business.currencyManager.monitorCurrencies(userPrefs.getFiatCurrencies.first())
 
             // setup jobs monitoring the business events
             eventsMonitoringJobs[walletId] = BusinessMonitorJobs(

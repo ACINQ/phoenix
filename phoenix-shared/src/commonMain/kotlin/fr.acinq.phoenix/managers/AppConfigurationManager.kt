@@ -276,29 +276,29 @@ class AppConfigurationManager(
         _isTorEnabled.value = enabled
     }
 
-    // Fiat preferences
-    @Serializable
-    data class PreferredFiatCurrencies(
-        val primary: FiatCurrency,
-        val others: Set<FiatCurrency>
-    ) {
-        constructor(primary: FiatCurrency, others: List<FiatCurrency>) :
-                this(primary = primary, others = others.toSet())
-
-        val all: Set<FiatCurrency>
-            get() {
-                return if (others.contains(primary)) {
-                    others
-                } else {
-                    others.toMutableSet().apply { add(primary) }
-                }
-            }
-    }
-
-    private val _preferredFiatCurrencies by lazy { MutableStateFlow<PreferredFiatCurrencies?>(null) }
-    val preferredFiatCurrencies: StateFlow<PreferredFiatCurrencies?> by lazy { _preferredFiatCurrencies }
-
-    fun updatePreferredFiatCurrencies(current: PreferredFiatCurrencies) {
-        _preferredFiatCurrencies.value = current
-    }
+//    // Fiat preferences
+//    @Serializable
+//    data class PreferredFiatCurrencies(
+//        val primary: FiatCurrency,
+//        val others: Set<FiatCurrency>
+//    ) {
+//        constructor(primary: FiatCurrency, others: List<FiatCurrency>) :
+//                this(primary = primary, others = others.toSet())
+//
+//        val all: Set<FiatCurrency>
+//            get() {
+//                return if (others.contains(primary)) {
+//                    others
+//                } else {
+//                    others.toMutableSet().apply { add(primary) }
+//                }
+//            }
+//    }
+//
+//    private val _preferredFiatCurrencies by lazy { MutableStateFlow<PreferredFiatCurrencies?>(null) }
+//    val preferredFiatCurrencies: StateFlow<PreferredFiatCurrencies?> by lazy { _preferredFiatCurrencies }
+//
+//    fun updatePreferredFiatCurrencies(current: PreferredFiatCurrencies) {
+//        _preferredFiatCurrencies.value = current
+//    }
 }

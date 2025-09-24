@@ -17,6 +17,7 @@ import fr.acinq.phoenix.db.createSqliteChannelsDb
 import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
+import fr.acinq.phoenix.managers.fiatcurrencies.CurrencyManager
 import fr.acinq.phoenix.utils.MetadataQueue
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.phoenixName
@@ -38,16 +39,14 @@ class DatabaseManager(
     private val chain: Chain,
     private val appDb: SqliteAppDb,
     private val nodeParamsManager: NodeParamsManager,
-    private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
-        ctx = business.ctx,
-        appDb = business.appDb,
+        ctx = business.phoenixGlobal.ctx,
+        appDb = business.phoenixGlobal.appDb,
         chain = business.chain,
         nodeParamsManager = business.nodeParamsManager,
-        currencyManager = business.currencyManager
     )
 
     private val log = loggerFactory.newLogger(this::class)
@@ -61,7 +60,7 @@ class DatabaseManager(
     @OptIn(ExperimentalCoroutinesApi::class)
     val contactsDb = _databases.filterNotNull().mapLatest { it.payments.contacts }
 
-    val metadataQueue = MetadataQueue(currencyManager)
+    val metadataQueue = MetadataQueue()
 
     init {
         launch {

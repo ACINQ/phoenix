@@ -10,6 +10,7 @@ import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.managers.fiatcurrencies.CurrencyManager
 import fr.acinq.phoenix.utils.extensions.isOnion
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

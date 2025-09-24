@@ -66,7 +66,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.data.PreferredFiatCurrencies
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
@@ -80,6 +80,7 @@ fun CurrencyConverter(
     val scope = rememberCoroutineScope()
     val userPrefs = LocalUserPrefs.current ?: return
     val appConfigManager = LocalBusiness.current?.appConfigurationManager ?: return
+    val currencyManager = LocalBusiness.current?.currencyManager ?: return
 
     val primaryBtcUnit = LocalBitcoinUnits.current.primary
     val otherBtcUnits = LocalBitcoinUnits.current.others
@@ -142,9 +143,9 @@ fun CurrencyConverter(
             otherRates.forEach { (fiat, rate) ->
                 FiatConverterInput(amount = amount?.amount, fiat = fiat, rate = rate, onAmountUpdate = { amount = it ; activeUnit = fiat }, onDelete = {
                     scope.launch {
-                        val newFiatCurrenciesConf = AppConfigurationManager.PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats - fiat)
-                        appConfigManager.updatePreferredFiatCurrencies(current = newFiatCurrenciesConf)
-                        userPrefs.saveFiatCurrencyList(newFiatCurrenciesConf)
+                        val newFiatPref = PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats - fiat)
+                        currencyManager.monitorCurrencies(newFiatPref)
+                        userPrefs.saveFiatCurrencyList(newFiatPref)
                     }
                 })
             }
@@ -160,8 +161,8 @@ fun CurrencyConverter(
                     scope.launch {
                         when (currency) {
                             is FiatCurrency -> {
-                                val newFiatPref = AppConfigurationManager.PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats + currency)
-                                appConfigManager.updatePreferredFiatCurrencies(current = newFiatPref)
+                                val newFiatPref = PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats + currency)
+                                currencyManager.monitorCurrencies(newFiatPref)
                                 userPrefs.saveFiatCurrencyList(newFiatPref)
                             }
                             is BitcoinUnit -> {
@@ -231,7 +232,11 @@ private fun FiatConverterInput(
                 onValueChange = {},
                 backgroundColor = MaterialTheme.colors.surface,
                 readonly = true,
+                modifier = Modifier.weight(1f),
                 placeholder = { Text(text = stringResource(R.string.utils_no_conversion), style = MaterialTheme.typography.caption) },
+                leadingContent = {
+                    Text(text = fiat.flag, modifier = Modifier.size(20.dp), textAlign = TextAlign.Right)
+                }
             )
         } else {
             ConverterInput(
