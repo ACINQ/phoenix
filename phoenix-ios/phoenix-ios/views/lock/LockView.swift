@@ -647,7 +647,8 @@ struct LockView: View {
 			promptUser()
 			
 		} else {
-			SceneDelegate.get().selectWallet(wallet)
+			let keychain = Keychain.wallet(wallet)
+			self.tryUnlockKeychain(keychain, wallet)
 		}
 	}
 	
@@ -684,10 +685,12 @@ struct LockView: View {
 	func verifyPin() {
 		log.trace(#function)
 		
-		let keychain = selectedKeychain()
-		
-		if let keychain, let correctPin = keychain.getLockPin(), pin == correctPin {
-			tryUnlockKeychain(keychain)
+		if let wallet = selectedWallet,
+			let keychain = selectedKeychain(),
+			let correctPin = keychain.getLockPin(),
+			pin == correctPin
+		{
+			tryUnlockKeychain(keychain, wallet)
 			handleCorrectPin(keychain, isHiddenWallet: false)
 			
 		} else if let hiddenWalletMatches = hiddenWalletPins[pin] {
@@ -696,7 +699,7 @@ struct LockView: View {
 				let hiddenWallet = hiddenWalletMatches[0]
 				let hiddenWalletKeychain = Keychain.wallet(hiddenWallet.standardKeyId)
 		
-				tryUnlockKeychain(hiddenWalletKeychain)
+				tryUnlockKeychain(hiddenWalletKeychain, hiddenWallet)
 				handleCorrectPin(hiddenWalletKeychain, isHiddenWallet: true)
 		
 			} else {
@@ -708,11 +711,11 @@ struct LockView: View {
 			}
 			
 		} else {
-			handleIncorrectPin(keychain)
+			handleIncorrectPin(selectedKeychain())
 		}
 	}
 	
-	func tryUnlockKeychain(_ keychain: Keychain_Wallet) {
+	func tryUnlockKeychain(_ keychain: Keychain_Wallet, _ wallet: WalletMetadata) {
 		
 		keychain.unlockWithKeychain { result, _ in
 			switch result {
@@ -721,7 +724,7 @@ struct LockView: View {
 				
 			case .success(let recoveryPhrase):
 				if let recoveryPhrase {
-					closeLockView(recoveryPhrase, delay: 0.15)
+					closeLockView(recoveryPhrase, wallet, delay: 0.15)
 				} else {
 					log.error("Failed to unlock keychain: wallet does not exist")
 				}
@@ -802,7 +805,10 @@ struct LockView: View {
 	func tryBiometricsLogin() {
 		log.trace(#function)
 		
-		guard let keychain = selectedKeychain() else {
+		guard
+			let wallet = selectedWallet,
+			let keychain = selectedKeychain()
+		else {
 			log.warning("tryBiometricsLogin(): ignoring: selectedWallet is nil")
 			return
 		}
@@ -817,7 +823,7 @@ struct LockView: View {
 			biometricsAttemptInProgress = false
 			switch result {
 			case .success(let recoveryPhrase):
-				closeLockView(recoveryPhrase, delay: 0.15)
+				closeLockView(recoveryPhrase, wallet, delay: 0.15)
 				
 			case .failure(let error):
 				log.debug("tryUnlockWithBiometrics: error: \(error)")
@@ -828,11 +834,23 @@ struct LockView: View {
 		}
 	}
 	
-	func closeLockView(_ recoveryPhrase: RecoveryPhrase, delay: TimeInterval) {
+	func closeLockView(_ recoveryPhrase: RecoveryPhrase, _ wallet: WalletMetadata, delay: TimeInterval) {
 		log.trace(#function)
 		assertMainThread()
 		
-		Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
+		if let existingWalletId = Biz.walletId {
+			if existingWalletId.nodeIdHash == wallet.nodeIdHash {
+				// Wallet already loaded, we're just unlocking the UI
+			} else {
+				// We're switching wallets
+				SceneDelegate.get().prepareForWalletSwitch()
+				Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
+			}
+		} else {
+			// Wallet is not loaded
+			Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
+		}
+		
 		SceneDelegate.get().finishLockWindow()
 		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
 			withAnimation(.easeInOut) {

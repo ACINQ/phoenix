@@ -25,7 +25,7 @@ class Keychain {
 		}
 	}
 	
-	static func wallet(_ walletId: WalletIdentifier) -> Keychain_Wallet {
+	static func wallet(_ walletId: WalletIdentifiable) -> Keychain_Wallet {
 		return wallet(walletId.standardKeyId)
 	}
 	

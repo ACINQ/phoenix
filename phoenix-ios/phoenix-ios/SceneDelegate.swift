@@ -401,10 +401,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 	}
 	
-	func selectWallet(_ wallet: WalletMetadata) {
+	func prepareForWalletSwitch() {
 		log.trace(#function)
 		
-		tryWalletUnlock(wallet.standardKeyId)
+		hideMainWindow()
+		MBiz.resetCurrent()
 	}
 	
 	func lockWallet() {
