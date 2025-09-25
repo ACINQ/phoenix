@@ -39,6 +39,8 @@ struct LockView: View {
 	@State var vibrationTrigger: Int = 0
 	@State var shakeTrigger: Int = 0
 	
+	@State var viewStateId: Int = 0
+	
 	enum VisibleContent {
 		case walletSelector
 		case accessOptions
@@ -583,14 +585,24 @@ struct LockView: View {
 			altInvalidPin = InvalidPin.none()
 		}
 		
+		viewStateId += 1
+		pin = ""
+		isCorrectPin = false
+		
 		currentDate = Date.now
 		if let delay = retryDelay() {
 			
 			numberPadDisabled = true
+			let id = viewStateId
 			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-				numberPadDisabled = false
-				pin = ""
+				if id == self.viewStateId {
+					numberPadDisabled = false
+					pin = ""
+				}
 			}
+			
+		} else {
+			numberPadDisabled = false
 		}
 	}
 	
@@ -747,10 +759,13 @@ struct LockView: View {
 		// Animate UI
 		isCorrectPin = true
 		numberPadDisabled = true
+		let id = viewStateId
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-			numberPadDisabled = false
-			pin = ""
-			isCorrectPin = false
+			if id == viewStateId {
+				numberPadDisabled = false
+				pin = ""
+				isCorrectPin = false
+			}
 		}
 	}
 	
@@ -764,14 +779,17 @@ struct LockView: View {
 		
 		isCorrectPin = false
 		numberPadDisabled = true
+		let id = viewStateId
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-			numberPadDisabled = false
-			pin = ""
-			incrementInvalidPin(keychain)
+			if id == viewStateId {
+				numberPadDisabled = false
+				pin = ""
+			}
+			incrementInvalidPin(keychain, id)
 		}
 	}
 	
-	func incrementInvalidPin(_ keychain: Keychain_Wallet?) {
+	func incrementInvalidPin(_ keychain: Keychain_Wallet?, _ id: Int) {
 		log.trace(#function)
 		
 		let newInvalidPin: InvalidPin
@@ -787,13 +805,17 @@ struct LockView: View {
 		} else {
 			Keychain.global.setHiddenWalletInvalidPin(newInvalidPin) { _ in }
 		}
-		invalidPin = newInvalidPin
 		
-		currentDate = Date.now
-		if let delay = retryDelay() {
-			numberPadDisabled = true
-			DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-				numberPadDisabled = false
+		if id == viewStateId {
+			invalidPin = newInvalidPin
+			currentDate = Date.now
+			if let delay = retryDelay() {
+				numberPadDisabled = true
+				DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+					if id == viewStateId {
+						numberPadDisabled = false
+					}
+				}
 			}
 		}
 	}
