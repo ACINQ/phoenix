@@ -714,7 +714,7 @@ struct LockView: View {
 	
 	func tryUnlockKeychain(_ keychain: Keychain_Wallet) {
 		
-		keychain.unlockWithKeychain { result in
+		keychain.unlockWithKeychain { result, _ in
 			switch result {
 			case .failure(let reason):
 				log.error("Failed to unlock keychain: \(reason)")

@@ -336,26 +336,33 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		log.trace(#function)
 		assertMainThread()
 		
-		Keychain.wallet(id).firstUnlockWithKeychain {
-			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
+		Keychain.wallet(id).unlockWithKeychain {
+			(result: Result<RecoveryPhrase?, UnlockError>, enabledSecurity: EnabledSecurity) in
 			
-			if let recoveryPhrase {
-				// The user has a wallet.
-				// Load it into memory immediately.
-				// The UI may or may not be locked.
-				Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
-			}
-		
-			if let error {
-				self.showErrorWindow(error)
-			} else if enabledSecurity.hasAppLock() {
-				AppState.shared.isUnlocked = false
-				self.showLockWindow(target: .automatic)
-				self.hideLoadingWindow()
-			} else {
-				AppState.shared.isUnlocked = true
-				self.showMainWindow()
-				self.hideLoadingWindow()
+			switch result {
+			case .success(let recoveryPhrase):
+				if let recoveryPhrase {
+					// The user has a wallet.
+					// Load it into memory immediately.
+					// The UI may or may not be locked.
+					Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
+				} else {
+					// This situation occurs when the user has hard-biometrics enabled.
+					// The lockWindow is needed to perform the initial wallet unlock.
+				}
+				
+				if enabledSecurity.hasAppLock() {
+					AppState.shared.isUnlocked = false
+					self.showLockWindow(target: .automatic)
+					self.hideLoadingWindow()
+				} else {
+					AppState.shared.isUnlocked = true
+					self.showMainWindow()
+					self.hideLoadingWindow()
+				}
+				
+			case .failure(let unlockError):
+				self.showErrorWindow(unlockError)
 			}
 		}
 	}

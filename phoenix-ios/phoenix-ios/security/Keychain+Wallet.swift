@@ -53,19 +53,29 @@ class Keychain_Wallet {
 	var enabledSecurity: EnabledSecurity {
 		
 		return queue.sync {
-			
-			if let cached = _cached_enabledSecurity {
-				return cached
-			}
-			
-			let calculated = calculateEnabledSecurity()
-			_cached_enabledSecurity = calculated
-			
-			return calculated
+			_getEnabledSecurity()
 		}
 	}
 	
-	private func calculateEnabledSecurity() -> EnabledSecurity {
+	private func _getEnabledSecurity() -> EnabledSecurity {
+		log.trace(#function)
+		
+		#if DEBUG
+		dispatchPrecondition(condition: .onQueue(queue))
+		#endif
+		
+		if let cached = _cached_enabledSecurity {
+			return cached
+		}
+		
+		let calculated = _calculateEnabledSecurity()
+		_cached_enabledSecurity = calculated
+		
+		return calculated
+	}
+	
+	private func _calculateEnabledSecurity() -> EnabledSecurity {
+		log.trace(#function)
 		
 		#if DEBUG
 		dispatchPrecondition(condition: .onQueue(queue))
@@ -109,14 +119,14 @@ class Keychain_Wallet {
 		return enabledSecurity
 	}
 	
-	private func updateEnabledSecurity() {
+	private func _updateEnabledSecurity() {
 		log.trace(#function)
 		
 		#if DEBUG
 		dispatchPrecondition(condition: .onQueue(queue))
 		#endif
 		
-		let calculated = calculateEnabledSecurity()
+		let calculated = _calculateEnabledSecurity()
 		_cached_enabledSecurity = calculated
 	}
 	
@@ -124,46 +134,12 @@ class Keychain_Wallet {
 	// MARK: Unlock
 	// --------------------------------------------------
 	
-	public func firstUnlockWithKeychain(
-		completion: @escaping (
-			_ recoveryPhrase: RecoveryPhrase?,
-			_ enabledSecurity: EnabledSecurity,
-			_ error: UnlockError?
-		) -> Void
-	) {
-		log.trace(#function)
-		
-		// Disk IO ahead - get off the main thread.
-		// Also - go thru the serial queue for proper thread safety.
-		queue.async {
-			let result = self._unlockWithKeychain()
-			
-			let recoveryPhrase: RecoveryPhrase?
-			let error: UnlockError?
-			switch result {
-			case .success(let success):
-				recoveryPhrase = success
-				error = nil
-				
-			case .failure(let failure):
-				recoveryPhrase = nil
-				error = failure
-			}
-			
-			let enabledSecurity = self.calculateEnabledSecurity()
-			self._cached_enabledSecurity = enabledSecurity
-			DispatchQueue.main.async {
-				completion(recoveryPhrase, enabledSecurity, error)
-			}
-		}
-	}
-	
 	/// Attempts to extract the mnemonics using the keychain.
-	/// If the user hasn't enabled any additional security options, this will succeed.
-	/// Otherwise it will fail, and the completion closure will specify the additional security in place.
+	/// This generally succeeds, unless the user has "hard biometrics" enabled.
+	/// The enabled security options are also returned to the caller.
 	///
 	public func unlockWithKeychain(
-		completion: @escaping (Result<RecoveryPhrase?, UnlockError>) -> Void
+		completion: @escaping (Result<RecoveryPhrase?, UnlockError>, EnabledSecurity) -> Void
 	) {
 		log.trace(#function)
 		
@@ -171,8 +147,9 @@ class Keychain_Wallet {
 		// Also - go thru the serial queue for proper thread safety.
 		queue.async {
 			let result = self._unlockWithKeychain()
+			let enabledSecurity = self._getEnabledSecurity()
 			DispatchQueue.main.async {
-				completion(result)
+				completion(result, enabledSecurity)
 			}
 		}
 	}
@@ -255,7 +232,7 @@ class Keychain_Wallet {
 		}
 		
 		queue.async {
-			self.updateEnabledSecurity()
+			self._updateEnabledSecurity()
 		}
 		return .success
 	}
@@ -272,7 +249,7 @@ class Keychain_Wallet {
 		
 		let succeed = {
 			self._cached_softBiometrics = enabled
-			self.updateEnabledSecurity()
+			self._updateEnabledSecurity()
 			DispatchQueue.main.async {
 				completion(nil)
 			}
@@ -368,7 +345,7 @@ class Keychain_Wallet {
 		
 		let succeed = {
 			self._cached_passcodeFallback = enabled
-			self.updateEnabledSecurity()
+			self._updateEnabledSecurity()
 			DispatchQueue.main.async {
 				completion(nil)
 			}
@@ -473,7 +450,7 @@ class Keychain_Wallet {
 				case .lockPin     : self._cached_lockPin = pin
 				case .spendingPin : self._cached_spendingPin = pin
 			}
-			self.updateEnabledSecurity()
+			self._updateEnabledSecurity()
 			DispatchQueue.main.async {
 				completion(nil)
 			}

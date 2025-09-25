@@ -592,7 +592,7 @@ struct RecoveryPhraseList: View {
 				AuthenticateWithPinSheet(type: type) { result in
 					switch result {
 					case .Authenticated:
-						Keychain.current.unlockWithKeychain { result in
+						Keychain.current.unlockWithKeychain { result, _ in
 							if case .success(let recoveryPhrase) = result, let recoveryPhrase {
 								Succeed(recoveryPhrase)
 							} else {
@@ -610,7 +610,7 @@ struct RecoveryPhraseList: View {
 		
 		let enabledSecurity = Keychain.current.enabledSecurity
 		if enabledSecurity == .none {
-			Keychain.current.unlockWithKeychain { result in
+			Keychain.current.unlockWithKeychain { result, _ in
 				if case .success(let recoveryPhrase) = result, let recoveryPhrase {
 					Succeed(recoveryPhrase)
 				} else {
