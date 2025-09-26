@@ -10,6 +10,10 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 extension KotlinByteArray {
 	
+	func toByteVector() -> Bitcoin_kmpByteVector {
+		return Bitcoin_kmpByteVector(bytes: self)
+	}
+	
 	func toSwiftData() -> Data {
 		
 		return ByteArray_toNSData(buffer: self)

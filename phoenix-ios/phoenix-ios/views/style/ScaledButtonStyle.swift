@@ -97,12 +97,36 @@ struct ScaleButtonStyle: ButtonStyle {
 			configuration.label
 				.opacity(isEnabled ? (configuration.isPressed ? pressedOpacity : 1.0) : disabledOpacity)
 				.scaleEffect(configuration.isPressed ? scaleAmount : 1.0)
-				.background(isEnabled ? backgroundFill : disabledBackgroundFill)
+				.background(effectiveBackgroundFill)
 				.cornerRadius(cornerRadius)
 				.overlay(
 					RoundedRectangle(cornerRadius: cornerRadius)
-						.stroke(isEnabled ? borderStroke : disabledBorderStroke, lineWidth: 1.5)
+						.stroke(effectiveBorderStroke, lineWidth: 1.5)
 				)
+		}
+		
+		var effectiveBackgroundFill: Color {
+			return if isEnabled {
+				if configuration.isPressed {
+					backgroundFill.opacity(pressedOpacity)
+				} else {
+					backgroundFill
+				}
+			} else {
+				disabledBackgroundFill
+			}
+		}
+		
+		var effectiveBorderStroke: Color {
+			return if isEnabled {
+				if configuration.isPressed {
+					borderStroke.opacity(pressedOpacity)
+				} else {
+					borderStroke
+				}
+			} else {
+				disabledBorderStroke
+			}
 		}
 	}
 }

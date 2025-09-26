@@ -27,7 +27,7 @@ class PickerResult: Equatable {
 		}
 		
 		let targetSize = CGSize(width: maxWidth, height: maxHeight)
-		guard let scaledImage = image.preparingThumbnail(of: targetSize) else {
+		guard let scaledImage = await image.byPreparingThumbnail(ofSize: targetSize) else {
 			log.error("PickerResult.downscale: image.preparingThumbnail returned nil")
 			return self
 		}

@@ -28,11 +28,11 @@ fileprivate struct DisplayConfigurationList: View {
 	
 	let scrollViewProxy: ScrollViewProxy
 	
-	@State var fiatCurrency = GroupPrefs.shared.fiatCurrency
-	@State var bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-	@State var theme = Prefs.shared.theme
-	@State var showOriginalFiatAmount = Prefs.shared.showOriginalFiatAmount
-	@State var recentPaymentsConfig = Prefs.shared.recentPaymentsConfig
+	@State var fiatCurrency = GroupPrefs.current.fiatCurrency
+	@State var bitcoinUnit = GroupPrefs.current.bitcoinUnit
+	@State var theme = Prefs.global.theme
+	@State var showOriginalFiatAmount = Prefs.current.showOriginalFiatAmount
+	@State var recentPaymentsConfig = Prefs.current.recentPaymentsConfig
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -68,16 +68,16 @@ fileprivate struct DisplayConfigurationList: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(GroupPrefs.shared.fiatCurrencyPublisher) {
+		.onReceive(GroupPrefs.current.fiatCurrencyPublisher) {
 			fiatCurrency = $0
 		}
-		.onReceive(GroupPrefs.shared.bitcoinUnitPublisher) {
+		.onReceive(GroupPrefs.current.bitcoinUnitPublisher) {
 			bitcoinUnit = $0
 		}
-		.onReceive(Prefs.shared.themePublisher) {
+		.onReceive(Prefs.global.themePublisher) {
 			theme = $0
 		}
-		.onReceive(Prefs.shared.recentPaymentsConfigPublisher) {
+		.onReceive(Prefs.current.recentPaymentsConfigPublisher) {
 			recentPaymentsConfig = $0
 		}
 	}
@@ -129,7 +129,7 @@ fileprivate struct DisplayConfigurationList: View {
 			Picker(
 				selection: Binding(
 					get: { theme },
-					set: { Prefs.shared.theme = $0 }
+					set: { Prefs.global.theme = $0 }
 				), label: Text("App theme")
 			) {
 				ForEach(Theme.allCases, id: \.self) { theme in
@@ -151,7 +151,7 @@ fileprivate struct DisplayConfigurationList: View {
 				Text("Show original fiat amount")
 			}
 			.onChange(of: showOriginalFiatAmount) { newValue in
-				Prefs.shared.showOriginalFiatAmount = newValue
+				Prefs.current.showOriginalFiatAmount = newValue
 			}
 			
 			Group {
@@ -240,8 +240,4 @@ fileprivate struct DisplayConfigurationList: View {
 			case .RecentPaymentsSelector : RecentPaymentsSelector(recentPaymentsConfig: recentPaymentsConfig)
 		}
 	}
-	
-	// --------------------------------------------------
-	// MARK: View Helpers
-	// --------------------------------------------------
 }

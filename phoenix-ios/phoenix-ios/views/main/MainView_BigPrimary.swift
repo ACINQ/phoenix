@@ -89,7 +89,7 @@ struct MainView_BigPrimary: View {
 			Color.primaryBackground
 				.ignoresSafeArea()
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea()
@@ -119,6 +119,7 @@ struct MainView_BigPrimary: View {
 		}
 		.sheet(isPresented: $showingMergeChannelsView) {
 			MergeChannelsView(location: .sheet)
+				.environmentObject(GlobalEnvironment.deviceInfo)
 		}
 	}
 	

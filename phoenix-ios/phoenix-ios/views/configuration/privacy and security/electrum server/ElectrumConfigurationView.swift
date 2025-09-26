@@ -11,10 +11,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ElectrumConfigurationView: MVIView {
 	
-	@StateObject var mvi = MVIState({ $0.electrumConfiguration() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.electrumConfiguration() })
 	
 	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
 	
