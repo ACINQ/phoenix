@@ -1,103 +1,189 @@
 import Foundation
+import PhoenixShared
 import CryptoKit
-
 
 /// Represents the "security.json" file, where we store the wrapped/encrypted seed.
 ///
-struct SecurityFile: Codable {
+/// Here's how it works:
+/// The seed is wrapped/encrypted with a randomly generated key (called the locking key).
+/// The lockingKey is then stored in the iOS keychain.
+/// And the SecurityFile contains the parameters needed to reproduce the seed, given the lockingKey.
+/// E.g. the salt, nonce, IV, tag, rounds ... whatever the specific crypto algorithm needs.
+///
+class SecurityFile {
 	
-	private enum CodingKeys: String, CodingKey {
-		case keychain
-		case biometrics
+	enum Version {
+		case v0(file: SecurityFile.V0)
+		case v1(file: SecurityFile.V1)
 	}
 	
-	/// The "keychain" option represents the default security.
-	/// That is, the user has not enabled any additional security measures such as touchID/faceID.
-	///
-	/// Here's how it works:
-	/// The seed is wrapped with a randomly generated key (called the locking key).
-	/// The lockingKey is then stored in the iOS keychain.
-	/// And the SecurityFile contains the parameters needed to reproduce the seed, given the lockingKey.
-	/// E.g. the salt, nonce, IV, tag, rounds ... whatever the specific crypto algorithm needs
-	///
-	let keychain: KeyInfo?
-	
-	/// The "biometrics" option represents advanced security.
-	///
-	/// Here's how it works:
-	/// The seed is wrapped with a randomly generated key (called the locking key).
-	/// The lockingKey is then stored in the iOS keychain, and configured with access-control
-	/// settings that require biometrics to unlock/access the keychain item.
-	/// And the SecurityFile contains the parameters needed to reproduce the seed, given the lockingKey.
-	/// E.g. the salt, nonce, IV, tag, rounds ... whatever the specific crypto algorithm needs
-	///
-	let biometrics: KeyInfo?
-	
-	init() {
-		self.keychain = nil
-		self.biometrics = nil
-	}
-	
-	init(keychain: KeyInfo) {
-		self.keychain = keychain
-		self.biometrics = nil
-	}
-	
-	init(biometrics: KeyInfo) {
-		self.keychain = nil
-		self.biometrics = biometrics
-	}
-
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
+	struct V0: Decodable {
+		static let filename = "security.json"
 		
-		self.keychain = try container.decodeIfPresent(KeyInfo_ChaChaPoly.self, forKey: .keychain)
-		self.biometrics = try container.decodeIfPresent(KeyInfo_ChaChaPoly.self, forKey: .biometrics)
-	}
-	
-	func encode(to encoder: Encoder) throws {
+		/// The "keychain" option represents the default security.
+		let keychain: SealedBox_ChaChaPoly?
 		
-		var container = encoder.container(keyedBy: CodingKeys.self)
+		/// In V0 we had a "biometrics" option, which represented advanced security.
+		///
+		/// It worked just like the "keychain" option, except the lockingKey (stored in
+		/// the iOS keychain) was configured with access-control settings that required
+		/// biometrics to unlock/access the keychain item.
+		///
+		/// Support for this option was removed because it blocked Phoenix's ability to
+		/// properly accept payments in the background (via a notification-service-extension).
+		///
+		let biometrics: SealedBox_ChaChaPoly?
 		
-		if let keychain = self.keychain as? KeyInfo_ChaChaPoly {
-			try container.encode(keychain, forKey: .keychain)
+		init() {
+			self.keychain = nil
+			self.biometrics = nil
 		}
-		if let biometrics = self.biometrics as? KeyInfo_ChaChaPoly {
-			try container.encode(biometrics, forKey: .biometrics)
+		
+		init(keychain: SealedBox_ChaChaPoly) {
+			self.keychain = keychain
+			self.biometrics = nil
+		}
+	}
+	
+	struct V1: Codable {
+		static let filename = "security.v1.json"
+		
+		struct Wallet: Codable {
+			let keychain: SealedBox_ChaChaPoly
+			let name: String
+			let photo: String
+			
+			private let hidden: Bool?
+			var isHidden: Bool {
+				return hidden ?? false
+			}
+			
+			private let chainName: String?
+			var chain: Bitcoin_kmpChain {
+				if let chainName, let chain = Bitcoin_kmpChain.fromString(chainName) {
+					return chain
+				} else {
+					return Bitcoin_kmpChain.Mainnet()
+				}
+			}
+			
+			init(
+				keychain: SealedBox_ChaChaPoly,
+				name: String,
+				photo: String,
+				isHidden: Bool,
+				chain: Bitcoin_kmpChain?
+			) {
+				self.keychain = keychain
+				self.name = name
+				self.photo = photo
+				self.hidden = isHidden ? true : nil
+				self.chainName = chain?.phoenixName
+			}
+			
+			func updated(
+				name newName: String,
+				photo newPhoto: String,
+				isHidden newIsHidden: Bool
+			) -> Wallet {
+				return Wallet(
+					keychain: self.keychain,
+					name: newName,
+					photo: newPhoto,
+					isHidden: newIsHidden,
+					chain: self.chain
+				)
+			}
+		}
+		
+		let wallets: [String: Wallet]
+		let defaultKey: String?
+		
+		private init(wallets: [String: Wallet], defaultKey: String?) {
+			self.wallets = wallets
+			self.defaultKey = defaultKey
+		}
+		
+		init() {
+			self.wallets = [:]
+			self.defaultKey = nil
+		}
+		
+		init(wallet: Wallet, id: WalletIdentifiable) {
+			let key = id.standardKeyId
+			self.wallets = [key: wallet]
+			self.defaultKey = key
+		}
+		
+		func getWallet(_ id: WalletIdentifiable) -> Wallet? {
+			return wallets[id.standardKeyId]
+		}
+		
+		func allKeys() -> [String] {
+			return Array(wallets.keys)
+		}
+		
+		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifiable) -> V1 {
+			var newWallets = self.wallets
+			newWallets[id.standardKeyId] = wallet
+			
+			return V1(wallets: newWallets, defaultKey: self.defaultKey)
+		}
+		
+		func copyRemovingWallet(_ id: WalletIdentifiable) -> V1 {
+			var newWallets = self.wallets
+			newWallets.removeValue(forKey: id.standardKeyId)
+			
+			let newDefaultKey: String? = if (defaultKey == id.standardKeyId) { nil } else { defaultKey }
+			
+			return V1(wallets: newWallets, defaultKey: newDefaultKey)
+		}
+		
+		func copyWithDefaultWalletId(_ id: WalletIdentifiable?) -> V1 {
+			
+			return V1(wallets: self.wallets, defaultKey: id?.standardKeyId)
+		}
+		
+		func isDefaultWalletId(_ id: WalletIdentifiable) -> Bool {
+			return id.standardKeyId == self.defaultKey
+		}
+		
+		func defaultWallet() -> Wallet? {
+			guard let defaultKey else {
+				return nil
+			}
+			return wallets[defaultKey]
 		}
 	}
 }
 
-// --------------------------------------------------------------------------------
+// --------------------------------------------------
 // MARK:-
+// --------------------------------------------------
 
 /// Generic typed container.
 /// Allows us to switch to alternative encryption schemes in the future, if needed.
 ///
-protocol KeyInfo: Codable {
+protocol SealedBox_Any: Codable {
 	var type: String { get }
 }
 
-// --------------------------------------------------------------------------------
-// MARK:-
-
-/// ChaCha20-Poly1305
-/// Via Apple's CryptoKit using ChaChaPoly.
+/// ChaCha20-Poly1305 via Apple's CryptoKit
 ///
-struct KeyInfo_ChaChaPoly: KeyInfo, Codable {
+struct SealedBox_ChaChaPoly: SealedBox_Any, Codable {
 	let type: String // "ChaCha20-Poly1305"
 	let nonce: Data
 	let ciphertext: Data
 	let tag: Data
 	
-	init(sealedBox: ChaChaPoly.SealedBox) {
+	init(_ raw: ChaChaPoly.SealedBox) {
 		type = "ChaCha20-Poly1305"
-		nonce = sealedBox.nonce.dataRepresentation
-		ciphertext = sealedBox.ciphertext
-		tag = sealedBox.tag
+		nonce = raw.nonce.dataRepresentation
+		ciphertext = raw.ciphertext
+		tag = raw.tag
 	}
 	
-	func toSealedBox() throws -> ChaChaPoly.SealedBox {
+	func toRaw() throws -> ChaChaPoly.SealedBox {
 		return try ChaChaPoly.SealedBox(
 			nonce      : ChaChaPoly.Nonce(data: self.nonce),
 			ciphertext : self.ciphertext,

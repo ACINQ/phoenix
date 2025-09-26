@@ -10,15 +10,14 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 struct BackgroundPaymentsSelector: View {
 	
 	@State var settings = NotificationsManager.shared.settings.value
-	
-	@State var includeAmount = !GroupPrefs.shared.discreetNotifications
-	
+	@State var includeAmount = !GroupPrefs.current.discreetNotifications
 	@State var didAppear = false
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -312,7 +311,7 @@ struct BackgroundPaymentsSelector: View {
 	func includeAmountChanged() {
 		log.trace("includeAmountChanged()")
 		
-		log.debug("GroupPrefs.shared.discreetNotifications = \(!includeAmount)")
-		GroupPrefs.shared.discreetNotifications = !includeAmount
+		log.debug("GroupPrefs.current.discreetNotifications = \(!includeAmount)")
+		GroupPrefs.current.discreetNotifications = !includeAmount
 	}
 }

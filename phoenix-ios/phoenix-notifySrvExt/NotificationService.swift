@@ -31,22 +31,6 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
  * - XPC.shared
  */
 class NotificationService: UNNotificationServiceExtension {
-
-	enum PushNotificationReason: CustomStringConvertible {
-		case incomingPayment
-		case incomingOnionMessage
-		case pendingSettlement
-		case unknown
-		
-		var description: String {
-			switch self {
-				case .incomingPayment      : return "incomingPayment"
-				case .incomingOnionMessage : return "incomingOnionMessage"
-				case .pendingSettlement    : return "pendingSettlement"
-				case .unknown              : return "unknown"
-			}
-		}
-	}
 	
 	private var contentHandler: ((UNNotificationContent) -> Void)?
 	private var remoteNotificationContent: UNMutableNotificationContent?
@@ -56,7 +40,8 @@ class NotificationService: UNNotificationServiceExtension {
 	private var srvExtDone: Bool = false
 	
 	private var business: PhoenixBusiness? = nil
-	private var pushNotificationReason: PushNotificationReason = .unknown
+	private var pushNotification: PushNotification? = nil
+	private var targetNodeIdHash: String? = nil
 	
 	private var isConnectedToPeer = false
 	private var receivedPayments: [Lightning_kmpIncomingPayment] = []
@@ -118,104 +103,25 @@ class NotificationService: UNNotificationServiceExtension {
 		// - Google's Firebase Cloud Messaging (FCM)
 		// - Amazon Web Services (AWS) (only used for debugging)
 		
-		if isFCM(userInfo) {
-			processNotification_fcm(userInfo)
-		} else {
-			processNotification_aws(userInfo)
-		}
-	}
-	
-	private func isFCM(_ userInfo: [AnyHashable : Any]) -> Bool {
-			
-		/* This could be a push notification coming from Google Firebase or from AWS.
-		 *
-		 * Example from Google FCM:
-		 * {
-		 *   "aps": {
-		 *     "alert": {
-		 *       "title": "foobar"
-		 *     }
-		 *     "mutable-content": 1
-		 *   },
-		 *   "reason": "IncomingPayment",
-		 *   "gcm.message_id": 1676919817341932,
-		 *   "google.c.a.e": 1,
-		 *   "google.c.fid": "f7Wfr_yqG00Gt6B9O7qI13",
-		 *   "google.c.sender.id": 358118532563
-		 * }
-		 *
-		 * Example from AWS:
-		 * {
-		 *   "aps": {
-		 *     "alert": {
-		 *       "title": "Missed incoming payment"
-		 *     }
-		 *     "mutable-content": 1
-		 *   },
-		 *   "acinq": {
-		 *     "amt": 120000,
-		 *     "h": "d48bf163c0e24d68567e80b10cc7dd583e2f44390c9592df56a61f79559611e6",
-		 *     "n": "02ed721545840184d1544328059e8b20c01965b73b301a7d03fc89d3d84aba0642",
-		 *     "t": "invoice",
-		 *     "ts": 1676920273561
-		 *   }
-		 * }
-		 */
-		
-		return userInfo["gcm.message_id"]     != nil ||
-		       userInfo["google.c.a.e"]       != nil ||
-		       userInfo["google.c.fid"]       != nil ||
-		       userInfo["google.c.sender.id"] != nil ||
-		       userInfo["reason"]             != nil // just in-case google changes format
-	}
-	
-	private func processNotification_fcm(_ userInfo: [AnyHashable : Any]) {
-		log.trace("processNotification_fcm()")
-		assertMainThread()
-		
-		// Example:
-		// {
-		//   "gcm.message_id": 1605136272123442,
-		//   "google.c.sender.id": 458618232423,
-		//   "google.c.a.e": 1,
-		//   "google.c.fid": "dRLLO-mxUxbDvmV1urj5Tt",
-		//   "reason": "IncomingPayment",
-		//   "aps": {
-		//     "alert": {
-		//       "title": "Missed incoming payment",
-		//     },
-		//     "mutable-content": 1
-		//   }
-		// }
-		
-		if let reason = userInfo["reason"] as? String {
-			log.debug("userInfo.reason: '\(reason)'")
-			
-			switch reason {
-				case "IncomingPayment"       : pushNotificationReason = .incomingPayment
-				case "IncomingOnionMessage$" : pushNotificationReason = .incomingOnionMessage
-				case "PendingSettlement"     : pushNotificationReason = .pendingSettlement
-				default                      : pushNotificationReason = .unknown
+		if let notification = PushNotification.parse(userInfo) {
+					
+			self.pushNotification = notification
+			switch notification {
+			case .fcm(let notification):
+				processNotification_fcm(notification)
 			}
+					
 		} else {
-			log.debug("userInfo.reason: !string")
-			pushNotificationReason = .unknown
+			
+			log.warning("processNotification(): Failed to parse userInfo as PushNotification")
+			finish()
 		}
-		
-		log.debug("pushNotificationReason = \(pushNotificationReason)")
-		
-		// Nothing else to do here.
-		// These types of requests are handled automatically by the Peer.
 	}
 	
-	private func processNotification_aws(_ userInfo: [AnyHashable : Any]) {
-		log.trace("processNotification_aws()")
-		assertMainThread()
+	private func processNotification_fcm(_ notification: FcmPushNotification) {
+		log.trace(#function)
 		
-		pushNotificationReason = .unknown
-		log.debug("pushNotificationReason = \(pushNotificationReason)")
-		
-		return finish()
+		targetNodeIdHash = notification.nodeIdHash
 	}
 	
 	// --------------------------------------------------
@@ -262,9 +168,13 @@ class NotificationService: UNNotificationServiceExtension {
 			log.debug("startConnectionTimer(): ignoring: already started")
 			return
 		}
+		guard let groupPrefs = PhoenixManager.shared.groupPrefs() else {
+			log.debug("startConnectionTimer(): ignoring: groupPrefs is nil")
+			return
+		}
 		
-		log.debug("GroupPrefs.shared.srvExtConnection = now")
-		GroupPrefs.shared.srvExtConnection = Date.now
+		log.debug("GroupPrefs.current.srvExtConnection = now")
+		groupPrefs.srvExtConnection = Date.now
 		
 		connectionTimer = Timer.scheduledTimer(
 			withTimeInterval : 2.0,
@@ -273,8 +183,8 @@ class NotificationService: UNNotificationServiceExtension {
 		
 			if let _ = self {
 				log.debug("connectionsTimer.fire()")
-				log.debug("GroupPrefs.shared.srvExtConnection = now")
-				GroupPrefs.shared.srvExtConnection = Date.now
+				log.debug("GroupPrefs.current.srvExtConnection = now")
+				groupPrefs.srvExtConnection = Date.now
 			}
 		}
 	}
@@ -391,7 +301,7 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 		phoenixStarted = true
 		
-		let newBusiness = PhoenixManager.shared.setupBusiness()
+		let newBusiness = PhoenixManager.shared.setupBusiness(targetNodeIdHash)
 		business = newBusiness
 		
 		newBusiness.connectionsManager.connectionsPublisher().sink {
@@ -487,38 +397,47 @@ class NotificationService: UNNotificationServiceExtension {
 	private func updateRemoteNotificationContent(
 		_ content: UNMutableNotificationContent
 	) {
-		log.trace("updateRemoteNotificationContent()")
+		log.trace(#function)
 		
 		// The first thing we need to do is switch on the type of notification that we received
 		
-		switch pushNotificationReason {
-		case .incomingPayment:
-			// We expected to receive 1 or more incoming payments
-			
-			if let item = NotificationServiceQueue.shared.dequeue() {
-				updateNotificationContent_localNotification(content, item)
-			} else if let payment = popFirstReceivedPayment() {
-				updateNotificationContent_receivedPayment(content, payment)
-			} else {
-				updateNotificationContent_missedPayment(content)
+		if let pushNotification {
+			switch pushNotification {
+			case .fcm(let notification):
+				
+				switch notification.reason {
+				case .incomingPayment:
+					// We expected to receive 1 or more incoming payments
+					
+					if let item = NotificationServiceQueue.shared.dequeue() {
+						updateNotificationContent_localNotification(content, item)
+					} else if let payment = popFirstReceivedPayment() {
+						updateNotificationContent_receivedPayment(content, payment)
+					} else {
+						updateNotificationContent_missedPayment(content)
+					}
+					
+				case .incomingOnionMessage:
+					// This was probably an incoming Bolt 12 payment.
+					// But it could be anything, so let's code defensively.
+					
+					if let item = NotificationServiceQueue.shared.dequeue() {
+						updateNotificationContent_localNotification(content, item)
+					} else if let payment = popFirstReceivedPayment() {
+						updateNotificationContent_receivedPayment(content, payment)
+					} else {
+						updateNotificationContent_unknown(content)
+					}
+					
+				case .pendingSettlement:
+					updateNotificationContent_pendingSettlement(content)
+					
+				case .unknown:
+					updateNotificationContent_unknown(content)
+				}
 			}
-		
-		case .incomingOnionMessage:
-			// This is probably an incoming Bolt 12 payment.
-			// But it could be anything, so let's code defensively.
 			
-			if let item = NotificationServiceQueue.shared.dequeue() {
-				updateNotificationContent_localNotification(content, item)
-			} else if let payment = popFirstReceivedPayment() {
-				updateNotificationContent_receivedPayment(content, payment)
-			} else {
-				updateNotificationContent_unknown(content)
-			}
-			
-		case .pendingSettlement:
-			updateNotificationContent_pendingSettlement(content)
-		
-		case .unknown:
+		} else {
 			updateNotificationContent_unknown(content)
 		}
 	}
@@ -567,15 +486,17 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace("updateNotificationContent_incomingPayment()")
 		
 		content.title = String(localized: "Received payment", comment: "Push notification title")
-			
-		if !GroupPrefs.shared.discreetNotifications {
+		
+		let groupPrefs = PhoenixManager.shared.groupPrefs()
+		
+		if let groupPrefs, !groupPrefs.discreetNotifications {
 			let paymentInfo = WalletPaymentInfo(
 				payment: payment,
 				metadata: WalletPaymentMetadata.empty(),
 				contact: nil
 			)
 			
-			let amountString = formatAmount(msat: payment.amount.msat)
+			let amountString = formatAmount(groupPrefs, msat: payment.amount.msat)
 			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
 				content.body = "\(amountString): \(desc)"
 			} else {
@@ -590,8 +511,8 @@ class NotificationService: UNNotificationServiceExtension {
 		// - badges
 		// So we may only be able to badge the app icon, and that's it.
 		
-		GroupPrefs.shared.badgeCount += 1
-		content.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
+		GroupPrefs.global.badgeCount += 1
+		content.badge = NSNumber(value: GroupPrefs.global.badgeCount)
 	}
 	
 	private func updateNotificationContent_missedPayment(
@@ -616,8 +537,11 @@ class NotificationService: UNNotificationServiceExtension {
 	) {
 		log.trace("updateNotificationContent_unknown()")
 		
-		let fiatCurrency = GroupPrefs.shared.fiatCurrency
-		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+		var exchangeRate: ExchangeRate.BitcoinPriceRate? = nil
+		if let groupPrefs = PhoenixManager.shared.groupPrefs() {
+			let fiatCurrency = groupPrefs.fiatCurrency
+			exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+		}
 		
 		if let exchangeRate {
 			let fiatAmt = Utils.formatFiat(amount: exchangeRate.price, fiatCurrency: exchangeRate.fiatCurrency)
@@ -644,10 +568,10 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 	}
 	
-	private func formatAmount(msat: Int64) -> String {
+	private func formatAmount(_ groupPrefs: GroupPrefs_Wallet, msat: Int64) -> String {
 		
-		let bitcoinUnit = GroupPrefs.shared.bitcoinUnit
-		let fiatCurrency = GroupPrefs.shared.fiatCurrency
+		let bitcoinUnit = groupPrefs.bitcoinUnit
+		let fiatCurrency = groupPrefs.fiatCurrency
 		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
 		
 		let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)

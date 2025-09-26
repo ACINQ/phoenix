@@ -34,7 +34,8 @@ struct ModifyInvoiceSheet: View {
 	
 	@State var didTapSave: Bool = false
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// Workaround for SwiftUI bug

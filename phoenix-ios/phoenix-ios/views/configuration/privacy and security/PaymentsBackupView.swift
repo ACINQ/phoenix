@@ -9,9 +9,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct PaymentsBackupView: View {
 	
-	@State var backupTransactions_enabled = Prefs.shared.backupTransactions.isEnabled
-	@State var backupTransactions_useCellularData = Prefs.shared.backupTransactions.useCellular
-	@State var backupTransactions_useUploadDelay = Prefs.shared.backupTransactions.useUploadDelay
+	@State var backupTransactions_enabled = Prefs.current.backupTransactions.isEnabled
+	@State var backupTransactions_useCellularData = Prefs.current.backupTransactions.useCellular
+	@State var backupTransactions_useUploadDelay = Prefs.current.backupTransactions.useUploadDelay
 	
 	@ViewBuilder
 	var body: some View {
@@ -161,7 +161,7 @@ struct PaymentsBackupView: View {
 		
 		ToggleAlignment {
 			
-			Label {
+			LabelAlignment {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
 					Text("Randomize upload delays")
 						.alignmentGuide(VerticalAlignment.centerTopLine) { (d: ViewDimensions) in
@@ -201,18 +201,18 @@ struct PaymentsBackupView: View {
 	func didToggle_backupTransactions_enabled(_ flag: Bool) {
 		log.trace("didToggle_backupTransactions_enabled(newValue = \(flag))")
 		
-		Prefs.shared.backupTransactions.isEnabled = flag
+		Prefs.current.backupTransactions.isEnabled = flag
 	}
 	
 	func didToggle_backupTransactions_useCellularData(_ flag: Bool) {
 		log.trace("didToggle_backupTransactions_useCellularData(newValue = \(flag))")
 		
-		Prefs.shared.backupTransactions.useCellular = flag
+		Prefs.current.backupTransactions.useCellular = flag
 	}
 	
 	func didToggle_backupTransactions_useUploadDelay(_ flag: Bool) {
 		log.trace("didToggle_backupTransactions_useUploadDelay(newValue = \(flag))")
 		
-		Prefs.shared.backupTransactions.useUploadDelay = flag
+		Prefs.current.backupTransactions.useUploadDelay = flag
 	}
 }

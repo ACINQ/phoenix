@@ -31,6 +31,15 @@ extension Result where Success == Void {
 // These should exist in the standard library, but they don't.
 extension Result {
 	
+	var successValue: Success? {
+		switch self {
+		case .success(let value):
+			return value
+		case .failure:
+			return nil
+		}
+	}
+	
 	var isSuccess: Bool {
 		if case .success = self {
 			return true

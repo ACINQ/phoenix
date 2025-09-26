@@ -411,7 +411,7 @@ struct ManageContact: View {
 			Spacer(minLength: 0)
 			Group {
 				if useDiskImage && didAppear {
-					ContactPhoto(fileName: contact?.photoUri, size: IMG_SIZE, useCache: false)
+					ContactPhoto(filename: contact?.photoUri, size: IMG_SIZE, useCache: false)
 				} else if let uiimage = pickerResult?.image {
 					Image(uiImage: uiimage)
 						.resizable()
@@ -439,7 +439,6 @@ struct ManageContact: View {
 		) {
 			Button {
 				selectImageOptionSelected()
-				activeSheet = .imagePicker
 			} label: {
 				Text("Select image")
 			}

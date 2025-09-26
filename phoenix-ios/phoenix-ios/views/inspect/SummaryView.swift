@@ -36,7 +36,7 @@ struct SummaryView: View {
 	@State var blockchainConfirmations: Int? = nil
 	@State var showBlockchainExplorerOptions = false
 	
-	@State var showOriginalFiatValue = GlobalEnvironment.currencyPrefs.showOriginalFiatValue
+	@State var showOriginalFiatValue = CurrencyPrefs.current.showOriginalFiatValue
 	@State var showFiatValueExplanation = false
 	
 	@State var showDeletePaymentConfirmationDialog = false
@@ -75,11 +75,12 @@ struct SummaryView: View {
 	
 	@StateObject var blockchainMonitorState = BlockchainMonitorState()
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------

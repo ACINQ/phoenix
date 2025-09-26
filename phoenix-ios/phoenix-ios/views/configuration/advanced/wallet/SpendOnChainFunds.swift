@@ -38,7 +38,8 @@ struct SpendOnChainFunds: View {
 	)
 	@State var maxNumberWidth: CGFloat? = nil
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var smartModalState: SmartModalState
 	
 	// --------------------------------------------------

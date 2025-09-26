@@ -260,7 +260,7 @@ extension SyncBackupManager {
 				
 				log.trace("downloadContacts(): finish: success")
 				
-				Prefs.shared.backupTransactions.markHasDownloadedContacts(walletId)
+				prefs.backupTransactions.hasDownloadedContacts = true
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadContacts() {
@@ -385,7 +385,7 @@ extension SyncBackupManager {
 			let container = CKContainer.default()
 			
 			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = Prefs.shared.backupTransactions.useCellular
+			configuration.allowsCellularAccess = self.prefs.backupTransactions.useCellular
 			
 			return try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				

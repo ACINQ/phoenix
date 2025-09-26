@@ -1,5 +1,6 @@
 import SwiftUI
 import PhoenixShared
+import CryptoKit
 
 fileprivate let filename = "InitializationView"
 #if DEBUG && true
@@ -15,10 +16,9 @@ struct InitializationView: MVIView {
 		case RestoreView
 	}
 	
-	@StateObject var mvi = MVIState({ $0.initialization() })
+	let isCancellable: Bool
 	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.initialization() })
 
 	@State var mnemonicLanguage = Biz.mnemonicLanguagePublisher.value
 	
@@ -34,6 +34,10 @@ struct InitializationView: MVIView {
 	// </iOS_16_workarounds>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
+	
+	init(isCancellable: Bool) {
+		self.isCancellable = isCancellable
+	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -62,7 +66,7 @@ struct InitializationView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -75,7 +79,7 @@ struct InitializationView: MVIView {
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model) { model in
-			onModelChange(model: model)
+			onModelChange(model)
 		}
 		.onReceive(Biz.mnemonicLanguagePublisher) {
 			log.debug("mnemonicLanguage = \($0.code)")
@@ -86,10 +90,11 @@ struct InitializationView: MVIView {
 	@ViewBuilder
 	func header() -> some View {
 		
-		// Position the settings icon in top-right corner.
-		HStack{
-			Spacer()
-			VStack {
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer()
+				
 				navLink(.Configuration) {
 					Image(systemName: "gearshape")
 						.renderingMode(.template)
@@ -97,10 +102,11 @@ struct InitializationView: MVIView {
 				}
 				.accessibilityLabel("Settings")
 				.accessibilitySortPriority(-1)
-				Spacer()
 			}
-			.padding(.all, 20)
+			
+			Spacer()
 		}
+		.padding(.all, 20)
 	}
 	
 	@ViewBuilder
@@ -111,68 +117,113 @@ struct InitializationView: MVIView {
 			Spacer()
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				Image(logoImageName)
+				Image(Biz.isTestnet ? "logo_blue" : "logo_green")
 					.resizable()
 					.frame(width: 96, height: 96)
 
 				Text("Phoenix")
 					.font(Font.title2)
 					.padding(.top, -10)
-					.padding(.bottom, 80)
 			}
+			.padding(.bottom, 80)
 			.accessibilityHidden(true)
 			
-			Button {
-				createMnemonics()
-			} label: {
-				HStack(alignment: VerticalAlignment.firstTextBaseline) {
-					Image(systemName: "flame")
-						.imageScale(.small)
-					Text("Create new wallet")
-				}
-				.foregroundColor(Color.white)
-				.font(.title3)
-				.read(buttonWidthReader)
-				.frame(width: buttonWidth)
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-			}
-			.buttonStyle(
-				ScaleButtonStyle(
-					cornerRadius: 100,
-					backgroundFill: Color.appAccent
-				)
-			)
-			.padding(.bottom, 40)
+			createNewWalletButton()
+				.padding(.bottom, 40)
 
-			navLink(.RestoreView) {
-				HStack(alignment: VerticalAlignment.firstTextBaseline) {
-					Image(systemName: "arrow.down.circle")
-						.imageScale(.small)
-					Text("Restore my wallet")
-				}
-				.foregroundColor(Color.primary)
-				.font(.title3)
-				.read(buttonWidthReader)
-				.frame(width: buttonWidth)
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-			}
-			.buttonStyle(
-				ScaleButtonStyle(
-					cornerRadius: 100,
-					backgroundFill: Color.primaryBackground,
-					borderStroke: Color.appAccent
-				)
-			)
-			.padding([.top, .bottom], 0)
+			restoreWalletButton()
 			
 			Spacer() // 2 spacers at bottom
 			Spacer() // move center upwards; focus is buttons, not logo
+			
+			if isCancellable {
+				cancelButton()
+					.padding(.bottom, 10)
+			}
 
 		} // </VStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
+	}
+	
+	@ViewBuilder
+	func createNewWalletButton() -> some View {
+		
+		Button {
+			createNewWallet()
+		} label: {
+			HStack(alignment: VerticalAlignment.firstTextBaseline) {
+				Image(systemName: "flame")
+					.imageScale(.small)
+				Text("Create new wallet")
+			}
+			.foregroundColor(Color.white)
+			.font(.title3)
+			.read(buttonWidthReader)
+			.frame(width: buttonWidth)
+			.padding([.top, .bottom], 8)
+			.padding([.leading, .trailing], 16)
+			.contentShape(Rectangle()) // make Spacer area tappable
+		}
+		.buttonStyle(
+			ScaleButtonStyle(
+				cornerRadius: 100,
+				backgroundFill: Color.appAccent
+			)
+		)
+	}
+	
+	@ViewBuilder
+	func restoreWalletButton() -> some View {
+		
+		navLink(.RestoreView) {
+			HStack(alignment: VerticalAlignment.firstTextBaseline) {
+				Image(systemName: "arrow.down.circle")
+					.imageScale(.small)
+				Text("Restore my wallet")
+			}
+			.foregroundColor(Color.primary)
+			.font(.title3)
+			.read(buttonWidthReader)
+			.frame(width: buttonWidth)
+			.padding([.top, .bottom], 8)
+			.padding([.leading, .trailing], 16)
+			.contentShape(Rectangle()) // make Spacer area tappable
+		}
+		.buttonStyle(
+			ScaleButtonStyle(
+				cornerRadius: 100,
+				backgroundFill: Color.primaryBackground,
+				borderStroke: Color.appAccent
+			)
+		)
+	}
+	
+	@ViewBuilder
+	func cancelButton() -> some View {
+		
+		Button {
+			cancelNewWallet()
+		} label: {
+			HStack(alignment: VerticalAlignment.firstTextBaseline) {
+				Image(systemName: "x.circle")
+					.imageScale(.small)
+				Text("Cancel")
+			}
+			.foregroundColor(Color.primary)
+			.font(.title3)
+			.read(buttonWidthReader)
+			.frame(width: buttonWidth)
+			.padding([.top, .bottom], 8)
+			.padding([.leading, .trailing], 16)
+			.contentShape(Rectangle()) // make Spacer area tappable
+		}
+		.buttonStyle(
+			ScaleButtonStyle(
+				cornerRadius: 100,
+				borderStroke: Color.appNegative
+			)
+		)
 	}
 	
 	@ViewBuilder
@@ -223,14 +274,6 @@ struct InitializationView: MVIView {
 	// MARK: View Helpers
 	// --------------------------------------------------
 	
-	var logoImageName: String {
-		if BusinessManager.isTestnet {
-			return "logo_blue"
-		} else {
-			return "logo_green"
-		}
-	}
-	
 	func navLinkTagBinding() -> Binding<Bool> {
 		
 		return Binding<Bool>(
@@ -239,10 +282,57 @@ struct InitializationView: MVIView {
 		)
 	}
 	
-	func createMnemonics() -> Void {
-		log.trace("createMnemonics()")
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onModelChange(_ model: Initialization.Model) -> Void {
+		log.trace(#function)
+	
+		if let model = model as? Initialization.ModelGeneratedWallet {
+			didGenerateWallet(model: model)
+		}
+	}
+	
+	func didGenerateWallet(model: Initialization.ModelGeneratedWallet) -> Void {
+		log.trace(#function)
 		
-		let swiftEntropy = AppSecurity.shared.generateEntropy()
+		let recoveryPhrase = RecoveryPhrase(
+			mnemonics : model.mnemonics,
+			language  : model.language
+		)
+
+		let chain = Biz.business.chain
+		AppSecurity.shared.addWallet(chain: chain, recoveryPhrase: recoveryPhrase, seed: model.seed) { result in
+			switch result {
+			case .failure(let reason):
+				log.error("Error adding wallet: \(reason)")
+				
+			case .success():
+				Biz.loadWallet(
+					trigger        : .newWallet,
+					recoveryPhrase : recoveryPhrase,
+					seed           : model.seed
+				)
+				SceneDelegate.get().finishIntroWindow()
+				AppState.shared.isUnlocked = true
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
+	func createNewWallet() {
+		log.trace(#function)
+		
+		let randomKey = SymmetricKey(size: .bits128)
+		let swiftEntropy: Data = randomKey.withUnsafeBytes {(bytes: UnsafeRawBufferPointer) -> Data in
+			return Data(bytes: bytes.baseAddress!, count: bytes.count)
+		}
+		assert(swiftEntropy.count == (128 / 8))
+		
 		let kotlinEntropy = swiftEntropy.toKotlinByteArray()
 		
 		let intent = Initialization.IntentGenerateWallet(
@@ -252,39 +342,9 @@ struct InitializationView: MVIView {
 		mvi.intent(intent)
 	}
 	
-	func onModelChange(model: Initialization.Model) -> Void {
-		log.trace("onModelChange()")
-	
-		if let model = model as? Initialization.ModelGeneratedWallet {
-			createWallet(model: model)
-		}
-	}
-	
-	func createWallet(model: Initialization.ModelGeneratedWallet) -> Void {
-		log.trace("createWallet()")
+	func cancelNewWallet() {
+		log.trace(#function)
 		
-		let recoveryPhrase = RecoveryPhrase(
-			mnemonics : model.mnemonics,
-			language  : model.language
-		)
-
-		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
-			if error == nil {
-				Biz.loadWallet(recoveryPhrase: recoveryPhrase, seed: model.seed)
-			}
-		}
+		SceneDelegate.get().cancelIntroWindow()
 	}
 }
-
-/*
-struct MnemonicLanguageBindingKey: EnvironmentKey {
-	static var defaultValue: Binding<MnemonicLanguage> = .constant(MnemonicLanguage.french)
-}
-
-extension EnvironmentValues {
-	var mnemonicLanguageBinding: Binding<MnemonicLanguage> {
-		get { self[MnemonicLanguageBindingKey.self] }
-		set { self[MnemonicLanguageBindingKey.self] = newValue }
-	}
-}
-*/
