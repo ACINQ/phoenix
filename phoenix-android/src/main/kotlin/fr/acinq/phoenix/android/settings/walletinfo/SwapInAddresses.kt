@@ -42,26 +42,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.ItemCard
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.layouts.ItemCard
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.buttons.addressUrl
 import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.darken
 import fr.acinq.phoenix.android.utils.monoTypo
-import fr.acinq.phoenix.utils.BlockchainExplorer
 
 
 @Composable
 fun SwapInAddresses(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<SwapInAddressesViewModel>(factory = SwapInAddressesViewModel.Factory(business.peerManager))
@@ -117,8 +118,8 @@ private fun AddressStateView(
     isCurrent: Boolean,
 ) {
     val context = LocalContext.current
-    val link = business.blockchainExplorer.addressUrl(addr = address, website = BlockchainExplorer.Website.MempoolSpace)
-    Clickable(onClick = { openLink(context, link) }) {
+    val link = addressUrl(address = address)
+    Clickable(onClick = { link?.let { openLink(context, link) } }) {
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,

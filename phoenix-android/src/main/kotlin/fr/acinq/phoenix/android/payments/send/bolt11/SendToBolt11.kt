@@ -33,13 +33,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
-import fr.acinq.phoenix.android.userPrefs
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
@@ -47,6 +52,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SendToBolt11View(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     invoice: Bolt11Invoice,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -77,10 +84,10 @@ fun SendToBolt11View(
             else -> ""
         }
     }
-    val isOverpaymentEnabled by userPrefs.getIsOverpaymentEnabled.collectAsState(initial = false)
+    val isOverpaymentEnabled = LocalUserPrefs.current?.getIsOverpaymentEnabled?.collectAsState(initial = false)?.value ?: false
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             var inputForcedAmount by remember { mutableStateOf(requestedAmount) }
             AmountHeroInput(
@@ -162,6 +169,7 @@ fun SendToBolt11View(
         Spacer(modifier = Modifier.height(36.dp))
         val scope = rememberCoroutineScope()
         SmartSpendButton(
+            walletId = walletId,
             enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
             onSpend = {
                 safeLet(amount, trampolineFees) { amt, fees ->

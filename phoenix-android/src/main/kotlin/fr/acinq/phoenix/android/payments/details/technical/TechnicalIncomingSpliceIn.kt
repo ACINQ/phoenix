@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.InlineTransactionLink
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.buttons.InlineTransactionLink
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount

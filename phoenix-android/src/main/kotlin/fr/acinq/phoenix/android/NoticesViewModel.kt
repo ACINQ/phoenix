@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
+import android.text.format.DateUtils
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.ConnectionsManager
@@ -49,10 +52,10 @@ sealed class Notice() {
     data object CriticalUpdateAvailable : ShowInHome(2)
     data object TorDisconnected : ShowInHome(3)
     data object SwapInCloseToTimeout : ShowInHome(4)
-    data object BackupSeedReminder : ShowInHome(5)
+    data object NotificationPermission : ShowInHome(5)
+    data object BackupSeedReminder : ShowInHome(6)
     data object MempoolFull : ShowInHome(10)
     data object UpdateAvailable : ShowInHome(20)
-    data object NotificationPermission : ShowInHome(30)
 
     // less important notices
     sealed class DoNotShowInHome(override val priority: Int = 999) : Notice()
@@ -60,17 +63,17 @@ sealed class Notice() {
 }
 
 class NoticesViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId,
     val appConfigurationManager: AppConfigurationManager,
     val peerManager: PeerManager,
-    val connectionsManager: ConnectionsManager,
-    val internalDataRepository: InternalDataRepository,
-    val context: Context
-
+    private val connectionsManager: ConnectionsManager,
 ) : ViewModel() {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     val notices = mutableStateListOf<Notice>()
     var isPowerSaverModeOn by mutableStateOf(false)
+    val internalPrefs: InternalPrefs
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -80,19 +83,24 @@ class NoticesViewModel(
     }
 
     init {
+        internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }
-        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        val powerManager = application.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
         isPowerSaverModeOn = powerManager.isPowerSaveMode
-        context.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
+        application.applicationContext.registerReceiver(receiver, IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
 
         viewModelScope.launch { monitorTorConnection() }
+        viewModelScope.launch { monitorSeedBackupPref() }
+        viewModelScope.launch { monitorChannelsWatcherOutcome() }
     }
 
     override fun onCleared() {
         super.onCleared()
-        context.unregisterReceiver(receiver)
+        log.info("cleared notices-view-model")
+        application.applicationContext.unregisterReceiver(receiver)
     }
 
     fun addNotice(notice: Notice) {
@@ -148,7 +156,7 @@ class NoticesViewModel(
     }
 
     private suspend fun monitorWalletNotice() {
-        combine(appConfigurationManager.walletNotice, internalDataRepository.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
+        combine(appConfigurationManager.walletNotice, internalPrefs.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
             notice to lastReadIndex
         }.collect { (notice, lastReadIndex) ->
             log.debug("collecting wallet-notice={}", notice)
@@ -169,7 +177,28 @@ class NoticesViewModel(
         }
     }
 
+    private suspend fun monitorSeedBackupPref() {
+        internalPrefs.showSeedBackupNotice.collect {
+            if (it) {
+                addNotice(Notice.BackupSeedReminder)
+            } else {
+                removeNotice<Notice.BackupSeedReminder>()
+            }
+        }
+    }
+
+    private suspend fun monitorChannelsWatcherOutcome() {
+        internalPrefs.getChannelsWatcherOutcome.filterNotNull().collect {
+            if (currentTimestampMillis() - it.timestamp > 6 * DateUtils.DAY_IN_MILLIS) {
+                addNotice(Notice.WatchTowerLate)
+            } else {
+                removeNotice<Notice.WatchTowerLate>()
+            }
+        }
+    }
+
     class Factory(
+        private val walletId: WalletId,
         private val appConfigurationManager: AppConfigurationManager,
         private val peerManager: PeerManager,
         private val connectionsManager: ConnectionsManager,
@@ -178,9 +207,7 @@ class NoticesViewModel(
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
             @Suppress("UNCHECKED_CAST")
             return NoticesViewModel(
-                appConfigurationManager, peerManager, connectionsManager,
-                internalDataRepository = application.internalDataRepository,
-                application.applicationContext
+                application, walletId, appConfigurationManager, peerManager, connectionsManager,
             ) as T
         }
     }

@@ -24,9 +24,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.UserTheme
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.android.utils.datastore.GlobalPrefs
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.managers.AppConfigurationManager
@@ -35,7 +36,10 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 typealias CF = ControllerFactory
 
 val LocalTheme = staticCompositionLocalOf { UserTheme.SYSTEM }
-val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
+val LocalWalletId = compositionLocalOf<WalletId?> { null }
+val LocalBusiness = compositionLocalOf<PhoenixBusiness?> { null }
+val LocalUserPrefs = staticCompositionLocalOf<UserPrefs?> { null }
+val LocalInternalPrefs = staticCompositionLocalOf<InternalPrefs?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
 val LocalNavController = staticCompositionLocalOf<NavController?> { null }
 val LocalBitcoinUnits = compositionLocalOf { PreferredBitcoinUnits(primary = BitcoinUnit.Sat) }
@@ -58,21 +62,9 @@ val primaryFiatRate: ExchangeRate.BitcoinPriceRate?
     @Composable
     get() = LocalFiatCurrencies.current.primary.let { prefFiat -> LocalExchangeRatesMap.current[prefFiat] }
 
-val internalData: InternalDataRepository
+val globalPrefs: GlobalPrefs
     @Composable
-    get() = application.internalDataRepository
-
-val userPrefs: UserPrefsRepository
-    @Composable
-    get() = application.userPrefs
-
-val controllerFactory: ControllerFactory
-    @Composable
-    get() = LocalControllerFactory.current ?: error("No controller factory set. Please use appView or mockView.")
-
-val business: PhoenixBusiness
-    @Composable
-    get() = LocalBusiness.current ?: error("business is not available")
+    get() = application.globalPrefs
 
 val application: PhoenixApplication
     @Composable

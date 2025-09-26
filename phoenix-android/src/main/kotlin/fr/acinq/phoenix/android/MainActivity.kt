@@ -28,7 +28,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.collectAsState
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -36,11 +35,16 @@ import androidx.navigation.compose.rememberNavController
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.components.nfc.NfcState
 import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.HceService
-import fr.acinq.phoenix.android.services.NodeService
+import fr.acinq.phoenix.android.services.PaymentsForegroundService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.android.utils.nfc.NfcReaderCallback
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,7 +60,10 @@ class MainActivity : AppCompatActivity() {
     private val screenStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_SCREEN_OFF -> appViewModel.lockScreen()
+                Intent.ACTION_SCREEN_OFF -> {
+                    appViewModel.clearActiveWallet()
+                    appViewModel.startWalletImmediately.value = true
+                }
                 else -> Unit
             }
         }
@@ -67,9 +74,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        appViewModel.serviceState.observe(this) {
-            log.debug("wallet state update=${it.name}")
-        }
 
         intent?.fixUri()
         onNewIntent(intent)
@@ -83,14 +87,9 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             navController = rememberNavController()
-            val businessState = (application as PhoenixApplication).business.collectAsState()
-
             navController?.let {
-                PhoenixAndroidTheme(it) {
-                    when (val business = businessState.value) {
-                        null -> LoadingAppView()
-                        else -> AppView(business, appViewModel, it)
-                    }
+                PhoenixAndroidTheme {
+                    AppRoot(it, appViewModel)
                 }
             }
         }
@@ -100,6 +99,8 @@ class MainActivity : AppCompatActivity() {
         super.onUserInteraction()
         appViewModel.scheduleAutoLock()
     }
+
+    val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -116,7 +117,15 @@ class MainActivity : AppCompatActivity() {
                 intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 intent?.fixUri()
                 try {
-                    this.navController?.handleDeepLink(intent)
+                    scope.launch {
+                        delay(1000)
+                        if (navController != null) {
+                            log.info("handling deeplink=$intent")
+                            navController?.handleDeepLink(intent)
+                        } else {
+                            log.warn("navigation controller is not initialized, ignoring deeplink=$intent")
+                        }
+                    }
                 } catch (e: Exception) {
                     log.warn("could not handle deeplink: {}", e.localizedMessage)
                 }
@@ -126,9 +135,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        Intent(this, NodeService::class.java).let { intent ->
-            applicationContext.bindService(intent, appViewModel.serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_ADJUST_WITH_ACTIVITY)
-        }
+        stopService(Intent(this, PaymentsForegroundService::class.java))
     }
 
     override fun onResume() {
@@ -152,9 +159,13 @@ class MainActivity : AppCompatActivity() {
         }
         NfcStateRepository.updateState(NfcState.ShowReader)
         nfcAdapter?.enableReaderMode(this@MainActivity, NfcReaderCallback(onFoundData = {
-            runOnUiThread {
-                log.info("nfc reader found valid ndef data, redirecting to send-screen with input=$it")
-                this.navController?.navigate("${Screen.Send.route}?input=$it")
+            if (navController != null) {
+                runOnUiThread {
+                    log.info("nfc reader found valid ndef data, redirecting to send-screen with input=$it")
+                    navController?.navigate("${Screen.BusinessNavGraph.Send.route}?input=$it")
+                }
+            } else {
+                log.warn("ignoring nfc start command, nav controller is not initialized yet")
             }
         }), NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK, Bundle())
     }
@@ -203,7 +214,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun tryReconnect() {
         lifecycleScope.launch {
-            (application as? PhoenixApplication)?.business?.value?.let { business ->
+            appViewModel.activeWalletInUI.value?.business?.let { business ->
                 val daemon = business.appConnectionsDaemon ?: return@launch
                 val connections = business.connectionsManager.connections.value
                 if (connections.electrum !is Connection.ESTABLISHED) {
@@ -224,11 +235,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        try {
-            unbindService(appViewModel.serviceConnection)
-        } catch (e: Exception) {
-            log.error("failed to unbind activity from node service: {}", e.localizedMessage)
-        }
         unregisterReceiver(screenStateReceiver)
         log.debug("destroyed main activity")
     }

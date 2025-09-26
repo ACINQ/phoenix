@@ -51,26 +51,33 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Liaison au service…</string>
-    <string name="startup_wait">Préparation du portefeuille…</string>
-    <string name="startup_checking_seed">Déverrouillage…</string>
-    <string name="startup_unlocked">Accès accordé…</string>
-    <string name="startup_unlock_failure">Échec du déverrouillage</string>
-    <string name="startup_unlock_failure_fallback">Déverrouiller avec la seed</string>
+    <string name="startup_init">Initialisation…</string>
+    <string name="startup_preparing">Préparation du wallet…</string>
+    <string name="startup_loading_seed">Déchiffrement…</string>
+    <string name="startup_starting">Démarrage du wallet…</string>
+    <string name="startup_started">Ouverture du wallet…</string>
+    <string name="startup_selector_title">Selectionner un wallet</string>
 
-    <string name="startup_fallback_instructions">Saisissez vos 12 mots de récupération pour déverrouiller le wallet.\n\nLes mots doivent être saisis dans le bon ordre et séparés par un seul espace.</string>
-    <string name="startup_fallback_input_label">Saisir le mot #%1$d</string>
-    <string name="startup_fallback_input_label_error">Pas plus de 12 mots !</string>
-    <string name="startup_fallback_incomplete">Saisissez la seed entière pour continuer.</string>
-    <string name="startup_fallback_invalid">Cette seed n\'est pas valide. Assurez-vous que les mots sont corrects et dans l\'ordre.</string>
-    <string name="startup_fallback_checking">Vérification de la seed…</string>
-    <string name="startup_fallback_error_default">Une erreur est survenue. Merci de réessayer.</string>
-    <string name="startup_fallback_error_incorrect_seed">Cette seed ne correspond pas à votre wallet.</string>
-    <string name="startup_fallback_success_match">La seed correspond.\nÉcriture sur le disque…</string>
-    <string name="startup_fallback_success_starting">Démarrage de Phoenix…</string>
+    <string name="startup_error_start_business">Le wallet n\'a pas pu démarrer</string>
+    <string name="startup_error_generic">Échec de la lecture des données du wallet</string>
+    <string name="startup_error_try_again">Réessayer</string>
+    <string name="startup_error_decryption_general">Erreur de déchiffrement:\n%1$s</string>
+    <string name="startup_error_recovery_button">Restaurer manuellement</string>
 
-    <string name="startup_starting">Démarrage…</string>
-    <string name="startup_error_generic">L\'application n\'a pas pu démarrer.</string>
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_instructions">Cet écran vous permet de restaurer un wallet en saissant sa clé de 12 mots.\n\nLes mots de la clé doivent être entrés dans le bon ordre, et séparés par un seul espace.</string>
+    <string name="startup_recovery_input_label">Saisir le mot #%1$d</string>
+    <string name="startup_recovery_input_label_error">Pas plus de 12 mots !</string>
+    <string name="startup_recovery_invalid">Cette seed n\'est pas valide</string>
+
+    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_checking">Vérification de la seed…</string>
+    <string name="startup_recovery_reset_button">Réessayer</string>
+
+    <string name="startup_recovery_error_default">Une erreur est survenue.</string>
+    <string name="startup_recovery_error_incorrect_seed">La clé saisie ne correspond pas à un wallet existant.</string>
+    <string name="startup_recovery_success_match">Restauration du wallet…</string>
 
     <!-- Payment line -->
 
@@ -110,7 +117,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Solde:</string>
+    <string name="send_balance_prefix">Solde</string>
     <string name="send_error_amount_too_large">Le montant est trop élevé.</string>
     <string name="send_error_amount_negative">Le montant ne peut pas être négatif.</string>
     <string name="send_error_amount_invalid">Ce montant n\'est pas valide.</string>
@@ -669,6 +676,12 @@
     <string name="payments_export_csv_error">Échec de l\'export.</string>
     <string name="payments_export_csv_no_data">Aucun paiements trouvés.</string>
 
+    <string name="payments_export_database_header">Export de base de données</string>
+    <string name="payments_export_database_instructions">Chiffre et exporte la base de données des paiements, ce qui permet de migrer votre historique de paiements depuis ce téléphone vers un autre.</string>
+    <string name="payments_export_database_button">Exporter la base</string>
+    <string name="payments_export_database_failed">Échec de l\'export</string>
+    <string name="payments_export_database_success">Le fichier pourra être trouvé dans les dossiers publics de votre téléphone.</string>
+
     <!-- components -->
 
     <string name="component_calendar_inclusive">(inclus)</string>
@@ -702,6 +715,7 @@
     <string name="walletinfo_legacy_nodeid">Identifiant legacy</string>
 
     <string name="walletinfo_onchain_final">Wallet final</string>
+    <string name="walletinfo_onchain_final_spend_button">Dépenser</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
@@ -752,16 +766,18 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Réinitialiser le wallet</string>
-    <string name="reset_wallet_instructions_header">Supprime toutes les données du wallet de cet appareil</string>
-    <string name="reset_wallet_instructions_details">L\'application sera réinitialisée, comme si vous veniez de l\'installer.</string>
+    <string name="reset_wallet_title">Suppression du wallet</string>
+    <string name="reset_wallet_instructions_header">Cet écran vous permet de supprimer ce portefeuille de votre téléphone.</string>
+    <string name="reset_wallet_instructions_details">Toutes les données de ce portefeuille seront supprimées. Cela inclut votre historique de paiements.</string>
+    <string name="reset_wallet_payments_history_button">Sauvegarder l\'historique des paiements</string>
     <string name="reset_wallet_review_button">Valider</string>
 
     <string name="reset_wallet_confirm_title">cConfirmer la réinitialisation</string>
     <string name="reset_wallet_confirm_header">Le wallet sera complètement supprimé de <b>cet appareil</b>.</string>
-    <string name="reset_wallet_confirm_details">L\'application sera réinitialisée. Votre historique de paiements sera perdu. Vous serez redirigé vers l\'écran de création du wallet..</string>
-    <string name="reset_wallet_confirm_seed_balance">Ne perdez pas vos fonds :\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Vous êtes responsable de la conservation de votre clé de sauvegarde.</string>
+    <string name="reset_wallet_confirm_details">La seed de ce portefeuille et son historique de paiements seront supprimés du disque. Vous serez invité à utiliser un autre portefeuille ou à en créer un nouveau.</string>
+    <string name="reset_wallet_confirm_details2">Les autres portefeuilles que vous avez déjà importés ne seront pas supprimés.</string>
+    <string name="reset_wallet_confirm_seed_balance">Ne perdez pas vos fonds</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Je comprends que si je perds la phrase de sauvegarde après avoir supprimé le portefeuille, tous les fonds restants seront définitivement perdus.</string>
     <string name="reset_wallet_confirm_button">Supprimer le wallet</string>
     <string name="reset_wallet_shutting_down">Extinction…</string>
     <string name="reset_wallet_deleting_prefs">Suppression des préférences…</string>

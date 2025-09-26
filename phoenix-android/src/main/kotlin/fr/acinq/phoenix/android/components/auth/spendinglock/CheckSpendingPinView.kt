@@ -17,15 +17,23 @@
 package fr.acinq.phoenix.android.components.auth.spendinglock
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
+import fr.acinq.phoenix.android.globalPrefs
 
 @Composable
 fun CheckSpendingPinFlow(
+    walletId: WalletId,
     onCancel: () -> Unit,
     onPinValid: () -> Unit,
     prompt: @Composable () -> Unit,
 ) {
-    val vm = viewModel<CheckSpendingPinViewModel>(factory = CheckSpendingPinViewModel.Factory)
-    CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt)
+    val walletMetadataMap = globalPrefs.getAvailableWalletsMeta.collectAsState(null)
+    val walletMetadata = walletMetadataMap.value?.get(walletId)
+
+    val vm = viewModel<CheckSpendingPinViewModel>(factory = CheckSpendingPinViewModel.Factory(application, walletId), key = walletId.nodeIdHash)
+    CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt, walletId = walletId, walletMetadata = walletMetadata)
 }

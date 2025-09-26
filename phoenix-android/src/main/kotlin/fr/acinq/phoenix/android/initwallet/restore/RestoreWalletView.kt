@@ -20,69 +20,49 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.initwallet.WritingSeedState
-import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.security.SeedFileState
-import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.navigation.Screen
 
 @Composable
 fun RestoreWalletView(
-    onRestoreDone: () -> Unit,
+    navController: NavController,
+    onRestoreDone: (WalletId) -> Unit,
 ) {
-    val nc = navController
-    val context = LocalContext.current
-    val vm = viewModel<RestoreWalletViewModel>(factory = RestoreWalletViewModel.Factory())
+    val initGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.InitWalletGraph.route) }
+    val initViewModel = viewModel<InitViewModel>(factory = InitViewModel.Factory(application), viewModelStoreOwner = initGraphEntry)
 
-    val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
-        value = SeedManager.getSeedState(context)
-    }
+    val restoreViewModel = viewModel<RestoreWalletViewModel>(factory = RestoreWalletViewModel.Factory(application = application))
 
-    when (val writingState = vm.writingState) {
+    when (val writingState = initViewModel.writingState) {
         is WritingSeedState.Init -> {
             DefaultScreenLayout {
                 DefaultScreenHeader(
-                    onBackClick = { nc.popBackStack() },
+                    onBackClick = { navController.popBackStack() },
                     title = stringResource(id = R.string.restore_title),
                 )
 
-                when (seedFileState.value) {
-                    is SeedFileState.Absent -> {
-                        when (val state = vm.state) {
-                            is RestoreWalletState.Disclaimer -> {
-                                DisclaimerView(onClickNext = { vm.state = RestoreWalletState.SeedInput.Pending })
-                            }
-
-                            is RestoreWalletState.SeedInput -> {
-                                SeedInputView(state, vm, onRestoreDone)
-                            }
-                        }
+                when (val state = restoreViewModel.state) {
+                    is RestoreWalletState.Disclaimer -> {
+                        DisclaimerView(onClickNext = { restoreViewModel.state = RestoreWalletState.SeedInput.Pending })
                     }
 
-                    SeedFileState.Unknown -> {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
-                            Text(stringResource(id = R.string.startup_wait))
-                        }
-                    }
-
-                    else -> {
-                        // we should not be here
-                        LaunchedEffect(true) {
-                            onRestoreDone()
-                        }
+                    is RestoreWalletState.SeedInput -> {
+                        SeedInputView(state, restoreViewModel, initViewModel, onRestoreDone)
                     }
                 }
             }
@@ -99,7 +79,8 @@ fun RestoreWalletView(
                     header = stringResource(id = R.string.autocreate_error),
                     details = when (writingState) {
                         is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
-                        is WritingSeedState.Error.SeedAlreadyExist -> "A wallet already exists"
+                        is WritingSeedState.Error.SeedAlreadyExists -> stringResource(R.string.autocreate_error_already_exists)
+                        is WritingSeedState.Error.CannotLoadSeedMap -> stringResource(R.string.autocreate_error_cannot_load_existing)
                     },
                     alignment = Alignment.CenterHorizontally,
                 )

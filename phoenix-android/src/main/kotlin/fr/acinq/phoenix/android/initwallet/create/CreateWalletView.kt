@@ -16,110 +16,59 @@
 
 package fr.acinq.phoenix.android.initwallet.create
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.lightning.Lightning
-import fr.acinq.phoenix.android.CF
-import fr.acinq.phoenix.android.PhoenixApplication
+import androidx.navigation.NavController
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
-import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.initwallet.WritingSeedState
-import fr.acinq.phoenix.android.security.SeedFileState
-import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.controllers.init.Initialization
-import fr.acinq.phoenix.utils.MnemonicLanguage
+import fr.acinq.phoenix.android.navigation.Screen
 
 
 @Composable
 fun CreateWalletView(
-    onSeedWritten: () -> Unit
+    navController: NavController,
+    onWalletCreationDone: (WalletId) -> Unit
 ) {
-    val log = logger("CreateWallet")
-    val context = LocalContext.current
+    val initGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.InitWalletGraph.route) }
+    val initViewModel = viewModel<InitViewModel>(factory = InitViewModel.Factory(application), viewModelStoreOwner = initGraphEntry)
+    val createViewModel = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory(application = application))
 
-    val vm = viewModel<CreateWalletViewModel>(factory = CreateWalletViewModel.Factory())
-
-    val seedFileState = produceState<SeedFileState>(initialValue = SeedFileState.Unknown, true) {
-        value = SeedManager.getSeedState(context)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
-        when (val state = seedFileState.value) {
-            is SeedFileState.Absent -> {
-                Text(stringResource(id = R.string.autocreate_generating))
-                MVIView(CF::initialization) { model, postIntent ->
-                    when (model) {
-                        is Initialization.Model.Ready -> {
-                            val entropy = remember { Lightning.randomBytes(16) }
-                            LaunchedEffect(key1 = entropy) {
-                                log.debug("generating new wallet...")
-                                postIntent(Initialization.Intent.GenerateWallet(entropy, MnemonicLanguage.English))
-                            }
-                        }
-                        is Initialization.Model.GeneratedWallet -> {
-                            val writingState = vm.writingState
-                            if (writingState is WritingSeedState.Error) {
-                                ErrorMessage(
-                                    header = stringResource(id = R.string.autocreate_error),
-                                    details = when (writingState) {
-                                        is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
-                                        is WritingSeedState.Error.SeedAlreadyExist -> stringResource(R.string.autocreate_error_cannot_overwrite)
-                                    },
-                                    alignment = Alignment.CenterHorizontally,
-                                )
-                            }
-                            LaunchedEffect(true) {
-                                vm.writeSeed(context, model.mnemonics, isNewWallet = true, onSeedWritten)
-                            }
-                        }
-                    }
-                }
-            }
-            SeedFileState.Unknown -> {
-                Text(stringResource(id = R.string.startup_wait))
-            }
-            else -> {
-                // we should not be here
-                LaunchedEffect(true) {
-                    onSeedWritten()
-                }
-            }
+        LaunchedEffect(Unit) {
+            createViewModel.createNewWallet(writeSeed = { words ->
+                initViewModel.writeSeed(words, isRestoringWallet = false, onSeedWritten = onWalletCreationDone)
+            })
         }
-    }
-}
-
-class CreateWalletViewModel(override val internalDataRepository: InternalDataRepository) : InitViewModel() {
-
-    class Factory : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-            @Suppress("UNCHECKED_CAST")
-            return CreateWalletViewModel(application.internalDataRepository) as T
+        when (val writingState = initViewModel.writingState) {
+            is WritingSeedState.Init, is WritingSeedState.Writing, is WritingSeedState.WrittenToDisk -> {
+                Text(stringResource(id = R.string.autocreate_generating))
+            }
+            is WritingSeedState.Error -> {
+                ErrorMessage(
+                    header = stringResource(id = R.string.autocreate_error),
+                    details = when (writingState) {
+                        is WritingSeedState.Error.Generic -> writingState.cause.localizedMessage ?: writingState.cause::class.java.simpleName
+                        is WritingSeedState.Error.SeedAlreadyExists -> stringResource(R.string.autocreate_error_already_exists)
+                        is WritingSeedState.Error.CannotLoadSeedMap -> stringResource(R.string.autocreate_error_cannot_load_existing)
+                    },
+                    alignment = Alignment.CenterHorizontally,
+                )
+            }
         }
     }
 }

@@ -53,28 +53,29 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Binding dịch vụ…</string>
-    <string name="startup_wait">Đang chuẩn bị ví…</string>
-    <string name="startup_checking_seed">Đang mở khoá…</string>
-    <string name="startup_unlocked">Quyền truy cập được chấp nhận…</string>
-    <string name="startup_unlock_failure">Mở khóa không thành công</string>
-    <string name="startup_unlock_failure_keystore">Lỗi kho khóa Android</string>
-    <string name="startup_unlock_failure_fallback">Mở khóa bằng hạt giống</string>
+    <string name="startup_selector_title">Chọn ví</string>
 
-    <string name="startup_fallback_instructions">Nhập 12 từ khôi phục để mở khóa ví của bạn.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau bằng một dấu cách.</string>
-    <string name="startup_fallback_input_label">Nhập từ #%1$d</string>
-    <string name="startup_fallback_input_label_error">Không vượt quá 12 từ!</string>
-    <string name="startup_fallback_incomplete">Nhập hạt giống hoàn chỉnh để tiếp tục.</string>
-    <string name="startup_fallback_invalid">Hạt giống này không hợp lệ. Hãy đảm bảo các từ chính xác và theo đúng thứ tự.</string>
-    <string name="startup_fallback_unlock_button">Mở khoá ví</string>
-    <string name="startup_fallback_checking">Đang kiểm tra hạt giống…</string>
-    <string name="startup_fallback_error_default">Đã xảy ra lỗi. Vui lòng thử lại.</string>
-    <string name="startup_fallback_error_incorrect_seed">Hạt giống này không khớp với ví của bạn.</string>
-    <string name="startup_fallback_success_match">Hạt giống đã khớp.\nĐang ghi nhớ vào ổ…</string>
-    <string name="startup_fallback_success_starting">Đang khởi động Phoenix…</string>
+    <string name="startup_error_start_business">Không thể khởi động ví</string>
+    <string name="startup_error_generic">Không thể đọc dữ liệu ví.</string>
+    <string name="startup_error_try_again">Thử lại</string>
+    <string name="startup_error_decryption_general">Giải mã lỗi:\n%1$s</string>
+    <string name="startup_error_recovery_button">Khôi phục thủ công</string>
 
-    <string name="startup_starting">Đang khởi động…</string>
-    <string name="startup_error_generic">Ứng dụng không khởi động được.</string>
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Khôi phục ví</string>
+    <string name="startup_recovery_instructions">Màn hình này cho phép bạn khôi phục thủ công một ví bằng cách nhập cụm từ khôi phục 12 từ của ví đó.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau một khoảng trắng.</string>
+    <string name="startup_recovery_input_label">Nhập từ #%1$d</string>
+    <string name="startup_recovery_input_label_error">Không quá 12 từ!</string>
+    <string name="startup_recovery_invalid">Hạt giống này không hợp lệ</string>
+
+    <string name="startup_recovery_import_button">Nhập hạt giống</string>
+    <string name="startup_recovery_reset_button">Thử lại</string>
+    <string name="startup_recovery_checking">Đang kiểm tra hạt giống…</string>
+
+    <string name="startup_recovery_error_default">Đã xảy ra lỗi.</string>
+    <string name="startup_recovery_error_incorrect_seed">Hạt giống này không khớp với bất kỳ dữ liệu ví nào hiện có.</string>
+    <string name="startup_recovery_success_match">Đang khôi phục ví…</string>
 
     <!-- Payment line -->
 
@@ -115,7 +116,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Số dư:</string>
+    <string name="send_balance_prefix">Số dư</string>
     <string name="send_error_amount_too_large">Số tiền quá lớn.</string>
     <string name="send_error_amount_negative">Số tiền không thể âm.</string>
     <string name="send_error_amount_invalid">Số tiền này không hợp lệ.</string>
@@ -720,16 +721,18 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Đặt lại ví</string>
-    <string name="reset_wallet_instructions_header">Xóa tất cả dữ liệu ví khỏi thiết bị này</string>
-    <string name="reset_wallet_instructions_details">Thao tác này sẽ đặt lại ứng dụng về trạng thái ban đầu, như lúc bạn mới cài đặt nó.</string>
+    <string name="reset_wallet_title">Xóa ví</string>
+    <string name="reset_wallet_instructions_header">Màn hình này cho phép bạn xóa ví này khỏi điện thoại.</string>
+    <string name="reset_wallet_instructions_details">Tất cả dữ liệu của ví này sẽ bị xóa, bao gồm cả lịch sử thanh toán của bạn.</string>
+    <string name="reset_wallet_payments_history_button">Lưu lịch sử thanh toán</string>
     <string name="reset_wallet_review_button">Kiểm tra lại</string>
 
     <string name="reset_wallet_confirm_title">Xác nhận đặt lại</string>
     <string name="reset_wallet_confirm_header">Ví sẽ bị xóa hoàn toàn khỏi <b>thiết bị này</b>.</string>
-    <string name="reset_wallet_confirm_details">Thao tác này sẽ đặt lại ứng dụng. Mọi lịch sử thanh toán của bạn sẽ bị xoá. Một màn hình Giới thiệu sẽ hiện ra và nhắc bạn tạo ví mới hoặc khôi phục lại ví.</string>
-    <string name="reset_wallet_confirm_seed_balance">Đừng để mất quỹ vốn của bạn:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Bạn có trách nhiệm lưu trữ cụm từ khôi phục của mình.</string>
+    <string name="reset_wallet_confirm_details">Seed của ví này và lịch sử thanh toán của nó sẽ bị xóa khỏi ổ đĩa. Bạn sẽ được nhắc sử dụng ví khác hoặc tạo ví mới.</string>
+    <string name="reset_wallet_confirm_details2">Các ví khác mà bạn đã nhập sẽ không bị xóa.</string>
+    <string name="reset_wallet_confirm_seed_balance">Đừng để mất tiền của bạn</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Tôi hiểu rằng nếu tôi mất cụm từ khôi phục sau khi xóa ví, mọi số tiền còn lại sẽ bị mất vĩnh viễn.</string>
     <string name="reset_wallet_confirm_button">Xóa ví</string>
     <string name="reset_wallet_shutting_down">Đang tắt…</string>
     <string name="reset_wallet_deleting_prefs">Đang xóa tùy chọn…</string>

@@ -16,16 +16,19 @@
 
 package fr.acinq.phoenix.android.components.auth.pincode
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialog.PIN_LENGTH
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -46,56 +49,64 @@ sealed class CheckPinState {
     data class Error(val cause: Throwable) : CheckPinState()
 }
 
-abstract class CheckPinViewModel : ViewModel() {
+abstract class CheckPinViewModel() : ViewModel() {
+
+    abstract val application: PhoenixApplication
+    abstract val walletId: WalletId
+
     val log: Logger = LoggerFactory.getLogger(this::class.java)
     var state by mutableStateOf<CheckPinState>(CheckPinState.Init)
         private set
 
     var pinInput by mutableStateOf("")
 
-    abstract suspend fun getPinCodeAttempt(): Int
+    abstract suspend fun getPinCodeAttempt(): Flow<Int>
     abstract suspend fun savePinCodeSuccess()
     abstract suspend fun savePinCodeFailure()
-    abstract suspend fun getExpectedPin(context: Context): String?
+    abstract suspend fun getExpectedPin(): String?
+    abstract suspend fun resetPinPrefs()
 
-    suspend fun evaluateLockState() {
-        val currentPinCodeAttempt = getPinCodeAttempt()
-        val timeToWait = when (currentPinCodeAttempt) {
-            0, 1, 2 -> Duration.ZERO
-            3 -> 10.seconds
-            4 -> 30.seconds
-            5 -> 1.minutes
-            6 -> 2.minutes
-            7 -> 5.minutes
-            8 -> 10.minutes
-            else -> 30.minutes
-        }
-
-        if (timeToWait > Duration.ZERO) {
-            state = CheckPinState.Locked(timeToWait)
-            val countdownJob = viewModelScope.launch {
-                val countdownFlow = flow {
-                    while (true) {
-                        delay(1_000)
-                        emit(Unit)
-                    }
-                }
-                countdownFlow.collect {
-                    val s = state
-                    if (s is CheckPinState.Locked) {
-                        state = CheckPinState.Locked((s.timeToWait.minus(1.seconds)).coerceAtLeast(Duration.ZERO))
-                    }
-                }
+    suspend fun monitorPinCodeAttempts() {
+        var countdownJob: Job? = null
+        getPinCodeAttempt().collect { attemptCount ->
+            val timeToWait = when (attemptCount) {
+                0, 1, 2 -> Duration.ZERO
+                3 -> 10.seconds
+                4 -> 30.seconds
+                5 -> 1.minutes
+                6 -> 2.minutes
+                7 -> 5.minutes
+                8 -> 10.minutes
+                else -> 30.minutes
             }
-            delay(timeToWait)
-            countdownJob.cancelAndJoin()
-            state = CheckPinState.CanType
-        } else {
-            state = CheckPinState.CanType
+
+            if (timeToWait > Duration.ZERO) {
+                state = CheckPinState.Locked(timeToWait)
+                countdownJob?.cancelAndJoin()
+                countdownJob = viewModelScope.launch {
+                    val countdownFlow = flow {
+                        while (true) {
+                            delay(1_000)
+                            emit(Unit)
+                        }
+                    }
+                    countdownFlow.collect {
+                        val s = state
+                        if (s is CheckPinState.Locked) {
+                            state = CheckPinState.Locked((s.timeToWait.minus(1.seconds)).coerceAtLeast(Duration.ZERO))
+                        }
+                    }
+                }
+                delay(timeToWait)
+                countdownJob.cancelAndJoin()
+                state = CheckPinState.CanType
+            } else {
+                state = CheckPinState.CanType
+            }
         }
     }
 
-    fun checkPinAndSaveOutcome(context: Context, pin: String, onPinValid: () -> Unit) {
+    fun checkPinAndSaveOutcome(pin: String, onPinValid: () -> Unit) {
         if (state is CheckPinState.Checking || state is CheckPinState.Locked) return
         state = CheckPinState.Checking
 
@@ -105,36 +116,42 @@ abstract class CheckPinViewModel : ViewModel() {
                     log.debug("malformed pin")
                     state = CheckPinState.MalformedInput
                     delay(1300)
-                    if (state is CheckPinState.MalformedInput) {
-                        evaluateLockState()
-                    }
+                    savePinCodeFailure()
                 }
 
-                val expected = getExpectedPin(context)
-                if (pin == expected) {
-                    log.debug("valid pin")
-                    delay(20)
-                    savePinCodeSuccess()
-                    pinInput = ""
-                    state = CheckPinState.CanType
-                    viewModelScope.launch(Dispatchers.Main) {
-                        onPinValid()
+                val expected = getExpectedPin()
+                when {
+                    expected == null -> {
+                        log.info("no expected pin for $walletId, aborting pin-check and reset pin settings")
+                        resetPinPrefs()
+                        viewModelScope.launch(Dispatchers.Main) {
+                            onPinValid()
+                        }
                     }
-                } else {
-                    log.debug("incorrect pin")
-                    delay(80)
-                    savePinCodeFailure()
-                    state = CheckPinState.IncorrectPin
-                    delay(1300)
-                    pinInput = ""
-                    evaluateLockState()
+                    pin == expected -> {
+                        log.debug("valid pin")
+                        delay(20)
+                        savePinCodeSuccess()
+                        pinInput = ""
+                        state = CheckPinState.CanType
+                        viewModelScope.launch(Dispatchers.Main) {
+                            onPinValid()
+                        }
+                    }
+                    else -> {
+                        log.debug("incorrect pin")
+                        delay(80)
+                        state = CheckPinState.IncorrectPin
+                        delay(1300)
+                        pinInput = ""
+                        savePinCodeFailure()
+                    }
                 }
             } catch (e: Exception) {
                 log.error("error when checking pin code: ", e)
                 state = CheckPinState.Error(e)
                 delay(1300)
-                pinInput = ""
-                evaluateLockState()
+                savePinCodeFailure()
             }
         }
     }

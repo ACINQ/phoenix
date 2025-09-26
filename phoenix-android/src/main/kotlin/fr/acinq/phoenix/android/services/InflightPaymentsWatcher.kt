@@ -16,12 +16,7 @@
 
 package fr.acinq.phoenix.android.services
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
-import androidx.lifecycle.asFlow
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -32,32 +27,33 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import fr.acinq.lightning.channel.states.Syncing
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.inFlightPaymentsCount
-import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
 /**
@@ -72,139 +68,119 @@ import kotlin.time.toJavaDuration
  */
 class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
         log.info("starting $name")
-        var business: PhoenixBusiness? = null
-        var closeDatabases = true
 
+        if (BusinessManager.businessFlow.first().isNotEmpty()) {
+            log.debug("there already are active businesses, aborting $name")
+            return Result.success()
+        }
+
+        val userWallets = SeedManager.loadAndDecryptOrNull(applicationContext)
+        if (userWallets.isNullOrEmpty()) {
+            log.debug("could not load any seed, aborting $name")
+            return Result.success()
+        }
+
+        val watchResult = userWallets.map { (walletId, wallet) ->
+            val walletMetadata = (applicationContext as PhoenixApplication).globalPrefs.getAvailableWalletsMeta.first().getByWalletIdOrDefault(walletId)
+            watchWallet(walletId, walletMetadata, wallet.words)
+        }
+
+        BusinessManager.stopAllHeadlessBusinesses()
+
+        return if (watchResult.all { it }) {
+            log.info("finished $name, watchers have all terminated successfully")
+            Result.success()
+        } else {
+            log.info("finished $name, one or more watchers encountered an error")
+            Result.failure()
+        }
+    }
+
+    private suspend fun watchWallet(walletId: WalletId, walletMetadata: UserWalletMetadata, words: List<String>): Boolean {
         try {
-
-            val application = (applicationContext as PhoenixApplication)
-            val internalData = application.internalDataRepository
-            val userPrefs = application.userPrefs
-            val inFlightPaymentsCount = internalData.getInFlightPaymentsCount.first()
+            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId = walletId)
+            val inFlightPaymentsCount = internalPrefs.getInFlightPaymentsCount.first()
 
             if (inFlightPaymentsCount == 0) {
                 log.info("aborting $name: expecting NO in-flight payments")
-                return Result.success()
-            } else {
+                return true
+            }
 
-                val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext) as? EncryptedSeed.V2.NoAuth ?: run {
-                    log.error("aborting $name: unhandled seed type")
-                    return Result.failure()
+            val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
+            if (res is StartBusinessResult.Failure) {
+                log.info("failed to start business for wallet=$walletId")
+                return false
+            }
+
+            val business = BusinessManager.businessFlow.value[walletId]?.business
+            if (business == null) {
+                log.info("failed to access business for wallet=$walletId")
+                return false
+            }
+
+            withContext(Dispatchers.Default) {
+                val stopJobs = MutableStateFlow(false)
+
+                val jobTimer = launch {
+                    delay(2.minutes)
+                    log.info("stopping $name-$walletId after 2 minutes without resolution - show notification")
+                    scheduleOnce(applicationContext)
+                    SystemNotificationHelper.notifyInFlightHtlc(applicationContext, walletMetadata)
+                    stopJobs.value = true
                 }
 
-                log.info("expecting $inFlightPaymentsCount in-flight payments, binding to service and starting process...")
+                val watcher = launch {
+                    business.appConnectionsDaemon?.forceReconnect()
+                    business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
+                    log.debug("watching in-flight payments for wallet={}", walletId)
 
-                // connect to [NodeService] to monitor the state of the main app business
-                val service = MutableStateFlow<NodeService?>(null)
-                val serviceConnection = object : ServiceConnection {
-                    override fun onServiceConnected(component: ComponentName, bind: IBinder) {
-                        service.value = (bind as NodeService.NodeBinder).getService()
-                    }
+                    business.peerManager.channelsFlow.filterNotNull().collectIndexed { index, channels ->
+                        val paymentsCount = channels.inFlightPaymentsCount()
+                        internalPrefs.saveInFlightPaymentsCount(paymentsCount)
+                        when {
+                            channels.isEmpty() -> {
+                                log.info("no channels found, successfully terminating watcher (#$index)")
+                                stopJobs.value = true
+                            }
 
-                    override fun onServiceDisconnected(component: ComponentName) {
-                        service.value = null
-                    }
-                }
-                Intent(applicationContext, NodeService::class.java).let { intent ->
-                    applicationContext.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-                }
+                            channels.any { it.value.state is Syncing } -> {
+                                log.debug("channels syncing, pausing 10s before next check (#$index)")
+                                delay(10.seconds)
+                            }
 
-                // Start the monitoring process. If the main app starts, we interrupt this job to prevent concurrent access.
-                withContext(Dispatchers.Default) {
-                    business = PhoenixBusiness(PlatformContext(applicationContext))
-                    val stopJobs = MutableStateFlow(false)
-                    var jobChannelsWatcher: Job? = null
+                            paymentsCount > 0 -> {
+                                log.debug("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
+                                delay(5.seconds)
+                            }
 
-                    val jobStateWatcher = launch {
-                        service.filterNotNull().flatMapLatest { it.state.asFlow() }.collect { state ->
-                            when (state) {
-                                is NodeServiceState.Init, is NodeServiceState.Running, is NodeServiceState.Error, NodeServiceState.Disconnected -> {
-                                    log.info("interrupting $name: node service in state=${state.name}")
-                                    closeDatabases = false
-                                    stopJobs.value = true
-                                    scheduleOnce(applicationContext)
-                                }
-
-                                is NodeServiceState.Off -> {
-                                    // note: we can't simply launch NodeService, either as a background service (disallowed since android 8) or as a
-                                    // foreground service (disallowed since android 14)
-                                    log.info("node service in state=${state.name}, starting an isolated business")
-
-                                    jobChannelsWatcher = launch {
-                                        WorkerHelper.startIsolatedBusiness(business!!, encryptedSeed, userPrefs)
-
-                                        business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
-                                        log.debug("connections established, watching channels for in-flight payments...")
-
-                                        business?.peerManager?.channelsFlow?.filterNotNull()?.collectIndexed { index, channels ->
-                                            val paymentsCount = channels.inFlightPaymentsCount()
-                                            internalData.saveInFlightPaymentsCount(paymentsCount)
-                                            when {
-                                                channels.isEmpty() -> {
-                                                    log.info("no channels found, successfully terminating watcher (#$index)")
-                                                    stopJobs.value = true
-                                                }
-
-                                                channels.any { it.value.state is Syncing } -> {
-                                                    log.debug("channels syncing, pausing 10s before next check (#$index)")
-                                                    delay(10_000)
-                                                }
-
-                                                paymentsCount > 0 -> {
-                                                    log.debug("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
-                                                    delay(5_000)
-                                                }
-
-                                                else -> {
-                                                    log.info("$paymentsCount payments in-flight, successfully completing worker (#$index)...")
-                                                    stopJobs.value = true
-                                                }
-                                            }
-                                        }
-                                    }.also {
-                                        it.invokeOnCompletion {
-                                            log.debug("terminated job watching channels (${it?.localizedMessage})")
-                                        }
-                                    }
-                                }
+                            else -> {
+                                log.info("$paymentsCount payments in-flight, successfully completing worker (#$index)...")
+                                stopJobs.value = true
                             }
                         }
                     }
-
-                    val jobTimer = launch {
-                        delay(120_000)
-                        log.info("stopping $name after 2 minutes without resolution - show notification")
-                        scheduleOnce(applicationContext)
-                        SystemNotificationHelper.notifyInFlightHtlc(applicationContext)
-                        stopJobs.value = true
-                    }
-
-                    stopJobs.first { it }
-                    log.debug("stop-job signal detected")
-                    jobChannelsWatcher?.cancelAndJoin()
-                    jobStateWatcher.cancelAndJoin()
-                    jobTimer.cancelAndJoin()
                 }
-                return Result.success()
+
+                stopJobs.first { it }
+                log.debug("stop-job signal detected")
+                watcher.cancelAndJoin()
+                jobTimer.cancelAndJoin()
             }
+
+            return true
         } catch (e: Exception) {
-            log.error("error in $name: ", e)
-            return Result.failure()
-        } finally {
-            business?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business?.stop(closeDatabases = closeDatabases)
-            log.info("terminated $name...")
+            log.error("error in $name-$walletId: ", e)
+            return false
         }
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
-        val name = "inflight-payments-watcher"
+        const val name = "inflight-payments-watcher"
         const val TAG = BuildConfig.APPLICATION_ID + ".InflightPaymentsWatcher"
 
         /** Schedule a in-flight payments watcher job to start every few hours. */

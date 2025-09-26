@@ -42,16 +42,26 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.inputs.FeerateSlider
-import fr.acinq.phoenix.android.internalData
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
+import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.buttons.Checkbox
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
+import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -61,6 +71,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SendSpliceOutView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     requestedAmount: Satoshi?,
     address: String,
     onBackClick: () -> Unit,
@@ -82,7 +94,7 @@ fun SendSpliceOutView(
     var amountErrorMessage by remember { mutableStateOf("") }
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = requestedAmount?.toMilliSatoshi(),
@@ -164,6 +176,7 @@ fun SendSpliceOutView(
 
             is SpliceOutState.ReadyToSend -> {
                 SpliceOutReadyView(
+                    walletId = walletId,
                     state = state,
                     mempoolFeerate = mempoolFeerate,
                     balance = balance,
@@ -218,6 +231,7 @@ private fun SpliceOutErrorView(state: SpliceOutState) {
 
 @Composable
 private fun SpliceOutReadyView(
+    walletId: WalletId,
     state: SpliceOutState.ReadyToSend,
     mempoolFeerate: MempoolFeerate?,
     balance: MilliSatoshi?,
@@ -242,8 +256,8 @@ private fun SpliceOutReadyView(
     } else {
         // low feerate == below 1 hour estimate
         val isUsingLowFeerate = mempoolFeerate != null && FeeratePerByte(state.userFeerate).feerate < mempoolFeerate.hour.feerate
-        val showSpliceoutCapacityDisclaimer = internalData.getSpliceoutCapacityDisclaimer.collectAsState(initial = true).value
-        ReviewSpliceOutAndConfirm(onExecute, isAmountValid, isUsingLowFeerate, showSpliceoutCapacityDisclaimer)
+        val showCapacityDisclaimer = LocalInternalPrefs.current?.getSpliceoutCapacityDisclaimer?.collectAsState(initial = true)?.value
+        ReviewSpliceOutAndConfirm(walletId, onExecute, isAmountValid, isUsingLowFeerate, showSpliceoutCapacityDisclaimer = showCapacityDisclaimer == true)
     }
 }
 
@@ -291,6 +305,7 @@ fun SpliceOutCapacityDisclaimer(showCapacityDisclaimer: Boolean, onShowCapacityD
 
 @Composable
 private fun ReviewSpliceOutAndConfirm(
+    walletId: WalletId,
     onExecute: () -> Unit,
     isAmountValid: Boolean,
     isUsingLowFeerate: Boolean,
@@ -337,12 +352,13 @@ private fun ReviewSpliceOutAndConfirm(
                             modifier = Modifier.fillMaxWidth(),
                         )
                     } else {
-                        val internalPrefs = internalData
+                        val internalPrefs = LocalInternalPrefs.current
                         SmartSpendButton(
+                            walletId = walletId,
                             text = stringResource(R.string.send_confirm_pay_button),
                             shape = RoundedCornerShape(12.dp),
                             onSpend = {
-                                internalPrefs.saveSpliceoutCapacityDisclaimer(showCapacityDisclaimer)
+                                internalPrefs?.saveSpliceoutCapacityDisclaimer(showCapacityDisclaimer)
                                 onExecute()
                             },
                             enabled = isAmountValid,
@@ -371,6 +387,7 @@ private fun ReviewSpliceOutAndConfirm(
         )
     } else {
         SmartSpendButton(
+            walletId = walletId,
             enabled = isAmountValid,
             modifier = Modifier.enableOrFade(!showSheet),
             onSpend = {

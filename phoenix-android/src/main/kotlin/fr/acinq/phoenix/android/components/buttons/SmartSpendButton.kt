@@ -30,13 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalBusiness
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
-import fr.acinq.phoenix.android.userPrefs
 import kotlinx.coroutines.launch
 
 /**
@@ -46,23 +46,26 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun SmartSpendButton(
+    walletId: WalletId,
     onSpend: suspend () -> Unit,
     enabled: Boolean,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.send_pay_button),
     icon: Int = R.drawable.ic_send,
     shape: Shape = CircleShape,
+    padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     ignoreChannelsState: Boolean = false,
     prompt: @Composable () -> Unit = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_spending_payment_title)) }
 ) {
     val scope = rememberCoroutineScope()
-    val needPinCodeToPayFlow = userPrefs.getIsSpendingPinEnabled.collectAsState(null)
-    val needPinCodeToPay = needPinCodeToPayFlow.value
-    val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
+    val needPinCodeToPayFlow = LocalUserPrefs.current?.getSpendingPinEnabled?.collectAsState(null)
+    val needPinCodeToPay = needPinCodeToPayFlow?.value
+    val mayDoPayments by LocalBusiness.current!!.peerManager.mayDoPayments.collectAsState(false)
 
     var showSendingPinCheck by remember { mutableStateOf(false) }
     if (showSendingPinCheck) {
         CheckSpendingPinFlow(
+            walletId = walletId,
             onCancel = { showSendingPinCheck = false },
             onPinValid = { scope.launch { onSpend() } },
             prompt = prompt
@@ -84,6 +87,7 @@ fun SmartSpendButton(
                     shape = shape,
                     enabled = enabled,
                     modifier = modifier,
+                    padding = padding,
                     onClick = { showSendingPinCheck = true },
                 )
             }
@@ -94,6 +98,7 @@ fun SmartSpendButton(
                     shape = shape,
                     enabled = enabled,
                     modifier = modifier,
+                    padding = padding,
                     onClick = { scope.launch { onSpend() } }
                 )
             }

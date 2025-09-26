@@ -16,7 +16,7 @@ enum LoadWalletTrigger: CustomStringConvertible {
 	case newWallet
 	case restoreFromManualEntry
 	case restoreFromCloudBackup(name: String?)
-	
+
 	var description: String {
 		switch self {
 			case .walletUnlock              : return "walletUnlock"
@@ -30,7 +30,7 @@ enum LoadWalletTrigger: CustomStringConvertible {
 /// Manages the `PhoenixBusiness` instance, which is the shared logic written in Kotlin Multiplatform.
 ///
 class BusinessManager {
-	
+
 	/// There are some places in the code where we need to access the testnet state from a background thread.
 	/// This is problematic because calling into Kotlin via `business.chain.isTestnet()`
 	/// from a background thread will throw an exception.
@@ -73,7 +73,7 @@ class BusinessManager {
 	/// General wallet info (e.g. nodeId)
 	///
 	public var walletInfo: WalletManager.WalletInfo? = nil
-	
+
 	private var wasStopped = false
 	private var isInBackground = false
 	private var peerConnectionState: Lightning_kmpConnection? = nil
@@ -104,17 +104,17 @@ class BusinessManager {
 		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
 			self.applicationWillEnterForeground()
 		}.store(in: &appCancellables)
-		
+
 		let ad = AppDelegate.get()
-		
+
 		ad.pushTokenPublisher.sink { _ in
 			self.pushTokenChanged()
 		}.store(in: &appCancellables)
-		
+
 		ad.fcmTokenPublisher.sink { _ in
 			self.fcmTokenChanged()
 		}.store(in: &appCancellables)
-		
+
 		WatchTower.shared.prepare()
 		
 	#if DEBUG
@@ -127,17 +127,17 @@ class BusinessManager {
 	deinit {
 		log.trace(#function)
 	}
-	
+
 	func prepare() { /* Stub function */ }
-	
+
 	// --------------------------------------------------
 	// MARK: Lifecycle
 	// --------------------------------------------------
-	
+
 	private func setup(_ walletId: WalletIdentifier) {
 		log.trace(#function)
 		assertMainThread()
-		
+
 		let prefs = Prefs.wallet(walletId)
 		let groupPrefs = GroupPrefs.wallet(walletId)
 		
@@ -356,21 +356,21 @@ class BusinessManager {
 	private func start(_ walletId: WalletIdentifier) {
 		log.trace(#function)
 		assertMainThread()
-		
+
 		let groupPrefs = GroupPrefs.wallet(walletId)
-		
+
 		if let electrumConfigPrefs = groupPrefs.electrumConfig {
 			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
 		} else {
 			business.appConfigurationManager.updateElectrumConfig(config: nil)
 		}
-		
+
 		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
 			primary: groupPrefs.fiatCurrency,
 			others: groupPrefs.preferredFiatCurrencies
 		)
 		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
-		
+
 		let startupParams = StartupParams(
 			isTorEnabled: groupPrefs.isTorEnabled,
 			liquidityPolicy: groupPrefs.liquidityPolicy.toKotlin()
@@ -381,19 +381,19 @@ class BusinessManager {
 	public func stop() {
 		log.trace(#function)
 		assertMainThread()
-		
+
 		guard !wasStopped else {
 			log.debug("stop(): ignoring: already stopped")
 			return
 		}
 		wasStopped = true
-		
+
 		cancellables.removeAll()
 		appCancellables.removeAll()
-		business.stop(closeDatabases: true)
+		business.stop()
 		syncManager?.shutdown()
 	}
-	
+
 	// --------------------------------------------------
 	// MARK: Notifications
 	// --------------------------------------------------
@@ -474,9 +474,9 @@ class BusinessManager {
 		Keychain.printKeysAndValues(walletId)
 		log.debug("--------------------------------------------------")
 	#endif
-		
+
 		let prefs = Prefs.wallet(walletId)
-		
+
 		switch trigger {
 		case .restoreFromManualEntry:
 			//
@@ -490,7 +490,7 @@ class BusinessManager {
 			prefs.backupSeed.isEnabled = false
 			prefs.backupSeed.name = nil
 			prefs.backupSeed.hasUploadedSeed = false
-			
+
 		case .restoreFromCloudBackup(let name):
 			//
 			// User is restoring wallet from an existing iCloud backup.
@@ -506,7 +506,7 @@ class BusinessManager {
 		default:
 			break
 		}
-		
+
 		setup(walletId)
 		start(walletId)
 
@@ -536,13 +536,13 @@ class BusinessManager {
 	
 	private func pushTokenChanged() {
 		log.trace("pushTokenChanged()")
-		
+
 		// Reserved for debugging use (AWS)
 	}
-	
+
 	private func fcmTokenChanged() {
 		log.trace("fcmTokenChanged()")
-		
+
 		maybeRegisterFcmToken()
 	}
 	

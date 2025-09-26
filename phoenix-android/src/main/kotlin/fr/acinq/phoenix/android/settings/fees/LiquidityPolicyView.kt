@@ -37,15 +37,23 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalFiatCurrencies
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.inputs.InlineSatoshiInput
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.primaryFiatRate
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -55,24 +63,24 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LiquidityPolicyView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
 
-    val maxSatFeePrefsFlow = userPrefs.getIncomingMaxSatFeeInternal.collectAsState(null)
-    val maxPropFeePrefsFlow = userPrefs.getIncomingMaxPropFeeInternal.collectAsState(null)
-    val liquidityPolicyPrefsFlow = userPrefs.getLiquidityPolicy.collectAsState(null)
+    val maxSatFeePrefsFlow = LocalUserPrefs.current?.getIncomingMaxSatFeeInternal?.collectAsState(null)
+    val maxPropFeePrefsFlow = LocalUserPrefs.current?.getIncomingMaxPropFeeInternal?.collectAsState(null)
+    val liquidityPolicyPrefsFlow = LocalUserPrefs.current?.getLiquidityPolicy?.collectAsState(null)
 
     val peerManager = business.peerManager
     val notificationsManager = business.notificationsManager
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val channels by business.peerManager.channelsFlow.collectAsState()
 
-    val maxSatFeePrefs = maxSatFeePrefsFlow.value
-    val maxPropFeePrefs = maxPropFeePrefsFlow.value
-    val liquidityPolicyPrefs = liquidityPolicyPrefsFlow.value
+    val maxSatFeePrefs = maxSatFeePrefsFlow?.value
+    val maxPropFeePrefs = maxPropFeePrefsFlow?.value
+    val liquidityPolicyPrefs = liquidityPolicyPrefsFlow?.value
 
     DefaultScreenLayout {
         var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
@@ -142,6 +150,7 @@ fun LiquidityPolicyView(
                     }
                 }
                 val isEnabled = newPolicy != null && liquidityPolicyPrefs != newPolicy
+                val userPrefs = LocalUserPrefs.current
                 Button(
                     text = stringResource(id = R.string.liquiditypolicy_save_button),
                     icon = R.drawable.ic_check,
@@ -152,6 +161,7 @@ fun LiquidityPolicyView(
                     enabled = isEnabled,
                     onClick = {
                         keyboardManager?.hide()
+                        if (userPrefs == null) return@Button
                         scope.launch {
                             if (newPolicy != null) {
                                 userPrefs.saveLiquidityPolicy(newPolicy)

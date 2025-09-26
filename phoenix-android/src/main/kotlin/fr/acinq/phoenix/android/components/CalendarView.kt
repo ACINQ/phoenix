@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.mutedBgColor

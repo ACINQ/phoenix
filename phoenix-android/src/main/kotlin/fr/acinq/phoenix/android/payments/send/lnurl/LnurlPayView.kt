@@ -40,16 +40,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
-import fr.acinq.phoenix.android.components.BackButtonWithBalance
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
+import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SplashClickableContent
-import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.layouts.SplashClickableContent
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
@@ -65,6 +66,8 @@ import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlPayView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     pay: SendManager.ParseResult.Lnurl.Pay,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -85,7 +88,7 @@ fun LnurlPayView(
     val vm = viewModel<LnurlPayViewModel>(factory = LnurlPayViewModel.Factory(business.sendManager))
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = minRequestedAmount,
@@ -182,6 +185,7 @@ fun LnurlPayView(
                 }
 
                 SmartSpendButton(
+                    walletId = walletId,
                     enabled = amount != null && amountErrorMessage.isBlank() && trampolineFees != null,
                     onSpend = {
                         safeLet(trampolineFees, amount) { fees, amt ->

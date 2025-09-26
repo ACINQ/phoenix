@@ -57,27 +57,28 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalBusiness
+import fr.acinq.phoenix.android.LocalInternalPrefs
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountInput
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.components.MutedFilledButton
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.inputs.TextInput
-import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.buttons.SegmentedControl
 import fr.acinq.phoenix.android.components.buttons.SegmentedControlButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
-import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.internalData
-import fr.acinq.phoenix.android.userPrefs
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity
@@ -87,6 +88,7 @@ import java.text.DecimalFormat
 @Composable
 fun ColumnScope.LightningInvoiceView(
     vm: ReceiveViewModel,
+    business: PhoenixBusiness,
     onFeeManagementClick: () -> Unit,
     defaultDescription: String,
     defaultExpiry: Long,
@@ -100,7 +102,8 @@ fun ColumnScope.LightningInvoiceView(
     var isReusable by remember { mutableStateOf(false) }
     var feeWarningDialogShownTimestamp by remember { mutableLongStateOf(0L) }
 
-    val bip353Address by internalData.getBip353Address.collectAsState(initial = null)
+    val bip353AddressState = LocalInternalPrefs.current?.getBip353Address?.collectAsState(initial = null)
+    val bip353Address = bip353AddressState?.value
 
     var showEditInvoiceDialog by remember { mutableStateOf(false) }
     var showCopyDialog by remember { mutableStateOf(false) }
@@ -420,6 +423,7 @@ fun EvaluateLiquidityIssuesForPayment(
     showDialogImmediately: Boolean,
     onDialogShown: () -> Unit,
 ) {
+    val business = LocalBusiness.current ?: return
     val channelsMap by business.peerManager.channelsFlow.collectAsState()
     val canRequestLiquidity = remember(channelsMap) { channelsMap.canRequestLiquidity() }
     val availableForReceive = remember(channelsMap) { channelsMap.availableForReceive() }
@@ -432,9 +436,9 @@ fun EvaluateLiquidityIssuesForPayment(
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
     val swapFee = remember(mempoolFeerate, amount) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
-    val liquidityPolicyPrefs = userPrefs.getLiquidityPolicy.collectAsState(null)
+    val liquidityPolicyPrefs = LocalUserPrefs.current?.getLiquidityPolicy?.collectAsState(null)
 
-    when (val liquidityPolicy = liquidityPolicyPrefs.value) {
+    when (val liquidityPolicy = liquidityPolicyPrefs?.value) {
         null -> {}
         // when fee policy is disabled, we are more aggressive with the warning (dialog is shown immediately)
         is LiquidityPolicy.Disable -> {
@@ -627,7 +631,7 @@ private fun IncomingLiquidityWarning(
 
 @Composable
 private fun TorWarning() {
-    val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
+    val isTorEnabled = LocalUserPrefs.current?.getIsTorEnabled?.collectAsState(initial = null)?.value
 
     if (isTorEnabled == true) {
 

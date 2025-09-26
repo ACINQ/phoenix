@@ -63,28 +63,29 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Kuunganisha huduma…</string>
-    <string name="startup_wait">Kuandaa pochi…</string>
-    <string name="startup_checking_seed">Kufungua…</string>
-    <string name="startup_unlocked">Ufikiaji umekubaliwa…</string>
-    <string name="startup_unlock_failure">Kufungua kumeshindikana</string>
-    <string name="startup_unlock_failure_keystore">Hitilafu ya kitunzaji cha Android</string>
-    <string name="startup_unlock_failure_fallback">Fungua kwa mbegu</string>
+    <string name="startup_selector_title">Chagua pochi</string>
 
-    <string name="startup_fallback_instructions">Ingiza maneno yako 12 ya urejesho ili kufungua pochi.\n\nManeno lazima yaingizwe kwa mpangilio sahihi, na kutenganishwa na nafasi moja.</string>
-    <string name="startup_fallback_input_label">Ingiza neno #%1$d</string>
-    <string name="startup_fallback_input_label_error">Maneno yasizidi 12!</string>
-    <string name="startup_fallback_incomplete">Ingiza mbegu kamili ili kuendelea zaidi.</string>
-    <string name="startup_fallback_invalid">Mbegu hii si sahihi. Hakikisha maneno yako ni sahihi na yamepangwa kwa mpangilio.</string>
-    <string name="startup_fallback_unlock_button">Fungua pochi</string>
-    <string name="startup_fallback_checking">Kuangalia mbegu…</string>
-    <string name="startup_fallback_error_default">Hitilafu imetokea. Tafadhali jaribu tena.</string>
-    <string name="startup_fallback_error_incorrect_seed">Mbegu hii haifanani na pochi yako.</string>
-    <string name="startup_fallback_success_match">Mbegu inafanana.\nInaandika kwa diski…</string>
-    <string name="startup_fallback_success_starting">Inaanzisha Phoenix…</string>
+    <string name="startup_error_start_business">"Haikuweza kuanzisha pochi"</string>
+    <string name="startup_error_generic">Haiwezi kusoma data ya pochi.</string>
+    <string name="startup_error_try_again">Jaribu tena</string>
+    <string name="startup_error_decryption_general">Imeshindwa kusimbua:\n%1$s</string>
+    <string name="startup_error_recovery_button">"Kurejesha kikuli"</string>
 
-    <string name="startup_starting">Inaanzisha…</string>
-    <string name="startup_error_generic">Programu haikuweza kuanza.</string>
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Urejeshaji wa Wallet</string>
+    <string name="startup_recovery_instructions">Skrini hii hukuwezesha kurejesha pochi moja kwa kuweka kifungu chake cha maneno 12 cha urejeshaji.\n\nLazima maneno yaandikwe kwa mpangilio ufaao, na kutengwa kwa nafasi moja.</string>
+    <string name="startup_recovery_input_label">Andika neno #%1$d</string>
+    <string name="startup_recovery_input_label_error">Si zaidi ya maneno 12!</string>
+    <string name="startup_recovery_invalid">"Mbegu hii si sahihi"</string>
+
+    <string name="startup_recovery_import_button">Leta mbegu</string>
+    <string name="startup_recovery_reset_button">Jaribu tena</string>
+    <string name="startup_recovery_checking">Inakagua mbegu…</string>
+
+    <string name="startup_recovery_error_default">Hitilafu imetokea.</string>
+    <string name="startup_recovery_error_incorrect_seed">Mbegu hii hailingani na data yoyote iliyopo ya pochi.</string>
+    <string name="startup_recovery_success_match">Inarejesha pochi…</string>
 
     <!-- Payment line -->
 
@@ -123,7 +124,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Salio:</string>
+    <string name="send_balance_prefix">Salio</string>
     <string name="send_error_amount_too_large">Kiasi ni kubwa kupita kiasi.</string>
     <string name="send_error_amount_negative">Kiasi hakiwezi kuwa hasi.</string>
     <string name="send_error_amount_invalid">Hii si kiasi halali.</string>
@@ -773,16 +774,18 @@
 
     <!-- Reset wallet -->
 
-    <string name="reset_wallet_title">Futa pochi</string>
-    <string name="reset_wallet_instructions_header">Futa data zote za pochi kutoka kifaa hiki</string>
-    <string name="reset_wallet_instructions_details">Hii itafanya programu irejee kama vile umeisakinisha tu.</string>
+    <string name="reset_wallet_title">Futa mkoba</string>
+    <string name="reset_wallet_instructions_header">Skrini hii hukuruhusu kufuta pochi hii kutoka kwa simu yako.</string>
+    <string name="reset_wallet_instructions_details">Data yote ya pochi hii itafutwa. Hii inajumuisha historia yako ya malipo.</string>
+    <string name="reset_wallet_payments_history_button">Hifadhi historia ya malipo</string>
     <string name="reset_wallet_review_button">Tathmini</string>
 
     <string name="reset_wallet_confirm_title">Thibitisha kufuta</string>
     <string name="reset_wallet_confirm_header">Pochi itafutwa kabisa kutoka <b>kifaa hiki</b>.</string>
-    <string name="reset_wallet_confirm_details">Hii itafanya programu irejee. Historia yako ya malipo itapotea. Utapelekwa kwenye skrini ya Utangulizi, na utaombwa kuunda au kurejesha pochi.</string>
-    <string name="reset_wallet_confirm_seed_balance">Usipoteze fedha zako:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Wewe ndiye mwenye jukumu la kuhifadhi sentensi yako ya urejeleaji.</string>
+    <string name="reset_wallet_confirm_details">Mbegu za pochi hii na historia yake ya malipo itafutwa kutoka kwenye diski. Utaombwa utumie pochi nyingine, au uunde mpya.</string>
+    <string name="reset_wallet_confirm_details2">Pochi zingine ambazo tayari umeingiza hazitafutwa.</string>
+    <string name="reset_wallet_confirm_seed_balance">Usipoteze pesa zako</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Ninaelewa kuwa nikipoteza maneno ya kurejesha akaunti baada ya kufuta pochi, pesa zozote zilizosalia zitapotea kabisa.</string>
     <string name="reset_wallet_confirm_button">Futa pochi</string>
     <string name="reset_wallet_shutting_down">Inazima…</string>
     <string name="reset_wallet_deleting_prefs">Ikifuta mapendeleo…</string>

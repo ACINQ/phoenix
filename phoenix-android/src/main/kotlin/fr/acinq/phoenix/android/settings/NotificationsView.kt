@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,10 +47,18 @@ import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.openLink
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.home.TorDisconnectedDialog
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
@@ -62,6 +72,7 @@ import java.text.DecimalFormat
 
 @Composable
 fun NotificationsView(
+    business: PhoenixBusiness,
     noticesViewModel: NoticesViewModel,
     onBackClick: () -> Unit,
 ) {
@@ -82,7 +93,7 @@ fun NotificationsView(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         } else {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 // -- notices
                 if (notices.isNotEmpty()) {
                     item {
@@ -106,9 +117,8 @@ fun NotificationsView(
                         CardHeader(text = stringResource(id = R.string.inappnotif_payments_title))
                     }
                 }
-                items(notifications) {
-                    val relatedNotifications = it.first
-                    PaymentNotification(it.second, onNotificationRead = { notificationsManager.dismissNotifications(relatedNotifications) })
+                items(notifications) { (relatedNotifications, notification) ->
+                    PaymentNotification(notification, onNotificationRead = { notificationsManager.dismissNotifications(relatedNotifications) })
                 }
             }
         }
@@ -121,8 +131,8 @@ private fun PermamentNotice(
     notice: Notice
 ) {
     val context = LocalContext.current
-    val internalData = application.internalDataRepository
-    val userPrefs = application.userPrefs
+    val internalPrefs = LocalInternalPrefs.current
+    val userPrefs = LocalUserPrefs.current
     val nc = LocalNavController.current
     val scope = rememberCoroutineScope()
 
@@ -137,7 +147,7 @@ private fun PermamentNotice(
                 icon = R.drawable.ic_key,
                 message = stringResource(id = R.string.inappnotif_backup_seed_message),
                 actionText = stringResource(id = R.string.inappnotif_backup_seed_action),
-                onActionClick = { nc?.navigate(Screen.DisplaySeed.route) }
+                onActionClick = { nc?.navigate(Screen.BusinessNavGraph.DisplaySeed.route) }
             )
         }
 
@@ -168,7 +178,7 @@ private fun PermamentNotice(
                         confirmStateChange = {
                             if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
                                 scope.launch {
-                                    userPrefs.saveShowNotificationPermissionReminder(false)
+                                    userPrefs?.saveShowNotificationPermissionReminder(false)
                                 }
                             }
                             true
@@ -213,7 +223,7 @@ private fun PermamentNotice(
                 message = stringResource(id = R.string.inappnotif_watchtower_late_message),
                 actionText = stringResource(id = R.string.inappnotif_watchtower_late_action),
                 onActionClick = {
-                    scope.launch { internalData.saveChannelsWatcherOutcome(ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
+                    scope.launch { internalPrefs?.saveChannelsWatcherOutcome(ChannelsWatcher.Outcome.Nominal(currentTimestampMillis())) }
                 }
             )
         }
@@ -223,7 +233,7 @@ private fun PermamentNotice(
                 icon = R.drawable.ic_alert_triangle,
                 message = stringResource(id = R.string.inappnotif_swapin_timeout_message),
                 actionText = stringResource(id = R.string.inappnotif_swapin_timeout_action),
-                onActionClick = { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) },
+                onActionClick = { nc?.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route) },
             )
         }
 
@@ -234,7 +244,7 @@ private fun PermamentNotice(
                 actionText = stringResource(id = R.string.btn_ok),
                 onActionClick = {
                     scope.launch {
-                        internalData.saveLastReadWalletNoticeIndex(notice.notice.index)
+                        internalPrefs?.saveLastReadWalletNoticeIndex(notice.notice.index)
                     }
                 },
             )
@@ -295,9 +305,9 @@ private fun PaymentNotification(
                 extraActionClick = when (notification) {
                     is Notification.FeePolicyDisabled, is Notification.OverAbsoluteFee, is Notification.OverRelativeFee -> {
                         if (notification.source == LiquidityEvents.Source.OnChainWallet) {
-                            { nc?.navigate(Screen.WalletInfo.SwapInWallet.route) }
+                            { nc?.navigate(Screen.BusinessNavGraph.WalletInfo.SwapInWallet.route) }
                         } else {
-                            { nc?.navigate(Screen.LiquidityPolicy.route) }
+                            { nc?.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) }
                         }
                     }
 
@@ -348,7 +358,7 @@ private fun ImportantNotification(
             Column(modifier = Modifier.alignByBaseline()) {
                 Text(text = message, style = MaterialTheme.typography.body1.copy(fontSize = 16.sp))
                 safeLet(actionText, onActionClick) { text, onClick ->
-                    Button(
+                    fr.acinq.phoenix.android.components.buttons.Button(
                         text = text, textStyle = MaterialTheme.typography.body2.copy(fontSize = 16.sp),
                         icon = R.drawable.ic_chevron_right,
                         modifier = Modifier.offset(x = (-16).dp),
@@ -372,18 +382,10 @@ private fun DimissibleNotification(
     onRead: () -> Unit,
     extraActionClick: (() -> Unit)? = null,
 ) {
-    val dismissState = rememberDismissState(
-        confirmStateChange = {
-            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                onRead()
-            }
-            true
-        }
-    )
-    SwipeToDismiss(
-        state = dismissState,
-        background = {},
-        dismissThresholds = { FractionalThreshold(0.8f) }
+    val dismissBoxState = rememberSwipeToDismissBoxState(confirmValueChange = { onRead(); true })
+    SwipeToDismissBox(
+        state = dismissBoxState,
+        backgroundContent = {},
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),

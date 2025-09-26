@@ -32,19 +32,18 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.extensions.isBadCertificate
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.android.utils.mutedBgColor
@@ -70,7 +69,7 @@ fun ConnectionDialog(
                     modifier = Modifier.padding(top = 16.dp, start = 24.dp, end = 24.dp)
                 )
             } else {
-                val isTorEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null).value
+                val isTorEnabled = LocalUserPrefs.current?.getIsTorEnabled?.collectAsState(initial = null)?.value
                 val hasConnectionIssues = connections.electrum != Connection.ESTABLISHED || connections.peer != Connection.ESTABLISHED
                 if (hasConnectionIssues) {
                     Text(text = stringResource(id = R.string.conndialog_summary_not_ok), Modifier.padding(horizontal = 24.dp))
@@ -86,8 +85,8 @@ fun ConnectionDialog(
                             Text(text = stringResource(R.string.conndialog_connected), style = monoTypo)
                         }
                         else -> {
-                            val customElectrumServer by userPrefs.getElectrumServer.collectAsState(initial = null)
-                            if (isTorEnabled == true && customElectrumServer?.server?.isOnion == false && customElectrumServer?.requireOnionIfTorEnabled == true) {
+                            val customElectrumServer = LocalUserPrefs.current?.getElectrumServer?.collectAsState(initial = null)?.value
+                            if (isTorEnabled == true && customElectrumServer?.server?.isOnion == false && customElectrumServer.requireOnionIfTorEnabled) {
                                 TextWithIcon(text = stringResource(R.string.conndialog_electrum_not_onion), textStyle = monoTypo, icon = R.drawable.ic_alert_triangle, iconTint = negativeColor)
                             } else if (connection is Connection.CLOSED && connection.isBadCertificate()) {
                                 TextWithIcon(text = stringResource(R.string.conndialog_closed_bad_cert), textStyle = monoTypo, icon = R.drawable.ic_alert_triangle, iconTint = negativeColor)

@@ -35,12 +35,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.buttons.Button
 
 @Composable
 fun Dialog(
@@ -48,12 +49,15 @@ fun Dialog(
     title: String? = null,
     properties: DialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     isScrollable: Boolean = true,
+    externalPadding: PaddingValues = PaddingValues(16.dp),
+    internalPadding: PaddingValues = PaddingValues(0.dp),
+    backgroundColor: Color = MaterialTheme.colors.surface,
     buttonsTopMargin: Dp = 20.dp,
     buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp), shape = RoundedCornerShape(16.dp)) },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
-        DialogBody(isScrollable) {
+        DialogBody(isScrollable, externalPadding, internalPadding, backgroundColor) {
             // optional title
             title?.run {
                 Text(text = title, modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp), style = MaterialTheme.typography.h4)
@@ -76,13 +80,16 @@ fun Dialog(
 @Composable
 private fun DialogBody(
     isScrollable: Boolean = true,
+    externalPadding: PaddingValues = PaddingValues(16.dp),
+    internalPadding: PaddingValues = PaddingValues(0.dp),
+    backgroundColor: Color = MaterialTheme.colors.surface,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         Modifier
-            .padding(vertical = 16.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
+            .padding(externalPadding)
             .clip(MaterialTheme.shapes.large)
-            .background(MaterialTheme.colors.surface)
+            .background(backgroundColor)
             .widthIn(max = 600.dp)
             .then(
                 if (isScrollable) {
@@ -91,6 +98,7 @@ private fun DialogBody(
                     Modifier
                 }
             )
+            .padding(internalPadding)
     ) {
         content()
     }

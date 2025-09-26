@@ -25,7 +25,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix beží na pozadí</string>
-    <string name="notif_headless_received">Prijaté +%1$s</string>
+    <string name="notif_headless_received">%1$s Prijaté %2$s</string>
 
     <string name="notif_pending_settlement_title">Spustite prosím Phoenix</string>
     <string name="notif_pending_settlement_message">Čaká sa na prichádzajúce vyrovnanie.</string>
@@ -66,7 +66,7 @@
     <string name="settings_list_channels">Platobné kanály</string>
     <string name="settings_logs">Logy</string>
     <string name="settings_electrum">Electrum server</string>
-    <string name="settings_reset_wallet">Reset peňaženky</string>
+    <string name="settings_reset_wallet">Odstrániť peňaženku</string>
     <string name="settings_mutual_close">Uzavretie kanálov</string>
     <string name="settings_force_close">Vynútené zatvorenie kanálov</string>
     <string name="settings_tor">Tor</string>
@@ -94,6 +94,7 @@
 
     <string name="home_final_title">Konečná peňaženka</string>
     <string name="home_final_desc">Tieto prostriedky pochádzajú z uzavretých kanálov Lightning. Musia sa minúť manuálne.</string>
+    <string name="home_onchain_balance_only">Zostatok v reťazci</string>
 
     <string name="home_background_restriction_title">Omedzené spracovanie pozadia</string>
     <string name="home_background_restriction_body_1">Fénix nebude môcť prijímať platby, keď je na pozadí alebo keď je zatvorený.</string>
@@ -212,6 +213,7 @@
     <string name="inappnotif_backup_seed_message">Zálohujte svoju peňaženku, aby ste zabránili strate bitcoinov.</string>
     <string name="inappnotif_backup_seed_action">Zálohovanie peňaženky</string>
 
+    <string name="inappnotif_notification_permission_message_short">Povoliť oznámenia Android</string>
     <string name="inappnotif_notification_permission_message">Oznámenia sú v nastaveniach systému Android zakázané. Phoenix vás nebude môcť upozorniť na spracovanie platby.</string>
     <string name="inappnotif_notification_permission_enable">Povoliť</string>
 

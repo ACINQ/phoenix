@@ -50,28 +50,34 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Vinculando o serviço…</string>
-    <string name="startup_wait">Preparando a carteira…</string>
-    <string name="startup_checking_seed">Desbloqueando…</string>
-    <string name="startup_unlocked">Acesso concedido…</string>
-    <string name="startup_unlock_failure">Falha no desbloqueio</string>
-    <string name="startup_unlock_failure_keystore">Erro do Android Keystore</string>
-    <string name="startup_unlock_failure_fallback">Desbloquear com seed</string>
+    <string name="startup_init">Inicializando…</string>
+    <string name="startup_preparing">Preparando a carteira…</string>
+    <string name="startup_loading_seed">Descifrando…</string>
+    <string name="startup_starting">Iniciando a carteira…</string>
+    <string name="startup_started">Abrindo carteira…</string>
+    <string name="startup_selector_title">Selecionando uma carteira</string>
 
-    <string name="startup_fallback_instructions">Digite suas 12 palavras de recuperação para desbloquear a carteira.\n\nAs palavras devem ser digitadas na ordem correta e separadas por um único espaço.</string>
-    <string name="startup_fallback_input_label">Digite a palavra #%1$d</string>
-    <string name="startup_fallback_input_label_error">Não insira mais de 12 palavras!</string>
-    <string name="startup_fallback_incomplete">Insira a semente completa para continuar.</string>
-    <string name="startup_fallback_invalid">Esta semente é inválida. Verifique se as palavras estão corretas e em ordem.</string>
-    <string name="startup_fallback_unlock_button">Desbloquear carteira</string>
-    <string name="startup_fallback_checking">Verificando a semente…</string>
-    <string name="startup_fallback_error_default">Ocorreu um erro. Tente novamente.</string>
-    <string name="startup_fallback_error_incorrect_seed">Esta semente não corresponde à carteira.</string>
-    <string name="startup_fallback_success_match">Correspondências iniciais.\nGravando no disco…</string>
-    <string name="startup_fallback_success_starting">Iniciando o Phoenix…</string>
+    <string name="startup_error_start_business">Não foi possível iniciar a carteira</string>
+    <string name="startup_error_generic">Não foi possível ler os dados da carteira.</string>
+    <string name="startup_error_try_again">Tentar novamente</string>
+    <string name="startup_error_decryption_general">Falha na descriptografia:\n%1$s</string>
+    <string name="startup_error_recovery_button">Digite a frase de recuperação</string>
 
-    <string name="startup_starting">Iniciando…</string>
-    <string name="startup_error_generic">Não foi possível iniciar o aplicativo.</string>
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Recuperação de carteira</string>
+    <string name="startup_recovery_instructions">Esta tela permite recuperar manualmente uma única carteira inserindo sua frase de recuperação de 12 palavras.\n\nAs palavras devem ser inseridas na ordem correta e separadas por um único espaço.</string>
+    <string name="startup_recovery_input_label">Digite a palavra #%1$d</string>
+    <string name="startup_recovery_input_label_error">No máximo 12 palavras!</string>
+    <string name="startup_recovery_invalid">Esta semente não é válida</string>
+
+    <string name="startup_recovery_import_button">Importar semente</string>
+    <string name="startup_recovery_reset_button">Tentar novamente</string>
+    <string name="startup_recovery_checking">Verificando a semente…</string>
+
+    <string name="startup_recovery_error_default">Ocorreu um erro.</string>
+    <string name="startup_recovery_error_incorrect_seed">Esta semente não corresponde a nenhum dado de carteira existente.</string>
+    <string name="startup_recovery_success_match">Recuperando a carteira…</string>
 
     <!-- Payment line -->
 
@@ -111,7 +117,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Saldo:</string>
+    <string name="send_balance_prefix">Saldo</string>
     <string name="send_error_amount_too_large">O valor é muito alto.</string>
     <string name="send_error_amount_negative">O valor não pode ser negativo.</string>
     <string name="send_error_amount_invalid">Este valor é inválido.</string>
@@ -619,6 +625,12 @@
     <string name="payments_export_csv_error">Erro de exportação.</string>
     <string name="payments_export_csv_no_data">Nenhum pagamento encontrado.</string>
 
+    <string name="payments_export_database_header">Exportar banco de dados</string>
+    <string name="payments_export_database_instructions">Criptografa e exporta o banco de dados de pagamentos, permitindo migrar seu histórico de pagamentos deste telefone para outro.</string>
+    <string name="payments_export_database_button">Exportar banco de dados</string>
+    <string name="payments_export_database_failed">Falha na exportação</string>
+    <string name="payments_export_database_success">O arquivo poderá ser encontrado nas pastas públicas do seu telefone.</string>
+
     <!-- components -->
 
     <string name="component_calendar_inclusive">(par)</string>
@@ -642,6 +654,7 @@
     <string name="walletinfo_legacy_nodeid">Identificador de nó legado</string>
 
     <string name="walletinfo_onchain_final">Carteira final</string>
+    <string name="walletinfo_onchain_final_spend_button">Gastar</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
@@ -689,16 +702,18 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Redefinir carteira</string>
-    <string name="reset_wallet_instructions_header">Excluir todos os dados da carteira neste dispositivo</string>
-    <string name="reset_wallet_instructions_details">Isso redefinirá o aplicativo, como se você tivesse acabado de instalá-lo.</string>
+    <string name="reset_wallet_title">Excluir carteira</string>
+    <string name="reset_wallet_instructions_header">Esta tela permite que você exclua esta carteira do seu telefone.</string>
+    <string name="reset_wallet_instructions_details">Todos os dados desta carteira serão excluídos. Isso inclui seu histórico de pagamentos.</string>
+    <string name="reset_wallet_payments_history_button">Salvar histórico de pagamentos</string>
     <string name="reset_wallet_review_button">Analisar</string>
 
     <string name="reset_wallet_confirm_title">Confirmar redefinição</string>
     <string name="reset_wallet_confirm_header">A carteira será completamente excluída <b>neste dispositivo</b>.</string>
-    <string name="reset_wallet_confirm_details">Isso redefinirá o aplicativo. Iremos direcioná-lo para a tela de introdução, onde solicitaremos que você crie ou restaure uma carteira.</string>
-    <string name="reset_wallet_confirm_seed_balance">Não perca seus fundos:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Você é responsável por salvar sua frase de recuperação.</string>
+    <string name="reset_wallet_confirm_details">A semente desta carteira e seu histórico de pagamentos serão excluídos do disco. Você será solicitado a usar outra carteira ou criar uma nova.</string>
+    <string name="reset_wallet_confirm_details2">Outras carteiras que você já importou não serão excluídas.</string>
+    <string name="reset_wallet_confirm_seed_balance">Não perca seus fundos</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Entendo que, se perder a frase de recuperação após excluir a carteira, quaisquer fundos restantes serão perdidos permanentemente.</string>
     <string name="reset_wallet_confirm_button">Excluir carteira</string>
 
     <string name="reset_wallet_success">A carteira foi redefinida com sucesso</string>

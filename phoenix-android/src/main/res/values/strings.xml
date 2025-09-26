@@ -41,11 +41,13 @@
 
     <string name="autocreate_generating">Creating your wallet…</string>
     <string name="autocreate_error">Wallet creation failed</string>
-    <string name="autocreate_error_cannot_overwrite">A wallet already exists</string>
+    <string name="autocreate_error_already_exists">This seed has already been imported</string>
+    <string name="autocreate_error_cannot_load_existing">The wallet could not be written at this time. Try again later.</string>
 
     <string name="restore_title">Restore my wallet</string>
     <string name="restore_disclaimer_next">Next</string>
     <string name="restore_in_progress">Restoring your wallet…</string>
+    <string name="initwallet_electrum_option">Use a custom Electrum server</string>
 
     <!-- utils: placeholders -->
 
@@ -66,30 +68,37 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Binding service…</string>
-    <string name="startup_wait">Preparing wallet…</string>
-    <string name="startup_checking_seed">Unlocking…</string>
-    <string name="startup_unlocked">Access granted…</string>
-    <string name="startup_unlock_failure">Unlock failed</string>
-    <string name="startup_unlock_failure_keystore">Android keystore error</string>
-    <string name="startup_unlock_failure_fallback">Unlock with seed</string>
-
-    <string name="startup_fallback_instructions">Enter your 12-words recovery to unlock the wallet.\n\nWords must be entered in the correct order, and separated with a single space.</string>
-    <string name="startup_fallback_input_label">Enter word #%1$d</string>
-    <string name="startup_fallback_input_label_error">No more than 12 words!</string>
-    <string name="startup_fallback_incomplete">Enter the complete seed to proceed further.</string>
-    <string name="startup_fallback_invalid">This seed is not valid. Make sure the words are correct and in order.</string>
-    <string name="startup_fallback_unlock_button">Unlock wallet</string>
-    <string name="startup_fallback_checking">Checking seed…</string>
-    <string name="startup_fallback_error_default">An error occurred. Please try again.</string>
-    <string name="startup_fallback_error_incorrect_seed">This seed does not match your wallet data.</string>
-    <string name="startup_fallback_error_keystore_error">Failed to perform keystore operations.</string>
-    <string name="startup_fallback_success_match">Seed matches.\nWriting to disk…</string>
-    <string name="startup_fallback_success_starting">Starting Phoenix…</string>
-
     <string name="startup_init">Initialising…</string>
-    <string name="startup_starting">Starting…</string>
-    <string name="startup_error_generic">The application could not start.</string>
+    <string name="startup_preparing">Preparing wallet…</string>
+    <string name="startup_loading_seed">Decrypting…</string>
+    <string name="startup_starting">Starting wallet…</string>
+    <string name="startup_started">Opening wallet…</string>
+    <string name="startup_selector_title">Select a wallet</string>
+
+    <string name="startup_error_start_business">Could not start the wallet</string>
+    <string name="startup_error_generic">Unable to read wallet data.</string>
+    <string name="startup_error_try_again">Try again</string>
+    <string name="startup_error_serialisation">Unhandled file serialisation</string>
+    <string name="startup_error_decryption_general">Decryption failure:\n%1$s</string>
+    <string name="startup_error_decryption_keystore" translatable="false">Android keystore failure:\n%1$s</string>
+    <string name="startup_error_recovery_button">Manual recover</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Wallet recovery</string>
+    <string name="startup_recovery_instructions">This screen lets you manually recover a single wallet by entering its 12-words recovery phrase.\n\nWords must be entered in the correct order, and separated with a single space.</string>
+    <string name="startup_recovery_input_label">Enter word #%1$d</string>
+    <string name="startup_recovery_input_label_error">No more than 12 words!</string>
+    <string name="startup_recovery_invalid">This seed is not valid</string>
+
+    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_reset_button">Try again</string>
+    <string name="startup_recovery_checking">Checking seed…</string>
+
+    <string name="startup_recovery_error_default">An error occurred.</string>
+    <string name="startup_recovery_error_incorrect_seed">This seed does not match any existing wallet data.</string>
+    <string name="startup_recovery_error_keystore_error" translatable="false">Failed to perform keystore operations.</string>
+    <string name="startup_recovery_success_match">Recovering wallet…</string>
 
     <!-- Payment line -->
 
@@ -144,7 +153,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Balance:</string>
+    <string name="send_balance_prefix">Balance</string>
     <string name="send_error_amount_too_large">Amount is too large.</string>
     <string name="send_error_amount_negative">Amount cannot be negative.</string>
     <string name="send_error_amount_invalid">This is not a valid amount.</string>
@@ -213,6 +222,9 @@
     <string name="preparesend_parsing">Reading input…</string>
     <string name="preparesend_lnurl_fetching">Fetching data from service…</string>
     <string name="preparesend_bip353_resolving">Resolving payment request over DNS…</string>
+
+    <string name="preparesend_funds_final_wallet">You have on-chain funds on the final wallet, but none on Lightning.</string>
+    <string name="preparesend_funds_final_wallet_button">View final wallet</string>
 
     <!-- utils: misc strings -->
 
@@ -817,7 +829,7 @@
     <string name="payments_export_csv_no_payments">No successful payments yet</string>
     <string name="payments_export_csv_invalid_timestamps">Please pick a valid start/end date</string>
     <string name="payments_export_csv_in_progress">Exporting payments…</string>
-    <string name="payments_export_csv_copy_button">Copy data to clipboard Phoenix payments…</string>
+    <string name="payments_export_csv_copy_button">Copy data to clipboard…</string>
     <string name="payments_export_csv_share_subject">Phoenix - payments from %1$s to %2$s</string>
     <string name="payments_export_csv_share_title">Share Phoenix payments…</string>
     <string name="payments_export_csv_share_button">Share file</string>
@@ -863,6 +875,7 @@
     <string name="walletinfo_legacy_nodeid">Legacy node id</string>
 
     <string name="walletinfo_onchain_final">Final wallet</string>
+    <string name="walletinfo_onchain_final_spend_button">Spend</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
@@ -915,16 +928,18 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Reset wallet</string>
-    <string name="reset_wallet_instructions_header">Delete all wallet data from this device</string>
-    <string name="reset_wallet_instructions_details">This will reset the app, as if you had just installed it.</string>
+    <string name="reset_wallet_title">Delete wallet</string>
+    <string name="reset_wallet_instructions_header">This screens allows you delete this wallet from your device.</string>
+    <string name="reset_wallet_instructions_details">All data for this wallet will be deleted. This includes your payments history.</string>
+    <string name="reset_wallet_payments_history_button">Save payments history</string>
     <string name="reset_wallet_review_button">Review</string>
 
-    <string name="reset_wallet_confirm_title">Confirm reset</string>
+    <string name="reset_wallet_confirm_title">Confirm wallet deletion</string>
     <string name="reset_wallet_confirm_header">The wallet will be completely deleted from <b>this device</b>.</string>
-    <string name="reset_wallet_confirm_details">This will reset the app. Your payments history will be lost. You will be taken to the Intro screen, and prompted to create or restore a wallet.</string>
-    <string name="reset_wallet_confirm_seed_balance">Don\'t lose your funds:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">You are responsible for storing your recovery phrase.</string>
+    <string name="reset_wallet_confirm_details">This wallet\'s seed and its payments history will be deleted from the disk. You will be prompted to use another wallet, or create a new one.</string>
+    <string name="reset_wallet_confirm_details2">Other wallets that you have already imported will not be deleted.</string>
+    <string name="reset_wallet_confirm_seed_balance">Don\'t lose your funds</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">I understand that if I lose the recovery phrase after deleting the wallet, any remaining funds would be permanently lost.</string>
     <string name="reset_wallet_confirm_button">Delete wallet</string>
     <string name="reset_wallet_shutting_down">Shutting down…</string>
     <string name="reset_wallet_deleting_prefs">Deleting preferences…</string>
@@ -1004,5 +1019,19 @@
     <string name="unitdropdown_more">Other…</string>
     <string name="currencypicker_title">Select a currency</string>
     <string name="currencypicker_no_match">No match found…</string>
+
+    <!-- user wallet -->
+
+    <string name="wallet_name_default">Wallet</string>
+    <string name="wallet_add_new">Add new wallet</string>
+    <string name="wallet_lock">Lock</string>
+
+
+    <string name="wallet_edit_name_placeholder">Enter a name</string>
+    <string name="wallet_edit_default_label">Default Wallet</string>
+    <string name="wallet_edit_default_description">If a default wallet is selected, it will be automatically opened on app launch.</string>
+    <string name="wallet_edit_secret_label">Hidden Wallet (WIP)</string>
+    <string name="wallet_edit_secret_description">Wallet will not be visible in selector screens. To access the wallet, you must enter its lock PIN.</string>
+    <string name="wallet_edit_pick_avatar">Pick an avatar</string>
 
 </resources>

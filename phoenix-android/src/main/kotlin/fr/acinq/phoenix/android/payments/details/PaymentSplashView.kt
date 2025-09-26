@@ -39,10 +39,11 @@ import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.lightning.db.SpliceInIncomingPayment
 import fr.acinq.lightning.db.SpliceOutgoingPayment
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.payments.details.splash.SplashAutoLiquidityPurchase
 import fr.acinq.phoenix.android.payments.details.splash.SplashChannelClose
 import fr.acinq.phoenix.android.payments.details.splash.SplashIncomingBolt11
@@ -67,6 +68,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 
 @Composable
 fun PaymentDetailsSplashView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     data: WalletPaymentInfo,
     onDetailsClick: (UUID) -> Unit,
@@ -91,7 +93,7 @@ fun PaymentDetailsSplashView(
         @Suppress("DEPRECATION")
         when (payment) {
             is Bolt11IncomingPayment -> SplashIncomingBolt11(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is Bolt12IncomingPayment -> SplashIncomingBolt12(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
+            is Bolt12IncomingPayment -> SplashIncomingBolt12(business = business, payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceInIncomingPayment -> SplashIncomingSpliceIn(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is NewChannelIncomingPayment -> SplashIncomingNewChannel(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is LegacySwapInIncomingPayment -> SplashIncomingLegacySwapIn(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
@@ -101,8 +103,8 @@ fun PaymentDetailsSplashView(
             is ChannelCloseOutgoingPayment -> SplashChannelClose(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceCpfpOutgoingPayment -> SplashSpliceOutCpfp(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
             is SpliceOutgoingPayment -> SplashSpliceOut(payment = payment, metadata = data.metadata, onMetadataDescriptionUpdate = onMetadataDescriptionUpdate)
-            is ManualLiquidityPurchasePayment -> SplashManualLiquidityPurchase(payment)
-            is AutomaticLiquidityPurchasePayment -> SplashAutoLiquidityPurchase(payment)
+            is ManualLiquidityPurchasePayment -> SplashManualLiquidityPurchase(payment = payment)
+            is AutomaticLiquidityPurchasePayment -> SplashAutoLiquidityPurchase(business = business, payment = payment)
         }
 
         Spacer(modifier = Modifier.height(48.dp))

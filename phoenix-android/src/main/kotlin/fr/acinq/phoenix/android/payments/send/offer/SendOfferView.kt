@@ -44,17 +44,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
-import fr.acinq.phoenix.android.components.BackButtonWithBalance
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SplashLabelRow
-import fr.acinq.phoenix.android.components.SplashLayout
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
@@ -65,6 +66,8 @@ import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 
 @Composable
 fun SendToOfferView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     offer: OfferTypes.Offer,
     onBackClick: () -> Unit,
     onPaymentSent: () -> Unit,
@@ -97,7 +100,7 @@ fun SendToOfferView(
     var showMessageDialog by remember { mutableStateOf(false) }
 
     SplashLayout(
-        header = { BackButtonWithBalance(onBackClick = onBackClick, balance = balance) },
+        header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
             AmountHeroInput(
                 initialAmount = requestedAmount,
@@ -118,7 +121,7 @@ fun SendToOfferView(
         }
 
         SplashLabelRow(label = stringResource(id = R.string.send_destination_label)) {
-            ContactOrOfferView(offer = offer)
+            ContactOrOfferView(business = business, offer = offer)
         }
 
         SplashLabelRow(label = stringResource(id = R.string.send_offer_payer_note_label)) {
@@ -152,6 +155,7 @@ fun SendToOfferView(
         Spacer(modifier = Modifier.height(36.dp))
 
         SendOfferStateButton(
+            walletId = walletId,
             state = vm.state,
             offer = offer,
             amount = amount,
@@ -168,6 +172,7 @@ fun SendToOfferView(
 
 @Composable
 private fun SendOfferStateButton(
+    walletId: WalletId,
     state: OfferState,
     offer: OfferTypes.Offer,
     amount: MilliSatoshi?,
@@ -192,6 +197,7 @@ private fun SendOfferStateButton(
             }
 
             SmartSpendButton(
+                walletId = walletId,
                 enabled = amount != null && !isAmountInError,
                 text = if (state is OfferState.Complete.Failed) {
                     stringResource(id = R.string.send_pay_retry_button)

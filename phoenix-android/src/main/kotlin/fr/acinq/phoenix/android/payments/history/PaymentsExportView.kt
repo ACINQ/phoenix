@@ -24,7 +24,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,10 +32,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
+import fr.acinq.phoenix.android.components.buttons.SwitchView
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toBasicAbsoluteDateString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toBasicAbsoluteDateTimeString
 import fr.acinq.phoenix.android.utils.copyToClipboard
@@ -45,13 +53,15 @@ import fr.acinq.phoenix.android.utils.shareFile
 
 @Composable
 fun PaymentsExportView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm: PaymentsExportViewModel = viewModel(factory = PaymentsExportViewModel.Factory(dbManager = business.databaseManager, walletManager = business.walletManager))
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(R.string.payments_export_title))
         ExportAsCsvView(vm)
-        ExportDatabaseView(vm)
+        ExportDatabaseView(vm, walletId)
     }
 }
 
@@ -175,6 +185,7 @@ private fun ExportAsCsvView(
                         icon = R.drawable.ic_copy,
                         onClick = { copyToClipboard(context, data = state.content) },
                         modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
                     )
                 }
             }
@@ -184,11 +195,10 @@ private fun ExportAsCsvView(
 
 @Composable
 private fun ExportDatabaseView(
-    vm: PaymentsExportViewModel
+    vm: PaymentsExportViewModel,
+    walletId: WalletId,
 ) {
     val context = LocalContext.current
-    val nodeParams = business.nodeParamsManager.nodeParams.collectAsState()
-    val nodeId = nodeParams.value?.nodeId?.toString()?.take(8)
     val saveDatabaseLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.CreateDocument("application/vnd.sqlite3")) { uri ->
         uri?.let { vm.vacuumDatabase(context, it) }
     }
@@ -212,10 +222,9 @@ private fun ExportDatabaseView(
                 FilledButton(
                     text = stringResource(R.string.payments_export_database_button),
                     icon = R.drawable.ic_arrow_down_circle,
-                    onClick = { saveDatabaseLauncher.launch("phoenix-payments-$nodeId-${currentTimestampMillis().toBasicAbsoluteDateTimeString()}.sqlite") },
+                    onClick = { saveDatabaseLauncher.launch("phoenix-payments-${walletId.nodeIdHash.take(8)}-${currentTimestampMillis().toBasicAbsoluteDateTimeString()}.sqlite") },
                     modifier = Modifier.fillMaxWidth(),
                     padding = PaddingValues(12.dp),
-                    enabled = nodeId != null,
                     shape = RoundedCornerShape(10.dp),
                 )
             }

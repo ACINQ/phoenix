@@ -25,49 +25,54 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.prefs.ListPreferenceButton
 import fr.acinq.phoenix.android.components.prefs.PreferenceItem
 import fr.acinq.phoenix.android.components.settings.Setting
-import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.userPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.datastore.PreferredBitcoinUnits
-import fr.acinq.phoenix.android.utils.datastore.UserPrefsRepository
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.extensions.label
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
-fun DisplayPrefsView() {
-    val nc = navController
-    val userPrefs = userPrefs
+fun DisplayPrefsView(
+    business: PhoenixBusiness,
+    onBackClick: () -> Unit,
+) {
+    val userPrefs = LocalUserPrefs.current
     val scope = rememberCoroutineScope()
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
-        Card {
-            BitcoinUnitPreference(userPrefs = userPrefs, scope = scope)
-            FiatCurrencyPreference(userPrefs = userPrefs, scope = scope)
-            UserThemePreference(userPrefs = userPrefs, scope = scope)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                AppLocaleSetting()
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.prefs_display_title))
+        if (userPrefs != null) {
+            Card {
+                BitcoinUnitPreference(userPrefs = userPrefs, scope = scope)
+                FiatCurrencyPreference(business = business, userPrefs = userPrefs, scope = scope)
+                UserThemePreference(userPrefs = userPrefs, scope = scope)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    AppLocaleSetting()
+                }
             }
         }
     }
 }
 
 @Composable
-private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
+private fun BitcoinUnitPreference(userPrefs: UserPrefs, scope: CoroutineScope) {
     var prefsEnabled by remember { mutableStateOf(true) }
     val preferences = listOf(
         PreferenceItem(item = BitcoinUnit.Sat, title = "${BitcoinUnit.Sat.label()} (${BitcoinUnit.Sat.displayCode})", description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
@@ -95,7 +100,7 @@ private fun BitcoinUnitPreference(userPrefs: UserPrefsRepository, scope: Corouti
 }
 
 @Composable
-private fun FiatCurrencyPreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
+private fun FiatCurrencyPreference(business: PhoenixBusiness, userPrefs: UserPrefs, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
 
     val preferences = FiatCurrency.values.map {
@@ -126,7 +131,7 @@ private fun FiatCurrencyPreference(userPrefs: UserPrefsRepository, scope: Corout
 }
 
 @Composable
-private fun UserThemePreference(userPrefs: UserPrefsRepository, scope: CoroutineScope) {
+private fun UserThemePreference(userPrefs: UserPrefs, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
     val preferences = UserTheme.entries.map {
         PreferenceItem(it, title = it.label())

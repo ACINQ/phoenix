@@ -457,7 +457,7 @@ class WatchTower {
 			}
 			
 			if business != Biz.business {
-				business.stop(closeDatabases: true)
+				business.stop()
 			}
 		}
 		

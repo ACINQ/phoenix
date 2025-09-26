@@ -16,12 +16,7 @@
 
 package fr.acinq.phoenix.android.services
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
-import androidx.lifecycle.asFlow
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -31,27 +26,20 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.BusinessManager
+import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * This worker is scheduled to run roughly every day. It simply connects to the LSP, wait for 1 minute,
@@ -60,108 +48,79 @@ import kotlin.time.Duration.Companion.seconds
  */
 class DailyConnect(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
         log.info("starting $name")
-        var business: PhoenixBusiness? = null
-        var closeDatabases = true
 
-        // add a delay so this job does not start a node too quickly and collide with the UI startup logic
-        // (on some devices, background workers only run when the app is started by the user which causes a race to create
-        // a business node and can cause db locks)
-        // FIXME rework the node service/business logic to guarantee unicity
-        delay(20.seconds)
+        if (BusinessManager.businessFlow.first().isNotEmpty()) {
+            log.info("there already are active businesses, aborting $name")
+            return Result.success()
+        }
+
+        val userWallets = SeedManager.loadAndDecryptOrNull(applicationContext)
+        if (userWallets.isNullOrEmpty()) {
+            log.info("could not load any seed, aborting $name")
+            return Result.success()
+        }
 
         try {
-            val application = (applicationContext as PhoenixApplication)
-            val userPrefs = application.userPrefs
-
-            val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext) as? EncryptedSeed.V2.NoAuth ?: run {
-                log.error("aborting $name: unhandled seed type")
-                return Result.failure()
-            }
-
-            // connect to [NodeService] to monitor the state of the main app business
-            val service = MutableStateFlow<NodeService?>(null)
-            val serviceConnection = object : ServiceConnection {
-                override fun onServiceConnected(component: ComponentName, bind: IBinder) {
-                    service.value = (bind as NodeService.NodeBinder).getService()
+            val businessMap = userWallets.map { (walletId, wallet) ->
+                val res = BusinessManager.startNewBusiness(words = wallet.words, isHeadless = true)
+                if (res is StartBusinessResult.Failure) {
+                    log.info("failed to start business for wallet=$walletId")
+                    return Result.success()
                 }
 
-                override fun onServiceDisconnected(component: ComponentName) {
-                    service.value = null
+                val business = BusinessManager.businessFlow.value[walletId]
+                if (business == null) {
+                    log.info("failed to access business for wallet=$walletId")
+                    return Result.success()
                 }
-            }
 
-            Intent(applicationContext, NodeService::class.java).let { intent ->
-                applicationContext.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-            }
+                walletId to business
+            }.toMap()
 
-            // Start the monitoring process. If the main app starts, we interrupt this job to prevent concurrent access.
             withContext(Dispatchers.Default) {
                 val stopJobSignal = MutableStateFlow(false)
-                var jobWatchingChannels: Job? = null
 
-                val jobMain = launch {
-                    business = PhoenixBusiness(PlatformContext(applicationContext))
-                    service.filterNotNull().flatMapLatest { it.state.asFlow() }.collect { state ->
-                        when (state) {
-                            is NodeServiceState.Init, is NodeServiceState.Running, is NodeServiceState.Error, NodeServiceState.Disconnected -> {
-                                log.info("aborting $name: node service in state=${state.name}")
-                                closeDatabases = false
-                                stopJobSignal.value = true
-                            }
+                val watchers = businessMap.map { (walletId, running) ->
+                    val business = running.business
+                    launch {
+                        business.appConnectionsDaemon?.forceReconnect()
+                        business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
+                        log.debug("connections established for wallet={}", walletId)
 
-                            is NodeServiceState.Off -> {
-                                // note: we can't simply launch NodeService from the background, either as a background service (disallowed since android 8) or as a
-                                // foreground service (disallowed since android 14)
-                                log.info("node service in state=${state.name}, starting an isolated business")
-
-                                jobWatchingChannels = launch {
-                                    WorkerHelper.startIsolatedBusiness(business!!, encryptedSeed, userPrefs)
-
-                                    business?.connectionsManager?.connections?.first { it.global is Connection.ESTABLISHED }
-                                    log.debug("connections established")
-
-                                    business?.peerManager?.channelsFlow?.filterNotNull()?.collect { channels ->
-                                        when {
-                                            channels.isEmpty() -> {
-                                                log.info("completing $name: no channels found")
-                                                stopJobSignal.value = true
-                                            }
-                                            else -> {
-                                                log.info("${channels.size} channel(s) found, waiting 60s...")
-                                                delay(60_000)
-                                                log.debug("completing $name after 60s...")
-                                                stopJobSignal.value = true
-                                            }
-                                        }
-                                    }
-                                }.also {
-                                    it.invokeOnCompletion {
-                                        log.debug("terminated job-watching-channels (${it?.localizedMessage})")
-                                    }
+                        business.peerManager.channelsFlow.filterNotNull().collect { channels ->
+                            when {
+                                channels.isEmpty() -> {
+                                    log.info("no channels found for wallet=$walletId")
+                                    stopJobSignal.value = true
+                                }
+                                else -> {
+                                    log.info("${channels.size} channel(s) found for wallet=$walletId, waiting 60s...")
+                                    delay(60_000)
+                                    stopJobSignal.value = true
                                 }
                             }
                         }
+                    }.also {
+                        it.invokeOnCompletion { log.debug("completed watching-channels job for wallet={} ({})", walletId, it?.localizedMessage) }
                     }
                 }
-
                 stopJobSignal.first { it }
                 log.debug("stop-job signal detected")
-                jobWatchingChannels?.cancelAndJoin()
-                jobMain.cancelAndJoin()
+                watchers.forEach { it.cancelAndJoin() }
             }
+
             return Result.success()
+
         } catch (e: Exception) {
             log.error("error in $name: ", e)
             return Result.failure()
         } finally {
-            business?.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business?.stop(closeDatabases = closeDatabases)
-            log.info("terminated $name")
+            BusinessManager.stopAllHeadlessBusinesses()
+            log.info("finished $name")
         }
     }
 

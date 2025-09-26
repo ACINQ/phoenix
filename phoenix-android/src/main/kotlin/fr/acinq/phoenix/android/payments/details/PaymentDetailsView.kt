@@ -31,11 +31,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.PaymentsManager
@@ -94,6 +94,7 @@ class PaymentDetailsViewModel(
 
 @Composable
 fun PaymentDetailsView(
+    business: PhoenixBusiness,
     paymentId: UUID,
     onBackClick: () -> Unit,
     fromEvent: Boolean,
@@ -121,6 +122,7 @@ fun PaymentDetailsView(
         }
         is PaymentDetailsState.Success.Splash -> DefaultScreenLayout(isScrollable = false) {
             PaymentDetailsSplashView(
+                business = business,
                 onBackClick = onBackClick,
                 data = state.payment,
                 onDetailsClick = { vm.state = PaymentDetailsState.Success.TechnicalDetails(state.payment) },

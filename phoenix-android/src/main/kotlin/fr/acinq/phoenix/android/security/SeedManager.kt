@@ -17,44 +17,128 @@
 package fr.acinq.phoenix.android.security
 
 import android.content.Context
+import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.lightning.crypto.LocalKeyManager
+import fr.acinq.lightning.utils.toByteVector
+import fr.acinq.phoenix.android.UserWallet
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.managers.NodeParamsManager
+import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.security.KeyStoreException
 
-sealed class SeedFileState {
-    fun isReady() = this is Present
-
-    object Unknown : SeedFileState()
-    object Absent : SeedFileState()
-    data class Present(internal val encryptedSeed: EncryptedSeed.V2) : SeedFileState()
-    sealed class Error : SeedFileState() {
-        data class Unreadable(val message: String?) : Error()
-        object UnhandledSeedType : Error()
+sealed class DecryptSeedResult {
+    data class Success(val userWalletsMap: Map<WalletId, UserWallet>): DecryptSeedResult()
+    sealed class Failure: DecryptSeedResult() {
+        data object SeedFileNotFound: Failure()
+        data object SerializationError: Failure()
+        data class KeyStoreFailure(val cause: KeyStoreException): Failure()
+        data class DecryptionError(val cause: Exception): Failure()
+        data object SeedFileUnreadable: Failure()
+        data object SeedInvalid: Failure()
     }
 }
 
 object SeedManager {
-    private val BASE_DATADIR = "node-data"
+    private const val BASE_DATADIR = "node-data"
     private const val SEED_FILE = "seed.dat"
-    private val log = LoggerFactory.getLogger(this::class.java) // newLogger(LoggerFactory.default)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     fun getDatadir(context: Context): File {
         return File(context.filesDir, BASE_DATADIR)
     }
 
-    /** Extract the encrypted seed from app private dir. */
-    fun loadSeedFromDisk(context: Context): EncryptedSeed? = loadSeedFromDir(getDatadir(context), SEED_FILE)
-
-    fun getSeedState(context: Context): SeedFileState = try {
-        when (val seed = loadSeedFromDisk(context)) {
-            null -> SeedFileState.Absent
-            is EncryptedSeed.V2.NoAuth -> SeedFileState.Present(seed)
+    @Suppress("DEPRECATION")
+    fun loadAndDecrypt(context: Context): DecryptSeedResult {
+        val encryptedSeed = try {
+            loadEncryptedSeedFromDisk(context)
+        } catch (e: Exception) {
+            log.error("could read seed file: ", e)
+            return DecryptSeedResult.Failure.SeedFileUnreadable
         }
-    } catch (e: Exception) {
-        log.error("failed to read seed: ", e)
-        SeedFileState.Error.Unreadable(e.localizedMessage)
+
+        return when (encryptedSeed) {
+            is EncryptedSeed.V2.SingleSeed -> {
+                log.info("decrypting [V2.SingleSeed]...")
+                val payload = try {
+                    encryptedSeed.decrypt()
+                } catch (e: Exception) {
+                    log.error("failed to decrypt [V2.SingleSeed]: ", e)
+                    return when (e) {
+                        is KeyStoreException -> DecryptSeedResult.Failure.KeyStoreFailure(e)
+                        else -> DecryptSeedResult.Failure.DecryptionError(e)
+                    }
+                }
+                val words = EncryptedSeed.V2.SingleSeed.toMnemonicsSafe(payload) ?: return DecryptSeedResult.Failure.SeedInvalid
+
+                val seed = MnemonicCode.toSeed(words, "").toByteVector()
+                val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
+                val nodeId = keyManager.nodeKeys.nodeKey.publicKey
+                val walletId = WalletId(nodeId)
+
+                DataStoreManager.migratePrefsForWallet(context, walletId)
+                PinManager.migrateSingleWalletPinCode(context, walletId)
+
+                DecryptSeedResult.Success(userWalletsMap = mapOf(walletId to UserWallet(walletId, nodeId.toHex(), words)))
+            }
+
+            is EncryptedSeed.V2.MultipleSeed -> {
+                log.info("decrypting [V2.MultipleSeed]")
+                val seedMap = try {
+                    encryptedSeed.decryptAndGetSeedMap()
+                } catch (e: Exception) {
+                    return when (e) {
+                        is SerializationException, is IllegalArgumentException -> {
+                            log.error("failed to decrypt [V2.MultipleSeed]: ${e.javaClass.simpleName}")
+                            DecryptSeedResult.Failure.SerializationError
+                        }
+                        is KeyStoreException -> {
+                            log.error("failed to decrypt [V2.MultipleSeed]: ", e)
+                            DecryptSeedResult.Failure.KeyStoreFailure(e)
+                        }
+                        else -> {
+                            log.error("failed to decrypt [V2.MultipleSeed]: ", e)
+                            DecryptSeedResult.Failure.DecryptionError(e)
+                        }
+                    }
+                }
+
+                return when {
+                    seedMap.isEmpty() -> DecryptSeedResult.Failure.SeedFileNotFound
+                    else -> {
+                        seedMap.map { (walletId, words) ->
+                            val seed = MnemonicCode.toSeed(words, "").toByteVector()
+                            val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
+                            val nodeId = keyManager.nodeKeys.nodeKey.publicKey
+                            walletId to UserWallet(walletId, nodeId.toHex(), words)
+                        }.toMap().let {
+                            DecryptSeedResult.Success(it)
+                        }
+                    }
+                }
+            }
+
+            null -> DecryptSeedResult.Failure.SeedFileNotFound
+        }
     }
 
-    /** Extract an encrypted seed contained in a given file/folder. */
+    /**
+     * Wrapper method for [loadAndDecrypt].
+     * Returns an empty map if the seed file does not exist yet.
+     * Returns null if there was a problem when loading or decrypting the seed file.
+     */
+    suspend fun loadAndDecryptOrNull(context: Context): Map<WalletId, UserWallet>? = when (val res = loadAndDecrypt(context)) {
+        is DecryptSeedResult.Success -> res.userWalletsMap
+        is DecryptSeedResult.Failure.SeedFileNotFound -> emptyMap()
+        is DecryptSeedResult.Failure -> null
+    }
+
+    /** Gets the encrypted seed from app private dir. */
+    fun loadEncryptedSeedFromDisk(context: Context): EncryptedSeed? = loadSeedFromDir(getDatadir(context), SEED_FILE)
+
+    /** Extracts an encrypted seed contained in a given file/folder. Returns null if the file does not exist. */
     private fun loadSeedFromDir(dir: File, seedFileName: String): EncryptedSeed? {
         val seedFile = File(dir, seedFileName)
         return if (!seedFile.exists()) {
@@ -74,9 +158,9 @@ object SeedManager {
         }
     }
 
-    fun writeSeedToDisk(context: Context, seed: EncryptedSeed.V2, overwrite: Boolean = false) = writeSeedToDir(getDatadir(context), seed, overwrite)
+    fun writeSeedToDisk(context: Context, seed: EncryptedSeed.V2.MultipleSeed, overwrite: Boolean = false) = writeSeedToDir(getDatadir(context), seed, overwrite)
 
-    private fun writeSeedToDir(dir: File, seed: EncryptedSeed.V2, overwrite: Boolean) {
+    private fun writeSeedToDir(dir: File, seed: EncryptedSeed.V2.MultipleSeed, overwrite: Boolean) {
         // 1 - create dir
         if (!dir.exists()) {
             dir.mkdirs()
@@ -87,7 +171,7 @@ object SeedManager {
         temp.writeBytes(seed.serialize())
 
         // 3 - decrypt temp file and check validity; if correct, move temp file to final file
-        val checkSeed = loadSeedFromDir(dir, temp.name) as EncryptedSeed.V2
+        val checkSeed = loadSeedFromDir(dir, temp.name) as EncryptedSeed.V2.MultipleSeed
         if (!checkSeed.ciphertext.contentEquals(seed.ciphertext)) {
             log.warn("seed check do not match!")
 //            throw WriteErrorCheckDontMatch

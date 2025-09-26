@@ -5,10 +5,12 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
+import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 
 class FCMService : FirebaseMessagingService() {
@@ -31,39 +33,50 @@ class FCMService : FirebaseMessagingService() {
         )
 
         val reason = remoteMessage.data["reason"]
-        val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)
+        val nodeIdHash = remoteMessage.data["node_id_hash"]
+        val encryptedSeed = SeedManager.loadEncryptedSeedFromDisk(applicationContext)
 
         when {
-            encryptedSeed !is EncryptedSeed.V2.NoAuth -> {
-                log.warn("ignored fcm message with unhandled seed=${encryptedSeed?.name()}")
+            encryptedSeed == null -> {
+                log.info("no seed yet, ignoring fcm message")
+            }
+            nodeIdHash.isNullOrEmpty() -> {
+                log.warn("no node_id_hash provided, ignoring fcm message")
             }
             remoteMessage.priority != RemoteMessage.PRIORITY_HIGH -> {
                 // cannot start foreground service from low/normal priority message
                 log.warn("ignoring FCM message with low/normal priority, show notification with reason=$reason")
-                when (reason) {
-                    "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext)
-                    "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext)
-                    else -> {}
+                serviceScope.launch {
+                    val walletId = WalletId(nodeIdHash)
+                    val walletMetadata = (application as PhoenixApplication).globalPrefs.getAvailableWalletsMeta.first().getByWalletIdOrDefault(walletId)
+                    when (reason) {
+                        "IncomingPayment" -> SystemNotificationHelper.notifyPaymentMissedAppUnavailable(applicationContext, walletMetadata)
+                        "PendingSettlement" -> SystemNotificationHelper.notifyPendingSettlement(applicationContext, walletMetadata)
+                        else -> {}
+                    }
                 }
             }
             else -> {
                 log.debug("starting phoenix foreground service with reason=$reason")
-                startPhoenixForegroundService(reason)
+                startPhoenixForegroundService(reason, nodeIdHash)
             }
         }
     }
 
-    private fun startPhoenixForegroundService(reason: String?) {
-        ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, NodeService::class.java)
-            .apply { reason?.let { putExtra(NodeService.EXTRA_REASON, it) } })
+    private fun startPhoenixForegroundService(reason: String?, nodeIdHash: String) {
+        ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, PaymentsForegroundService::class.java)
+            .apply {
+                reason?.let { putExtra(PaymentsForegroundService.EXTRA_REASON, it) }
+                putExtra(PaymentsForegroundService.EXTRA_NODE_ID_HASH, nodeIdHash)
+            })
     }
 
     override fun onNewToken(token: String) {
         serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.warn("failed to save fcm token after onNewToken event: {}", e.localizedMessage)
         }) {
-            val internalData = (applicationContext as PhoenixApplication).internalDataRepository
-            internalData.saveFcmToken(token)
+            val globalPrefs = (applicationContext as PhoenixApplication).globalPrefs
+            globalPrefs.saveFcmToken(token)
         }
     }
 }

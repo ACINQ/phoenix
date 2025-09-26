@@ -70,31 +70,36 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.lightning.blockchain.electrum.balance
+import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.navigation.Screen
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
 import fr.acinq.phoenix.android.components.contact.ContactPhotoView
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.components.nfc.NfcReaderMonitor
-import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.navigation.popBackStackOrHome
 import fr.acinq.phoenix.android.payments.send.bolt11.SendToBolt11View
 import fr.acinq.phoenix.android.payments.send.lnurl.LnurlAuthView
 import fr.acinq.phoenix.android.payments.send.lnurl.LnurlPayView
 import fr.acinq.phoenix.android.payments.send.lnurl.LnurlWithdrawView
 import fr.acinq.phoenix.android.payments.send.offer.SendToOfferView
 import fr.acinq.phoenix.android.payments.send.spliceout.SendSpliceOutView
-import fr.acinq.phoenix.android.popToHome
+import fr.acinq.phoenix.android.navigation.popToHome
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.extensions.toLocalisedMessage
 import fr.acinq.phoenix.android.utils.gray300
@@ -107,16 +112,13 @@ import fr.acinq.phoenix.data.ContactPaymentCode
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.managers.SendManager
 
-/**
- * @param fromDeepLink Default false. If true, the back button always pops to Home.
- * @param forceNavOnBack Default false. If true, the back button always pops the backstack. Otherwise, be smart and maybe reset the parser instead.
- */
 @Composable
 fun SendView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     initialInput: String?,
     immediatelyOpenScanner: Boolean,
-    fromDeepLink: Boolean,
-    forceNavOnBack: Boolean,
+    fromRoute: String?
 ) {
     val navController = navController
     val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(sendManager = business.sendManager))
@@ -125,9 +127,11 @@ fun SendView(
 
     val onBackClick: () -> Unit = {
         when {
-            fromDeepLink -> navController.popToHome()
-            forceNavOnBack -> navController.popBackStack()
-            vm.parsePaymentState is ParsePaymentState.Ready -> navController.popBackStack()
+            fromRoute == "back" || fromRoute == Screen.BusinessNavGraph.Home.route -> navController.popBackStackOrHome()
+            fromRoute != null -> navController.navigate(fromRoute) {
+                popUpTo(fromRoute) { inclusive = true }
+            }
+            vm.parsePaymentState is ParsePaymentState.Ready -> navController.popBackStackOrHome()
             else -> vm.resetParsing()
         }
     }
@@ -144,22 +148,22 @@ fun SendView(
             LocalViewModelStoreOwner.current?.viewModelStore?.clear()
             when (val data = parseState.data) {
                 is SendManager.ParseResult.Bolt11Invoice -> {
-                    SendToBolt11View(invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    SendToBolt11View(walletId = walletId, business = business, invoice = data.invoice, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Bolt12Offer -> {
-                    SendToOfferView(offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    SendToOfferView(walletId = walletId, business = business, offer = data.offer, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Uri -> {
-                    SendSpliceOutView(requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
+                    SendSpliceOutView(walletId = walletId, business = business, requestedAmount = data.uri.amount, address = data.uri.address, onBackClick = onBackClick, onSpliceOutSuccess = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Pay -> {
-                    LnurlPayView(pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
+                    LnurlPayView(walletId = walletId, business = business, pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
-                    LnurlWithdrawView(withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
+                    LnurlWithdrawView(business = business, withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Auth -> {
-                    LnurlAuthView(auth = data.auth, onBackClick = onBackClick, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.PaymentSettings.route}?showAuthSchemeDialog=true") },
+                    LnurlAuthView(business = business, auth = data.auth, onBackClick = onBackClick, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.BusinessNavGraph.PaymentSettings.route}?showAuthSchemeDialog=true") },
                         onAuthDone = { navController.popToHome() },)
                 }
             }
@@ -167,6 +171,7 @@ fun SendView(
         is ParsePaymentState.Ready, is ParsePaymentState.Processing, is ParsePaymentState.Error, is ParsePaymentState.ChoosePaymentMode -> {
             PrepareSendView(
                 onBackClick = onBackClick,
+                business = business,
                 vm = vm,
                 onShowScanner = {
                     vm.resetParsing()
@@ -216,7 +221,19 @@ fun SendView(
             }
 
             if (showScanner) {
-                ScannerBox(state = vm.parsePaymentState, onDismiss = { vm.resetParsing() ; showScanner = false }, onReset = vm::resetParsing, onSubmit = vm::parsePaymentData)
+                ScannerBox(
+                    state = vm.parsePaymentState,
+                    onDismiss = {
+                        if (immediatelyOpenScanner && fromRoute != null) {
+                            onBackClick()
+                        } else {
+                            vm.resetParsing()
+                            showScanner = false
+                        }
+                    },
+                    onReset = vm::resetParsing,
+                    onSubmit = vm::parsePaymentData
+                )
             }
         }
     }
@@ -224,6 +241,7 @@ fun SendView(
 
 @Composable
 private fun PrepareSendView(
+    business: PhoenixBusiness,
     vm: PrepareSendViewModel,
     onBackClick: () -> Unit,
     onShowScanner: () -> Unit,
@@ -235,6 +253,18 @@ private fun PrepareSendView(
 
     DefaultScreenLayout(isScrollable = false, navBarColor = MaterialTheme.colors.surface) {
         DefaultScreenHeader(title = stringResource(id = R.string.preparesend_title), onBackClick = onBackClick)
+
+        val channels by business.peerManager.channelsFlow.collectAsState()
+        val finalWallet by business.peerManager.finalWallet.collectAsState()
+        val finalWalletBalance = finalWallet?.deeplyConfirmed?.balance
+        var showFinalWalletDialog by remember { mutableStateOf(false) }
+
+        LaunchedEffect(finalWalletBalance, channels) {
+            showFinalWalletDialog = (channels?.isEmpty() == true || channels?.all { it.value.isTerminated } == true) && finalWalletBalance != null && finalWalletBalance > 0.sat
+        }
+        if (showFinalWalletDialog) {
+            FinalWalletDialog(onDismiss = { showFinalWalletDialog = false })
+        }
 
         // show error message when reading an image from disk fails
         when (vm.readImageState) {
@@ -517,5 +547,23 @@ private fun ChoosePaymentModeDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FinalWalletDialog(onDismiss: () -> Unit) {
+    Dialog(onDismiss = onDismiss, buttons = null, internalPadding = PaddingValues(20.dp)) {
+        val navController = navController
+        TextWithIcon(text = stringResource(R.string.preparesend_funds_final_wallet), icon = R.drawable.ic_info, space = 12.dp)
+        Spacer(Modifier.height(24.dp))
+        MutedFilledButton(
+            text = stringResource(R.string.preparesend_funds_final_wallet_button),
+            icon = R.drawable.ic_arrow_next,
+            onClick = { navController.navigate(Screen.BusinessNavGraph.WalletInfo.FinalWallet.route) },
+            padding = PaddingValues(12.dp),
+            space = 8.dp,
+            iconTint = MaterialTheme.colors.primary,
+            modifier = Modifier.align(Alignment.End)
+        )
     }
 }

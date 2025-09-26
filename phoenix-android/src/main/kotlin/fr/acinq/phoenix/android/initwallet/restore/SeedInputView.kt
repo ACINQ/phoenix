@@ -45,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -57,34 +56,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Clickable
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
+import fr.acinq.phoenix.android.initwallet.InitViewModel
 import fr.acinq.phoenix.android.utils.negativeColor
 
 @Composable
 fun SeedInputView(
     state: RestoreWalletState.SeedInput,
-    vm: RestoreWalletViewModel,
-    onRestoreDone: () -> Unit,
+    restoreViewModel: RestoreWalletViewModel,
+    initViewModel: InitViewModel,
+    onRestoreDone: (WalletId) -> Unit,
 ) {
-    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var filteredWords by remember { mutableStateOf(emptyList<String>()) }
-    val enteredWords = vm.mnemonics.filterNot { it.isNullOrBlank() }
+    val enteredWords = restoreViewModel.mnemonics.filterNot { it.isNullOrBlank() }
 
     LaunchedEffect(enteredWords) {
         if (enteredWords.size != 12) {
-            vm.state = RestoreWalletState.SeedInput.Pending
+            restoreViewModel.state = RestoreWalletState.SeedInput.Pending
         } else {
             try {
-                MnemonicCode.validate(vm.mnemonics.joinToString(" "))
-                vm.state = RestoreWalletState.SeedInput.Valid
-            } catch (e: Exception) {
-                vm.state = RestoreWalletState.SeedInput.Invalid
+                MnemonicCode.validate(restoreViewModel.mnemonics.joinToString(" "))
+                restoreViewModel.state = RestoreWalletState.SeedInput.Valid
+            } catch (_: Exception) {
+                restoreViewModel.state = RestoreWalletState.SeedInput.Invalid
             }
         }
     }
@@ -105,8 +106,8 @@ fun SeedInputView(
                     WordInputView(
                         wordIndex = enteredWords.size + 1,
                         filteredWords = filteredWords,
-                        onInputChange = { filteredWords = vm.filterWordsMatching(it) },
-                        onWordSelected = { vm.appendWordToMnemonic(it) },
+                        onInputChange = { filteredWords = restoreViewModel.filterWordsMatching(it) },
+                        onWordSelected = { restoreViewModel.appendWordToMnemonic(it) },
                     )
                 }
                 RestoreWalletState.SeedInput.Invalid -> {
@@ -132,8 +133,8 @@ fun SeedInputView(
                 .align(Alignment.CenterHorizontally)
                 .padding(horizontal = 16.dp)
                 .widthIn(max = 350.dp),
-            words = vm.mnemonics.toList(),
-            onRemoveWordFrom = { vm.removeWordsFromMnemonic(it) }
+            words = restoreViewModel.mnemonics.toList(),
+            onRemoveWordFrom = { restoreViewModel.removeWordsFromMnemonic(it) }
         )
     }
 
@@ -141,14 +142,16 @@ fun SeedInputView(
 
     if (state is RestoreWalletState.SeedInput.Valid) {
         RestorePaymentsDbButton(
-            restorePaymentDbState = vm.restorePaymentsDbState,
-            onImportDbClick = { vm.loadPaymentsDb(context, it) },
+            restorePaymentDbState = restoreViewModel.restorePaymentsDbState,
+            onImportDbClick = { restoreViewModel.loadPaymentsDb(it) },
         )
         Spacer(modifier = Modifier.height(16.dp))
         Clickable(
             onClick = {
                 focusManager.clearFocus()
-                vm.checkSeedAndWrite(context, onRestoreDone)
+                restoreViewModel.checkSeedAndWrite(writeSeed = { words ->
+                    initViewModel.writeSeed(words, isRestoringWallet = true, onSeedWritten = onRestoreDone)
+                })
             },
             modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),

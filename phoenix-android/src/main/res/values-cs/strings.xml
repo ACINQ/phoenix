@@ -41,7 +41,6 @@
 
     <string name="autocreate_generating">Vytváření peněženky…</string>
     <string name="autocreate_error">Vytváření peněženky selhalo</string>
-    <string name="autocreate_error_cannot_overwrite">Peněženka již existuje</string>
 
     <string name="restore_title">Obnovit moji peněženku</string>
     <string name="restore_disclaimer_next">Další</string>
@@ -66,30 +65,34 @@
 
     <!-- Startup -->
 
-    <string name="startup_binding_service">Připojování služby…</string>
-    <string name="startup_wait">Připravování peněženky…</string>
-    <string name="startup_checking_seed">Odemykání…</string>
-    <string name="startup_unlocked">Přístup udělen…</string>
-    <string name="startup_unlock_failure">Odemykání selhalo</string>
-    <string name="startup_unlock_failure_keystore">Chyba Android keystore</string>
-    <string name="startup_unlock_failure_fallback">Odemčít seedem</string>
-
-    <string name="startup_fallback_instructions">Pro odemčení peněženky zadejte dvanáctislovní zálohu.\n\nSlova musí být zadána ve správném pořadí a oddělována jednou mezerou.</string>
-    <string name="startup_fallback_input_label">Zadejte slovo #%1$d</string>
-    <string name="startup_fallback_input_label_error">Pouze 12 slov!</string>
-    <string name="startup_fallback_incomplete">Pro pokračování zadejte celý seed.</string>
-    <string name="startup_fallback_invalid">Tento seed je neplatný. Ujistěte se, že slova píšete správně a jsou ve správném pořadí.</string>
-    <string name="startup_fallback_unlock_button">Odemčít peněženku</string>
-    <string name="startup_fallback_checking">Ověřování seedu…</string>
-    <string name="startup_fallback_error_default">Vyskytla se chyba. Zkuste to prosím znovu.</string>
-    <string name="startup_fallback_error_incorrect_seed">Tento seed se neshoduje s daty vaší peněženky.</string>
-    <string name="startup_fallback_error_keystore_error">Nepodařilo se provést keystore operaci.</string>
-    <string name="startup_fallback_success_match">Seed sedí.\nZapisuji na disk…</string>
-    <string name="startup_fallback_success_starting">Zapínání Phoenixu…</string>
-
     <string name="startup_init">Inicializace…</string>
-    <string name="startup_starting">Spouštění…</string>
-    <string name="startup_error_generic">Aplikaci nebylo možné spustit.</string>
+    <string name="startup_preparing">Příprava peněženky…</string>
+    <string name="startup_loading_seed">Popsáno…</string>
+    <string name="startup_starting">Spouštění peněženky…</string>
+    <string name="startup_started">Otevírání peněženky…</string>
+    <string name="startup_selector_title">Vybrat peněženku</string>
+
+    <string name="startup_error_start_business">Nelze spustit peněženku</string>
+    <string name="startup_error_generic">Nelze číst data peněženky.</string>
+    <string name="startup_error_try_again">Zkuste to znovu</string>
+    <string name="startup_error_decryption_general">Chyba dešifrování:\n%1$s</string>
+    <string name="startup_error_recovery_button">Zadejte obnovovací frázi</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Obnova peněženky</string>
+    <string name="startup_recovery_instructions">Tato obrazovka vám umožňuje ručně obnovit jednu peněženku zadáním její 12slovné obnovovací fráze.\n\nSlova musí být zadána ve správném pořadí a oddělena jednou mezerou.</string>
+    <string name="startup_recovery_input_label">Zadejte slovo #%1$d</string>
+    <string name="startup_recovery_input_label_error">Ne více než 12 slov!</string>
+    <string name="startup_recovery_invalid">Toto seed není platné</string>
+
+    <string name="startup_recovery_import_button">Importovat seed</string>
+    <string name="startup_recovery_reset_button">Zkuste to znovu</string>
+    <string name="startup_recovery_checking">Kontrola seed…</string>
+
+    <string name="startup_recovery_error_default">Došlo k chybě.</string>
+    <string name="startup_recovery_error_incorrect_seed">Toto seed se neshoduje s žádnými existujícími daty peněženky.</string>
+    <string name="startup_recovery_success_match">Obnovení peněženky…</string>
 
     <!-- Payment line -->
 
@@ -144,7 +147,7 @@
 
     <!-- send -->
 
-    <string name="send_balance_prefix">Zůstatek:</string>
+    <string name="send_balance_prefix">Zůstatek</string>
     <string name="send_error_amount_too_large">Částka je příliš vysoká.</string>
     <string name="send_error_amount_negative">Částka nemůže být záporná.</string>
     <string name="send_error_amount_invalid">Tato částka není platná.</string>
@@ -817,7 +820,7 @@
     <string name="payments_export_csv_no_payments">Zatím žádné úspěšné platby</string>
     <string name="payments_export_csv_invalid_timestamps">Vyberte prosím platné od/do datum</string>
     <string name="payments_export_csv_in_progress">Exportování platby #%1$d</string>
-    <string name="payments_export_csv_copy_button">Zkopírovat data Phoenix plateb do schránky…</string>
+    <string name="payments_export_csv_copy_button">Zkopírovat data do schránky…</string>
     <string name="payments_export_csv_share_subject">Phoenix - platby od %1$s do %2$s</string>
     <string name="payments_export_csv_share_title">Sdílet Phoenix platby…</string>
     <string name="payments_export_csv_share_button">Sdílet soubor</string>
@@ -863,6 +866,7 @@
     <string name="walletinfo_legacy_nodeid">ID legacy uzlu</string>
 
     <string name="walletinfo_onchain_final">Konečná peněženka</string>
+    <string name="walletinfo_onchain_final_spend_button">Utratit</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
@@ -915,17 +919,19 @@
 
     <!-- reset wallet -->
 
-    <string name="reset_wallet_title">Resetovat peněženku</string>
-    <string name="reset_wallet_instructions_header">Smazat veškerá data peněženky z tohoto zařízení</string>
-    <string name="reset_wallet_instructions_details">Toto resetuje aplikaci tak, jako byste ji právě nainstalovali.</string>
+    <string name="reset_wallet_title">Odstranění peněženky</string>
+    <string name="reset_wallet_instructions_header">Na této obrazovce můžete tuto peněženku ze svého zařízení odstranit.</string>
+    <string name="reset_wallet_instructions_details">Všechna data této peněženky budou odstraněna. To zahrnuje i historii vašich plateb.</string>
+    <string name="reset_wallet_payments_history_button">Uložit historii plateb</string>
     <string name="reset_wallet_review_button">Pokračovat</string>
 
     <string name="reset_wallet_confirm_title">Potvrdit reset</string>
     <string name="reset_wallet_confirm_header">Peněženka bude kompletně smazána z <b>tohoto zařízení</b>.</string>
-    <string name="reset_wallet_confirm_details">Toto resetuje aplikaci. Zobrazí se úvodní obrazovka s výzvou k vytvoření nebo obnovení peněženky.</string>
-    <string name="reset_wallet_confirm_seed_balance">Neztraťte své prostředky:\n%1$s (≈ %2$s).</string>
-    <string name="reset_wallet_confirm_seed_responsibility">Za uložení obnovovací fráze jste zodpovědní vy.</string>
-    <string name="reset_wallet_confirm_button">Smazat peněženku</string>
+    <string name="reset_wallet_confirm_details">Seed této peněženky a její platební historie budou smazány z disku. Budete vyzváni k použití jiné peněženky nebo k vytvoření nové. </string>
+    <string name="reset_wallet_confirm_details2">Ostatní peněženky, které jste již importovali, nebudou smazány. </string>
+    <string name="reset_wallet_confirm_seed_balance">Neztraťte své prostředky</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Beru na vědomí, že pokud po smazání peněženky ztratím obnovovací frázi, všechny zbývající prostředky budou trvale ztraceny.</string>
+    <string name="reset_wallet_confirm_button">Odstranění peněženky</string>
     <string name="reset_wallet_shutting_down">Vypínání…</string>
     <string name="reset_wallet_deleting_prefs">Mazání předvoleb…</string>
     <string name="reset_wallet_deleting_seed">Mazání seedu…</string>

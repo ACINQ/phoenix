@@ -48,21 +48,22 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.inputs.TextInput
-import fr.acinq.phoenix.android.components.InlineTransactionLink
+import fr.acinq.phoenix.android.components.buttons.InlineTransactionLink
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
@@ -70,15 +71,15 @@ import fr.acinq.phoenix.android.primaryFiatRate
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
 
 @Composable
 fun SendSwapInRefundView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val peerManager = business.peerManager
-    val swapInWallet by peerManager.swapInWallet.collectAsState()
+    val swapInWallet by business.peerManager.swapInWallet.collectAsState()
     val availableForRefund = swapInWallet?.readyForRefund?.balance
 
     DefaultScreenLayout(isScrollable = false) {
@@ -90,7 +91,7 @@ fun SendSwapInRefundView(
             }
 
             else -> {
-                AvailableForRefundView(peerManager = peerManager, availableForRefund = availableForRefund)
+                AvailableForRefundView(walletId = walletId, business = business, availableForRefund = availableForRefund)
             }
         }
     }
@@ -98,12 +99,13 @@ fun SendSwapInRefundView(
 
 @Composable
 private fun AvailableForRefundView(
-    peerManager: PeerManager,
+    walletId: WalletId,
+    business: PhoenixBusiness,
     availableForRefund: Satoshi,
 ) {
     val electrumClient = business.electrumClient
     val walletManager = business.walletManager
-    val vm = viewModel<SwapInRefundViewModel>(factory = SwapInRefundViewModel.Factory(peerManager, walletManager, electrumClient))
+    val vm = viewModel<SwapInRefundViewModel>(factory = SwapInRefundViewModel.Factory(business.peerManager, walletManager, electrumClient))
     val state = vm.state
     val keyboardManager = LocalSoftwareKeyboardController.current
 
@@ -112,7 +114,7 @@ private fun AvailableForRefundView(
     var showScannerView by remember { mutableStateOf(false) }
 
     val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
-    val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()
+    val recommendedFeerate by business.peerManager.recommendedFeerateFlow.collectAsState()
     var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
 
     if (showScannerView) {
@@ -242,10 +244,12 @@ private fun AvailableForRefundView(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         SmartSpendButton(
+                            walletId = walletId,
                             text = stringResource(id = R.string.swapinrefund_send_button),
                             onSpend = { vm.executeRefund(currentState.transaction) },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = true,
+                            ignoreChannelsState = true,
                         )
                     }
 

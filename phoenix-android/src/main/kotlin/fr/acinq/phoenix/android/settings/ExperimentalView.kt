@@ -35,19 +35,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.datastore.InternalDataRepository
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.delay
@@ -65,15 +67,15 @@ sealed class ClaimAddressState {
     data class Failure(val e: Throwable) : ClaimAddressState()
 }
 
-class ExperimentalViewModel(val peerManager: PeerManager, val internalDataRepository: InternalDataRepository) : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
+class ExperimentalViewModel(val peerManager: PeerManager, private val internalPrefs: InternalPrefs) : ViewModel() {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     var claimAddressState by mutableStateOf<ClaimAddressState>(ClaimAddressState.Init)
         private set
 
     init {
         viewModelScope.launch {
-            val address = internalDataRepository.getBip353Address.first()
+            val address = internalPrefs.getBip353Address.first()
             if (address.isNullOrBlank()) {
                 claimAddressState = ClaimAddressState.None
             } else {
@@ -88,10 +90,9 @@ class ExperimentalViewModel(val peerManager: PeerManager, val internalDataReposi
         viewModelScope.launch {
             log.debug("claiming bip-353 address")
             try {
-
                 withTimeout(5_000) {
                     val address = peerManager.getPeer().requestAddress(languageSubtag = "en")
-                    internalDataRepository.saveBip353Address(address)
+                    internalPrefs.saveBip353Address(address)
                     delay(500)
                     log.info("successfully claimed bip-353 address=$address")
                     claimAddressState = ClaimAddressState.Done(address)
@@ -104,22 +105,26 @@ class ExperimentalViewModel(val peerManager: PeerManager, val internalDataReposi
     }
 
     class Factory(
+        private val walletId: WalletId,
         private val peerManager: PeerManager,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
+            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
             @Suppress("UNCHECKED_CAST")
-            return ExperimentalViewModel(peerManager, application.internalDataRepository) as T
+            return ExperimentalViewModel(peerManager, internalPrefs) as T
         }
     }
 }
 
 @Composable
 fun ExperimentalView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(business.peerManager))
+    val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(walletId, business.peerManager))
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -129,13 +134,14 @@ fun ExperimentalView(
 
         CardHeader(text = stringResource(id = R.string.bip353_header))
         Card(modifier = Modifier.fillMaxWidth()) {
-            ClaimAddressButton(state = vm.claimAddressState, onClaim = { vm.claimAddress() })
+            ClaimAddressButton(business = business, state = vm.claimAddressState, onClaim = { vm.claimAddress() })
         }
     }
 }
 
 @Composable
 private fun ClaimAddressButton(
+    business: PhoenixBusiness,
     state: ClaimAddressState,
     onClaim: () -> Unit,
 ) {

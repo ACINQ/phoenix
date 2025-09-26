@@ -29,9 +29,9 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix is running in the background</string>
-    <string name="notif_headless_received">Received +%1$s</string>
+    <string name="notif_headless_received">%1$s Received %2$s</string>
 
-    <string name="notif_pending_settlement_title">Please start Phoenix</string>
+    <string name="notif_pending_settlement_title">Please start wallet</string>
     <string name="notif_pending_settlement_message">An incoming settlement is pending.</string>
 
     <string name="notif_inflight_payment_title">A payment is pending</string>
@@ -70,7 +70,7 @@
     <string name="settings_list_channels">Payment channels</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum server</string>
-    <string name="settings_reset_wallet">Reset wallet</string>
+    <string name="settings_reset_wallet">Delete wallet</string>
     <string name="settings_mutual_close">Close channels</string>
     <string name="settings_force_close">Force-close channels</string>
     <string name="settings_tor">Tor</string>
@@ -98,6 +98,7 @@
 
     <string name="home_final_title">Final wallet</string>
     <string name="home_final_desc">These funds come from closed Lightning channels. They must be spent manually.</string>
+    <string name="home_onchain_balance_only">On-chain balance</string>
 
     <string name="home_background_restriction_title">Background processing restricted</string>
     <string name="home_background_restriction_body_1">Phoenix may not be able to receive payments when it is in the background, or when it is closed.</string>
@@ -214,6 +215,7 @@
     <string name="inappnotif_backup_seed_message">Backup your wallet to prevent losing your bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Backup my wallet</string>
 
+    <string name="inappnotif_notification_permission_message_short">Enable Android notifications</string>
     <string name="inappnotif_notification_permission_message">Notifications are disabled in Android settings. Phoenix won\'t be able to notify you when a payment is processing.</string>
     <string name="inappnotif_notification_permission_enable">Enable</string>
 
