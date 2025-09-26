@@ -19,25 +19,9 @@ class PushManager {
 		
 		// This could be a push notification coming from either:
 		// - Google's Firebase Cloud Messaging (FCM)
-		// - Amazon Web Services (AWS)
+		// - Amazon Web Services (AWS) (only used for debugging)
 		
-	#if DEBUG
-		var push = PushNotification.parse(userInfo)
-		
-		// Still waiting for nodeId to be included in push notifications
-		if case .fcm(let notification) = push {
-			if notification.nodeIdHash == nil {
-				let nodeId = "03a496f0414de4ed699d99a6e922da4e96e689a9312d2340bf85ff69688e6e4ef6"
-				push = PushNotification.fcm(notification: FcmPushNotification(
-					reason: notification.reason,
-					nodeIdHash: hash160(nodeId: nodeId).successValue
-				))
-			}
-		}
-		
-	#else
 		let push = PushNotification.parse(userInfo)
-	#endif
 		
 		if let push {
 			switch push {
