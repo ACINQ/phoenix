@@ -1,0 +1,10 @@
+-- Migration: v8 -> v9
+--
+-- Changes:
+-- * Adding column `node_id_hash` to notifications table
+--
+
+ALTER TABLE notifications
+    ADD COLUMN node_id_hash TEXT DEFAULT NULL;
+
+CREATE INDEX notifications_source ON notifications(node_id_hash) WHERE read_at IS NULL;

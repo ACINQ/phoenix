@@ -59,7 +59,7 @@ struct ValidateView: View {
 	@State var satsPerByte: String = ""
 	@State var parsedSatsPerByte: Result<NSNumber, TextFieldNumberStylerError> = Result.failure(.emptyInput)
 	
-	@State var allowOverpayment = Prefs.shared.allowOverpayment
+	@State var allowOverpayment = Prefs.current.allowOverpayment
 	
 	@State var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
 	
@@ -82,6 +82,8 @@ struct ValidateView: View {
 	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
+	@State var walletInfoPresented: Bool = false
+	
 	// For the cicular buttons: [metadata, tip, comment]
 	enum MaxButtonWidth: Preference {}
 	let maxButtonWidthReader = GeometryPreferenceReader(
@@ -98,13 +100,15 @@ struct ValidateView: View {
 	@StateObject var toast = Toast()
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	// --------------------------------------------------
 	// MARK: Init
@@ -129,6 +133,7 @@ struct ValidateView: View {
 					: NSLocalizedString("Confirm Payment", comment: "Navigation bar title")
 			)
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: walletIconButton())
 			.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
 				navLinkView()
 			}
@@ -144,7 +149,7 @@ struct ValidateView: View {
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
@@ -188,7 +193,7 @@ struct ValidateView: View {
 		.onChange(of: currencyPickerChoice) { _ in
 			currencyPickerDidChange()
 		}
-		.onReceive(Prefs.shared.allowOverpaymentPublisher) {
+		.onReceive(Prefs.current.allowOverpaymentPublisher) {
 			allowOverpayment = $0
 		}
 		.onReceive(balancePublisher) {
@@ -494,6 +499,40 @@ struct ValidateView: View {
 	}
 	
 	@ViewBuilder
+	func walletIconButton() -> some View {
+		
+		if #available(iOS 17, *) {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(isPresented: $walletInfoPresented) {
+				WalletInfoSend()
+					.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+					.presentationCompactAdaptation(.popover)
+			}
+			
+		} else {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(present: $walletInfoPresented) {
+				InfoPopoverWindow {
+					WalletInfoSend()
+						.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func navLinkView() -> some View {
 		
 		if let tag = self.navLinkTag {
@@ -689,6 +728,10 @@ struct ValidateView: View {
 			return String(localized: "connecting to electrum", comment: "button text")
 		}
 		return ""
+	}
+	
+	func currentWalletMetadata() -> WalletMetadata {
+		return SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
 	}
 	
 	// --------------------------------------------------
@@ -1549,7 +1592,7 @@ struct ValidateView: View {
 	func maybeShowCapacityImpactWarning() {
 		log.trace("maybeShowCapacityImpactWarning()")
 		
-		guard !Prefs.shared.doNotShowChannelImpactWarning else {
+		guard !Prefs.current.doNotShowChannelImpactWarning else {
 			log.debug("Prefs.shared.doNotShowChannelImpact = true")
 			return
 		}
@@ -1765,7 +1808,7 @@ struct ValidateView: View {
 		
 		dismissKeyboardIfVisible()
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let enabledSecurity = Keychain.current.enabledSecurity
 		if enabledSecurity.contains(.spendingPin) {
 			
 			smartModalState.display(dismissable: false) {
@@ -2125,7 +2168,7 @@ struct ValidateView: View {
 		
 		if let nums = paymentNumbers(), nums.tipMsat > 0 {
 			let tipPercent = Int(nums.tipPercent * 100.0)
-			Prefs.shared.addRecentTipPercent(tipPercent)
+			Prefs.current.addRecentTipPercent(tipPercent)
 		}
 	}
 	

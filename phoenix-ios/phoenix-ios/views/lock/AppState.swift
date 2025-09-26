@@ -1,27 +1,9 @@
 import Foundation
 
-enum WalletExistence: CustomStringConvertible {
-	
-	/// We don't know if a wallet exists or not.
-	/// We're still waiting for initialization to complete.
-	case unknown
-	
-	case exists
-	case doesNotExist
-	
-	var description: String {
-		switch self {
-			case .unknown      : return "unknown"
-			case .exists       : return "exists"
-			case .doesNotExist : return "doesNotExist"
-		}
-	}
-}
-
-class LockState: ObservableObject {
+class AppState: ObservableObject {
 	
 	/// Singleton instance
-	public static let shared = LockState()
+	public static let shared = AppState()
 	
 	/// Indicates whether or not any required migration steps are still in flight.
 	///
@@ -32,10 +14,10 @@ class LockState: ObservableObject {
 	///
 	@Published var protectedDataAvailable: Bool
 	
-	/// Indicates whether or not a wallet exists.
-	/// Note that this is unknown until after we've checked the keychain.
+	/// Indicates whether the app is still loading/booting.
+	/// When this is true, the LoadingView is still visible.
 	///
-	@Published var walletExistence: WalletExistence
+	@Published var isLoading: Bool
 	
 	/// Indicates whether the app is locked or unlocked.
 	/// This will be set to true if app-lock is disabled, or if the user has authenticated using biometrics.
@@ -47,7 +29,7 @@ class LockState: ObservableObject {
 		
 		self.migrationStepsCompleted = false
 		self.protectedDataAvailable = false
-		self.walletExistence = .unknown
+		self.isLoading = true
 		self.isUnlocked = false
 	}
 }

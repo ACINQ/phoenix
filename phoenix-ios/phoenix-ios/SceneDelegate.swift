@@ -2,7 +2,6 @@ import UIKit
 import SwiftUI
 import Combine
 
-
 fileprivate let filename = "SceneDelegate"
 #if DEBUG && true
 fileprivate let log = LoggerFactory.shared.logger(filename, .trace)
@@ -10,32 +9,57 @@ fileprivate let log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+// The default animation duration on iOS is 0.35 seconds.
+// But there is a slight delay before the animation starts,
+// while the UI state is updated, and the animation is initiated.
+// Thus if we only wait 0.35 seconds there is a slight flash at the end
+// while window layers disappear before becoming completely invisible on screen.
+// So we use a conservative delay to ensure the animation has completed.
+//
+fileprivate let ANIMATION_DELAY: TimeInterval = 0.4
 
-	var window: UIWindow?
-	var cancellables = Set<AnyCancellable>()
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	
-	var lockWindow: UIWindow?
-	var resetWalletWindow: UIWindow?
-	var errorWindow: UIWindow?
+	var mainWindow        : UIWindow? = nil
+	var lockWindow        : UIWindow? = nil
+	var introWindow       : UIWindow? = nil
+	var errorWindow       : UIWindow? = nil
+	var loadingWindow     : UIWindow? = nil
+	var resetWalletWindow : UIWindow? = nil
+	
+	let loadingWindowLevel_B   : UIWindow.Level = .normal
+	let mainWindowLevel        : UIWindow.Level = .normal + 1
+	let resetWalletWindowLevel : UIWindow.Level = .normal + 2
+	let introWindowLevel       : UIWindow.Level = .normal + 3
+	let loadingWindowLevel_A   : UIWindow.Level = .normal + 4
+	let lockWindowLevel        : UIWindow.Level = .alert + 1
+	let errorWindowLevel       : UIWindow.Level = .alert + 2
+	
+	var allWindows: [UIWindow?] {
+		return [mainWindow, lockWindow, introWindow, errorWindow, loadingWindow, resetWalletWindow]
+	}
 	
 	var isAppLaunch = true
-	var firstUnlockAttempted = false
-
+	var cancellables = Set<AnyCancellable>()
+	
 	static func get() -> SceneDelegate {
 		
 		return UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate
 	}
+	
+	// --------------------------------------------------
+	// MARK: UIWindowSceneDelegate
+	// --------------------------------------------------
 	
 	func scene(
 		_ scene: UIScene,
 		willConnectTo session: UISceneSession,
 		options connectionOptions: UIScene.ConnectionOptions
 	) {
-		log.trace("scene(_:willConnectTo:options:)")
+		log.trace(#function)
 		
 		if let windowScene = scene as? UIWindowScene {
-			showRootWindow(windowScene)
+			showLoadingWindow(windowScene)
 		}
 		
 		// From Apple docs:
@@ -62,7 +86,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func sceneDidDisconnect(_ scene: UIScene) {
-		log.trace("sceneDidDisconnect()")
+		log.trace(#function)
 		
 		// Called as the scene is being released by the system.
 		// This occurs shortly after the scene enters the background, or when its session is discarded.
@@ -73,7 +97,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func sceneDidBecomeActive(_ scene: UIScene) {
-		log.trace("sceneDidBecomeActive()")
+		log.trace(#function)
 		
 		// Called when the scene has moved from an inactive state to an active state.
 		// Use this method to restart any tasks that were paused (or not yet started)
@@ -81,24 +105,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func sceneWillResignActive(_ scene: UIScene) {
-		log.trace("sceneWillResignActive()")
+		log.trace(#function)
 		
 		// Called when the scene will move from an active state to an inactive state.
 		// This may occur due to temporary interruptions (ex. an incoming phone call).
 	}
 
 	func sceneWillEnterForeground(_ scene: UIScene) {
-		log.trace("sceneWillEnterForeground()")
+		log.trace(#function)
 	}
 
 	func sceneDidEnterBackground(_ scene: UIScene) {
-		log.trace("sceneDidEnterBackground()")
+		log.trace(#function)
 		
-		let currentSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let currentSecurity = Keychain.current.enabledSecurity
 		if currentSecurity.hasAppLock() {
 			
-			LockState.shared.isUnlocked = false
-			showLockWindow()
+			AppState.shared.isUnlocked = false
+			showLockWindow(target: .automatic)
 			
 			// Shortly after this method returns:
 			//
@@ -107,7 +131,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// > It also displays the image temporarily when bringing your app
 			// > back to the foreground.
 			//
-			// We've requested a UI update (via @State change to LockState.shared).
+			// We've requested a UI update (via @State change to AppState.shared).
 			// But it appears that the update will run AFTER the OS takes the screenshot.
 			// So we have to explicitly notify the system than an update is needed / pending.
 			//
@@ -134,7 +158,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 	
 	func handleExternalURL(_ url: URL) {
-		log.trace("handleExternalURL")
+		log.trace(#function)
 		
 		var urlStr = url.absoluteString
 		
@@ -166,30 +190,33 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	// --------------------------------------------------
 	
 	private func onAppLaunch() -> Void {
-		log.trace("onAppLaunch()")
+		log.trace(#function)
 		
 		// List for changes to the themePublisher,
 		// and update the windows accordingly.
 		//
-		Prefs.shared.themePublisher.sink {[weak self](theme: Theme) in
+		Prefs.global.themePublisher.sink {(theme: Theme) in
 			
-			guard let self = self else {
-				return
+			let interfaceStyle = theme.toInterfaceStyle()
+			let tintColor = UIColor.appAccent // appAccent color might be customized for theme
+			
+			for window in self.allWindows {
+				window?.overrideUserInterfaceStyle = interfaceStyle
+				window?.tintColor = tintColor
 			}
-			self.window?.overrideUserInterfaceStyle = theme.toInterfaceStyle()
-			self.window?.tintColor = UIColor.appAccent // appAccent color might be customized for theme
 			
 		}.store(in: &cancellables)
 		
-		// Note that we cannot use `LockState.shared.objectWillChange.sink`,
+		// Note that we cannot use `AppState.shared.objectWillChange.sink`,
 		// because the callback is invoked before the `isUnlocked` value is changed,
 		// and doesn't provide us with the new value.
 		//
-		LockState.shared.$isUnlocked.sink {[weak self] isUnlocked in
-			
-			log.debug("LockState.shared.isUnlocked = \(isUnlocked)")
+		AppState.shared.$isUnlocked.sink {(isUnlocked: Bool) in
 			if isUnlocked {
-				self?.hideLockWindow()
+				log.debug("AppState.isUnlocked = true")
+				if self.lockWindow != nil {
+					self.hideLockWindow()
+				}
 			}
 		}.store(in: &cancellables)
 		
@@ -198,33 +225,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		//
 		// So we need to wait until the keychain is ready.
 		//
-		LockState.shared.$protectedDataAvailable.sink {[weak self] protectedDataAvailable in
-			
-			log.debug("LockState.shared.protectedDataAvailable = \(protectedDataAvailable)")
+		AppState.shared.$protectedDataAvailable.sink {(protectedDataAvailable: Bool) in
 			if protectedDataAvailable {
-				self?.tryFirstUnlock()
+				log.debug("AppState.protectedDataAvailable = true")
+				self.readSecurityFile()
 			}
 		}.store(in: &cancellables)
 		
 		// We delay our work until any needed migration has been completed.
 		//
-		LockState.shared.$migrationStepsCompleted.sink {[weak self] migrationStepsCompleted in
-			
-			log.debug("LockState.shared.migrationStepsCompleted = \(migrationStepsCompleted)")
+		AppState.shared.$migrationStepsCompleted.sink {(migrationStepsCompleted: Bool) in
 			if migrationStepsCompleted {
-				self?.checkProtectedDataAvailable()
+				log.debug("AppState.migrationStepsCompleted = true")
+				self.checkProtectedDataAvailable()
 			}
 		}.store(in: &cancellables)
 	}
 	
 	private func checkProtectedDataAvailable() {
-		log.trace("checkProtectedDataAvailable()")
+		log.trace(#function)
 		assertMainThread()
 		
 		if UIApplication.shared.isProtectedDataAvailable {
 			log.debug("UIApplication.shared.isProtectedDataAvailable == true")
 	
-			LockState.shared.protectedDataAvailable = true
+			AppState.shared.protectedDataAvailable = true
 			
 		} else {
 			log.debug("UIApplication.shared.isProtectedDataAvailable == false (waiting for notification)")
@@ -234,70 +259,110 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				
 				// Apple doesn't specify which thread this notification is posted on.
 				// Should be the main thread, but just in case, let's be safe.
-				if Thread.isMainThread {
-					LockState.shared.protectedDataAvailable = true
-				} else {
-					DispatchQueue.main.async {
-						LockState.shared.protectedDataAvailable = true
-					}
+				runOnMainThread {
+					AppState.shared.protectedDataAvailable = true
 				}
 			}.store(in: &cancellables)
 		}
 	}
 	
-	private func tryFirstUnlock() {
-		log.trace("tryFirstUnlock()")
+	private func readSecurityFile() {
+		log.trace(#function)
 		assertMainThread()
 		
-		guard !firstUnlockAttempted else {
-			log.debug("tryFirstUnlock() - ignoring, task already completed")
-			return
-		}
-		firstUnlockAttempted = true
-		
-		AppSecurity.shared.tryUnlockWithKeychain {
-			(recoveryPhrase: RecoveryPhrase?, enabledSecurity: EnabledSecurity, error: UnlockError?) in
-
-			// There are multiple potential configurations:
-			//
-			// - no wallet         => recoveryPhrase == nil, enabledSecurity is empty
-			// - no security       => recoveryPhrase != nil, enabledSecurity is empty
-			// - standard security => recoveryPhrase != nil, enabledSecurity is non-empty
-			// - advanced security => recoveryPhrase == nil, enabledSecurity is non-empty
-			//
-			// Another way to think about it:
-			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
-			// - advanced security => biometrics required to unlock both the UI and the seed
-
-			if recoveryPhrase == nil && enabledSecurity.isEmpty && error == nil {
-				// The user doesn't have a wallet yet.
-				LockState.shared.walletExistence = .doesNotExist
-				
-				// Issue #282 - Face ID remains enabled between app installs.
-				// Items stored in the iOS keychain remain persisted between iOS installs.
-				// So we need to clear the flag here.
-				//
-				// We have the same problem with the Custom PIN.
-				// And also the Bip353Address.
-				// So we perform a standard wallet reset (which clears all values).
-				AppSecurity.shared.resetWallet()
-				
-			} else {
-				// The user has a wallet. (UI may or may not be locked.)
-				LockState.shared.walletExistence = .exists
-			}
+		SecurityFileManager.shared.asyncReadFromDisk { result in
 			
-			if let recoveryPhrase {
-				// Load wallet into memory. (UI may or may not be locked.)
-				Biz.loadWallet(recoveryPhrase: recoveryPhrase)
-			}
+			switch result {
+			case .failure(let reason):
+				
+				switch reason {
+				case .errorReadingFile(_): fallthrough
+				case .errorDecodingFile(_):
+					self.showErrorWindow(UnlockError.readSecurityFileError(underlying: reason))
+					
+				case .fileNotFound:
+					self.noWalletsAvailable()
+					
+				} // <switch reason>
+
+			case .success(let securityFile):
+				
+				switch securityFile {
+				case .v0(let v0):
+					if v0.keychain != nil || v0.biometrics != nil {
+						self.tryWalletUnlock(KEYCHAIN_DEFAULT_ID)
+					} else {
+						self.noWalletsAvailable()
+					}
+					
+				case .v1(let v1):
+					
+					if v1.wallets.isEmpty {
+						self.noWalletsAvailable()
+					} else if let defaultKey = v1.defaultKey, let _ = v1.defaultWallet() {
+						self.tryWalletUnlock(defaultKey)
+					} else {
+						self.showLockWindow(target: .automatic)
+						self.hideLoadingWindow()
+					}
+					
+				} // </switch securityFile>
+			} // </switch result>
+		} // </asyncReadFromDisk>
+	}
+	
+	private func noWalletsAvailable() {
+		log.trace(#function)
+		assertMainThread()
 		
-			if let error = error {
-				self.showErrorWindow(error)
-			} else if !enabledSecurity.hasAppLock() {
-				LockState.shared.isUnlocked = true
-			} else {
-				self.showLockWindow()
+		// The user doesn't have a wallet yet.
+		showIntroWindow(animateIn: false, isCancellable: false)
+		hideLoadingWindow()
+		
+		// Items stored in the iOS keychain remain persisted between iOS installs.
+		// So we should clear them here.
+		//
+		// Note that we're clearing the KEYCHAIN_DEFAULT_ID account.
+		// If we don't, then when the user creates/restores a wallet,
+		// these old default values will get copied into their new account.
+		//
+		// Related issues:
+		// Issue #282 - Face ID remains enabled between app installs.
+		// 
+		Keychain.current.resetWallet()
+	}
+	
+	private func tryWalletUnlock(_ id: String) {
+		log.trace(#function)
+		assertMainThread()
+		
+		Keychain.wallet(id).unlockWithKeychain {
+			(result: Result<RecoveryPhrase?, UnlockError>, enabledSecurity: EnabledSecurity) in
+			
+			switch result {
+			case .success(let recoveryPhrase):
+				if let recoveryPhrase {
+					// The user has a wallet.
+					// Load it into memory immediately.
+					// The UI may or may not be locked.
+					Biz.loadWallet(trigger: .walletUnlock, recoveryPhrase: recoveryPhrase)
+				} else {
+					// This situation occurs when the user has hard-biometrics enabled.
+					// The lockWindow is needed to perform the initial wallet unlock.
+				}
+				
+				if enabledSecurity.hasAppLock() {
+					AppState.shared.isUnlocked = false
+					self.showLockWindow(target: .automatic)
+					self.hideLoadingWindow()
+				} else {
+					AppState.shared.isUnlocked = true
+					self.showMainWindow()
+					self.hideLoadingWindow()
+				}
+				
+			case .failure(let unlockError):
+				self.showErrorWindow(unlockError)
 			}
 		}
 	}
@@ -306,18 +371,98 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	// MARK: Window Transitions
 	// --------------------------------------------------
 	
-	public func transitionToResetWalletWindow(
-		deleteTransactionHistory: Bool,
-		deleteSeedBackup: Bool
-	) {
-		log.trace("transitionToResetWalletWindow()")
+	func switchToAnotherWallet() {
+		log.trace(#function)
 		assertMainThread()
 		
-		guard window != nil && resetWalletWindow == nil else {
+		AppState.shared.isUnlocked = false
+		showLockWindow(target: .walletSelector)
+		lockWindow?.isUserInteractionEnabled = false
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+			self.lockWindow?.isUserInteractionEnabled = true
+			self.hideMainWindow()
+			MBiz.resetCurrent()
+		}
+	}
+	
+	func addAnotherWallet() {
+		log.trace(#function)
+		assertMainThread()
+		
+		AppState.shared.isUnlocked = false
+		showIntroWindow(animateIn: true, isCancellable: true)
+		introWindow?.isUserInteractionEnabled = false
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+			self.introWindow?.isUserInteractionEnabled = true
+			self.hideMainWindow()
+			MBiz.resetCurrent()
+		}
+	}
+	
+	func prepareForWalletSwitch() {
+		log.trace(#function)
+		
+		hideMainWindow()
+		MBiz.resetCurrent()
+	}
+	
+	func lockWallet() {
+		log.trace(#function)
+		
+		AppState.shared.isUnlocked = false
+		showLockWindow(target: .automatic)
+	}
+	
+	func finishLockWindow() {
+		log.trace(#function)
+		
+		showMainWindow()
+	}
+	
+	func cancelIntroWindow() {
+		log.trace(#function)
+		
+		guard introWindow != nil else {
+			log.warning("\(#function): ignoring: invalid state")
 			return
 		}
 		
-		// We have to be careful to start the close-wallet process *after* we've closed the RootView.
+		AppState.shared.isUnlocked = false
+		showLockWindow(target: .walletSelector)
+		lockWindow?.isUserInteractionEnabled = false
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+			self.lockWindow?.isUserInteractionEnabled = true
+			self.hideIntroWindow()
+		}
+	}
+	
+	func finishIntroWindow() {
+		log.trace(#function)
+		
+		guard introWindow != nil else {
+			log.warning("\(#function): ignoring: invalid state")
+			return
+		}
+		
+		showMainWindow()
+		hideIntroWindow()
+	}
+	
+	func startResetWallet(
+		_ options: ResetWalletOptions
+	) {
+		log.trace(#function)
+		assertMainThread()
+		
+		guard mainWindow != nil && resetWalletWindow == nil else {
+			log.warning("\(#function): ignoring: invalid state")
+			return
+		}
+		
+		// We have to be careful to start the close-wallet process *after* we've closed the MainView.
 		// This is because we might crash if:
 		//
 		// - the close-wallet process deletes something
@@ -331,57 +476,77 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		// NB: Using a `DispatchQueue.main.asyncAfter` here doesn't seem to be enough to prevent crashes on iPad.
 		// We really need to give it time to fully unload the rootWindow.
 		
-		showResetWalletWindow(
-			deleteTransactionHistory: deleteTransactionHistory,
-			deleteSeedBackup: deleteSeedBackup,
-			startDelay: 0.4
-		)
-		hideRootWindow()
+		showResetWalletWindow(options, startDelay: (ANIMATION_DELAY * 2))
+		resetWalletWindow?.isUserInteractionEnabled = false
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+			self.resetWalletWindow?.isUserInteractionEnabled = true
+			self.hideMainWindow()
+		}
 	}
 	
-	public func transitionBackToMainWindow() -> Bool {
-		log.trace("transitionBackToMainWindow()")
+	func finishResetWallet() {
+		log.trace(#function)
 		assertMainThread()
 		
-		guard window == nil && resetWalletWindow != nil else {
-			return false
-		}
-		guard let windowScene = findWindowScene() else {
-			return false
+		guard resetWalletWindow != nil else {
+			log.warning("\(#function): ignoring: invalid state")
+			return
 		}
 		
-		showRootWindow(windowScene)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-			self.hideResetWalletWindow()
-		}
-		
-		return true
-	}
-	
-	// --------------------------------------------------
-	// MARK: Root Window
-	// --------------------------------------------------
-	
-	private func showRootWindow(_ windowScene: UIWindowScene) {
-		log.trace("showRootWindow()")
-		assertMainThread()
-		
-		if window == nil {
+		if SecurityFileManager.shared.hasZeroWallets() {
 			
-			let view = RootView()
+			// We need to transition to the Intro screen,
+			// because the user needs to create/restore a wallet to continue.
+			
+			AppState.shared.isUnlocked = false
+			showIntroWindow(animateIn: true, isCancellable: false)
+			introWindow?.isUserInteractionEnabled = false
+			
+			DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+				self.introWindow?.isUserInteractionEnabled = true
+				self.hideResetWalletWindow()
+			}
+			
+		} else {
+			
+			// There are still 1 or more wallets in the system,
+			// so we transition to the WalletSelector (LockScreen).
+			
+			AppState.shared.isUnlocked = false
+			showLockWindow(target: .walletSelector)
+			lockWindow?.isUserInteractionEnabled = false
+		
+			DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+				self.lockWindow?.isUserInteractionEnabled = true
+				self.hideResetWalletWindow()
+			}
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Main Window
+	// --------------------------------------------------
+	
+	private func showMainWindow() {
+		log.trace(#function)
+		assertMainThread()
+		
+		if mainWindow == nil {
+			
+			let view = MainView()
 			
 			let controller = UIHostingController(rootView: view)
 			
-			window = UIWindow(windowScene: windowScene)
-			window?.rootViewController = controller
-			window?.windowLevel = .normal
+			mainWindow = UIWindow(windowScene: self.windowScene)
+			mainWindow?.rootViewController = controller
 			
 			// Set the app-wide tint/accent color scheme.
 			//
 			// Credit for bug fix:
 			// https://adampaxton.com/how-to-globally-set-a-tint-or-accent-color-in-swiftui/
 			//
-			window?.tintColor = UIColor.appAccent
+			mainWindow?.tintColor = UIColor.appAccent
 			
 			// Set the app-wide color scheme.
 			//
@@ -397,83 +562,71 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// prevent your UI from supporting the system color prior to app re-launch.
 			// There may be other variations I didn't try, but this solution is currently the most stable.
 			//
-			window?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			mainWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
+			
+			mainWindow?.windowLevel = mainWindowLevel
+			log.debug("mainWindowLevel = \(mainWindowLevel.rawValue)")
 		}
 		
-		window?.makeKeyAndVisible()
+		mainWindow?.makeKeyAndVisible()
 	}
 	
-	private func hideRootWindow() {
-		log.trace("hideRootWindow()")
+	private func hideMainWindow() {
+		log.trace(#function)
 		assertMainThread()
 		
-		window?.isHidden = true
-		window = nil
+		mainWindow?.isHidden = true
+		mainWindow = nil
 	}
 	
 	// --------------------------------------------------
 	// MARK: Lock Window
 	// --------------------------------------------------
 	
-	func lockWallet() {
-		log.trace("lockWallet")
-		
-		LockState.shared.isUnlocked = false
-		showLockWindow()
-	}
-	
-	private func showLockWindow() {
-		log.trace("showLockWindow()")
+	private func showLockWindow(target: LockViewTarget) {
+		log.trace(#function)
 		assertMainThread()
 		
 		guard errorWindow == nil else {
 			return
 		}
-		guard let windowScene = findWindowScene() else {
-			return
-		}
 		
 		if lockWindow == nil {
 			
-			let view = LockView()
+			let view = LockContainer(target: target)
 			
 			let controller = UIHostingController(rootView: view)
 			controller.view.backgroundColor = .clear
 			
-			lockWindow = UIWindow(windowScene: windowScene)
+			lockWindow = UIWindow(windowScene: self.windowScene)
 			lockWindow?.rootViewController = controller
 			lockWindow?.tintColor = UIColor.appAccent
-			lockWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
-			lockWindow?.windowLevel = .alert + 1
+			lockWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
+			lockWindow?.windowLevel = lockWindowLevel
+			log.debug("lockWindowLevel = \(lockWindowLevel.rawValue)")
 		}
 		
 		lockWindow?.makeKeyAndVisible()
 	}
 	
 	private func hideLockWindow() {
-		log.trace("hideLockWindow()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard errorWindow == nil else {
 			return
 		}
+		guard lockWindow != nil else {
+			return
+		}
 		
-		// Make window the responder for touch events & other input.
-		window?.makeKey()
-		
-		// The LockView uses an animation to dismiss the lock screen.
+		// The view has a built-in animation to hide it's content.
 		// So we wait until after the animation has completed,
 		// and then we cleanup our resources (if still needed).
 		//
-		DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {[weak self] in
-			
-			guard let self = self else {
-				return
-			}
-			if LockState.shared.isUnlocked {
-				
+		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+			if AppState.shared.isUnlocked && self.lockWindow != nil {
 				log.debug("Cleaning up lockWindow resources...")
-				
 				self.lockWindow?.isHidden = true
 				self.lockWindow = nil
 			}
@@ -481,47 +634,53 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 	
 	// --------------------------------------------------
-	// MARK: ResetWallet Window
+	// MARK: Intro Window
 	// --------------------------------------------------
 	
-	private func showResetWalletWindow(
-		deleteTransactionHistory: Bool,
-		deleteSeedBackup: Bool,
-		startDelay: TimeInterval
+	private func showIntroWindow(
+		animateIn: Bool,
+		isCancellable: Bool
 	) {
-		log.trace("showResetWalletWindow()")
+		log.trace(#function)
 		assertMainThread()
 		
-		guard let windowScene = findWindowScene() else {
+		if introWindow == nil {
+			
+			let view = IntroContainer(animateIn: animateIn, isCancellable: isCancellable)
+			
+			let controller = UIHostingController(rootView: view)
+			controller.view.backgroundColor = .clear
+			
+			introWindow = UIWindow(windowScene: self.windowScene)
+			introWindow?.rootViewController = controller
+			introWindow?.tintColor = UIColor.appAccent
+			introWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
+			introWindow?.windowLevel = introWindowLevel
+			log.debug("introWindowLevel = \(introWindowLevel.rawValue)")
+		}
+		
+		introWindow?.makeKeyAndVisible()
+	}
+	
+	private func hideIntroWindow() {
+		log.trace(#function)
+		assertMainThread()
+		
+		guard introWindow != nil else {
 			return
 		}
 		
-		if resetWalletWindow == nil {
-			
-			let view = ResetWalletView_Action(
-				deleteTransactionHistory: deleteTransactionHistory,
-				deleteSeedBackup: deleteSeedBackup,
-				startDelay: startDelay
-			)
-			
-			let controller = UIHostingController(rootView: view)
-			
-			resetWalletWindow = UIWindow(windowScene: windowScene)
-			resetWalletWindow?.rootViewController = controller
-			resetWalletWindow?.tintColor = UIColor.appAccent
-			resetWalletWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
-			resetWalletWindow?.windowLevel = .normal + 1
+		// The view has a built-in animation to hide it's content.
+		// So we wait until after the animation has completed,
+		// and then we cleanup our resources (if still needed).
+		//
+		DispatchQueue.main.asyncAfter(deadline: .now() + ANIMATION_DELAY) {
+			if self.introWindow != nil {
+				log.debug("Cleaning up introWindow resources...")
+				self.introWindow?.isHidden = true
+				self.introWindow = nil
+			}
 		}
-		
-		resetWalletWindow?.makeKeyAndVisible()
-	}
-	
-	private func hideResetWalletWindow() {
-		log.trace("hideResetWalletWindow()")
-		assertMainThread()
-		
-		resetWalletWindow?.isHidden = true
-		resetWalletWindow = nil
 	}
 	
 	// --------------------------------------------------
@@ -529,41 +688,120 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	// --------------------------------------------------
 	
 	private func showErrorWindow(_ error: UnlockError) {
-		log.trace("showErrorWindow()")
+		log.trace(#function)
 		assertMainThread()
-		
-		guard let windowScene = findWindowScene() else {
-			return
-		}
 		
 		if errorWindow == nil {
 			
 			let view = UnlockErrorView(danger: error)
 			
 			let controller = UIHostingController(rootView: view)
-			controller.view.backgroundColor = .clear
 			
-			errorWindow = UIWindow(windowScene: windowScene)
+			errorWindow = UIWindow(windowScene: self.windowScene)
 			errorWindow?.rootViewController = controller
 			errorWindow?.tintColor = UIColor.appAccent
-			errorWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
-			errorWindow?.windowLevel = .alert + 1
+			errorWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
+			errorWindow?.windowLevel = errorWindowLevel
+			log.debug("errorWindowLevel = \(errorWindowLevel.rawValue)")
 		}
 		
 		errorWindow?.makeKeyAndVisible()
 	}
 	
 	// --------------------------------------------------
+	// MARK: Loading Window
+	// --------------------------------------------------
+	
+	private func showLoadingWindow(
+		_ newWindowScene: UIWindowScene
+	) {
+		log.trace(#function)
+		assertMainThread()
+		
+		if loadingWindow == nil {
+			
+			let view = LoadingView()
+			
+			let controller = UIHostingController(rootView: view)
+			controller.view.backgroundColor = .clear
+			
+			loadingWindow = UIWindow(windowScene: newWindowScene)
+			loadingWindow?.rootViewController = controller
+			loadingWindow?.tintColor = UIColor.appAccent
+			loadingWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
+			loadingWindow?.windowLevel = loadingWindowLevel_A
+			log.debug("loadingloadingWindowLevel_A = \(loadingWindowLevel_A.rawValue)")
+		}
+		
+		loadingWindow?.makeKeyAndVisible()
+	}
+	
+	private func hideLoadingWindow() {
+		log.trace(#function)
+		assertMainThread()
+		
+		AppState.shared.isLoading = false
+		
+		// The loadingWindow manages GlobalEnvironment.deviceInfo.
+		// So we never remove it from the view hierarchy.
+		// We just move it into the background.
+		//
+		DispatchQueue.main.asyncAfter(deadline: .now() + LOADING_VIEW_ANIMATION_DURATION + 0.05) {
+	
+			self.loadingWindow?.windowLevel = self.loadingWindowLevel_B
+			log.debug("loadingWindowLevel_B = \(self.loadingWindowLevel_B.rawValue)")
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: ResetWallet Window
+	// --------------------------------------------------
+	
+	private func showResetWalletWindow(_ options: ResetWalletOptions, startDelay: TimeInterval) {
+		log.trace(#function)
+		assertMainThread()
+		
+		if resetWalletWindow == nil {
+			
+			let view = ResetWalletView_Action(
+				deleteTransactionHistory: options.deleteTransactionHistory,
+				deleteSeedBackup: options.deleteSeedBackup,
+				startDelay: startDelay
+			)
+			
+			let controller = UIHostingController(rootView: view)
+			controller.view.backgroundColor = .clear
+			
+			resetWalletWindow = UIWindow(windowScene: self.windowScene)
+			resetWalletWindow?.rootViewController = controller
+			resetWalletWindow?.tintColor = UIColor.appAccent
+			resetWalletWindow?.overrideUserInterfaceStyle = Prefs.global.theme.toInterfaceStyle()
+			resetWalletWindow?.windowLevel = resetWalletWindowLevel
+			log.debug("resetWalletWindowLevel = \(resetWalletWindowLevel.rawValue)")
+		}
+		
+		resetWalletWindow?.makeKeyAndVisible()
+	}
+	
+	private func hideResetWalletWindow() {
+		log.trace(#function)
+		assertMainThread()
+		
+		resetWalletWindow?.isHidden = true
+		resetWalletWindow = nil
+	}
+	
+	// --------------------------------------------------
 	// MARK: Utilities
 	// --------------------------------------------------
 	
-	func findWindowScene() -> UIWindowScene? {
+	private var windowScene: UIWindowScene {
 		
-		return window?.windowScene ??
-			lockWindow?.windowScene ??
-			resetWalletWindow?.windowScene ??
-			errorWindow?.windowScene ??
-			nil
+		for window in allWindows {
+			if let scene = window?.windowScene { return scene }
+		}
+		
+		fatalError("Unabled to find UIWindowScene")
 	}
 }
 

@@ -10,10 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ManualRestoreView: MVIView {
 
-	@StateObject var mvi = MVIState({ $0.restoreWallet() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+	@StateObject var mvi = MVIState({ Biz.business.controllers.restoreWallet() })
 	
 	@State var acceptedWarning = false
 	
@@ -42,7 +39,7 @@ struct ManualRestoreView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -87,14 +84,21 @@ struct ManualRestoreView: MVIView {
 			mnemonics : model.mnemonics,
 			language  : model.language
 		)
-
-		AppSecurity.shared.addKeychainEntry(recoveryPhrase: recoveryPhrase) { (error: Error?) in
-			if error == nil {
+		
+		let chain = Biz.business.chain
+		AppSecurity.shared.addWallet(chain: chain, recoveryPhrase: recoveryPhrase, seed: model.seed) { result in
+			switch result {
+			case .failure(let reason):
+				log.error("Error adding wallet: \(reason)")
+				
+			case .success():
 				Biz.loadWallet(
+					trigger: .restoreFromManualEntry,
 					recoveryPhrase: recoveryPhrase,
-					seed: model.seed,
-					walletRestoreType: .fromManualEntry
+					seed: model.seed
 				)
+				SceneDelegate.get().finishIntroWindow()
+				AppState.shared.isUnlocked = true
 			}
 		}
 	}

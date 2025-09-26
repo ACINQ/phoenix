@@ -368,6 +368,7 @@ class SendManager(
                         }
                     }
                 } catch (e: Exception) {
+                    log.error { "failed to process lnurl: $e" }
                     log.error(e) { "failed to process lnurl=$lnurl" }
                     when (e) {
                         is LnurlError.RemoteFailure ->

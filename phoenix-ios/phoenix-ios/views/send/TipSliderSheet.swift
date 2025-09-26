@@ -38,8 +38,9 @@ struct TipSliderSheet: View {
 	)
 	@State var contentHeight: CGFloat? = nil
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var smartModalState: SmartModalState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// There are 3 scenarios:
 	//
@@ -385,7 +386,7 @@ struct TipSliderSheet: View {
 	func recentTipPercents() -> [Int] {
 		
 		// Most recent item is at index 0
-		var recents = Prefs.shared.recentTipPercents
+		var recents = Prefs.current.recentTipPercents
 		
 		// Remove items outside the valid range
 		let minPercent = Int(minPercentDouble() * 100.0)

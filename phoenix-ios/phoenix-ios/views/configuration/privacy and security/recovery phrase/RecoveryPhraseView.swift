@@ -72,10 +72,10 @@ struct RecoveryPhraseList: View {
 		self.walletId = walletId
 		self.syncSeedManager = Biz.syncManager!.syncSeedManager
 		
-		let manualBackup_taskDone = Prefs.shared.backupSeed.manualBackup_taskDone(walletId)
+		let manualBackup_taskDone = Prefs.current.backupSeed.manualBackupDone
 		self._manualBackup_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
 		
-		let backupSeed_enabled = Prefs.shared.backupSeed.isEnabled
+		let backupSeed_enabled = Prefs.current.backupSeed.isEnabled
 		self._backupSeed_enabled = State<Bool>(initialValue: backupSeed_enabled)
 		
 		self._legal_taskDone = State<Bool>(initialValue: manualBackup_taskDone)
@@ -238,7 +238,7 @@ struct RecoveryPhraseList: View {
 				.disabled(isDecrypting)
 				.padding(.vertical, 5)
 				
-				let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+				let enabledSecurity = Keychain.current.enabledSecurity
 				if enabledSecurity.hasAppLock() || enabledSecurity.hasSpendingPin() {
 					Text("(requires authentication)")
 						.font(.footnote)
@@ -564,7 +564,7 @@ struct RecoveryPhraseList: View {
 		if taskDone != manualBackup_taskDone {
 			
 			manualBackup_taskDone = taskDone
-			Prefs.shared.backupSeed.manualBackup_setTaskDone(taskDone, walletId)
+			Prefs.current.backupSeed.manualBackupDone = taskDone
 		}
 	}
 	
@@ -592,8 +592,8 @@ struct RecoveryPhraseList: View {
 				AuthenticateWithPinSheet(type: type) { result in
 					switch result {
 					case .Authenticated:
-						AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
-							if let recoveryPhrase {
+						Keychain.current.unlockWithKeychain { result, _ in
+							if case .success(let recoveryPhrase) = result, let recoveryPhrase {
 								Succeed(recoveryPhrase)
 							} else {
 								Fail()
@@ -608,10 +608,10 @@ struct RecoveryPhraseList: View {
 			}
 		}
 		
-		let enabledSecurity = AppSecurity.shared.enabledSecurityPublisher.value
+		let enabledSecurity = Keychain.current.enabledSecurity
 		if enabledSecurity == .none {
-			AppSecurity.shared.tryUnlockWithKeychain { (recoveryPhrase, _, _) in
-				if let recoveryPhrase {
+			Keychain.current.unlockWithKeychain { result, _ in
+				if case .success(let recoveryPhrase) = result, let recoveryPhrase {
 					Succeed(recoveryPhrase)
 				} else {
 					Fail()
@@ -637,7 +637,7 @@ struct RecoveryPhraseList: View {
 		} else if enabledSecurity.contains(.biometrics) {
 			let prompt = String(localized: "Unlock your seed.", comment: "Biometrics prompt")
 			
-			AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+			Keychain.current.unlockWithBiometrics(prompt: prompt) { result in
 				
 				if case .success(let recoveryPhrase) = result {
 					Succeed(recoveryPhrase)

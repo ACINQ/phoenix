@@ -129,7 +129,7 @@ struct ContactsListSheet: View {
 	func row(_ item: ContactInfo) -> some View {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
-			ContactPhoto(fileName: item.photoUri, size: 32)
+			ContactPhoto(filename: item.photoUri, size: 32)
 			Text(item.name)
 				.font(.title3)
 				.foregroundColor(.primary)

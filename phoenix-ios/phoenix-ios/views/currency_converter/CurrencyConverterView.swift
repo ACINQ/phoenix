@@ -31,7 +31,7 @@ struct CurrencyConverterView: View {
 	
 	@State var lastChange: CurrencyAmount?
 	
-	@State var currencies: [Currency] = GroupPrefs.shared.currencyConverterList
+	@State var currencies: [Currency] = GroupPrefs.current.currencyConverterList
 	
 	@State var parsedRow: ParsedRow? = nil
 	
@@ -65,10 +65,11 @@ struct CurrencyConverterView: View {
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.colorScheme) var colorScheme
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
 	// MARK: Init
@@ -411,9 +412,9 @@ struct CurrencyConverterView: View {
 		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies) ?? "<empty>")")
 		
 		if currencies == defaultCurrencies() {
-			GroupPrefs.shared.currencyConverterList = []
+			GroupPrefs.current.currencyConverterList = []
 		} else {
-			GroupPrefs.shared.currencyConverterList = currencies
+			GroupPrefs.current.currencyConverterList = currencies
 		}
 	}
 	

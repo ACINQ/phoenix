@@ -69,8 +69,9 @@ struct ToolsMenu: View {
 	let toolsImage: ToolsImage
 	let openCurrencyConverter: () -> Void
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.openURL) var openURL
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	init(
 		buttonHeightReader: GeometryPreferenceReader<AppendValue<HeaderButtonHeight>, [CGFloat]>,

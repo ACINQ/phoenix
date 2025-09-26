@@ -19,11 +19,12 @@ struct IncomingBalancePopover: View {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
-	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
-	let liquidityPolicyPublisher = GroupPrefs.shared.liquidityPolicyPublisher
+	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.current.liquidityPolicy
+	let liquidityPolicyPublisher = GroupPrefs.current.liquidityPolicyPublisher
+	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@ViewBuilder
 	var body: some View {

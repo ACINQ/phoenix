@@ -171,7 +171,7 @@ class WalletReset {
 		let dbDir = groupDir.appendingPathComponent("databases", isDirectory: true)
 		
 		let chainName: String = Biz.business.chain.phoenixName
-		let nodeIdHash: String = Biz.nodeIdHash!
+		let nodeIdHash: String = Biz.walletInfo!.nodeIdHash
 		
 		log.debug("dbDir: \(dbDir.path)")
 		log.debug("chainName: \(chainName)")
@@ -214,10 +214,8 @@ class WalletReset {
 		log.trace("step4()")
 		progress.send(.resetingUserDefaults)
 		
-		let walletId = Biz.walletId!
-		
-		Prefs.shared.resetWallet(walletId)
-		GroupPrefs.shared.resetWallet()
+		Prefs.current.resetWallet()
+		GroupPrefs.current.resetWallet()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step5()
@@ -226,13 +224,21 @@ class WalletReset {
 	
 	/**
 	 * Next we delete the wallet's recovery phrase.
-	 * This includes deleting the "security.json" file, and all the items stored in the keychain.
+	 * This includes all the items stored in the keychain (for this wallet),
+	 * and deleting the corresponding entry from the SecurityFile.
 	 */
 	private func step5() {
 		log.trace("step5()")
 		progress.send(.deletingKeychainItems)
 		
-		AppSecurity.shared.resetWallet()
+		Keychain.current.resetWallet()
+		
+		let walletId = Biz.walletId!
+		AppSecurity.shared.removeWallet(walletId: walletId) { result in
+			if case .failure(let error) = result {
+				log.warning("AppSecurity.removeWallet(): error: \(error)")
+			}
+		}
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.step6()
@@ -240,20 +246,13 @@ class WalletReset {
 	}
 	
 	/**
-	 * Finally we reset the BusinessManager & GlobalEnvironment.
+	 * Finally we reset the BusinessManager instance.
 	 */
 	private func step6() {
 		log.trace("step6()")
 		progress.send(.resettingBiz)
 		
-		Biz.reset()               // Must be 1st
-		GlobalEnvironment.reset() // Must be 2nd
-		
-		LockState.shared.walletExistence = .doesNotExist
-		LockState.shared.isUnlocked = true
-		
-		// walletExistence = .doesNotExist => User prompted to create/restore wallet => does not need upgrade screen
-		Prefs.shared.hasMergedChannelsForSplicing = true
+		MBiz.resetCurrent()
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 			self.finish()

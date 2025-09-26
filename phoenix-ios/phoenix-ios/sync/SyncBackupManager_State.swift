@@ -207,28 +207,20 @@ class SyncBackupManager_State_Downloading: ObservableObject, Equatable, @uncheck
 		return payments_completedCount + contacts_completedCount
 	}
 	
-	private func updateOnMainThread(_ block: @escaping () -> Void) {
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
-		}
-	}
-	
 	func setPayments_oldestCompletedDownload(_ date: Date?) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.payments_oldestCompletedDownload = date
 		}
 	}
 	
 	func setContacts_oldestCompletedDownload(_ date: Date?) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.contacts_oldestCompletedDownload = date
 		}
 	}
 	
 	func payments_finishBatch(completed: Int, oldest: Date?) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.payments_completedCount += completed
 			
 			if let oldest = oldest {
@@ -244,7 +236,7 @@ class SyncBackupManager_State_Downloading: ObservableObject, Equatable, @uncheck
 	}
 	
 	func contacts_finishBatch(completed: Int, oldest: Date?) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.contacts_completedCount += completed
 			
 			if let oldest = oldest {
@@ -315,35 +307,27 @@ class SyncBackupManager_State_Uploading: ObservableObject, Equatable {
 		self.contacts_totalCount = contacts_totalCount
 	}
 	
-	private func updateOnMainThread(_ block: @escaping () -> Void) {
-		if Thread.isMainThread {
-			block()
-		} else {
-			DispatchQueue.main.async { block() }
-		}
-	}
-	
 	func setPayments_totalCount(_ value: Int) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.payments_totalCount = value
 		}
 	}
 	
 	func setContacts_totalCount(_ value: Int) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.contacts_totalCount = value
 		}
 	}
 	
 	func setPayments_inFlight(count: Int, progress: Progress) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.payments_inFlightCount = count
 			self.payments_inFlightProgress = progress
 		}
 	}
 	
 	func completePayments_inFlight(_ completed: Int) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.payments_completedCount += completed
 			self.payments_inFlightCount = 0
 			self.payments_inFlightProgress = nil
@@ -351,7 +335,7 @@ class SyncBackupManager_State_Uploading: ObservableObject, Equatable {
 	}
 	
 	func completeContacts_inFlight(_ completed: Int) {
-		updateOnMainThread {
+		runOnMainThread {
 			self.contacts_completedCount += completed
 			self.contacts_inFlightCount = 0
 			self.contacts_inFlightProgress = nil

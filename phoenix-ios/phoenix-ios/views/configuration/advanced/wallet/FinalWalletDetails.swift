@@ -23,7 +23,7 @@ struct FinalWalletDetails: View {
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	// --------------------------------------------------
 	// MARK: View Builders

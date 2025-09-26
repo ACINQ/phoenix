@@ -39,7 +39,7 @@ internal class NotificationsQueries(val database: AppDatabase) {
         }
     }
 
-    fun save(notification: Notification) {
+    fun save(notification: Notification, nodeIdHash: String) {
         queries.insert(
             id = notification.id.toString(),
             type_version = when (notification) {
@@ -53,7 +53,8 @@ internal class NotificationsQueries(val database: AppDatabase) {
                 is WatchTowerOutcome.Unknown -> "WATCH_TOWER_UNKNOWN"
             },
             data_json = notification.encodeAsDb(),
-            created_at = currentTimestampMillis()
+            created_at = currentTimestampMillis(),
+            node_id_hash = nodeIdHash
         )
     }
 
@@ -67,6 +68,10 @@ internal class NotificationsQueries(val database: AppDatabase) {
         queries.markAllAsRead(currentTimestampMillis())
     }
 
+    fun initializeNodeIdHashColumn(nodeIdHash: String) {
+        queries.initializeNodeIdHashColumn(nodeIdHash)
+    }
+
     /**
      * Returns a list of unread notifications, grouped by type (i.e. [Notification]), in order to avoid spamming the UI
      * with duplicates.
@@ -74,8 +79,8 @@ internal class NotificationsQueries(val database: AppDatabase) {
      * The set of UUIDs linked to a [Notification] can be used to execute an action on all the actual relevant data in the
      * database (for example, to mark those notifications as read).
      */
-    fun listUnread(): Flow<List<Pair<Set<UUID>, Notification>>> {
-        return queries.listUnread().asFlow().mapToList(Dispatchers.IO).map {
+    fun listUnread(nodeIdHash: String): Flow<List<Pair<Set<UUID>, Notification>>> {
+        return queries.listUnread(nodeIdHash).asFlow().mapToList(Dispatchers.IO).map {
             val notifs = it.mapNotNull { row ->
                 val ids = row.grouped_ids.split(";").map { UUID.fromString(it) }.toSet()
                 val notif = mapToNotification(row.id, row.data_json, row.max ?: 0, null)
