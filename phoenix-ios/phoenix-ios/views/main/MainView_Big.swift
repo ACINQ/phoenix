@@ -620,6 +620,7 @@ struct MainView_Big: View {
 				case .electrum           : showSettings()
 				case .backgroundPayments : showSettings()
 				case .liquiditySettings  : showSettings()
+				case .torSettings        : showSettings()
 				case .forceCloseChannels : showSettings()
 				case .swapInWallet       : showSettings()
 				case .finalWallet        : showSettings()
@@ -653,6 +654,10 @@ struct MainView_Big: View {
 				case .liquiditySettings:
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.ChannelManagement)
+					
+				case .torSettings:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.Tor)
 					
 				case .forceCloseChannels:
 					navCoordinator_settings.path.removeAll()

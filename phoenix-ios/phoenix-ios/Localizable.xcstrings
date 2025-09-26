@@ -8573,6 +8573,9 @@
         }
       }
     },
+    "Cannot access the Tor network. Phoenix will not function correctly." : {
+
+    },
     "Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually." : {
       "localizations" : {
         "ar" : {
@@ -20891,6 +20894,9 @@
         }
       }
     },
+    "If you don't have a Tor VPN app, install one. We recommend Orbot." : {
+
+    },
     "If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it." : {
       "localizations" : {
         "ar" : {
@@ -25047,6 +25053,9 @@
         }
       }
     },
+    "Make sure your Tor Proxy VPN app is up and running, and that it's connected to Tor." : {
+
+    },
     "Make sure your Tor VPN is active and running." : {
       "localizations" : {
         "ar" : {
@@ -27053,6 +27062,9 @@
         }
       }
     },
+    "No access to the Tor network" : {
+
+    },
     "No address yet..." : {
       "localizations" : {
         "ar" : {
@@ -28597,6 +28609,12 @@
           }
         }
       }
+    },
+    "Open Orbot website" : {
+
+    },
+    "Open Tor settings" : {
+
     },
     "Opening the app" : {
 
@@ -30940,6 +30958,9 @@
           }
         }
       }
+    },
+    "Phoenix needs access to Tor to function properly." : {
+
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {

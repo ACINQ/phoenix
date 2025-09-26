@@ -84,6 +84,7 @@ struct HomeView : MVIView {
 	
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var smartModalState: SmartModalState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -481,6 +482,8 @@ struct HomeView : MVIView {
 					navigationToBackgroundPayments()
 				} else if noticeMonitor.hasNotice_watchTower {
 					fixBackgroundAppRefreshDisabled()
+				} else if noticeMonitor.hasNotice_torNetworkIssue {
+					showTorNetworkIssueSheet()
 				} else if noticeMonitor.hasNotice_mempoolFull {
 					openMempoolFullURL()
 				}
@@ -518,6 +521,10 @@ struct HomeView : MVIView {
 			
 		} else if noticeMonitor.hasNotice_mempoolFull {
 			NotificationCell.mempoolFull()
+				.font(.footnote)
+			
+		} else if noticeMonitor.hasNotice_torNetworkIssue {
+			NotificationCell.torNetworkIssue()
 				.font(.footnote)
 			
 		} else if let item = bizNotifications_watchtower.first {
@@ -735,6 +742,7 @@ struct HomeView : MVIView {
 		if noticeMonitor.hasNotice_mempoolFull        { count += 1 }
 		if noticeMonitor.hasNotice_backgroundPayments { count += 1 }
 		if noticeMonitor.hasNotice_watchTower         { count += 1 }
+		if noticeMonitor.hasNotice_torNetworkIssue    { count += 1 }
 		
 		count += bizNotifications_watchtower.count
 		
@@ -809,6 +817,7 @@ struct HomeView : MVIView {
 			case .electrum           : break
 			case .backgroundPayments : break
 			case .liquiditySettings  : break
+			case .torSettings        : break
 			case .forceCloseChannels : break
 			case .swapInWallet       : break
 			case .finalWallet        : break
@@ -989,7 +998,7 @@ struct HomeView : MVIView {
 	// --------------------------------------------------
 	
 	func toggleCurrencyType() -> Void {
-		log.trace("toggleCurrencyType()")
+		log.trace(#function)
 		
 		// bitcoin -> fiat -> hidden
 		
@@ -1008,7 +1017,7 @@ struct HomeView : MVIView {
 	}
 	
 	func showIncomingBalancePopover() {
-		log.trace("showIncomingBalancePopover()")
+		log.trace(#function)
 		
 		popoverState.display(dismissable: true) {
 			IncomingBalancePopover(
@@ -1025,7 +1034,7 @@ struct HomeView : MVIView {
 	}
 	
 	func openNotificationsSheet() {
-		log.trace("openNotificationSheet()")
+		log.trace(#function)
 		
 		if activeSheet == nil {
 			activeSheet = .notificationsView
@@ -1033,25 +1042,25 @@ struct HomeView : MVIView {
 	}
 	
 	func navigateToBackup() {
-		log.trace("navigateToBackup()")
+		log.trace(#function)
 		
 		deepLinkManager.broadcast(DeepLink.backup)
 	}
 	
 	func navigationToElecrumServer() {
-		log.trace("navigateToElectrumServer()")
+		log.trace(#function)
 		
 		deepLinkManager.broadcast(DeepLink.electrum)
 	}
 	
 	func navigationToBackgroundPayments() {
-		log.trace("navigateToBackgroundPayments()")
+		log.trace(#function)
 		
 		deepLinkManager.broadcast(DeepLink.backgroundPayments)
 	}
 	
 	func openMempoolFullURL() {
-		log.trace("openMempoolFullURL()")
+		log.trace(#function)
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
 			openURL(url)
@@ -1059,15 +1068,23 @@ struct HomeView : MVIView {
 	}
 	
 	func fixBackgroundAppRefreshDisabled() {
-		log.trace("fixBackgroundAppRefreshDisabled()")
+		log.trace(#function)
 		
 		popoverState.display(dismissable: true) {
 			BgRefreshDisabledPopover()
 		}
 	}
 	
+	func showTorNetworkIssueSheet() {
+		log.trace(#function)
+		
+		smartModalState.display(dismissable: true) {
+			TorNetworkIssueSheet()
+		}
+	}
+	
 	func didSelectPayment(row: WalletPaymentInfo) -> Void {
-		log.trace("didSelectPayment()")
+		log.trace(#function)
 		
 		if activeSheet == nil {
 			activeSheet = .paymentView(payment: row)

@@ -13,7 +13,10 @@ struct TorConfigurationView: View {
 	@State var isTorEnabled = GroupPrefs.current.isTorEnabled
 	
 	@State var ignoreToggleStateChange = false
+	
+	@State var didAppear = false
 
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
 	
@@ -36,6 +39,9 @@ struct TorConfigurationView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
+		.onAppear() {
+			onAppear()
+		}
 	}
 	
 	@ViewBuilder
@@ -79,6 +85,25 @@ struct TorConfigurationView: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace(#function)
+		
+		if !didAppear {
+			didAppear = true
+			
+			if let deepLink = deepLinkManager.deepLink, deepLink == .torSettings {
+				// Reached our destination
+				DispatchQueue.main.async { // iOS 14 issues workaround
+					deepLinkManager.unbroadcast(deepLink)
+				}
+			}
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
 
@@ -106,14 +131,14 @@ struct TorConfigurationView: View {
 	}
 	
 	func usingTorSheet_didCancel() {
-		log.trace("usingTorSheet_didCancel()")
+		log.trace(#function)
 		
 		ignoreToggleStateChange = true
 		toggleState = false
 	}
 	
 	func usingTorSheet_didConfirm() {
-		log.trace("usingTorSheet_didConfirm()")
+		log.trace(#function)
 		
 		isTorEnabled = true
 		GroupPrefs.current.isTorEnabled = true
@@ -124,14 +149,14 @@ struct TorConfigurationView: View {
 	}
 	
 	func disablingTorSheet_didCancel() {
-		log.trace("disablingTorSheet_didCancel()")
+		log.trace(#function)
 		
 		ignoreToggleStateChange = true
 		toggleState = true
 	}
 	
 	func disablingTorSheet_didConfirm() {
-		log.trace("disablingTorSheet_didConfirm()")
+		log.trace(#function)
 		
 		isTorEnabled = false
 		GroupPrefs.current.isTorEnabled = false
@@ -142,7 +167,7 @@ struct TorConfigurationView: View {
 	}
 	
 	func openLink() {
-		log.trace("openLink()")
+		log.trace(#function)
 		
 		guard let link = URL(string: "https://phoenix.acinq.co/faq#how-to-use-tor-on-phoenix") else {
 			return

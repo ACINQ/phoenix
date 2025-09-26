@@ -169,6 +169,7 @@
 		DC5631C72C5944CF00DCB5BF /* KotlinExtensions+Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */; };
 		DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */; };
 		DC5631CA2C597B8600DCB5BF /* SourceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C92C597B8600DCB5BF /* SourceInfo.swift */; };
+		DC5895D02E57856D00CBCCF9 /* TorNetworkIssueSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5895CF2E57856600CBCCF9 /* TorNetworkIssueSheet.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
@@ -663,6 +664,7 @@
 		DC5631C42C541E5C00DCB5BF /* Experimental.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Experimental.swift; sourceTree = "<group>"; };
 		DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Manager.swift"; sourceTree = "<group>"; };
 		DC5631C92C597B8600DCB5BF /* SourceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceInfo.swift; sourceTree = "<group>"; };
+		DC5895CF2E57856600CBCCF9 /* TorNetworkIssueSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorNetworkIssueSheet.swift; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
 		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
@@ -1795,6 +1797,7 @@
 				DCDD9ED1286377C5001800A3 /* MainView_Small.swift */,
 				DC5E28C92C62D37A0037B3D3 /* NavigationCoordinator.swift */,
 				DCDD9ED328637EBB001800A3 /* ToolsButton.swift */,
+				DC5895CF2E57856600CBCCF9 /* TorNetworkIssueSheet.swift */,
 			);
 			path = main;
 			sourceTree = "<group>";
@@ -2355,6 +2358,7 @@
 				DC9CF8412D2ECF08003F3B0F /* IncomingBalancePopover.swift in Sources */,
 				DCDD9ED2286377C5001800A3 /* MainView_Small.swift in Sources */,
 				DC4CBC752D64DAC600129BDB /* Details_Incoming_Bolt11.swift in Sources */,
+				DC5895D02E57856D00CBCCF9 /* TorNetworkIssueSheet.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 				DC2210D92DE4F7E30096D8D2 /* LabelAlignment.swift in Sources */,
 				DCC3E57F2D08A63900CCDA40 /* XPC+Foreground.swift in Sources */,
