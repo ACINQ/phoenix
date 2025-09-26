@@ -612,6 +612,7 @@ struct WalletInfoView: View {
 					case .electrum           : break
 					case .backgroundPayments : break
 					case .liquiditySettings  : break
+					case .torSettings        : break
 					case .forceCloseChannels : break
 					case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
 					case .finalWallet        : newNavLinkTag = NavLinkTag.FinalWalletDetails

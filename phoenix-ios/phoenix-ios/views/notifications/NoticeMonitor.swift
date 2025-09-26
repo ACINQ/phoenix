@@ -22,7 +22,12 @@ class NoticeMonitor: ObservableObject {
 	@Published private var notificationPermissions = NotificationsManager.shared.permissions.value
 	@Published private var bgRefreshStatus = NotificationsManager.shared.backgroundRefreshStatus.value
 	
+	@Published private var torNetworkIssue = false
+	
 	@NestedObservableObject private var customElectrumServerObserver = CustomElectrumServerObserver()
+	
+	private var isTorEnabled: Bool? = nil
+	private var connections: Connections? = nil
 	
 	private var cancellables = Set<AnyCancellable>()
 	
@@ -69,6 +74,17 @@ class NoticeMonitor: ObservableObject {
 				self?.bgRefreshStatus = status
 			}
 			.store(in: &cancellables)
+		
+		Publishers.CombineLatest(
+			Biz.business.appConfigurationManager.isTorEnabledPublisher(),
+			Biz.business.connectionsManager.connectionsPublisher()
+		).sink {[weak self](enabled: Bool, connections: Connections) in
+			if let self {
+				self.isTorEnabled = enabled
+				self.connections = connections
+				self.checkForTorIssues()
+			}
+		}.store(in: &cancellables)
 	}
 	
 	var hasNotice: Bool {
@@ -79,6 +95,7 @@ class NoticeMonitor: ObservableObject {
 		if hasNotice_mempoolFull { return true }
 		if hasNotice_backgroundPayments { return true }
 		if hasNotice_watchTower { return true }
+		if hasNotice_torNetworkIssue { return true }
 		
 		return false
 	}
@@ -113,5 +130,33 @@ class NoticeMonitor: ObservableObject {
 	
 	var hasNotice_watchTower: Bool {
 		return bgRefreshStatus != .available
+	}
+	
+	var hasNotice_torNetworkIssue: Bool {
+		return torNetworkIssue
+	}
+	
+	// --------------------------------------------------
+	// MARK: Utils
+	// --------------------------------------------------
+	
+	func checkForTorIssues(needsDelay: Bool = true) {
+		
+		guard let isTorEnabled, let connections else {
+			return
+		}
+		
+		if isTorEnabled && !connections.peer.isEstablished() {
+			if needsDelay {
+				Task { @MainActor in
+					try await Task.sleep(seconds: 3.0)
+					checkForTorIssues(needsDelay: false)
+				}
+			} else {
+				torNetworkIssue = true
+			}
+		} else {
+			torNetworkIssue = false
+		}
 	}
 }
