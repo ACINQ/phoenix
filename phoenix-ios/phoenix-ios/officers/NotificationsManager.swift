@@ -179,10 +179,8 @@ class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 			self.backgroundRefreshStatus.send(newStatus)
 		}
 		
-		if Thread.isMainThread {
+		runOnMainThread {
 			refreshBlock()
-		} else {
-			DispatchQueue.main.async { refreshBlock() }
 		}
 	}
 	
@@ -294,12 +292,12 @@ class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 				return
 			}
 			
-			GroupPrefs.shared.badgeCount += 1
+			GroupPrefs.global.badgeCount += 1
 			
 			let content = UNMutableNotificationContent()
 			content.title = "Some of your channels have closed"
 			content.body = "Please start Phoenix to review your channels."
-			content.badge = NSNumber(value: GroupPrefs.shared.badgeCount)
+			content.badge = NSNumber(value: GroupPrefs.global.badgeCount)
 			
 			let request = UNNotificationRequest(
 				identifier: "revokedCommit",
@@ -316,10 +314,8 @@ class NotificationsManager: NSObject, UNUserNotificationCenterDelegate {
 		
 		UNUserNotificationCenter.current().getNotificationSettings { settings in
 			
-			if Thread.isMainThread {
+			runOnMainThread {
 				handler(settings)
-			} else {
-				DispatchQueue.main.async { handler(settings) }
 			}
 		}
 	}

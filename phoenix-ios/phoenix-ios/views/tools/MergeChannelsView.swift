@@ -37,9 +37,10 @@ struct MergeChannelsView: View {
 	
 	@State var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject private var deviceInfo: DeviceInfo
 	
 	// --------------------------------------------------
@@ -75,11 +76,15 @@ struct MergeChannelsView: View {
 			
 		} // </VStack>
 		.frame(maxWidth: deviceInfo.textColumnMaxWidth)
-		.onReceive(Biz.business.connectionsManager.connectionsPublisher()) {
-			connectionsChanged($0)
+		.task {
+			for await connections in Biz.business.connectionsManager.connectionsSequence() {
+				connectionsChanged(connections)
+			}
 		}
-		.onReceive(Biz.business.peerManager.channelsPublisher()) {
-			channelsChanged($0)
+		.task {
+			for await channels in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(channels)
+			}
 		}
 	}
 	
@@ -605,7 +610,6 @@ struct MergeChannelsView: View {
 	func closeView() {
 		log.trace("closeView()")
 		
-		Prefs.shared.hasMergedChannelsForSplicing = true
 		if location == .sheet {
 			presentationMode.wrappedValue.dismiss()
 		}

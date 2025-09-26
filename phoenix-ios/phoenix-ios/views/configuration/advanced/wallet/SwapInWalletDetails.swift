@@ -22,10 +22,9 @@ struct SwapInWalletDetails: View {
 	let location: Location
 	let popTo: (PopToDestination) -> Void
 	
-	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
+	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.current.liquidityPolicy
 	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	
 	let swapInRejectedPublisher = Biz.swapInRejectedPublisher
 	@State var swapInRejected: Lightning_kmpLiquidityEventsRejected? = nil
@@ -36,10 +35,11 @@ struct SwapInWalletDetails: View {
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -67,14 +67,16 @@ struct SwapInWalletDetails: View {
 		.onAppear {
 			onAppear()
 		}
-		.onReceive(GroupPrefs.shared.liquidityPolicyPublisher) {
+		.onReceive(GroupPrefs.current.liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
-		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
 		}
 		.onReceive(swapInRejectedPublisher) {
 			swapInRejectedStateChange($0)
+		}
+		.task {
+			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+				swapInWalletChanged(wallet)
+			}
 		}
 	}
 	

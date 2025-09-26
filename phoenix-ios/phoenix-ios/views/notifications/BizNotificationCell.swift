@@ -19,7 +19,8 @@ struct BizNotificationCell: View {
 	let item: PhoenixShared.NotificationsManager.NotificationItem
 	let location: Location
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	@ViewBuilder

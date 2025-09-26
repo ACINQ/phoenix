@@ -24,15 +24,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		return UIApplication.shared.delegate as! AppDelegate
 	}
 	
-	private var appCancellables = Set<AnyCancellable>()
-	private var groupPrefsCancellables = Set<AnyCancellable>()
-
-	private var isInBackground = false
+	public let pushTokenPublisher = CurrentValueSubject<String?, Never>(nil)
+	public let fcmTokenPublisher = CurrentValueSubject<String?, Never>(nil)
 	
 	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 
 	public var clearPasteboardOnReturnToApp: Bool = false
 
+	private var isInBackground = false
+	
+	private var appCancellables = Set<AnyCancellable>()
+	private var groupPrefsCancellables = Set<AnyCancellable>()
 	
 	override init() {
 	#if DEBUG
@@ -40,7 +42,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	#endif
 		super.init()
 		AppMigration.shared.performMigrationChecks()
-		Biz.start()
 	}
 	
 	// --------------------------------------------------
@@ -53,6 +54,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	) -> Bool {
 		log.trace("### application(_:didFinishLaunchingWithOptions:)")
 		
+		Biz.prepare()
+		
 		let navBarAppearance = UINavigationBarAppearance()
 		navBarAppearance.backgroundColor = .primaryBackground
 		navBarAppearance.shadowColor = .clear // no separator line between navBar & content
@@ -60,9 +63,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		UINavigationBar.appearance().compactAppearance = navBarAppearance
 		UINavigationBar.appearance().standardAppearance = navBarAppearance
 
-		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
-			UIApplication.shared.registerForRemoteNotifications()
-		#endif
+		// Push notifictions now work on the iOS simulator.
+		// But only for:
+		// - Macs with Apple Silicon processor
+		// - Macs with Intel processor & the T2 security chip
+		//   https://support.apple.com/en-us/103265
+		//
+		UIApplication.shared.registerForRemoteNotifications()
 		
 		FirebaseApp.configure()
 		Messaging.messaging().delegate = self
@@ -114,10 +121,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	func _applicationDidBecomeActive(_ application: UIApplication) {
 		log.trace("### applicationDidBecomeActive(_:)")
 		
-		GroupPrefs.shared.badgeCountPublisher.sink {[self](count: Int) in
+		GroupPrefs.global.badgeCountPublisher.sink {[self](count: Int) in
 			if count > 0 {
 				self.didReceivePaymentViaAppExtension()
-				GroupPrefs.shared.badgeCount = 0
+				GroupPrefs.global.badgeCount = 0
 				UIApplication.shared.applicationIconBadgeNumber = 0
 			}
 		}.store(in: &groupPrefsCancellables)
@@ -202,7 +209,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		let pushToken = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		log.debug("pushToken: \(pushToken)")
 		
-		Biz.setPushToken(pushToken)
+		pushTokenPublisher.send(pushToken)
 		Messaging.messaging().apnsToken = deviceToken
 	}
 
@@ -228,6 +235,59 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// If the app is in the background:
 		// - this notification was delivered to the notifySrvExt, which is in charge of processing it
 		
+	#if DEBUG
+		var push = PushNotification.parse(userInfo)
+		
+		// Still waiting for nodeId to be included in push notifications
+		if push.nodeId == nil || push.chain == nil {
+			let nodeId = "03a496f0414de4ed699d99a6e922da4e96e689a9312d2340bf85ff69688e6e4ef6"
+			push = PushNotification(
+				source: push.source,
+				reason: push.reason,
+				nodeId: nodeId,
+				nodeIdHash: hash160(nodeId: nodeId).successValue,
+				chain: Bitcoin_kmpChain.Testnet3()
+			)
+		}
+		
+	#else
+		let push = PushNotification.parse(userInfo)
+	#endif
+		
+		
+		switch push.source {
+		case .googleFCM:
+			log.debug("push.source == .googleFCM")
+			
+			// If we receive a push notification that's not for the current wallet,
+			// then we'll try to launch the associated `BusinessManager` in the background
+			// to process an incoming payment.
+			
+			if let nodeId = push.nodeId, let chain = push.chain {
+				
+				let pushTargetIsCurrentWallet: Bool
+				if let walletInfo = Biz.walletInfo, walletInfo.nodeIdString == nodeId,
+				   let walletId = Biz.walletId, walletId.chain == chain
+				{
+					pushTargetIsCurrentWallet = true
+				} else {
+					pushTargetIsCurrentWallet = false
+				}
+				log.debug("pushTargetIsCurrentWallet = \(pushTargetIsCurrentWallet)")
+				
+				if !pushTargetIsCurrentWallet && push.reason != .unknown {
+					MBiz.launchBackgroundBiz(push)
+				}
+			} else {
+				log.warning("push.nodeId or push.chain is nil")
+			}
+			
+		case .aws:
+			log.debug("push.source == .aws")
+			
+			// Ignore: only for debugging
+		}
+		
 		DispatchQueue.main.async {
 			completionHandler(.noData)
 		}
@@ -242,8 +302,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		assertMainThread()
 		
-		if let fcmToken = fcmToken {
-			Biz.setFcmToken(fcmToken)
+		if let fcmToken {
+			fcmTokenPublisher.send(fcmToken)
 		}
 	}
 
@@ -280,16 +340,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// We're using the easier option for now.
 		// Especially since there are changes in the upcoming v2.0 release of SQLDelight
 		// that change the corresponding API, and aim to make it more accesible for us.
-
-		let business = Biz.business
+		
 		Task { @MainActor in
 			
-			let paymentsDb = try await business.databaseManager.paymentsDb()
+			let paymentsDb = try await Biz.business.databaseManager.paymentsDb()
 			
 			let fakePaymentId = Lightning_kmpUUID.companion.randomUUID()
 			try await paymentsDb.deletePayment(paymentId: fakePaymentId, notify: false)
 			
-			try await business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency")
+			try await Biz.business.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency")
 		}
 	}
 }

@@ -10,7 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct Experimental: View {
 	
-	@State var address: String? = AppSecurity.shared.getBip353Address()
+	@State var address: String? = Keychain.current.getBip353Address()
 	@State var isClaiming: Bool = false
 	
 	enum ClaimError: Error {
@@ -212,7 +212,7 @@ struct Experimental: View {
 			case .success(let addr):
 				self.address = addr
 				self.claimError = nil
-				let _ = AppSecurity.shared.setBip353Address(addr)
+				let _ = Keychain.current.setBip353Address(addr)
 				
 			case .failure(let err):
 				self.claimError = err

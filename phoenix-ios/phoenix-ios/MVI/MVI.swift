@@ -22,7 +22,7 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 		}
 	}
 	
-	private let _getController: ((ControllerFactory) -> MVIController<Model, Intent>)?
+	private let _getController: (() -> MVIController<Model, Intent>)?
 	private var _controller: MVIController<Model, Intent>?
 	
 	var controller: MVIController<Model, Intent>? {
@@ -32,7 +32,7 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	private var unsub: (() -> Void)? = nil
 	private var subCount: Int = 0
 
-	init(_ getController: @escaping (ControllerFactory) -> MVIController<Model, Intent>) {
+	init(_ getController: @escaping () -> MVIController<Model, Intent>) {
 		_getController = getController
 		_controller = nil
 	}
@@ -54,10 +54,10 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	
 	/// Called automatically when using MVIView.
 	/// 
-	fileprivate func initializeControllerIfNeeded(_ factory: ControllerFactory) -> Void {
+	fileprivate func initializeControllerIfNeeded() {
 		if _controller == nil {
 			if let getController = _getController {
-				let controller = getController(factory)
+				let controller = getController()
 				_controller = controller
 				_initialModel = controller.firstModel
 				
@@ -112,10 +112,7 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 /// The implementation looks something like this:
 ///
 /// > struct MyView: MVIView {
-/// >   @StateObject var mvi = MVIState({ $0.someFactoryMethodHere() })
-/// >
-/// >   @Environment(\.controllerFactory) var factoryEnv
-/// >   var factory: ControllerFactory { return factoryEnv }
+/// >   @StateObject var mvi = MVIState({ Biz.business.controllers.someFactoryMethodHere() })
 /// >
 /// >   @ViewBuilder var view: some View {
 /// >     // your view code here
@@ -139,18 +136,12 @@ protocol MVIView : View {
 	
 	/// The content and behavior of the view.
 	@ViewBuilder var view: Self.ViewBody { get }
-	
-	/// Implement this via the following code:
-	/// > @Environment(\.controllerFactory) var factoryEnv
-	/// > var factory: ControllerFactory { return factoryEnv }
-	///
-	var factory: ControllerFactory { get }
 }
 
 extension MVIView {
 	
 	var body: some View {
-		mvi.initializeControllerIfNeeded(self.factory)
+		mvi.initializeControllerIfNeeded()
 		return view.onAppear {
 			mvi.subscribe()
 		}.onDisappear {
@@ -208,69 +199,4 @@ extension MVISubView {
 			mvi.unsubscribe()
 		}
 	}
-}
-
-// MARK: -
-
-fileprivate struct ControllerFactoryKey: EnvironmentKey {
-	static let defaultValue: ControllerFactory = FakeControllerFactory()
-}
-
-extension EnvironmentValues {
-	var controllerFactory: ControllerFactory {
-		get { self[ControllerFactoryKey.self] }
-		set { self[ControllerFactoryKey.self] = newValue }
-	}
-}
-
-/// To support closing the current wallet, we use a FakeControllerFactory as the defaultValue.
-/// The real ControllerFactory gets injected via the GlobalEnvironment.
-///
-class FakeControllerFactory: ControllerFactory {
-
-	func closeChannelsConfiguration() ->
-		MVIController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func configuration() ->
-		MVIController<Configuration.Model, Configuration.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func content() ->
-		MVIController<Content.Model, Content.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func electrumConfiguration() ->
-		MVIController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func forceCloseChannelsConfiguration() ->
-		MVIController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func home() ->
-		MVIController<Home.Model, Home.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func initialization() ->
-		MVIController<Initialization.Model, Initialization.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func receive() ->
-		MVIController<Receive.Model, Receive.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
-	func restoreWallet() ->
-		MVIController<RestoreWallet.Model, RestoreWallet.Intent> {
-			fatalError("Missing @Environment: ControllerFactory")
-		}
-
 }

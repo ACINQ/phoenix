@@ -35,12 +35,7 @@ struct SwapInView: View {
 	}
 	@State var activeSheet: ActiveSheet? = nil
 	
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
-	
-	let swapInAddressPublisher = Biz.business.peerManager.peerStatePublisher()
-		.compactMap { $0.swapInWallet }
-		.flatMap { $0.swapInAddressPublisher() }
 	@State var swapInAddressInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -130,11 +125,18 @@ struct SwapInView: View {
 		.onAppear {
 			onAppear()
 		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
+		.task {
+			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+				swapInWalletChanged(wallet)
+			}
 		}
-		.onReceive(swapInAddressPublisher) {
-			swapInAddressChanged($0)
+		.task {
+			guard let peer = Biz.business.peerManager.peerStateValue() else {
+				return
+			}
+			for await info in peer.phoenixSwapInWallet.swapInAddressSequence() {
+				swapInAddressChanged(info)
+			}
 		}
 		.onChange(of: swapInAddressType) {
 			swapInAddressTypeChanged($0)
@@ -352,7 +354,7 @@ struct SwapInView: View {
 		let address: String
 		switch swapInAddressType {
 		case .taproot:
-			let index = swapInAddressInfo?.index ?? Prefs.shared.swapInAddressIndex
+			let index = swapInAddressInfo?.index ?? Prefs.current.swapInAddressIndex
 			address = keyManager.swapInOnChainWallet
 				.getSwapInProtocol(addressIndex: Int32(index))
 				.address(chain: chain)

@@ -28,10 +28,11 @@ struct DrainWalletView_Confirm: MVISubView {
 	@State var popToDestination: PopToDestination? = nil
 	// </iOS_16_workarounds>
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
 	// MARK: View Builders

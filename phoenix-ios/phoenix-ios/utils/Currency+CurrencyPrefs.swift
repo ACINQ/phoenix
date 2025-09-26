@@ -18,7 +18,7 @@ extension Currency {
 	///
 	static func displayable(currencyPrefs: CurrencyPrefs, plus: Currency? = nil) -> [Currency] {
 		
-		var all = [Currency](GroupPrefs.shared.currencyConverterList)
+		var all = [Currency](GroupPrefs.current.currencyConverterList)
 		
 		let preferredFiatCurrency = Currency.fiat(currencyPrefs.fiatCurrency)
 		if !all.contains(preferredFiatCurrency) {

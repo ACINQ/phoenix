@@ -58,7 +58,7 @@ enum PushPermissionQuery: String, Codable {
 	case userAccepted
 }
 
-struct ElectrumConfigPrefs: Equatable, Codable {
+struct ElectrumConfigPrefs: Equatable, Codable, CustomStringConvertible {
 	let host: String
 	let port: UInt16
 	let pinnedPubKey: String?
@@ -96,9 +96,22 @@ struct ElectrumConfigPrefs: Equatable, Codable {
 			requireOnionIfTorEnabled: requireOnionIfTorEnabled ?? true
 		)
 	}
+	
+	var description: String {
+		var result = "<\(host):\(port)"
+		if let pinnedPubKey {
+			result += ", pinnedPubKey(\(pinnedPubKey))"
+		}
+		if let flag = requireOnionIfTorEnabled {
+			result += ", requireOnionIfTorEnabled(\(flag))"
+		}
+		result += ">"
+		
+		return result
+	}
 }
 
-struct LiquidityPolicy: Equatable, Codable {
+struct LiquidityPolicy: Equatable, Codable, CustomStringConvertible {
 	
 	let enabled: Bool
 	let maxFeeSats: Int64?
@@ -163,6 +176,22 @@ struct LiquidityPolicy: Equatable, Codable {
 			
 			return Lightning_kmpLiquidityPolicy.Disable()
 		}
+	}
+	
+	var description: String {
+		var result = "<enabled(\(enabled))"
+		if let maxFeeSats {
+			result += ", maxFeeSats(\(maxFeeSats))"
+		}
+		if let maxFeeBasisPoints {
+			result += ", maxFeeBasisPoints(\(maxFeeBasisPoints))"
+		}
+		if let skipAbsoluteFeeCheck {
+			result += ", skipAbsoluteFeeCheck(\(skipAbsoluteFeeCheck))"
+		}
+		result += ">"
+		
+		return result
 	}
 }
 

@@ -50,6 +50,8 @@ struct SendView: View {
 	
 	@State var needsAcceptWarning = true
 	
+	@State var walletInfoPresented: Bool = false
+	
 	enum ActiveSheet {
 		case imagePicker
 		case qrCodeScanner
@@ -110,6 +112,7 @@ struct SendView: View {
 		layers()
 			.navigationTitle("Send")
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: walletIconButton())
 	}
 	
 	@ViewBuilder
@@ -159,9 +162,6 @@ struct SendView: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
-			contactsListChanged($0)
-		}
 		.onChange(of: inputFieldText) { _ in
 			inputFieldTextChanged()
 		}
@@ -177,6 +177,9 @@ struct SendView: View {
 				ScanQrCodeView(location: .sheet, didScanQrCode: didScanQrCode)
 			
 			} // </switch>
+		}
+		.task {
+			await monitorContactsList()
 		}
 	}
 	
@@ -539,7 +542,7 @@ struct SendView: View {
 			selectContact(item)
 		} label: {
 			HStack(alignment: VerticalAlignment.center, spacing: 8) {
-				ContactPhoto(fileName: item.photoUri, size: 32)
+				ContactPhoto(filename: item.photoUri, size: 32)
 				Text(item.name)
 					.font(.title3)
 					.foregroundColor(.primary)
@@ -558,7 +561,7 @@ struct SendView: View {
 				unselectContact()
 			} label: {
 				HStack(alignment: VerticalAlignment.center, spacing: 8) {
-					ContactPhoto(fileName: item.photoUri, size: 32)
+					ContactPhoto(filename: item.photoUri, size: 32)
 					Text(item.name)
 						.font(.title3)
 						.foregroundColor(.primary)
@@ -703,6 +706,40 @@ struct SendView: View {
 	}
 	
 	@ViewBuilder
+	func walletIconButton() -> some View {
+		
+		if #available(iOS 17, *) {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(isPresented: $walletInfoPresented) {
+				WalletInfoSend()
+					.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+					.presentationCompactAdaptation(.popover)
+			}
+			
+		} else {
+			
+			Button {
+				walletInfoPresented = true
+			} label: {
+				let wallet = currentWalletMetadata()
+				WalletImage(filename: wallet.photo, size: 48, useCache: true)
+			}
+			.popover(present: $walletInfoPresented) {
+				InfoPopoverWindow {
+					WalletInfoSend()
+						.frame(maxWidth: deviceInfo.windowSize.width * 0.6)
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func navLinkView() -> some View {
 		
 		if let tag = self.navLinkTag {
@@ -772,6 +809,10 @@ struct SendView: View {
 		)
 	}
 	
+	func currentWalletMetadata() -> WalletMetadata {
+		return SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
+	}
+	
 	// --------------------------------------------------
 	// MARK: View Lifecycle
 	// --------------------------------------------------
@@ -789,6 +830,26 @@ struct SendView: View {
 		if selectedContactId != nil {
 			selectedContactId = nil
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	@MainActor
+	func monitorContactsList() async {
+		log.trace(#function)
+		
+		do {
+			let contactsDb = try await Biz.business.databaseManager.contactsDb()
+			for await contacts in contactsDb.contactsList {
+				contactsListChanged(contacts)
+			}
+		} catch {
+			log.error("monitorContactsList(): error: \(error)")
+		}
+		
+		log.debug("monitorContactsList(): terminated")
 	}
 	
 	// --------------------------------------------------
@@ -828,7 +889,7 @@ struct SendView: View {
 			search_addresses = addresses
 		}
 		do {
-			var domains = ContactAddress.wellKnownDomains(includeTestnet: BusinessManager.isTestnet)
+			var domains = ContactAddress.wellKnownDomains(includeTestnet: Biz.isTestnet)
 			for contact in sortedContacts {
 				contact.addresses.forEach { address in
 					if let domain = address.domain {

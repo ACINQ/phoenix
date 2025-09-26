@@ -73,9 +73,10 @@ struct CpfpView: View {
 	)
 	@State var priorityBoxHeight: CGFloat? = nil
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -452,6 +453,7 @@ struct CpfpView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
+	@MainActor
 	func fetchMempoolRecommendedFees() async {
 		
 		for try await response in MempoolMonitor.shared.stream() {
@@ -462,6 +464,7 @@ struct CpfpView: View {
 		}
 	}
 	
+	@MainActor
 	func checkConfirmations() async {
 		log.trace("checkConfirmations()")
 		
@@ -479,10 +482,11 @@ struct CpfpView: View {
 		}
 	}
 	
+	@MainActor
 	func monitorBlockchain() async {
 		log.trace("monitorBlockchain()")
 		
-		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
+		for await notification in Biz.business.electrumClient.notificationsSequence() {
 			
 			if notification is Lightning_kmpHeaderSubscriptionResponse {
 				// A new block was mined !
