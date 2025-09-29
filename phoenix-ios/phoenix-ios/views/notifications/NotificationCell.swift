@@ -108,4 +108,21 @@ class NotificationCell {
 		.accessibilityAddTraits(.isButton)
 		.accessibilitySortPriority(47)
 	}
+	
+	@ViewBuilder
+	static func torNetworkIssue() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Image(systemName: "exclamationmark.triangle")
+				.imageScale(.large)
+				.padding(.trailing, 10)
+				.accessibilityHidden(true)
+				.accessibilityLabel("Warning")
+			
+			Text("Cannot access the Tor network. Phoenix will not function correctly.")
+		} // </HStack>
+		.accessibilityElement(children: .combine)
+		.accessibilityAddTraits(.isButton)
+		.accessibilitySortPriority(47)
+	}
 }

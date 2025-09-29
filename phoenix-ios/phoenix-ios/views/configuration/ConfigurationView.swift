@@ -635,11 +635,12 @@ struct ConfigurationList: View {
 					case .electrum           : newNavLinkTag = .ElectrumServer       ; delay *= 1
 					case .backgroundPayments : newNavLinkTag = .PaymentOptions       ; delay *= 2
 					case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
+					case .torSettings        : newNavLinkTag = .Tor                  ; delay *= 1
 					case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
 					case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .appAccess          : newNavLinkTag = .AppAccess            ; delay *= 1
-					case .walletMetadata     : newNavLinkTag = .WalletMetadata            ; delay *= 1
+					case .walletMetadata     : newNavLinkTag = .WalletMetadata       ; delay *= 1
 				}
 				
 				if let newNavLinkTag {

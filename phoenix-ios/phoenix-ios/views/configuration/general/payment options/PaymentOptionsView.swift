@@ -383,6 +383,7 @@ struct PaymentOptionsList: View {
 					case .electrum           : break
 					case .backgroundPayments : newNavLinkTag = NavLinkTag.BackgroundPaymentsSelector
 					case .liquiditySettings  : break
+					case .torSettings        : break
 					case .forceCloseChannels : break
 					case .swapInWallet       : break
 					case .finalWallet        : break
