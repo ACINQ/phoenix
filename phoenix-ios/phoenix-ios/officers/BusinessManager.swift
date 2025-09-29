@@ -185,11 +185,11 @@ class BusinessManager {
 				groupPrefs.currencyConverterListPublisher
 			).sink { _ in
 			
-				let current = AppConfigurationManager.PreferredFiatCurrencies(
+				let current = PreferredFiatCurrencies(
 					primary: groupPrefs.fiatCurrency,
 					others: groupPrefs.preferredFiatCurrencies
 				)
-				self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
+				MBiz.registerPreferredFiatCurrencies(walletId, current)
 			}
 			.store(in: &cancellables)
 		
@@ -367,11 +367,11 @@ class BusinessManager {
 			business.appConfigurationManager.updateElectrumConfig(config: nil)
 		}
 
-		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+		let preferredFiatCurrencies = PreferredFiatCurrencies(
 			primary: groupPrefs.fiatCurrency,
 			others: groupPrefs.preferredFiatCurrencies
 		)
-		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
+		MBiz.registerPreferredFiatCurrencies(walletId, preferredFiatCurrencies)
 
 		let startupParams = StartupParams(
 			isTorEnabled: groupPrefs.isTorEnabled,

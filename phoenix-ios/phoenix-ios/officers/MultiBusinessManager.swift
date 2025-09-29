@@ -36,6 +36,8 @@ class MultiBusinessManager {
 	
 	private var bgBizListTimers: [String: Int] = [:]
 	
+	private var monitoredCurrencies: [WalletIdentifier: PreferredFiatCurrencies] = [:]
+	
 	private init() { // must use shared instance
 		log.trace(#function)
 		
@@ -160,5 +162,35 @@ class MultiBusinessManager {
 	
 	private func ptrString(_ biz: BusinessManager) -> String {
 		return Unmanaged.passUnretained(biz).toOpaque().debugDescription
+	}
+	
+	func registerPreferredFiatCurrencies(
+		_ walletId: WalletIdentifier,
+		_ preferredFiatCurrencies: PreferredFiatCurrencies
+	) {
+		log.trace(#function)
+		
+		monitoredCurrencies[walletId] = preferredFiatCurrencies
+		updateCurrencyManager()
+	}
+	
+	func unregisterPreferredFiatCurrencies(
+		_ walletId: WalletIdentifier
+	) {
+		log.trace(#function)
+		
+		monitoredCurrencies[walletId] = nil
+		updateCurrencyManager()
+	}
+	
+	func updateCurrencyManager() {
+		log.trace(#function)
+		
+		var all = Set<FiatCurrency>()
+		for (_, preferredFiatCurrencies) in monitoredCurrencies {
+			all.formUnion(preferredFiatCurrencies.all)
+		}
+		
+		BusinessManager.phoenixGlobal.currencyManager.monitorCurrencies(value: all)
 	}
 }

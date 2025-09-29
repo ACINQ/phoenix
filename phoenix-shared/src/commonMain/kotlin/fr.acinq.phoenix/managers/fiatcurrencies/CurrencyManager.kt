@@ -109,7 +109,11 @@ class CurrencyManager(
     val monitoredCurrencies: StateFlow<Set<FiatCurrency>> by lazy { _monitoredCurrencies }
 
     fun monitorCurrencies(value: PreferredFiatCurrencies) {
-        _monitoredCurrencies.value += value.all
+        monitorCurrencies(value.all)
+    }
+
+    fun monitorCurrencies(value: Set<FiatCurrency>) {
+        _monitoredCurrencies.value = prepTargets(value)
         log.info { "monitoring ${_monitoredCurrencies.value}" }
     }
 
@@ -149,7 +153,7 @@ class CurrencyManager(
     // only used by iOS
     fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = scope.launch {
         stopAutoRefresh().join()
-        val targetSet = targets.toSet()
+        val targetSet = prepTargets(targets)
 
         val deferred1 = async {
             refresh(targetSet, blockchainInfoAPI, forceRefresh = force)
@@ -226,6 +230,20 @@ class CurrencyManager(
                 val refreshInfo = refreshList[fiatCurrency] ?: RefreshInfo()
                 refreshList[fiatCurrency] = refreshInfo.fail(now)
             }
+        }
+    }
+
+    private fun prepTargets(targets: Collection<FiatCurrency>): Set<FiatCurrency> {
+
+        // All non-high-liquidity currencies require USD to perform proper conversions.
+        // E.g. COP => USD => BTC
+        // So if the given list includes any non-high-liquidity currencies,
+        // then we need to make sure we append USD to the list.
+        val requiresUsd = targets.any { !ExchangeRateApi.highLiquidityMarkets.contains(it) }
+        return if (requiresUsd) {
+            targets.plus(FiatCurrency.USD).toSet()
+        } else {
+            targets.toSet()
         }
     }
 

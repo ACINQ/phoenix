@@ -5,7 +5,7 @@ protocol WalletIdentifiable {
 	var nodeIdHash: String { get }
 }
 
-struct WalletIdentifier: WalletIdentifiable, Equatable {
+struct WalletIdentifier: WalletIdentifiable, Hashable {
 	let chain: Bitcoin_kmpChain
 	let nodeIdHash: String
 	let encryptedNodeId: String
