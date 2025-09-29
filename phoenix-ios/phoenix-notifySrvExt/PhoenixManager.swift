@@ -20,7 +20,7 @@ typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
  * However, we encountered some technical problems with the approach...
  *
  * In lightning-kmp, the IncomingPaymentsHandler stores payment parts in memory.
- * If payment parts arrive slowly, the the background & foreground processes may
+ * If payment parts arrive slowly, then the background & foreground processes may
  * have a different view of the current state, or even handle the same part differently.
  *
  * Ultimately, this is a problem we'd like to fix in lightning-kmp. But for now,
@@ -29,6 +29,8 @@ typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
 class PhoenixManager {
 	
 	public static let shared = PhoenixManager()
+	
+	private static let phoenixGlobal = PhoenixGlobal(ctx: PlatformContext.default)
 	
 	private var business: PhoenixBusiness? = nil
 	private var oldBusiness: PhoenixBusiness? = nil
@@ -55,7 +57,7 @@ class PhoenixManager {
 			return currentBusiness
 		}
 
-		let newBusiness = PhoenixBusiness(ctx: PlatformContext.default)
+		let newBusiness = PhoenixBusiness(phoenixGlobal: PhoenixManager.phoenixGlobal)
 
 		newBusiness.networkMonitor.disable()
 		newBusiness.currencyManager.disableAutoRefresh()

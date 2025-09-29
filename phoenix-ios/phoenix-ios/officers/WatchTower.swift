@@ -263,7 +263,7 @@ class WatchTower {
 		log.trace(#function)
 		
 		let id = target.nodeIdHash
-		let business = PhoenixBusiness(ctx: PlatformContext.default)
+		let business = PhoenixBusiness(phoenixGlobal: BusinessManager.phoenixGlobal)
 
 		business.currencyManager.disableAutoRefresh()
 		

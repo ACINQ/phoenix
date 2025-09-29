@@ -31,6 +31,8 @@ enum LoadWalletTrigger: CustomStringConvertible {
 ///
 class BusinessManager {
 
+	public static let phoenixGlobal = PhoenixGlobal(ctx: PlatformContext.default)
+	
 	/// There are some places in the code where we need to access the testnet state from a background thread.
 	/// This is problematic because calling into Kotlin via `business.chain.isTestnet()`
 	/// from a background thread will throw an exception.
@@ -91,7 +93,7 @@ class BusinessManager {
 	init() {
 		log.trace(#function)
 		
-		business = PhoenixBusiness(ctx: PlatformContext.default)
+		business = PhoenixBusiness(phoenixGlobal: BusinessManager.phoenixGlobal)
 		isTestnet = !business.chain.isMainnet()
 		showTestnetBackground = !business.chain.isMainnet()
 		
