@@ -72,8 +72,8 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
         )
     }
 
-    businessComposable(Screen.BusinessNavGraph.DisplayPrefs.route, appViewModel) { _, _, business ->
-        DisplayPrefsView(business = business, onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.BusinessNavGraph.DisplayPrefs.route, appViewModel) { _, walletId, business ->
+        DisplayPrefsView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.BusinessNavGraph.About.route, appViewModel) { _, _, _ ->

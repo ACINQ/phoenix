@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.managers.fiatcurrencies
+package fr.acinq.phoenix.managers.global
 
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
@@ -23,13 +23,14 @@ import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.PreferredFiatCurrencies
 import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.managers.fiatcurrencies.apis.BlockchainInfoApi
-import fr.acinq.phoenix.managers.fiatcurrencies.apis.BluelyticsAPI
-import fr.acinq.phoenix.managers.fiatcurrencies.apis.CoinbaseAPI
-import fr.acinq.phoenix.managers.fiatcurrencies.apis.ExchangeRateApi
-import fr.acinq.phoenix.managers.fiatcurrencies.apis.YadioAPI
+import fr.acinq.phoenix.managers.global.fiatapis.BlockchainInfoApi
+import fr.acinq.phoenix.managers.global.fiatapis.BluelyticsAPI
+import fr.acinq.phoenix.managers.global.fiatapis.CoinbaseAPI
+import fr.acinq.phoenix.managers.global.fiatapis.ExchangeRateApi
+import fr.acinq.phoenix.managers.global.fiatapis.YadioAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -42,17 +43,17 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlin.collections.plus
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
-
 
 /**
  * Manages the routines fetching the btc exchange rates. The frontend app must add fiat currencies they
@@ -104,17 +105,22 @@ class CurrencyManager(
     private var networkAccessEnabled = false
     private var autoRefreshEnabled = true
 
-    // always monitor USD, because it's actually the basis btc rate used by most other currencies
-    private val _monitoredCurrencies by lazy { MutableStateFlow(setOf(FiatCurrency.USD)) }
-    val monitoredCurrencies: StateFlow<Set<FiatCurrency>> by lazy { _monitoredCurrencies }
+    // monitored currencies are grouped by wallet id to easily add/remove currencies from the flow when starting/shutting down wallets
+    private val _monitoredCurrencies by lazy { MutableStateFlow<Map<String, Set<FiatCurrency>>>(emptyMap()) }
 
-    fun monitorCurrencies(value: PreferredFiatCurrencies) {
-        monitorCurrencies(value.all)
+    // always monitor USD, because it's the basis btc rate used by most currencies
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val monitoredCurrencies = _monitoredCurrencies.mapLatest {
+        (it.values.flatten().toSet() + FiatCurrency.USD).also { log.debug { "monitoring $it" } }
+    }.stateIn(scope = scope, started = SharingStarted.Lazily, initialValue = setOf(FiatCurrency.USD))
+
+    /** Wallet id is the hash160 of the wallet's node id */
+    fun startMonitoringCurrencies(walletId: String, currencies: PreferredFiatCurrencies) {
+        _monitoredCurrencies.value += walletId to currencies.all
     }
 
-    fun monitorCurrencies(value: Set<FiatCurrency>) {
-        _monitoredCurrencies.value = prepTargets(value)
-        log.info { "monitoring ${_monitoredCurrencies.value}" }
+    fun stopMonitoringForWallet(walletId: String) {
+        _monitoredCurrencies.value -= walletId
     }
 
     /** Called by AppConnectionsDaemon when internet is available. */
@@ -153,7 +159,7 @@ class CurrencyManager(
     // only used by iOS
     fun refreshAll(targets: List<FiatCurrency>, force: Boolean = true) = scope.launch {
         stopAutoRefresh().join()
-        val targetSet = prepTargets(targets)
+        val targetSet = targets.toSet() + FiatCurrency.USD
 
         val deferred1 = async {
             refresh(targetSet, blockchainInfoAPI, forceRefresh = force)
@@ -208,6 +214,41 @@ class CurrencyManager(
     }
 
     /**
+     * Returns a snapshot of the ExchangeRate for the primary FiatCurrency.
+     * That is, an instance of OriginalFiat, where:
+     * - type => current primary FiatCurrency (via AppConfigurationManager)
+     * - price => BitcoinPriceRate.price for FiatCurrency type
+     */
+    fun calculateOriginalFiat(currency: FiatCurrency): ExchangeRate.BitcoinPriceRate? {
+        val rates = ratesFlow.value
+        val fiatRate = rates.firstOrNull { it.fiatCurrency == currency } ?: return null
+
+        return when (fiatRate) {
+            is ExchangeRate.BitcoinPriceRate -> {
+                // We have a direct exchange rate.
+                // BitcoinPriceRate.rate => The price of 1 BTC in this currency
+                fiatRate
+            }
+            is ExchangeRate.UsdPriceRate -> {
+                // We have an indirect exchange rate.
+                // UsdPriceRate.price => The price of 1 US Dollar in this currency
+                rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull {
+                    it.fiatCurrency == FiatCurrency.USD
+                }?.let { usdRate ->
+                    ExchangeRate.BitcoinPriceRate(
+                        fiatCurrency = currency,
+                        price = usdRate.price * fiatRate.price,
+                        source = "${fiatRate.source}/${usdRate.source}",
+                        timestampMillis = fiatRate.timestampMillis.coerceAtMost(
+                            usdRate.timestampMillis
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
      * Updates the `refreshList` with fresh RefreshInfo values.
      * Only the `attempted` currencies are updated.
      * The `refreshed` parameter marks those currencies that were successfully refreshed.
@@ -230,20 +271,6 @@ class CurrencyManager(
                 val refreshInfo = refreshList[fiatCurrency] ?: RefreshInfo()
                 refreshList[fiatCurrency] = refreshInfo.fail(now)
             }
-        }
-    }
-
-    private fun prepTargets(targets: Collection<FiatCurrency>): Set<FiatCurrency> {
-
-        // All non-high-liquidity currencies require USD to perform proper conversions.
-        // E.g. COP => USD => BTC
-        // So if the given list includes any non-high-liquidity currencies,
-        // then we need to make sure we append USD to the list.
-        val requiresUsd = targets.any { !ExchangeRateApi.highLiquidityMarkets.contains(it) }
-        return if (requiresUsd) {
-            targets.plus(FiatCurrency.USD).toSet()
-        } else {
-            targets.toSet()
         }
     }
 

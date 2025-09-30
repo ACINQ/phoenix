@@ -59,8 +59,8 @@ class PhoenixManager {
 
 		let newBusiness = PhoenixBusiness(phoenixGlobal: PhoenixManager.phoenixGlobal)
 
-		newBusiness.networkMonitor.disable()
-		newBusiness.currencyManager.disableAutoRefresh()
+		newBusiness.phoenixGlobal.networkMonitor.disable()
+		newBusiness.phoenixGlobal.currencyManager.disableAutoRefresh()
 
 		// Setup complete
 		business = newBusiness
@@ -235,8 +235,8 @@ class PhoenixManager {
 			primary: primaryFiatCurrency,
 			others: groupPrefs.preferredFiatCurrencies
 		)
-		business.currencyManager.monitorCurrencies(
-			value: preferredFiatCurrencies
+		business.appConfigurationManager.updatePreferredFiatCurrencies(
+			current: preferredFiatCurrencies
 		)
 
 		let startupParams = StartupParams(
@@ -245,8 +245,8 @@ class PhoenixManager {
 		)
 		business.start(startupParams: startupParams)
 
-		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
-		business.currencyManager.ratesPubliser().sink {
+		business.phoenixGlobal.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
+		business.phoenixGlobal.currencyManager.ratesPubliser().sink {
 			[weak self](rates: [ExchangeRate]) in
 
 			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread

@@ -124,7 +124,9 @@ fun AppRoot(
             lastCompletedPayment?.value?.let { payment ->
                 LaunchedEffect(key1 = payment.id) {
                     val completedAt = payment.completedAt
-                    if (navController.currentDestination?.route == Screen.BusinessNavGraph.Home.route && (completedAt != null && (currentTimestampMillis() - completedAt) < 5.seconds.inWholeMilliseconds) ) {
+                    val showPaymentOnCurrentRoute = navController.currentDestination?.route == Screen.BusinessNavGraph.Home.route
+                            || navController.currentDestination?.route == Screen.BusinessNavGraph.Receive.route
+                    if (showPaymentOnCurrentRoute && (completedAt != null && (currentTimestampMillis() - completedAt) < 5.seconds.inWholeMilliseconds)) {
                         navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
                     }
                 }

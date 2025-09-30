@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.managers.fiatcurrencies.apis
+package fr.acinq.phoenix.managers.global.fiatapis
 
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency

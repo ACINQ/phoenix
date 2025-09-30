@@ -11,8 +11,6 @@ import fr.acinq.phoenix.db.payments.*
 import kotlin.collections.List
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 class CloudKitPaymentsDb(
     private val paymentsDb: SqlitePaymentsDb
@@ -211,8 +209,8 @@ class CloudKitPaymentsDb(
             val ckQueries = paymentsDb.database.cloudKitPaymentsQueries
             val metaQueries = paymentsDb.database.paymentsMetadataQueries
 
-            val incomingPaymentsDb = SqliteIncomingPaymentsDb(paymentsDb.database, paymentsDb.metadataQueue)
-            val outgoingPaymentsDb = SqliteOutgoingPaymentsDb(paymentsDb.database, paymentsDb.metadataQueue)
+            val incomingPaymentsDb = SqliteIncomingPaymentsDb(paymentsDb.database, paymentsDb.paymentMetadataQueue)
+            val outgoingPaymentsDb = SqliteOutgoingPaymentsDb(paymentsDb.database, paymentsDb.paymentMetadataQueue)
 
             db.transaction {
 

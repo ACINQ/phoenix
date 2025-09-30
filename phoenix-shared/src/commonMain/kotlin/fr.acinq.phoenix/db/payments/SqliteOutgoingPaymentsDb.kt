@@ -25,13 +25,13 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.db.didSaveWalletPayment
-import fr.acinq.phoenix.utils.MetadataQueue
+import fr.acinq.phoenix.managers.PaymentMetadataQueue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SqliteOutgoingPaymentsDb(
     private val database: PaymentsDatabase,
-    private val metadataQueue: MetadataQueue?
+    private val paymentMetadataQueue: PaymentMetadataQueue?
 ) : OutgoingPaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
@@ -56,7 +56,9 @@ class SqliteOutgoingPaymentsDb(
     }
 
     override suspend fun addOutgoingPayment(outgoingPayment: OutgoingPayment) {
-        val metadata = metadataQueue?.dequeue(outgoingPayment.id)
+        val metadata = paymentMetadataQueue?.dequeue(outgoingPayment.id).let {
+            paymentMetadataQueue?.enrichPaymentMetadata(it)
+        }
         withContext(Dispatchers.Default) {
             database.transaction {
                 _addOutgoingPayment(outgoingPayment, metadata)

@@ -41,6 +41,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.PhoenixIcon
@@ -75,7 +76,7 @@ fun LiquidityPolicyView(
 
     val peerManager = business.peerManager
     val notificationsManager = business.notificationsManager
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
     val channels by business.peerManager.channelsFlow.collectAsState()
 
     val maxSatFeePrefs = maxSatFeePrefsFlow?.value

@@ -31,17 +31,11 @@ import fr.acinq.phoenix.controllers.main.AppContentController
 import fr.acinq.phoenix.controllers.main.AppHomeController
 import fr.acinq.phoenix.controllers.payments.AppReceiveController
 import fr.acinq.phoenix.data.StartupParams
-import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.db.createAppDbDriver
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
-import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 class PhoenixBusiness(
@@ -57,14 +51,6 @@ class PhoenixBusiness(
         tcpSocketBuilder
     }
 
-    internal val httpClient by lazy {
-        HttpClient {
-            install(ContentNegotiation) {
-                json(json = Json { ignoreUnknownKeys = true })
-            }
-        }
-    }
-
     val chain: Chain = NodeParamsManager.chain
 
     val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
@@ -72,7 +58,6 @@ class PhoenixBusiness(
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    val networkMonitor by lazy { NetworkMonitor(loggerFactory, phoenixGlobal.ctx) }
     val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
     val databaseManager by lazy { DatabaseManager(this) }
@@ -80,9 +65,6 @@ class PhoenixBusiness(
     val paymentsManager by lazy { PaymentsManager(this) }
     val balanceManager by lazy { BalanceManager(this) }
     val appConfigurationManager by lazy { AppConfigurationManager(this) }
-
-    val currencyManager = phoenixGlobal.currencyManager
-
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnurlManager by lazy { LnurlManager(this) }
     val notificationsManager by lazy { NotificationsManager(this) }
@@ -109,9 +91,7 @@ class PhoenixBusiness(
         electrumWatcher.stop()
         electrumWatcher.cancel()
         appConnectionsDaemon?.cancel()
-        networkMonitor.stop()
         notificationsManager.cancel()
-        currencyManager.scope.cancel()
         paymentsManager.cancel()
         walletManager.cancel()
         nodeParamsManager.cancel()

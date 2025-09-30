@@ -35,6 +35,7 @@ import fr.acinq.phoenix.utils.extensions.nextTimeout
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.managers.global.FeerateManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -44,6 +45,7 @@ class PeerManager(
     private val nodeParamsManager: NodeParamsManager,
     private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
+    private val feerateManager: FeerateManager,
     private val notificationsManager: NotificationsManager,
     private val electrumClient: ElectrumClient,
     private val electrumWatcher: ElectrumWatcher,
@@ -58,6 +60,7 @@ class PeerManager(
         nodeParamsManager = business.nodeParamsManager,
         databaseManager = business.databaseManager,
         configurationManager = business.appConfigurationManager,
+        feerateManager = business.phoenixGlobal.feerateManager,
         notificationsManager = business.notificationsManager,
         electrumClient = business.electrumClient,
         electrumWatcher = business.electrumWatcher,
@@ -130,7 +133,7 @@ class PeerManager(
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     val recommendedFeerateFlow = peerState.filterNotNull().flatMapLatest { peer ->
-        combine(configurationManager.mempoolFeerate, peer.peerFeeratesFlow) { mempoolFeerate, peerFeerates ->
+        combine(feerateManager.mempoolFeerate, peer.peerFeeratesFlow) { mempoolFeerate, peerFeerates ->
             mempoolFeerate?.halfHour
                 ?: peerFeerates?.fundingFeerate?.let { FeeratePerByte(it) }
                 ?: FeeratePerByte(3.sat)

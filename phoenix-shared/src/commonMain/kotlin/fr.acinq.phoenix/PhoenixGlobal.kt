@@ -20,8 +20,11 @@ import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.info
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.createAppDbDriver
-import fr.acinq.phoenix.managers.fiatcurrencies.CurrencyManager
-import fr.acinq.phoenix.managers.NetworkMonitor
+import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import fr.acinq.phoenix.managers.global.CurrencyManager
+import fr.acinq.phoenix.managers.global.FeerateManager
+import fr.acinq.phoenix.managers.global.NetworkMonitor
+import fr.acinq.phoenix.managers.global.WalletContextManager
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
 
@@ -32,12 +35,27 @@ class PhoenixGlobal(val ctx: PlatformContext) {
     private val logger = loggerFactory.newLogger(this::class)
 
     val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-
     val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
-
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDb) }
+    val feerateManager by lazy { FeerateManager(loggerFactory) }
+    val walletContextManager by lazy { WalletContextManager(loggerFactory) }
 
     init {
         logger.info { "init PhoenixGlobal..." }
     }
+
+    /** Called by [AppConnectionsDaemon] when internet is available. */
+    internal fun enableNetworkAccess() {
+        feerateManager.startMonitoringFeerate()
+        walletContextManager.stopJobs()
+        currencyManager.enableNetworkAccess()
+    }
+
+    /** Called by [AppConnectionsDaemon] when no connection is available. */
+    internal fun disableNetworkAccess() {
+        feerateManager.stopMonitoringFeerate()
+        walletContextManager.stopJobs()
+        currencyManager.disableNetworkAccess()
+    }
+
 }

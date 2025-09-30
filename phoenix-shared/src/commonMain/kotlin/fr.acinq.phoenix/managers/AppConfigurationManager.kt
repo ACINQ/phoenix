@@ -3,184 +3,36 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.Chain
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
-import fr.acinq.lightning.blockchain.fee.FeeratePerByte
-import fr.acinq.lightning.io.TcpSocket
-import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.lightning.utils.ServerAddress
-import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.io.Peer
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.data.*
-import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.utils.extensions.phoenixName
-import fr.acinq.lightning.logging.debug
-import fr.acinq.lightning.logging.error
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.utils.io.charsets.*
-import io.ktor.utils.io.core.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
-import kotlin.math.*
-import kotlin.time.*
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
+import fr.acinq.phoenix.data.ElectrumConfig
+import fr.acinq.phoenix.data.PreferredFiatCurrencies
+import fr.acinq.phoenix.data.StartupParams
+import fr.acinq.phoenix.data.mainnetElectrumServers
+import fr.acinq.phoenix.data.mainnetElectrumServersOnion
+import fr.acinq.phoenix.data.platformElectrumRegtestConf
+import fr.acinq.phoenix.data.testnetElectrumServers
+import fr.acinq.phoenix.data.testnetElectrumServersOnion
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.launch
 
 class AppConfigurationManager(
-    private val httpClient: HttpClient,
-    private val electrumWatcher: ElectrumWatcher,
     private val chain: Chain,
-    loggerFactory: LoggerFactory
+    private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
-        loggerFactory = business.loggerFactory,
         chain = business.chain,
-        httpClient = business.httpClient,
         electrumWatcher = business.electrumWatcher,
     )
 
-    private val logger = loggerFactory.newLogger(this::class)
-
     init {
         watchElectrumMessages()
-    }
-
-    // Called from AppConnectionsDaemon
-    internal fun enableNetworkAccess() {
-        startWalletContextJob()
-        startWalletNoticeJob()
-        monitorMempoolFeerate()
-    }
-
-    // Called from AppConnectionsDaemon
-    internal fun disableNetworkAccess() {
-        stopJobs()
-    }
-
-    /** Cancels [walletContextPollingJob] and [mempoolFeerateJob]. */
-    private fun stopJobs() {
-        launch {
-            mempoolFeerateJob?.cancelAndJoin()
-            walletContextPollingJob?.cancelAndJoin()
-            walletNoticePollingJob?.cancelAndJoin()
-        }
-    }
-
-    private val _walletContext = MutableStateFlow<WalletContext?>(null)
-    val walletContext = _walletContext.asStateFlow()
-
-    /** Track the job that polls the wallet-context endpoint, so that we can cancel/restart it when needed. */
-    private var walletContextPollingJob: Job? = null
-
-    /** Starts a coroutine that continuously polls the wallet-context endpoint. The coroutine is tracked in [walletContextPollingJob]. */
-    private fun startWalletContextJob() {
-        launch {
-            walletContextPollingJob = launch {
-                var pause = 30.seconds
-                while (isActive) {
-                    pause = (pause * 2).coerceAtMost(10.minutes)
-                    fetchWalletContext()?.let {
-                        _walletContext.value = it
-                        pause = 180.minutes
-                    }
-                    delay(pause)
-                }
-            }
-        }
-    }
-
-    /** Fetches and parses the wallet context from the wallet context remote endpoint. Returns null if resource is unavailable or unreadable. */
-    private suspend fun fetchWalletContext(): WalletContext? {
-        return try {
-            httpClient.get("https://acinq.co/phoenix/walletcontext.json")
-        } catch (e1: Exception) {
-            try {
-                httpClient.get("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
-            } catch (e2: Exception) {
-                logger.error { "failed to fetch wallet context: ${e2.message?.take(200)}" }
-                null
-            }
-        }?.let { response ->
-            if (response.status.isSuccess()) {
-                Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
-            } else {
-                logger.error { "wallet-context returned status=${response.status}" }
-                null
-            }
-        }?.let { json ->
-            logger.debug { "fetched wallet-context=$json" }
-            try {
-                val base = json[chain.phoenixName]!!
-                val isMempoolFull = base.jsonObject["mempool"]?.jsonObject?.get("v1")?.jsonObject?.get("high_usage")?.jsonPrimitive?.booleanOrNull
-                val androidLatestVersion = base.jsonObject["version"]?.jsonPrimitive?.intOrNull
-                val androidLatestCriticalVersion = base.jsonObject["latest_critical_version"]?.jsonPrimitive?.intOrNull
-                WalletContext(
-                    isMempoolFull = isMempoolFull ?: false,
-                    androidLatestVersion = androidLatestVersion ?: 0,
-                    androidLatestCriticalVersion = androidLatestCriticalVersion ?: 0,
-                )
-            } catch (e: Exception) {
-                logger.error { "could not parse wallet-context response: ${e.message}" }
-                null
-            }
-        }
-    }
-
-    private val _walletNotice = MutableStateFlow<WalletNotice?>(null)
-    val walletNotice = _walletNotice.asStateFlow()
-
-    /** Track the job that polls the wallet-context endpoint, so that we can cancel/restart it when needed. */
-    private var walletNoticePollingJob: Job? = null
-
-    /** Starts a coroutine that continuously polls the wallet-notice endpoint. The coroutine is tracked in [walletNoticePollingJob]. */
-    private fun startWalletNoticeJob() {
-        launch {
-            walletNoticePollingJob = launch {
-                var pause = 30.seconds
-                while (isActive) {
-                    pause = (pause * 2).coerceAtMost(10.minutes)
-                    fetchWalletNotice()?.let {
-                        _walletNotice.value = it
-                        pause = 180.minutes
-                    }
-                    delay(pause)
-                }
-            }
-        }
-    }
-
-    /** Fetches and parses the wallet context from the wallet context remote endpoint. Returns null if resource is unavailable or unreadable. */
-    private suspend fun fetchWalletNotice(): WalletNotice? {
-        return try {
-            httpClient.get("https://acinq.co/phoenix/walletnotice.json")
-        } catch (e1: Exception) {
-            try {
-                httpClient.get("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletnotice.json")
-            } catch (e2: Exception) {
-                null
-            }
-        }?.let { response ->
-            try {
-                if (response.status.isSuccess()) {
-                    val json = Json.decodeFromString<JsonObject>(response.bodyAsText())
-                    logger.debug { "fetched wallet-notice=$json" }
-                    val notice = json["notice"]!!
-                    val message = notice.jsonObject["message"]!!.jsonPrimitive.content
-                    val index = notice.jsonObject["index"]!!.jsonPrimitive.int
-                    WalletNotice(message = message, index = index)
-                } else {
-                    null
-                }
-            } catch (e: Exception) {
-                logger.debug { "failed to read wallet-notice response: ${e.message}" }
-                null
-            }
-        }
     }
 
     /**
@@ -228,47 +80,6 @@ class AppConfigurationManager(
         }
     }
 
-    private var mempoolFeerateJob: Job? = null
-    private val _mempoolFeerate by lazy { MutableStateFlow<MempoolFeerate?>(null) }
-    val mempoolFeerate by lazy { _mempoolFeerate.asStateFlow() }
-
-    /**  Polls an HTTP endpoint every X seconds to get an estimation of the mempool feerate. */
-    private fun monitorMempoolFeerate() {
-        mempoolFeerateJob = launch {
-            while (isActive) {
-                try {
-                    logger.debug { "fetching mempool.space feerate" }
-                    // FIXME: use our own endpoint
-                    val response = httpClient.get(
-                        // TODO: after switching to testnet4, consider using the Mainnet endpoint even on Testnet
-                        if (chain is Chain.Mainnet) {
-                            "https://mempool.space/api/v1/fees/recommended"
-                        } else {
-                            "https://mempool.space/testnet/api/v1/fees/recommended"
-                        }
-                    )
-                    if (response.status.isSuccess()) {
-                        val json = Json.decodeFromString<JsonObject>(response.bodyAsText(Charsets.UTF_8))
-                        logger.debug { "mempool.space feerate endpoint returned json=$json" }
-                        val feerate = MempoolFeerate(
-                            fastest = FeeratePerByte(json["fastestFee"]!!.jsonPrimitive.long.sat),
-                            halfHour = FeeratePerByte(json["halfHourFee"]!!.jsonPrimitive.long.sat),
-                            hour = FeeratePerByte(json["hourFee"]!!.jsonPrimitive.long.sat),
-                            economy = FeeratePerByte(json["economyFee"]!!.jsonPrimitive.long.sat),
-                            minimum = FeeratePerByte(json["minimumFee"]!!.jsonPrimitive.long.sat),
-                            timestamp = currentTimestampMillis(),
-                        )
-                        _mempoolFeerate.value = feerate
-                    }
-                } catch (e: Exception) {
-                    logger.error { "could not fetch/read data from mempool.space feerate endpoint: ${e.message}" }
-                } finally {
-                    delay(10 * 60 * 1_000) // pause for 10 min
-                }
-            }
-        }
-    }
-
     // Tor configuration
     private val _isTorEnabled = MutableStateFlow<Boolean?>(null)
     val isTorEnabled get(): StateFlow<Boolean?> = _isTorEnabled.asStateFlow()
@@ -276,29 +87,10 @@ class AppConfigurationManager(
         _isTorEnabled.value = enabled
     }
 
-//    // Fiat preferences
-//    @Serializable
-//    data class PreferredFiatCurrencies(
-//        val primary: FiatCurrency,
-//        val others: Set<FiatCurrency>
-//    ) {
-//        constructor(primary: FiatCurrency, others: List<FiatCurrency>) :
-//                this(primary = primary, others = others.toSet())
-//
-//        val all: Set<FiatCurrency>
-//            get() {
-//                return if (others.contains(primary)) {
-//                    others
-//                } else {
-//                    others.toMutableSet().apply { add(primary) }
-//                }
-//            }
-//    }
-//
-//    private val _preferredFiatCurrencies by lazy { MutableStateFlow<PreferredFiatCurrencies?>(null) }
-//    val preferredFiatCurrencies: StateFlow<PreferredFiatCurrencies?> by lazy { _preferredFiatCurrencies }
-//
-//    fun updatePreferredFiatCurrencies(current: PreferredFiatCurrencies) {
-//        _preferredFiatCurrencies.value = current
-//    }
+    private val _preferredFiatCurrencies = MutableStateFlow<PreferredFiatCurrencies?>(null)
+    val preferredFiatCurrencies: StateFlow<PreferredFiatCurrencies?> by lazy { _preferredFiatCurrencies }
+
+    fun updatePreferredFiatCurrencies(current: PreferredFiatCurrencies) {
+        _preferredFiatCurrencies.value = current
+    }
 }

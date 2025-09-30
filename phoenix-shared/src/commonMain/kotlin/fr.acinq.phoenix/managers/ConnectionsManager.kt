@@ -4,6 +4,8 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.managers.global.NetworkMonitor
+import fr.acinq.phoenix.managers.global.NetworkState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import fr.acinq.phoenix.utils.extensions.plus
@@ -28,7 +30,7 @@ class ConnectionsManager(
         loggerFactory = business.loggerFactory,
         peerManager = business.peerManager,
         electrumClient = business.electrumClient,
-        networkMonitor = business.networkMonitor
+        networkMonitor = business.phoenixGlobal.networkMonitor
     )
 
     val log = loggerFactory.newLogger(this::class)

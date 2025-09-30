@@ -52,6 +52,7 @@ import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -157,7 +158,7 @@ private fun ColumnScope.AvailableForRefund(
     onExecuteRefund: (Transaction) -> Unit,
 ) {
     val keyboardManager = LocalSoftwareKeyboardController.current
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
 
     var address by remember { mutableStateOf("") }
     val recommendedFeerate by business.peerManager.recommendedFeerateFlow.collectAsState()

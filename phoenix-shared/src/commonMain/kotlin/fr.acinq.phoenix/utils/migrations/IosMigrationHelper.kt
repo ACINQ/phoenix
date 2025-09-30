@@ -115,7 +115,7 @@ object IosMigrationHelper {
 
             log.info { "migrating ${channelsToMigrate.size} channels to $swapInAddress" }
             // Close all channels in parallel
-            val mempoolFeerate = biz.appConfigurationManager.mempoolFeerate.filterNotNull().first()
+            val mempoolFeerate = biz.phoenixGlobal.feerateManager.mempoolFeerate.filterNotNull().first()
             val command = ChannelCommand.Close.MutualClose(
                 replyTo = CompletableDeferred(),
                 scriptPubKey = closingScript,

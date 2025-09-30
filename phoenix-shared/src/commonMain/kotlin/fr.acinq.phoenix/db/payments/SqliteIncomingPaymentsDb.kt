@@ -28,20 +28,22 @@ import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.db.didDeleteWalletPayment
 import fr.acinq.phoenix.db.didSaveWalletPayment
-import fr.acinq.phoenix.utils.MetadataQueue
+import fr.acinq.phoenix.managers.PaymentMetadataQueue
 import fr.acinq.phoenix.utils.extensions.deriveUUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SqliteIncomingPaymentsDb(
     private val database: PaymentsDatabase,
-    private val metadataQueue: MetadataQueue?
+    private val paymentMetadataQueue: PaymentMetadataQueue?
 ) : IncomingPaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
 
     override suspend fun addIncomingPayment(incomingPayment: IncomingPayment) {
-        val metadata = metadataQueue?.dequeue(incomingPayment.id)
+        val metadata = paymentMetadataQueue?.dequeue(incomingPayment.id).let {
+            paymentMetadataQueue?.enrichPaymentMetadata(it)
+        }
         withContext(Dispatchers.Default) {
             database.transaction {
                 _addIncomingPayment(incomingPayment, metadata)

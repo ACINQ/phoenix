@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.managers.fiatcurrencies.apis
+package fr.acinq.phoenix.managers.global.fiatapis
 
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.error

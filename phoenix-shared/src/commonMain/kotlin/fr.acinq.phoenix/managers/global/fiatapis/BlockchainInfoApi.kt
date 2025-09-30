@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.managers.fiatcurrencies.apis
+package fr.acinq.phoenix.managers.global.fiatapis
 
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.error
-import fr.acinq.phoenix.data.BluelyticsResponse
+import fr.acinq.phoenix.data.BlockchainInfoResponse
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import io.ktor.client.request.get
@@ -28,43 +28,46 @@ import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.minutes
 
 /**
- * The bluelytics API is used to fetch the "blue market" price for the Argentine Peso.
- * - ARS => government controlled exchange rate
- * - ARS_BM => free market exchange rate
+ * The blockchain.info API is used to refresh the BitcoinPriceRates
+ * for currencies with "high-liquidity markets" (i.e. USD/EUR).
+ * Since bitcoin prices are volatile, we refresh them often.
  */
-class BluelyticsAPI(loggerFactory: LoggerFactory) : ExchangeRateApi {
+class BlockchainInfoApi(loggerFactory: LoggerFactory) : ExchangeRateApi {
 
     val log = loggerFactory.newLogger(this::class)
 
-    override val name = "bluelytics"
-    override val refreshDelay = 120.minutes
-    override val fiatCurrencies = setOf(FiatCurrency.ARS_BM)
+    override val name = "blockchain.info"
+    override val refreshDelay = 20.minutes
+    override val fiatCurrencies = ExchangeRateApi.highLiquidityMarkets
 
     override suspend fun fetch(targets: Set<FiatCurrency>): List<ExchangeRate> {
+
         val httpResponse: HttpResponse? = try {
-            ExchangeRateApi.httpClient.get(urlString = "https://api.bluelytics.com.ar/v2/latest")
+            ExchangeRateApi.httpClient.get(urlString = "https://blockchain.info/ticker")
         } catch (e: Exception) {
-            log.error { "failed to get exchange rates from api.bluelytics.com.ar: $e" }
+            log.error { "failed to get exchange rates from blockchain.info: ${e.message}" }
             null
         }
-        val parsedResponse: BluelyticsResponse? = httpResponse?.let {
+        val parsedResponse: BlockchainInfoResponse? = httpResponse?.let {
             try {
-                ExchangeRateApi.json.decodeFromString<BluelyticsResponse>(httpResponse.bodyAsText())
+                ExchangeRateApi.json.decodeFromString<BlockchainInfoResponse>(it.bodyAsText())
             } catch (e: Exception) {
-                log.error { "failed to get exchange rates response from api.bluelytics.com.ar: $e" }
+                log.error { "failed to read exchange rates response from blockchain.info: ${e.message}" }
                 null
             }
         }
 
         val timestampMillis = Clock.System.now().toEpochMilliseconds()
         val fetchedRates: List<ExchangeRate> = parsedResponse?.let {
-            targets.filter { it == FiatCurrency.ARS_BM }.map {
-                ExchangeRate.UsdPriceRate(
-                    fiatCurrency = FiatCurrency.ARS_BM,
-                    price = parsedResponse.blue.value_avg,
-                    source = "bluelytics.com.ar",
-                    timestampMillis = timestampMillis
-                )
+            targets.mapNotNull { fiatCurrency ->
+                parsedResponse[fiatCurrency.name]?.let { priceObject ->
+                    ExchangeRate.BitcoinPriceRate(
+                        fiatCurrency = fiatCurrency,
+                        price = priceObject.last,
+                        source = "blockchain.info",
+                        timestampMillis = timestampMillis,
+                    )
+                }
             }
         } ?: listOf()
 

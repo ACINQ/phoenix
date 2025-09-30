@@ -33,7 +33,7 @@ import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.db.sqldelight.*
-import fr.acinq.phoenix.utils.MetadataQueue
+import fr.acinq.phoenix.managers.PaymentMetadataQueue
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
 fun createSqliteChannelsDb(driver: SqlDriver): SqliteChannelsDb {
@@ -47,7 +47,7 @@ fun createSqliteChannelsDb(driver: SqlDriver): SqliteChannelsDb {
     )
 }
 
-fun createSqlitePaymentsDb(driver: SqlDriver, metadataQueue: MetadataQueue?, loggerFactory: LoggerFactory): SqlitePaymentsDb {
+fun createSqlitePaymentsDb(driver: SqlDriver, metadataQueue: PaymentMetadataQueue?, loggerFactory: LoggerFactory): SqlitePaymentsDb {
     val onError: (String) -> Unit = { loggerFactory.newLogger(SqlitePaymentsDb::class).error { it } }
     return SqlitePaymentsDb(
         driver = driver,
@@ -62,7 +62,7 @@ fun createSqlitePaymentsDb(driver: SqlDriver, metadataQueue: MetadataQueue?, log
             cloudkit_payments_metadataAdapter = Cloudkit_payments_metadata.Adapter(UUIDAdapter),
             contactsAdapter = Contacts.Adapter(UUIDAdapter, ContactInfoAdapter)
         ),
-        metadataQueue = metadataQueue,
+        paymentMetadataQueue = metadataQueue,
         loggerFactory = loggerFactory
     )
 }

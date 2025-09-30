@@ -47,7 +47,10 @@ import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.LocalUserPrefs
+import fr.acinq.phoenix.android.LocalWalletId
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -77,11 +80,12 @@ fun CurrencyConverter(
     initialUnit: CurrencyUnit,
     onDone: (ComplexAmount?, CurrencyUnit) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
+    val walletId = LocalWalletId.current ?: return
     val userPrefs = LocalUserPrefs.current ?: return
     val appConfigManager = LocalBusiness.current?.appConfigurationManager ?: return
-    val currencyManager = LocalBusiness.current?.currencyManager ?: return
+    val currencyManager = application.phoenixGlobal.currencyManager
 
+    val scope = rememberCoroutineScope()
     val primaryBtcUnit = LocalBitcoinUnits.current.primary
     val otherBtcUnits = LocalBitcoinUnits.current.others
     val primaryFiat = LocalFiatCurrencies.current.primary
@@ -144,7 +148,8 @@ fun CurrencyConverter(
                 FiatConverterInput(amount = amount?.amount, fiat = fiat, rate = rate, onAmountUpdate = { amount = it ; activeUnit = fiat }, onDelete = {
                     scope.launch {
                         val newFiatPref = PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats - fiat)
-                        currencyManager.monitorCurrencies(newFiatPref)
+                        appConfigManager.updatePreferredFiatCurrencies(newFiatPref)
+                        currencyManager.startMonitoringCurrencies(walletId.nodeIdHash, newFiatPref)
                         userPrefs.saveFiatCurrencyList(newFiatPref)
                     }
                 })
@@ -162,7 +167,8 @@ fun CurrencyConverter(
                         when (currency) {
                             is FiatCurrency -> {
                                 val newFiatPref = PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats + currency)
-                                currencyManager.monitorCurrencies(newFiatPref)
+                                appConfigManager.updatePreferredFiatCurrencies(newFiatPref)
+                                currencyManager.startMonitoringCurrencies(walletId.nodeIdHash, newFiatPref)
                                 userPrefs.saveFiatCurrencyList(newFiatPref)
                             }
                             is BitcoinUnit -> {

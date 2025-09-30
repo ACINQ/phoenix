@@ -10,7 +10,8 @@ import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
-import fr.acinq.phoenix.managers.fiatcurrencies.CurrencyManager
+import fr.acinq.phoenix.PhoenixGlobal
+import fr.acinq.phoenix.managers.global.NetworkState
 import fr.acinq.phoenix.utils.extensions.isOnion
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -31,8 +32,7 @@ class AppConnectionsDaemon(
     private val configurationManager: AppConfigurationManager,
     private val walletManager: WalletManager,
     private val peerManager: PeerManager,
-    private val currencyManager: CurrencyManager,
-    private val networkMonitor: NetworkMonitor,
+    private val phoenixGlobal: PhoenixGlobal,
     private val tcpSocketBuilder: suspend () -> TcpSocket.Builder,
     private val electrumClient: ElectrumClient,
 ) : CoroutineScope by MainScope() {
@@ -42,8 +42,7 @@ class AppConnectionsDaemon(
         configurationManager = business.appConfigurationManager,
         walletManager = business.walletManager,
         peerManager = business.peerManager,
-        currencyManager = business.currencyManager,
-        networkMonitor = business.networkMonitor,
+        phoenixGlobal = business.phoenixGlobal,
         tcpSocketBuilder = business.tcpSocketBuilderFactory,
         electrumClient = business.electrumClient
     )
@@ -158,8 +157,8 @@ class AppConnectionsDaemon(
 
         // Internet monitor
         launch {
-            networkMonitor.start()
-            networkMonitor.networkState.collect {
+            phoenixGlobal.networkMonitor.start()
+            phoenixGlobal.networkMonitor.networkState.collect {
                 val newValue = it == NetworkState.Available
                 logger.debug { "internetIsAvailable = $newValue" }
                 torControlChanges.send { copy(internetIsAvailable = newValue) }
@@ -305,15 +304,13 @@ class AppConnectionsDaemon(
                     it.internetIsAvailable && it.disconnectCount <= 0 -> {
                         if (!httpControlFlowEnabled) {
                             httpControlFlowEnabled = true
-                            configurationManager.enableNetworkAccess()
-                            currencyManager.enableNetworkAccess()
+                            phoenixGlobal.enableNetworkAccess()
                         }
                     }
                     else -> {
                         if (httpControlFlowEnabled) {
                             httpControlFlowEnabled = false
-                            configurationManager.disableNetworkAccess()
-                            currencyManager.disableNetworkAccess()
+                            phoenixGlobal.disableNetworkAccess()
                         }
                     }
                 }

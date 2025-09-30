@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.managers
+package fr.acinq.phoenix.managers.global
 
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.StateFlow

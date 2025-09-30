@@ -30,6 +30,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -51,6 +52,7 @@ import java.util.Locale
 
 @Composable
 fun DisplayPrefsView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
@@ -61,7 +63,7 @@ fun DisplayPrefsView(
         if (userPrefs != null) {
             Card {
                 BitcoinUnitPreference(userPrefs = userPrefs, scope = scope)
-                FiatCurrencyPreference(business = business, userPrefs = userPrefs, scope = scope)
+                FiatCurrencyPreference(business = business, walletId = walletId, userPrefs = userPrefs, scope = scope)
                 UserThemePreference(userPrefs = userPrefs, scope = scope)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     AppLocaleSetting()
@@ -100,7 +102,7 @@ private fun BitcoinUnitPreference(userPrefs: UserPrefs, scope: CoroutineScope) {
 }
 
 @Composable
-private fun FiatCurrencyPreference(business: PhoenixBusiness, userPrefs: UserPrefs, scope: CoroutineScope) {
+private fun FiatCurrencyPreference(business: PhoenixBusiness, walletId: WalletId, userPrefs: UserPrefs, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
 
     val preferences = FiatCurrency.values.map {
@@ -108,7 +110,8 @@ private fun FiatCurrencyPreference(business: PhoenixBusiness, userPrefs: UserPre
         PreferenceItem(item = it, title = title, description = desc)
     }
 
-    val currencyManager = business.currencyManager
+    val appConfigManager = business.appConfigurationManager
+    val currencyManager = business.phoenixGlobal.currencyManager
 
     val currentPref = LocalFiatCurrencies.current.primary
     ListPreferenceButton(
@@ -123,7 +126,8 @@ private fun FiatCurrencyPreference(business: PhoenixBusiness, userPrefs: UserPre
                 val previousFiatCurrencies = userPrefs.getFiatCurrencies.first()
                 val prefCurrencies = PreferredFiatCurrencies(primary = it.item, others = previousFiatCurrencies.others - it.item)
                 userPrefs.saveFiatCurrencyList(prefCurrencies)
-                currencyManager.monitorCurrencies(prefCurrencies)
+                appConfigManager.updatePreferredFiatCurrencies(prefCurrencies)
+                currencyManager.startMonitoringCurrencies(walletId = walletId.nodeIdHash, currencies = prefCurrencies)
                 prefEnabled = true
             }
         }

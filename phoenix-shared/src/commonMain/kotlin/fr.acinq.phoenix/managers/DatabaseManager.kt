@@ -17,8 +17,7 @@ import fr.acinq.phoenix.db.createSqliteChannelsDb
 import fr.acinq.phoenix.db.createSqlitePaymentsDb
 import fr.acinq.phoenix.db.makeCloudKitDb
 import fr.acinq.phoenix.db.payments.CloudKitInterface
-import fr.acinq.phoenix.managers.fiatcurrencies.CurrencyManager
-import fr.acinq.phoenix.utils.MetadataQueue
+import fr.acinq.phoenix.managers.global.CurrencyManager
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineScope
@@ -39,14 +38,18 @@ class DatabaseManager(
     private val chain: Chain,
     private val appDb: SqliteAppDb,
     private val nodeParamsManager: NodeParamsManager,
+    appConfigurationManager: AppConfigurationManager,
+    currencyManager: CurrencyManager,
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
         ctx = business.phoenixGlobal.ctx,
-        appDb = business.phoenixGlobal.appDb,
         chain = business.chain,
+        appDb = business.phoenixGlobal.appDb,
         nodeParamsManager = business.nodeParamsManager,
+        appConfigurationManager = business.appConfigurationManager,
+        currencyManager = business.phoenixGlobal.currencyManager,
     )
 
     private val log = loggerFactory.newLogger(this::class)
@@ -60,7 +63,7 @@ class DatabaseManager(
     @OptIn(ExperimentalCoroutinesApi::class)
     val contactsDb = _databases.filterNotNull().mapLatest { it.payments.contacts }
 
-    val metadataQueue = MetadataQueue()
+    val paymentMetadataQueue = PaymentMetadataQueue(currencyManager = currencyManager, appConfigurationManager = appConfigurationManager)
 
     init {
         launch {
@@ -71,7 +74,7 @@ class DatabaseManager(
                 val channelsDbDriver = createChannelsDbDriver(ctx, channelsDbName(chain, nodeParams.nodeId))
                 val channelsDb = createSqliteChannelsDb(channelsDbDriver)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, paymentsDbName(chain, nodeParams.nodeId)) { log.e { "payments-db migration error: $it" } }
-                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, metadataQueue, loggerFactory)
+                val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, paymentMetadataQueue, loggerFactory)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)
                 log.debug { "databases object created" }
                 _databases.value = PhoenixDatabases(

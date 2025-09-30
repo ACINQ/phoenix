@@ -32,7 +32,7 @@ import fr.acinq.phoenix.db.contacts.SqliteContactsDb
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.db.payments.PaymentsMetadataQueries
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
-import fr.acinq.phoenix.utils.MetadataQueue
+import fr.acinq.phoenix.managers.PaymentMetadataQueue
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlin.collections.List
@@ -45,10 +45,10 @@ import kotlinx.coroutines.withContext
 class SqlitePaymentsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
-    val metadataQueue: MetadataQueue?,
+    val paymentMetadataQueue: PaymentMetadataQueue?,
     val loggerFactory: LoggerFactory
-) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database, metadataQueue),
-    OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database, metadataQueue),
+) : IncomingPaymentsDb by SqliteIncomingPaymentsDb(database, paymentMetadataQueue),
+    OutgoingPaymentsDb by SqliteOutgoingPaymentsDb(database, paymentMetadataQueue),
     PaymentsDb {
 
     val metadataQueries = PaymentsMetadataQueries(database)
