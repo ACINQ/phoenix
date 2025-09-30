@@ -287,7 +287,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			let fakePaymentId = Lightning_kmpUUID.companion.randomUUID()
 			try await paymentsDb.deletePayment(paymentId: fakePaymentId, notify: false)
 			
-			try await BusinessManager.phoenixGlobal.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency")
+			try await BizGlobal.appDb.deleteBitcoinRate(fiat: "FakeFiatCurrency")
 		}
 	}
 }

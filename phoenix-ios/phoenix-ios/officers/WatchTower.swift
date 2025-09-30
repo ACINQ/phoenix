@@ -321,7 +321,7 @@ class WatchTower {
 		)
 		
 		let primaryFiatCurrency = groupPrefs.fiatCurrency
-		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
+		BizGlobal.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
 		
 		performTask(task, business, id)
 	}

@@ -46,7 +46,7 @@ class NoticeMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
-		Biz.business.appConfigurationManager.walletContextPublisher()
+		BizGlobal.walletContextManager.walletContextPublisher()
 			.sink {[weak self](context: WalletContext) in
 				self?.walletContext = context
 			}

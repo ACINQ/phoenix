@@ -71,8 +71,7 @@ class CurrencyPrefs: ObservableObject {
 			self?.showOriginalFiatValue = newValue
 		}.store(in: &cancellables)
 		
-		let business = Biz.business
-		business.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
+		BizGlobal.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
 			self?.fiatExchangeRates = rates
 		}.store(in: &cancellables)
 	}

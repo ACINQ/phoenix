@@ -11,6 +11,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+/// Short-hand for `BusinessManager.phoenixGlobal`
+///
+var BizGlobal: PhoenixGlobal {
+	return BusinessManager.phoenixGlobal
+}
+
 enum LoadWalletTrigger: CustomStringConvertible {
 	case walletUnlock
 	case newWallet
@@ -189,7 +195,10 @@ class BusinessManager {
 					primary: groupPrefs.fiatCurrency,
 					others: groupPrefs.preferredFiatCurrencies
 				)
-				MBiz.registerPreferredFiatCurrencies(walletId, current)
+				BizGlobal.currencyManager.startMonitoringCurrencies(
+					walletId: walletId.nodeIdHash,
+					currencies: current
+				)
 			}
 			.store(in: &cancellables)
 		
@@ -371,7 +380,10 @@ class BusinessManager {
 			primary: groupPrefs.fiatCurrency,
 			others: groupPrefs.preferredFiatCurrencies
 		)
-		MBiz.registerPreferredFiatCurrencies(walletId, preferredFiatCurrencies)
+		BizGlobal.currencyManager.startMonitoringCurrencies(
+			walletId: walletId.nodeIdHash,
+			currencies: preferredFiatCurrencies
+		)
 
 		let startupParams = StartupParams(
 			isTorEnabled: groupPrefs.isTorEnabled,
@@ -394,6 +406,10 @@ class BusinessManager {
 		appCancellables.removeAll()
 		business.stop()
 		syncManager?.shutdown()
+		
+		if let id = self.walletId {
+			BizGlobal.currencyManager.stopMonitoringForWallet(walletId: id.nodeIdHash)
+		}
 	}
 
 	// --------------------------------------------------

@@ -42,7 +42,7 @@ struct CurrencyConverterView: View {
 	
 	@State var isRefreshingExchangeRates = false
 	
-	let refreshingExchangeRatesPublisher = Biz.business.currencyManager.refreshPublisher()
+	let refreshingExchangeRatesPublisher = BizGlobal.currencyManager.refreshPublisher()
 	
 	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -574,7 +574,7 @@ struct CurrencyConverterView: View {
 	private func refreshRates() {
 		log.trace("refreshRates()")
 		
-		Biz.business.currencyManager.refreshAll(
+		BizGlobal.currencyManager.refreshAll(
 			targets : FiatCurrency.companion.values,
 			force   : true
 		)
