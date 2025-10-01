@@ -46,7 +46,6 @@ import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.PreferredFiatCurrencies
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.text.DecimalFormat

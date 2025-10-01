@@ -34,7 +34,6 @@ import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.PreferredFiatCurrencies
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.db.migrations.v10.json.SatoshiSerializer
-import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -51,7 +50,7 @@ import kotlin.time.toDuration
 class UserPrefs(private val data: DataStore<Preferences>) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val json = Json { ignoreUnknownKeys = true } // some prefs are json-serialized
+    private val jsonFormat = Json { ignoreUnknownKeys = true } // some prefs are json-serialized
 
     /** Retrieve preferences from [data], with a fallback to empty prefs if the data file can't be read. */
     private val safeData: Flow<Preferences> = data.data.catch { exception ->
@@ -106,7 +105,7 @@ class UserPrefs(private val data: DataStore<Preferences>) {
     val getBitcoinUnits: Flow<PreferredBitcoinUnits> = safeData.map {
         it[BITCOIN_UNITS]?.let {
             try {
-                Json.decodeFromString<PreferredBitcoinUnits>(it)
+                jsonFormat.decodeFromString<PreferredBitcoinUnits>(it)
             } catch (e: Exception) {
                 log.error("failed to decode bitcoin units: $it: ${e.message}")
                 null
@@ -124,7 +123,7 @@ class UserPrefs(private val data: DataStore<Preferences>) {
     val getFiatCurrencies: Flow<PreferredFiatCurrencies> = safeData.map {
         it[FIAT_CURRENCIES]?.let {
             try {
-                Json.decodeFromString<PreferredFiatCurrencies>(it)
+                jsonFormat.decodeFromString<PreferredFiatCurrencies>(it)
             } catch (e: Exception) {
                 log.error("failed to decode fiat currencies list: $it: ${e.message}")
                 null
@@ -271,7 +270,7 @@ class UserPrefs(private val data: DataStore<Preferences>) {
     val getLiquidityPolicy: Flow<LiquidityPolicy> = safeData.map {
         try {
             it[LIQUIDITY_POLICY]?.let { policy ->
-                when (val res = json.decodeFromString<InternalLiquidityPolicy>(policy)) {
+                when (val res = jsonFormat.decodeFromString<InternalLiquidityPolicy>(policy)) {
                     is InternalLiquidityPolicy.Auto -> LiquidityPolicy.Auto(
                         inboundLiquidityTarget = null,
                         maxAbsoluteFee = res.maxAbsoluteFee,
@@ -295,7 +294,7 @@ class UserPrefs(private val data: DataStore<Preferences>) {
             is LiquidityPolicy.Auto -> InternalLiquidityPolicy.Auto(policy.maxRelativeFeeBasisPoints, policy.maxAbsoluteFee, policy.skipAbsoluteFeeCheck)
             is LiquidityPolicy.Disable -> InternalLiquidityPolicy.Disable
         }
-        it[LIQUIDITY_POLICY] = json.encodeToString(serialisable)
+        it[LIQUIDITY_POLICY] = jsonFormat.encodeToString(serialisable)
         // also save the fee so that we don't lose the user fee preferences even when using a disabled policy
         if (policy is LiquidityPolicy.Auto) {
             it[INCOMING_MAX_SAT_FEE_INTERNAL_TRACKER] = policy.maxAbsoluteFee.sat

@@ -27,8 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * But sometimes there is associated metadata that we want to include,
  * and we would like to write it to the database within the same transaction.
  * So we have a system to enqueue/dequeue associated metadata.
- *
- * Needs a reference to the app config manager, and the currency manager to
  */
 class PaymentMetadataQueue(
     private val appConfigurationManager: AppConfigurationManager,

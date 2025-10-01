@@ -42,7 +42,7 @@ import java.io.IOException
 class GlobalPrefs(private val data: DataStore<Preferences>) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val serializer = Json { ignoreUnknownKeys = true }
+    private val jsonFormat = Json { ignoreUnknownKeys = true }
 
     /** Retrieve preferences from [data], with a fallback to empty prefs if the data file can't be read. */
     private val safeData: Flow<Preferences> = data.data.catch { exception ->
@@ -78,7 +78,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
     val getAvailableWalletsMeta: Flow<Map<WalletId, UserWalletMetadata>> = safeData.map {
         it[AVAILABLE_WALLETS_META]?.let { json ->
             try {
-                serializer.decodeFromString<Map<String, UserWalletMetadata>>(json).map { WalletId(it.key) to it.value }.toMap()
+                jsonFormat.decodeFromString<Map<String, UserWalletMetadata>>(json).map { WalletId(it.key) to it.value }.toMap()
             } catch (e: Exception) {
                 log.error("could not deserialize available_wallets=$json: ", e)
                 null
@@ -90,7 +90,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
     suspend fun saveAvailableWalletMeta(metadata: UserWalletMetadata) = data.edit {
         val existingMap: Map<WalletId, UserWalletMetadata> = getAvailableWalletsMeta.first()
         val newMap = existingMap + (metadata.walletId to metadata)
-        it[AVAILABLE_WALLETS_META] = serializer.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
+        it[AVAILABLE_WALLETS_META] = jsonFormat.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
     }
     suspend fun saveAvailableWalletMeta(walletId: WalletId, name: String?, avatar: String, isHidden: Boolean) = data.edit {
         val existingMap: Map<WalletId, UserWalletMetadata> = getAvailableWalletsMeta.first()
@@ -101,7 +101,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
             createdAt = existingMap[walletId]?.createdAt ?: currentTimestampMillis(),
             isHidden = isHidden,
         ))
-        it[AVAILABLE_WALLETS_META] = serializer.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
+        it[AVAILABLE_WALLETS_META] = jsonFormat.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
     }
 
     val getDefaultWallet: Flow<BaseWalletId> = safeData.map { it[DEFAULT_WALLET_ID]?.let { WalletId(it) } ?: EmptyWalletId }
