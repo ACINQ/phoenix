@@ -11,6 +11,12 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
+/// Short-hand for `BusinessManager.phoenixGlobal`
+///
+var BizGlobal: PhoenixGlobal {
+	return BusinessManager.phoenixGlobal
+}
+
 enum LoadWalletTrigger: CustomStringConvertible {
 	case walletUnlock
 	case newWallet
@@ -31,6 +37,8 @@ enum LoadWalletTrigger: CustomStringConvertible {
 ///
 class BusinessManager {
 
+	public static let phoenixGlobal = PhoenixGlobal(ctx: PlatformContext.default)
+	
 	/// There are some places in the code where we need to access the testnet state from a background thread.
 	/// This is problematic because calling into Kotlin via `business.chain.isTestnet()`
 	/// from a background thread will throw an exception.
@@ -91,7 +99,7 @@ class BusinessManager {
 	init() {
 		log.trace(#function)
 		
-		business = PhoenixBusiness(ctx: PlatformContext.default)
+		business = PhoenixBusiness(phoenixGlobal: BusinessManager.phoenixGlobal)
 		isTestnet = !business.chain.isMainnet()
 		showTestnetBackground = !business.chain.isMainnet()
 		
@@ -183,11 +191,14 @@ class BusinessManager {
 				groupPrefs.currencyConverterListPublisher
 			).sink { _ in
 			
-				let current = AppConfigurationManager.PreferredFiatCurrencies(
+				let current = PreferredFiatCurrencies(
 					primary: groupPrefs.fiatCurrency,
 					others: groupPrefs.preferredFiatCurrencies
 				)
-				self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
+				BizGlobal.currencyManager.startMonitoringCurrencies(
+					walletId: walletId.nodeIdHash,
+					currencies: current
+				)
 			}
 			.store(in: &cancellables)
 		
@@ -365,11 +376,14 @@ class BusinessManager {
 			business.appConfigurationManager.updateElectrumConfig(config: nil)
 		}
 
-		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+		let preferredFiatCurrencies = PreferredFiatCurrencies(
 			primary: groupPrefs.fiatCurrency,
 			others: groupPrefs.preferredFiatCurrencies
 		)
-		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
+		BizGlobal.currencyManager.startMonitoringCurrencies(
+			walletId: walletId.nodeIdHash,
+			currencies: preferredFiatCurrencies
+		)
 
 		let startupParams = StartupParams(
 			isTorEnabled: groupPrefs.isTorEnabled,
@@ -392,6 +406,10 @@ class BusinessManager {
 		appCancellables.removeAll()
 		business.stop()
 		syncManager?.shutdown()
+		
+		if let id = self.walletId {
+			BizGlobal.currencyManager.stopMonitoringForWallet(walletId: id.nodeIdHash)
+		}
 	}
 
 	// --------------------------------------------------

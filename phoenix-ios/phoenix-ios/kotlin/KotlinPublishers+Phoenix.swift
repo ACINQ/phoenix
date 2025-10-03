@@ -68,13 +68,11 @@ extension PeerManager {
 }
 
 // MARK: -
-extension AppConfigurationManager {
+extension WalletContextManager {
 	
 	fileprivate struct _Key {
 		static var walletContextPublisher = 0
 		static var walletNoticePublisher = 0
-		static var isTorEnabledPublisher = 0
-		static var electrumConfigPublisher = 0
 	}
 	
 	func walletContextPublisher() -> AnyPublisher<WalletContext, Never> {
@@ -105,6 +103,15 @@ extension AppConfigurationManager {
 			.compactMap { $0 }
 			.eraseToAnyPublisher()
 		}
+	}
+}
+
+// MARK: -
+extension AppConfigurationManager {
+	
+	fileprivate struct _Key {
+		static var isTorEnabledPublisher = 0
+		static var electrumConfigPublisher = 0
 	}
 	
 	func isTorEnabledPublisher() -> AnyPublisher<Bool, Never> {

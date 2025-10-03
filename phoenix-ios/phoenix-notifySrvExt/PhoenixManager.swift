@@ -20,7 +20,7 @@ typealias PaymentListener = (Lightning_kmpIncomingPayment) -> Void
  * However, we encountered some technical problems with the approach...
  *
  * In lightning-kmp, the IncomingPaymentsHandler stores payment parts in memory.
- * If payment parts arrive slowly, the the background & foreground processes may
+ * If payment parts arrive slowly, then the background & foreground processes may
  * have a different view of the current state, or even handle the same part differently.
  *
  * Ultimately, this is a problem we'd like to fix in lightning-kmp. But for now,
@@ -30,9 +30,11 @@ class PhoenixManager {
 	
 	public static let shared = PhoenixManager()
 	
+	private static let phoenixGlobal = PhoenixGlobal(ctx: PlatformContext.default)
+	
 	private var business: PhoenixBusiness? = nil
 	private var oldBusiness: PhoenixBusiness? = nil
-	
+
 	private var walletId: WalletIdentifier? = nil
 
 	private var cancellables = Set<AnyCancellable>()
@@ -55,10 +57,10 @@ class PhoenixManager {
 			return currentBusiness
 		}
 
-		let newBusiness = PhoenixBusiness(ctx: PlatformContext.default)
+		let newBusiness = PhoenixBusiness(phoenixGlobal: PhoenixManager.phoenixGlobal)
 
-		newBusiness.networkMonitor.disable()
-		newBusiness.currencyManager.disableAutoRefresh()
+		newBusiness.phoenixGlobal.networkMonitor.disable()
+		newBusiness.phoenixGlobal.currencyManager.disableAutoRefresh()
 
 		// Setup complete
 		business = newBusiness
@@ -104,14 +106,14 @@ class PhoenixManager {
 	}
 	
 	public func groupPrefs() -> GroupPrefs_Wallet? {
-		
+
 		if let walletId {
 			return GroupPrefs.wallet(walletId)
 		} else {
 			return nil
 		}
 	}
-	
+
 	public func exchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
 		
 		return Utils.exchangeRate(for: fiatCurrency, fromRates: fiatExchangeRates)
@@ -144,12 +146,12 @@ class PhoenixManager {
 				
 				var sealedBox: SealedBox_ChaChaPoly? = nil
 				var id: String? = nil
-				
+
 				switch securityFile {
 				case .v0(let v0):
 					sealedBox = v0.keychain
 					id = KEYCHAIN_DEFAULT_ID
-					
+
 				case .v1(let v1):
 					if let target {
 						sealedBox = v1.wallets[target]?.keychain
@@ -159,12 +161,12 @@ class PhoenixManager {
 						id = defaultTarget
 					}
 				}
-				
+
 				guard let sealedBox, let id else {
 					unlockWithRecoveryPhrase(nil)
 					return
 				}
-				
+
 				let keychainResult = SharedSecurity.shared.readKeychainEntry(id, sealedBox)
 				switch keychainResult {
 				case .failure(_):
@@ -209,27 +211,27 @@ class PhoenixManager {
 			passphrase: ""
 		)
 		let walletInfo = business.walletManager.loadWallet(seed: seed)
-		
+
 		let wid = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
 		walletId = wid
-		
+
 		if let targetNodeIdHash {
 			guard targetNodeIdHash == wid.nodeIdHash else {
 				log.warning("unlock(): ignoring: target.nodeIdHash != unlocked.nodeIdHash")
 				return
 			}
 		}
-		
+
 		let groupPrefs = GroupPrefs.wallet(wid)
-		
+
 		if let electrumConfigPrefs = groupPrefs.electrumConfig {
 			business.appConfigurationManager.updateElectrumConfig(config: electrumConfigPrefs.customConfig)
 		} else {
 			business.appConfigurationManager.updateElectrumConfig(config: nil)
 		}
-		
+
 		let primaryFiatCurrency = groupPrefs.fiatCurrency
-		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+		let preferredFiatCurrencies = PreferredFiatCurrencies(
 			primary: primaryFiatCurrency,
 			others: groupPrefs.preferredFiatCurrencies
 		)
@@ -243,8 +245,8 @@ class PhoenixManager {
 		)
 		business.start(startupParams: startupParams)
 
-		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
-		business.currencyManager.ratesPubliser().sink {
+		business.phoenixGlobal.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
+		business.phoenixGlobal.currencyManager.ratesPubliser().sink {
 			[weak self](rates: [ExchangeRate]) in
 
 			assertMainThread() // var `fiatExchangeRates` should be accessed/updated only on main thread

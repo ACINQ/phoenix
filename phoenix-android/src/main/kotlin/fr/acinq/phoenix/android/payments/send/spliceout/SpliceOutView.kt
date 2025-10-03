@@ -47,6 +47,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -84,7 +85,7 @@ fun SendSpliceOutView(
 
     val peerManager = business.peerManager
     val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
     val balance = business.balanceManager.balance.collectAsState(null).value
     val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
     val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))

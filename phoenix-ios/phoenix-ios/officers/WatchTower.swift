@@ -263,9 +263,7 @@ class WatchTower {
 		log.trace(#function)
 		
 		let id = target.nodeIdHash
-		let business = PhoenixBusiness(ctx: PlatformContext.default)
-
-		business.currencyManager.disableAutoRefresh()
+		let business = PhoenixBusiness(phoenixGlobal: BusinessManager.phoenixGlobal)
 		
 		guard let securityFile = SecurityFileManager.shared.currentSecurityFile() else {
 			log.warning("SecurityFile.current(): nil found")
@@ -311,15 +309,6 @@ class WatchTower {
 		} else {
 			business.appConfigurationManager.updateElectrumConfig(config: nil)
 		}
-		
-		let primaryFiatCurrency = groupPrefs.fiatCurrency
-		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
-			primary: primaryFiatCurrency,
-			others: groupPrefs.preferredFiatCurrencies
-		)
-		business.appConfigurationManager.updatePreferredFiatCurrencies(
-			current: preferredFiatCurrencies
-		)
 
 		let startupParams = StartupParams(
 			isTorEnabled: groupPrefs.isTorEnabled,
@@ -330,7 +319,9 @@ class WatchTower {
 		business.appConnectionsDaemon?.incrementDisconnectCount(
 			target: AppConnectionsDaemon.ControlTarget.companion.All
 		)
-		business.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
+		
+		let primaryFiatCurrency = groupPrefs.fiatCurrency
+		BizGlobal.currencyManager.refreshAll(targets: [primaryFiatCurrency], force: false)
 		
 		performTask(task, business, id)
 	}

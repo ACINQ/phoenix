@@ -57,6 +57,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
@@ -175,10 +176,9 @@ private fun RequestLiquidityBottomSection(
 ) {
 
     val peerManager = business.peerManager
-    val appConfigManager = business.appConfigurationManager
     val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
 
-    val vm = viewModel<RequestLiquidityViewModel>(factory = RequestLiquidityViewModel.Factory(peerManager, appConfigManager))
+    val vm = viewModel<RequestLiquidityViewModel>(factory = RequestLiquidityViewModel.Factory(peerManager, application))
     var amount by remember { mutableStateOf(LiquidityLimits.liquidityOptions.first()) }
     var isAmountError by remember { mutableStateOf(false) }
 

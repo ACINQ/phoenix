@@ -121,7 +121,7 @@ class AppViewModel(
     val activeWalletInUI = _activeWalletInUI.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val exchangeRates = activeWalletInUI.filterNotNull().mapLatest { it.business }.filterNotNull().flatMapLatest { it.currencyManager.ratesFlow }
+    val exchangeRates = application.phoenixGlobal.currencyManager.ratesFlow
         .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)

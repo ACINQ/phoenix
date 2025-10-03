@@ -43,7 +43,7 @@ val LocalInternalPrefs = staticCompositionLocalOf<InternalPrefs?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
 val LocalNavController = staticCompositionLocalOf<NavController?> { null }
 val LocalBitcoinUnits = compositionLocalOf { PreferredBitcoinUnits(primary = BitcoinUnit.Sat) }
-val LocalFiatCurrencies = compositionLocalOf { AppConfigurationManager.PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()) }
+val LocalFiatCurrencies = compositionLocalOf { PreferredFiatCurrencies(primary = FiatCurrency.USD, others = emptyList()) }
 val LocalExchangeRatesMap = compositionLocalOf<Map<FiatCurrency, ExchangeRate.BitcoinPriceRate>> { emptyMap() }
 val LocalShowInFiat = compositionLocalOf { false }
 val isDarkTheme: Boolean

@@ -63,6 +63,7 @@ import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.inputs.AmountInput
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -433,7 +434,7 @@ fun EvaluateLiquidityIssuesForPayment(
 
     // TODO: add a delay before evaluating liquidity to make sure we have all data necessary before displaying a warning, in order to avoid the dialog being displayed too eagerly with some flickering
 
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
     val swapFee = remember(mempoolFeerate, amount) { mempoolFeerate?.payToOpenEstimationFee(amount = amount ?: 0.msat, hasNoChannels = channelsMap?.values?.filterNot { it.isTerminated }.isNullOrEmpty()) }
 
     val liquidityPolicyPrefs = LocalUserPrefs.current?.getLiquidityPolicy?.collectAsState(null)

@@ -22,11 +22,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.managers.PeerManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +52,10 @@ sealed class RequestLiquidityState {
     }
 }
 
-class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManager: AppConfigurationManager): ViewModel() {
+class RequestLiquidityViewModel(
+    val application: PhoenixApplication,
+    val peerManager: PeerManager
+): ViewModel() {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<RequestLiquidityState>(RequestLiquidityState.Init)
@@ -66,7 +68,7 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
             state.value = RequestLiquidityState.Error.Thrown(e)
         }) {
             val peer = peerManager.getPeer()
-            val feerate = appConfigManager.mempoolFeerate.filterNotNull().first().hour
+            val feerate = application.phoenixGlobal.feerateManager.mempoolFeerate.filterNotNull().first().hour
             val fundingRate = peer.remoteFundingRates.filterNotNull().first().findRate(amount)
             if (fundingRate == null) {
                 state.value = RequestLiquidityState.Error.InvalidFundingAmount
@@ -113,11 +115,11 @@ class RequestLiquidityViewModel(val peerManager: PeerManager, val appConfigManag
 
     class Factory(
         private val peerManager: PeerManager,
-        private val appConfigManager: AppConfigurationManager,
+        private val application: PhoenixApplication,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return RequestLiquidityViewModel(peerManager, appConfigManager) as T
+            return RequestLiquidityViewModel(application, peerManager) as T
         }
     }
 }

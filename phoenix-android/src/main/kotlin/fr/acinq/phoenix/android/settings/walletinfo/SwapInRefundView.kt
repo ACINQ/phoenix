@@ -53,6 +53,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.AmountWithFiatBelow
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -113,7 +114,7 @@ private fun AvailableForRefundView(
     var addressErrorMessage by remember { mutableStateOf<String?>(null) }
     var showScannerView by remember { mutableStateOf(false) }
 
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
     val recommendedFeerate by business.peerManager.recommendedFeerateFlow.collectAsState()
     var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
 

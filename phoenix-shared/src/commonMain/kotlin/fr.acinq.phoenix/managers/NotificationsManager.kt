@@ -41,7 +41,7 @@ class NotificationsManager(
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
-        appDb = business.appDb,
+        appDb = business.phoenixGlobal.appDb,
         walletManager = business.walletManager
     )
 

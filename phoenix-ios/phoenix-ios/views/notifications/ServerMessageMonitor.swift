@@ -31,7 +31,7 @@ class ServerMessageMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
-		Biz.business.appConfigurationManager.walletNoticePublisher()
+		BizGlobal.walletContextManager.walletNoticePublisher()
 			.sink {[weak self] (notice: WalletNotice) in
 				self?.noticeDidChange(notice)
 			}

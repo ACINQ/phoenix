@@ -61,6 +61,7 @@ import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -96,7 +97,7 @@ fun MutualCloseView(
 
     var address by remember { mutableStateOf("") }
     var addressErrorMessage by remember { mutableStateOf<String?>(null) }
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
     val recommendedFeerate by business.peerManager.recommendedFeerateFlow.collectAsState()
     var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
 

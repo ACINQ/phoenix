@@ -114,7 +114,7 @@ class NoticesViewModel(
     }
 
     private suspend fun monitorWalletContext() {
-        appConfigurationManager.walletContext.collect {
+        application.phoenixGlobal.walletContextManager.walletContext.collect {
             log.debug("collecting wallet-context={}", it)
             val isMempoolFull = it?.isMempoolFull ?: false
             val isUpdateAvailable = it?.androidLatestVersion?.let { it > BuildConfig.VERSION_CODE } ?: false
@@ -156,7 +156,7 @@ class NoticesViewModel(
     }
 
     private suspend fun monitorWalletNotice() {
-        combine(appConfigurationManager.walletNotice, internalPrefs.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
+        combine(application.phoenixGlobal.walletContextManager.walletNotice, internalPrefs.getLastReadWalletNoticeIndex) { notice, lastReadIndex ->
             notice to lastReadIndex
         }.collect { (notice, lastReadIndex) ->
             log.debug("collecting wallet-notice={}", notice)

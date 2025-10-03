@@ -47,7 +47,10 @@ import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.LocalUserPrefs
+import fr.acinq.phoenix.android.LocalWalletId
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -66,7 +69,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.data.PreferredFiatCurrencies
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
@@ -77,10 +80,12 @@ fun CurrencyConverter(
     initialUnit: CurrencyUnit,
     onDone: (ComplexAmount?, CurrencyUnit) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
+    val walletId = LocalWalletId.current ?: return
     val userPrefs = LocalUserPrefs.current ?: return
     val appConfigManager = LocalBusiness.current?.appConfigurationManager ?: return
+    val currencyManager = application.phoenixGlobal.currencyManager
 
+    val scope = rememberCoroutineScope()
     val primaryBtcUnit = LocalBitcoinUnits.current.primary
     val otherBtcUnits = LocalBitcoinUnits.current.others
     val primaryFiat = LocalFiatCurrencies.current.primary
@@ -142,9 +147,10 @@ fun CurrencyConverter(
             otherRates.forEach { (fiat, rate) ->
                 FiatConverterInput(amount = amount?.amount, fiat = fiat, rate = rate, onAmountUpdate = { amount = it ; activeUnit = fiat }, onDelete = {
                     scope.launch {
-                        val newFiatCurrenciesConf = AppConfigurationManager.PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats - fiat)
-                        appConfigManager.updatePreferredFiatCurrencies(current = newFiatCurrenciesConf)
-                        userPrefs.saveFiatCurrencyList(newFiatCurrenciesConf)
+                        val newFiatPref = PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats - fiat)
+                        appConfigManager.updatePreferredFiatCurrencies(newFiatPref)
+                        currencyManager.startMonitoringCurrencies(walletId.nodeIdHash, newFiatPref)
+                        userPrefs.saveFiatCurrencyList(newFiatPref)
                     }
                 })
             }
@@ -160,8 +166,9 @@ fun CurrencyConverter(
                     scope.launch {
                         when (currency) {
                             is FiatCurrency -> {
-                                val newFiatPref = AppConfigurationManager.PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats + currency)
-                                appConfigManager.updatePreferredFiatCurrencies(current = newFiatPref)
+                                val newFiatPref = PreferredFiatCurrencies(primary = primaryFiat, others = otherFiats + currency)
+                                appConfigManager.updatePreferredFiatCurrencies(newFiatPref)
+                                currencyManager.startMonitoringCurrencies(walletId.nodeIdHash, newFiatPref)
                                 userPrefs.saveFiatCurrencyList(newFiatPref)
                             }
                             is BitcoinUnit -> {
@@ -231,7 +238,11 @@ private fun FiatConverterInput(
                 onValueChange = {},
                 backgroundColor = MaterialTheme.colors.surface,
                 readonly = true,
+                modifier = Modifier.weight(1f),
                 placeholder = { Text(text = stringResource(R.string.utils_no_conversion), style = MaterialTheme.typography.caption) },
+                leadingContent = {
+                    Text(text = fiat.flag, modifier = Modifier.size(20.dp), textAlign = TextAlign.Right)
+                }
             )
         } else {
             ConverterInput(

@@ -247,3 +247,21 @@ data class StartupParams(
     val liquidityPolicy: LiquidityPolicy,
     // TODO: add custom electrum address, fiat currencies, ...
 )
+
+@Serializable
+data class PreferredFiatCurrencies(
+    val primary: FiatCurrency,
+    val others: Set<FiatCurrency>
+) {
+    constructor(primary: FiatCurrency, others: List<FiatCurrency>) :
+            this(primary = primary, others = others.toSet())
+
+    val all: Set<FiatCurrency>
+        get() {
+            return if (others.contains(primary)) {
+                others
+            } else {
+                others.toMutableSet().apply { add(primary) }
+            }
+        }
+}

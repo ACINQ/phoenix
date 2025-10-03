@@ -1,19 +1,43 @@
-package fr.acinq.phoenix.managers
+/*
+ * Copyright 2025 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package fr.acinq.phoenix.managers.global
 
 import android.content.Context
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkCapabilities
 import fr.acinq.lightning.logging.LoggerFactory
-import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.info
-import kotlinx.coroutines.*
+import fr.acinq.phoenix.utils.PlatformContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val ctx: PlatformContext) : CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Default) {
 
     val logger = loggerFactory.newLogger(this::class)
+
+    private val isCallbackRegistered = AtomicBoolean(false)
 
     private val _networkState = MutableStateFlow(NetworkState.NotAvailable)
     actual val networkState: StateFlow<NetworkState> = _networkState
@@ -65,11 +89,14 @@ actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val
 
     actual fun start() {
         val connectivityManager = ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        if (isCallbackRegistered.compareAndSet(false, true)) {
+            connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        }
     }
 
     actual fun stop() {
         val connectivityManager = ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.unregisterNetworkCallback(networkCallback)
+        isCallbackRegistered.set(false)
     }
 }

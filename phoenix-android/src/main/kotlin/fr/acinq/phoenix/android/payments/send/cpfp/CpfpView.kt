@@ -44,6 +44,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.buttons.BorderButton
@@ -67,7 +68,7 @@ fun CpfpView(
 ) {
     val peerManager = business.peerManager
     val vm = viewModel<CpfpViewModel>(factory = CpfpViewModel.Factory(peerManager))
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
 
     val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()
     var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
