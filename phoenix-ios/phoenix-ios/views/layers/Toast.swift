@@ -10,9 +10,11 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 class Toast: ObservableObject {
 	
 	enum ToastAlignment {
-		case top
+		case top(padding: CGFloat = 45)
+		case topLeading(padding: CGFloat = 25)
+		case topTrailing(padding: CGFloat = 25)
 		case middle
-		case bottom
+		case bottom(padding: CGFloat = 45)
 		case none
 	}
 	
@@ -29,7 +31,8 @@ class Toast: ObservableObject {
 	@Published private var message: String? = nil
 	@Published private var colorScheme: ColorScheme = ColorScheme.light
 	@Published private var style: ToastStyle = .regular
-	@Published private var alignment: ToastAlignment = .bottom
+	@Published private var alignment: ToastAlignment = .bottom()
+	@Published private var transition: AnyTransition = .opacity
 	@Published private var showCloseButton: Bool = false
 	
 	func pop(
@@ -37,7 +40,8 @@ class Toast: ObservableObject {
 		colorScheme: ColorScheme,
 		style: ToastStyle = .regular,
 		duration: TimeInterval = 1.5,
-		alignment: ToastAlignment = .bottom,
+		alignment: ToastAlignment = .bottom(),
+		transition: AnyTransition = .opacity,
 		showCloseButton: Bool = false
 	) {
 		
@@ -49,6 +53,7 @@ class Toast: ObservableObject {
 			self.colorScheme = colorScheme
 			self.style = style
 			self.alignment = alignment
+			self.transition = transition
 			self.showCloseButton = showCloseButton
 		}
 		DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -65,7 +70,7 @@ class Toast: ObservableObject {
 		
 		if let message = message {
 			aligned(message)
-				.transition(.opacity)
+				.transition(transition)
 				.zIndex(1001)
 				.onAppear {
 					self.onAppear()
@@ -77,9 +82,25 @@ class Toast: ObservableObject {
 	private func aligned(_ message: String) -> some View {
 		
 		switch alignment {
-		case .top:
+		case .top(let padding):
 			VStack {
-				wrapped(message).padding(.top, 45)
+				wrapped(message).padding(.top, padding)
+				Spacer()
+			}
+		case .topLeading(let padding):
+			VStack {
+				HStack {
+					wrapped(message).padding(.leading, padding)
+					Spacer()
+				}
+				Spacer()
+			}
+		case .topTrailing(let padding):
+			VStack {
+				HStack {
+					Spacer()
+					wrapped(message).padding(.trailing, padding)
+				}
 				Spacer()
 			}
 		case .middle:
@@ -88,10 +109,10 @@ class Toast: ObservableObject {
 				wrapped(message)
 				Spacer()
 			}
-		case .bottom:
+		case .bottom(let padding):
 			VStack {
 				Spacer()
-				wrapped(message).padding(.bottom, 45)
+				wrapped(message).padding(.bottom, padding)
 			}
 		case .none:
 			wrapped(message)

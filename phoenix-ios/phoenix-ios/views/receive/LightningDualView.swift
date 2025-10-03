@@ -1203,7 +1203,7 @@ struct LightningDualView: View {
 			colorScheme: colorScheme.opposite,
 			style: .chrome,
 			duration: 5.0,
-			alignment: .bottom,
+			alignment: .bottom(),
 			showCloseButton: true
 		)
 	}
