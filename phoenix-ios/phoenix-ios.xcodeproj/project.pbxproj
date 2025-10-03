@@ -127,7 +127,6 @@
 		DC4309702A795F9900E28995 /* UtxoWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC43096F2A795F9900E28995 /* UtxoWrapper.swift */; };
 		DC46BAE426C6FDD300E760A6 /* CircularCheckmarkProgress in Frameworks */ = {isa = PBXBuildFile; productRef = DC46BAE326C6FDD300E760A6 /* CircularCheckmarkProgress */; };
 		DC46BAF326CACCF700E760A6 /* KotlinExtensions+Other.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */; };
-		DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
 		DC46BAF526CACCF700E760A6 /* KotlinPublishers+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */; };
 		DC46BAF726CACCF700E760A6 /* KotlinExtensions+Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */; };
 		DC46BAF826CACCF700E760A6 /* KotlinAssociatedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */; };
@@ -170,6 +169,10 @@
 		DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */; };
 		DC5631CA2C597B8600DCB5BF /* SourceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5631C92C597B8600DCB5BF /* SourceInfo.swift */; };
 		DC5895D02E57856D00CBCCF9 /* TorNetworkIssueSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5895CF2E57856600CBCCF9 /* TorNetworkIssueSheet.swift */; };
+		DC5895CA2E551A5300CBCCF9 /* AnyAsyncSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5895C92E551A4E00CBCCF9 /* AnyAsyncSequence.swift */; };
+		DC5895CB2E551A7800CBCCF9 /* AnyAsyncSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5895C92E551A4E00CBCCF9 /* AnyAsyncSequence.swift */; };
+		DC5895CD2E55217400CBCCF9 /* Task+Cancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5895CC2E55216C00CBCCF9 /* Task+Cancellable.swift */; };
+		DC5895CE2E55219800CBCCF9 /* Task+Cancellable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5895CC2E55216C00CBCCF9 /* Task+Cancellable.swift */; };
 		DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59377027516296003B4B53 /* Sequence+Sum.swift */; };
 		DC5A935329846044004F19FD /* FileHandle+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5A935229846043004F19FD /* FileHandle+Async.swift */; };
 		DC5CA4ED28F83C3B0048A737 /* DrainWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */; };
@@ -426,7 +429,6 @@
 		DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */; };
 		DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */; };
 		DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */; };
-		DCE81C172BC883BE0094B950 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */; };
 		DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAE5B82943D64B00320C46 /* MsatRange.swift */; };
 		DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */; };
 		DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
@@ -625,7 +627,6 @@
 		DC43096D2A7953F400E28995 /* FinalWalletDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalWalletDetails.swift; sourceTree = "<group>"; };
 		DC43096F2A795F9900E28995 /* UtxoWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtxoWrapper.swift; sourceTree = "<group>"; };
 		DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Other.swift"; sourceTree = "<group>"; };
-		DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinFlow.swift; sourceTree = "<group>"; };
 		DC46BAEF26CACCF700E760A6 /* KotlinPublishers+Phoenix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinPublishers+Phoenix.swift"; sourceTree = "<group>"; };
 		DC46BAF126CACCF700E760A6 /* KotlinExtensions+Conversion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Conversion.swift"; sourceTree = "<group>"; };
 		DC46BAF226CACCF700E760A6 /* KotlinAssociatedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinAssociatedObject.swift; sourceTree = "<group>"; };
@@ -665,6 +666,8 @@
 		DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KotlinExtensions+Manager.swift"; sourceTree = "<group>"; };
 		DC5631C92C597B8600DCB5BF /* SourceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceInfo.swift; sourceTree = "<group>"; };
 		DC5895CF2E57856600CBCCF9 /* TorNetworkIssueSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorNetworkIssueSheet.swift; sourceTree = "<group>"; };
+		DC5895C92E551A4E00CBCCF9 /* AnyAsyncSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyAsyncSequence.swift; sourceTree = "<group>"; };
+		DC5895CC2E55216C00CBCCF9 /* Task+Cancellable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+Cancellable.swift"; sourceTree = "<group>"; };
 		DC59377027516296003B4B53 /* Sequence+Sum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sequence+Sum.swift"; sourceTree = "<group>"; };
 		DC5A935229846043004F19FD /* FileHandle+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileHandle+Async.swift"; sourceTree = "<group>"; };
 		DC5CA4EC28F83C3B0048A737 /* DrainWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrainWalletView.swift; sourceTree = "<group>"; };
@@ -1271,7 +1274,6 @@
 				DC5631C62C5944CF00DCB5BF /* KotlinExtensions+Manager.swift */,
 				DC46BAED26CACCF700E760A6 /* KotlinExtensions+Other.swift */,
 				DC0D2EA62939273B00284608 /* KotlinExtensions+Payments.swift */,
-				DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */,
 				DC71E7342728A5720063613D /* KotlinIdentifiable.swift */,
 				DCCFE6A32B63021E002FFF11 /* KotlinLogger.swift */,
 				DCB62F462A5DF19D00912A71 /* KotlinPublishers+Lightning.swift */,
@@ -1609,25 +1611,27 @@
 		DCACF6EE2566D0A60009B01E /* extensions */ = {
 			isa = PBXGroup;
 			children = (
+				DC5895C92E551A4E00CBCCF9 /* AnyAsyncSequence.swift */,
+				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
 				DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */,
 				DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */,
 				DC422F3229392ABD00E72253 /* Date+Format.swift */,
+				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
+				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
 				DCB493CC269F8531001B0F09 /* Int+TimeInterval.swift */,
 				DC422F3429392B0500E72253 /* Int+ToDate.swift */,
+				DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */,
+				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
 				DCB493CA269F3B05001B0F09 /* Result+Deugly.swift */,
 				DC59377027516296003B4B53 /* Sequence+Sum.swift */,
 				DCC753E22CB98221006F646B /* String+Email.swift */,
 				DC4CF3CB2BE93311003A957F /* String+PIN.swift */,
 				DC7DA9F52AD84DF200F86B99 /* String+Substring.swift */,
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
+				DC5895CC2E55216C00CBCCF9 /* Task+Cancellable.swift */,
+				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
 				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
-				DC5A935229846043004F19FD /* FileHandle+Async.swift */,
-				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
-				DCFB8DF62A94066100947698 /* Task+Sleep.swift */,
-				DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */,
-				DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */,
-				DCA4DA312C6674A20010363C /* NavigationPath+RemoveAll.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -2120,6 +2124,7 @@
 				DCCFE6BD2B69A610002FFF11 /* LogFileManager.swift in Sources */,
 				DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */,
 				DC63A3762B965D54008E040E /* InboundFeeSheet.swift in Sources */,
+				DC5895CA2E551A5300CBCCF9 /* AnyAsyncSequence.swift in Sources */,
 				DC355E212A44D838008E8A8E /* NotificationsView.swift in Sources */,
 				DC9AD20D2C9C90A20019BEE9 /* ParseResultHelper.swift in Sources */,
 				DC7DA9F62AD84DF200F86B99 /* String+Substring.swift in Sources */,
@@ -2318,7 +2323,6 @@
 				DCA7263B2C80BA0E00600716 /* SyncBackupManager+Payments.swift in Sources */,
 				DC5F1C4828DDA539007A55ED /* DrainWalletView_Confirm.swift in Sources */,
 				DC641C802821767D00862DCD /* Prefs+BackupTransactions.swift in Sources */,
-				DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */,
 				DCB493CD269F8531001B0F09 /* Int+TimeInterval.swift in Sources */,
 				DCCFE6B22B6445F3002FFF11 /* LogFileHandler.swift in Sources */,
 				DC422F3529392B0500E72253 /* Int+ToDate.swift in Sources */,
@@ -2461,6 +2465,7 @@
 				DCEAE5B92943D64B00320C46 /* MsatRange.swift in Sources */,
 				DC43096E2A7953F400E28995 /* FinalWalletDetails.swift in Sources */,
 				DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */,
+				DC5895CD2E55217400CBCCF9 /* Task+Cancellable.swift in Sources */,
 				DC4CBC942D678ED700129BDB /* Details_Outgoing_Lightning.swift in Sources */,
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
@@ -2504,6 +2509,7 @@
 				DC78A5F92DF22ABE003A7DD8 /* NotificationServiceQueue.swift in Sources */,
 				DCEB2798282D7B070096B87E /* KotlinExtensions+Other.swift in Sources */,
 				DC641C7328208B7F00862DCD /* UserDefaults+Codable.swift in Sources */,
+				DC5895CE2E55219800CBCCF9 /* Task+Cancellable.swift in Sources */,
 				DC5F96B82E0455760052CDE6 /* GroupPrefs+Global.swift in Sources */,
 				DCEB2796282D7AAB0096B87E /* KotlinTypes.swift in Sources */,
 				DC9130A02AE045FA00F9B8C6 /* Sequence+Sum.swift in Sources */,
@@ -2539,7 +2545,6 @@
 				DCBBEEA82D1314CA00B0A9EB /* CurrencyAmount.swift in Sources */,
 				DC6ACC592B10F4FE0079179B /* RecoveryPhrase.swift in Sources */,
 				DCA6DEC72829BFD70073C658 /* XPC.swift in Sources */,
-				DCE81C172BC883BE0094B950 /* KotlinFlow.swift in Sources */,
 				DC641C7428208BD600862DCD /* String+VersionComparison.swift in Sources */,
 				DCA6DEC92829C3180073C658 /* GenericPasswordConvertible.swift in Sources */,
 				DCCFE6A72B630836002FFF11 /* KotlinLogger.swift in Sources */,
@@ -2547,6 +2552,7 @@
 				DC5631C82C59466000DCB5BF /* KotlinExtensions+Manager.swift in Sources */,
 				DC5F96D22E0AFF050052CDE6 /* GroupPrefs+Keys.swift in Sources */,
 				DC5F96A62E00AD3D0052CDE6 /* RunOnMainThread.swift in Sources */,
+				DC5895CB2E551A7800CBCCF9 /* AnyAsyncSequence.swift in Sources */,
 				DC5F96BA2E0457530052CDE6 /* Prefs+Constants.swift in Sources */,
 				DCCFE6B32B680DF5002FFF11 /* LoggerFactory.swift in Sources */,
 				DC1B71C62CCBE9A400914D80 /* AddToContactsInfo.swift in Sources */,

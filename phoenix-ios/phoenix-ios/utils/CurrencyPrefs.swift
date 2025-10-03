@@ -71,8 +71,10 @@ class CurrencyPrefs: ObservableObject {
 			self?.showOriginalFiatValue = newValue
 		}.store(in: &cancellables)
 		
-		BizGlobal.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
-			self?.fiatExchangeRates = rates
+		Task { @MainActor [weak self] in
+			for await rates in BizGlobal.currencyManager.ratesSequence() {
+				self?.fiatExchangeRates = rates
+			}
 		}.store(in: &cancellables)
 	}
 	

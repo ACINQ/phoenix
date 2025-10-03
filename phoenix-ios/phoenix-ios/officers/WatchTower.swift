@@ -507,7 +507,7 @@ class WatchTower {
 				let minMillis = Date.now.toMilliseconds()
 				
 				log.debug("watchTowerTask: waiting for electrum up-to-date signal...")
-				for try await millis in business.electrumWatcher.upToDatePublisher().values {
+				for try await millis in business.electrumWatcher.upToDateSequence() {
 					// millis => timestamp of when electrum watch was marked up-to-date
 					if millis > minMillis {
 						log.debug("watchTowerTask: done")
@@ -522,7 +522,7 @@ class WatchTower {
 				
 				// Wait until we're connected
 				log.debug("pendingTxTask: waiting for connections...")
-				for try await connections in business.connectionsManager.asyncStream() {
+				for try await connections in business.connectionsManager.connectionsSequence() {
 					if connections.targetsEstablished(target) {
 						log.debug("pendingTxTask: connections established")
 						break
@@ -539,7 +539,7 @@ class WatchTower {
 				// Check to see if the peer clears its pending tx's
 				async let subtask2 = Task { @MainActor in
 					log.debug("pendingTxTask: waiting for pending tx's to clear...")
-					for try await channels in business.peerManager.channelsPublisher().values {
+					for try await channels in business.peerManager.channelsArraySequence() {
 						if !self.hasInFlightTransactions(channels) {
 							log.debug("pendingTxTask: pending tx's have cleared")
 							break
@@ -560,7 +560,7 @@ class WatchTower {
 		setupTask = Task { @MainActor in
 			
 			log.debug("setupTask: waiting for peer...")
-			for try await value in business.peerManager.peerStatePublisher().values {
+			for try await value in business.peerManager.peerStateSequence() {
 				peer = value
 				break
 			}
@@ -571,12 +571,12 @@ class WatchTower {
 				return abortTasks(/* didTimeout: */ false)
 			}
 			
-			// peerManager.channelsPublisher() will fire when either:
+			// peerManager.channelsArraySequence() will fire when either:
 			// - peer.bootChannelsFlow is non-nil
 			// - peer.channelsFlow is non-nil
 			//
 			log.debug("setupTask: waiting for channels...")
-			for try await _ in business.peerManager.channelsPublisher().values {
+			for try await _ in business.peerManager.channelsArraySequence() {
 				break
 			}
 			

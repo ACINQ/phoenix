@@ -8,7 +8,7 @@ sqldelight = "2.0.2"
 okio = "3.8.0"
 
 # iOS
-skie = "0.10.1"
+skie = "0.10.5"
 
 # Android
 androidx-junit = "1.1.3"

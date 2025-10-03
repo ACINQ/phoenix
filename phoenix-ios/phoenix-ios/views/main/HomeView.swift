@@ -32,25 +32,17 @@ struct HomeView : MVIView {
 	@State var recentPaymentsConfig = Prefs.current.recentPaymentsConfig
 	@State var lastCompletedPaymentId: Lightning_kmpUUID? = nil
 	
-	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	
-	let lastCompletedPaymentPublisher = Biz.business.paymentsManager.lastCompletedPaymentPublisher()
-	
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
-	
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
-	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	@State var channels: [LocalChannelInfo] = []
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
 	
-	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
@@ -99,8 +91,6 @@ struct HomeView : MVIView {
 		self.showLiquidityAds = showLiquidityAds
 		self.showSwapInWallet = showSwapInWallet
 		self.showFinalWallet = showFinalWallet
-		
-		self.paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
 	}
 	
 	// --------------------------------------------------
@@ -134,23 +124,35 @@ struct HomeView : MVIView {
 			.onReceive(recentPaymentsConfigPublisher) {
 				recentPaymentsConfigChanged($0)
 			}
-			.onReceive(paymentsPagePublisher) {
-				paymentsPageChanged($0)
+			.task {
+				for await page in paymentsPageFetcher.paymentsPageSequence() {
+					paymentsPageChanged(page)
+				}
 			}
-			.onReceive(lastCompletedPaymentPublisher) {
-				lastCompletedPaymentChanged($0)
+			.task {
+				for await payment in Biz.business.paymentsManager.lastCompletedPaymentSequence() {
+					lastCompletedPaymentChanged(payment)
+				}
 			}
-			.onReceive(swapInWalletPublisher) {
-				swapInWalletChanged($0)
+			.task {
+				for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+					swapInWalletChanged(wallet)
+				}
 			}
-			.onReceive(finalWalletPublisher) {
-				finalWalletChanged($0)
+			.task {
+				for await wallet in Biz.business.peerManager.finalWalletSequence() {
+					finalWalletChanged(wallet)
+				}
 			}
-			.onReceive(channelsPublisher) {
-				channelsChanged($0)
+			.task {
+				for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+					channelsChanged(newChannels)
+				}
 			}
-			.onReceive(bizNotificationsPublisher) {
-				bizNotificationsChanged($0)
+			.task {
+				for await notifications in Biz.business.notificationsManager.notificationsSequence() {
+					bizNotificationsChanged(notifications)
+				}
 			}
 	}
 

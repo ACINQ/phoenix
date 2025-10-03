@@ -453,6 +453,7 @@ struct CpfpView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
+	@MainActor
 	func fetchMempoolRecommendedFees() async {
 		
 		for try await response in MempoolMonitor.shared.stream() {
@@ -463,6 +464,7 @@ struct CpfpView: View {
 		}
 	}
 	
+	@MainActor
 	func checkConfirmations() async {
 		log.trace("checkConfirmations()")
 		
@@ -480,10 +482,11 @@ struct CpfpView: View {
 		}
 	}
 	
+	@MainActor
 	func monitorBlockchain() async {
 		log.trace("monitorBlockchain()")
 		
-		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
+		for await notification in Biz.business.electrumClient.notificationsSequence() {
 			
 			if notification is Lightning_kmpHeaderSubscriptionResponse {
 				// A new block was mined !

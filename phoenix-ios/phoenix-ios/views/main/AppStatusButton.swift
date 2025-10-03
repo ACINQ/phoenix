@@ -26,7 +26,6 @@ struct AppStatusButton: View {
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	@State var channels = Biz.business.peerManager.channelsValue()
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deviceInfo: DeviceInfo
@@ -65,14 +64,20 @@ struct AppStatusButton: View {
 		.onReceive(syncBackupManager.pendingSettingsPublisher) {
 			syncBackupManagerPendingSettingsChanged($0)
 		}
-		.onReceive(Biz.business.appConfigurationManager.isTorEnabledPublisher()) {
-			isTorEnabledChanged($0)
+		.task {
+			for await value in Biz.business.appConfigurationManager.isTorEnabledSequence() {
+				isTorEnabledChanged(value)
+			}
 		}
-		.onReceive(Biz.business.appConfigurationManager.electrumConfigPublisher()) {
-			electrumConfigChanged($0)
+		.task {
+			for await config in Biz.business.appConfigurationManager.electrumConfigSequence() {
+				electrumConfigChanged(config)
+			}
 		}
-		.onReceive(channelsPublisher) {
-			channelsChanged($0)
+		.task {
+			for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(newChannels)
+			}
 		}
 	}
 	

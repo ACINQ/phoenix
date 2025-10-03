@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import PhoenixShared
+import AsyncAlgorithms
 
 fileprivate let filename = "NoticeMonitor"
 #if DEBUG && true
@@ -51,17 +52,17 @@ class NoticeMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
-		BizGlobal.walletContextManager.walletContextPublisher()
-			.sink {[weak self](context: WalletContext) in
+		Task { @MainActor [weak self] in
+			for await context in BizGlobal.walletContextManager.walletContextSequence() {
 				self?.walletContext = context
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
-		Biz.business.balanceManager.swapInWalletPublisher()
-			.sink {[weak self](wallet: Lightning_kmpWalletState.WalletWithConfirmations) in
+		Task { @MainActor [weak self] in
+			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
 				self?.swapInWallet = wallet
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		NotificationsManager.shared.permissions
 			.sink {[weak self](permissions: NotificationPermissions) in
@@ -75,14 +76,17 @@ class NoticeMonitor: ObservableObject {
 			}
 			.store(in: &cancellables)
 		
-		Publishers.CombineLatest(
-			Biz.business.appConfigurationManager.isTorEnabledPublisher(),
-			Biz.business.connectionsManager.connectionsPublisher()
-		).sink {[weak self](enabled: Bool, connections: Connections) in
-			if let self {
-				self.isTorEnabled = enabled
-				self.connections = connections
-				self.checkForTorIssues()
+		Task { @MainActor [weak self] in
+			let sequence = combineLatest(
+				Biz.business.appConfigurationManager.isTorEnabledSequence(),
+				Biz.business.connectionsManager.connectionsSequence()
+			)
+			for await (torEnabled, connections) in sequence {
+				if let self {
+					self.isTorEnabled = torEnabled
+					self.connections = connections
+					self.checkForTorIssues()
+				}
 			}
 		}.store(in: &cancellables)
 	}

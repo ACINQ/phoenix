@@ -79,7 +79,6 @@ struct ValidateView: View {
 	
 	@State var payIndex: Int = 0
 	
-	let balancePublisher = Biz.business.balanceManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
 	@State var walletInfoPresented: Bool = false
@@ -196,8 +195,10 @@ struct ValidateView: View {
 		.onReceive(Prefs.current.allowOverpaymentPublisher) {
 			allowOverpayment = $0
 		}
-		.onReceive(balancePublisher) {
-			balanceDidChange($0)
+		.task {
+			for await balance in Biz.business.balanceManager.balance {
+				balanceDidChange(balance)
+			}
 		}
 		.task {
 			await fetchMempoolRecommendedFees()

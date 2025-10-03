@@ -304,28 +304,27 @@ class NotificationService: UNNotificationServiceExtension {
 		let newBusiness = PhoenixManager.shared.setupBusiness(targetNodeIdHash)
 		business = newBusiness
 		
-		newBusiness.connectionsManager.connectionsPublisher().sink {
-			[weak self](connections: Connections) in
-				
-			self?.connectionsChanged(connections)
-		}
-		.store(in: &cancellables)
+		Task { @MainActor [newBusiness, weak self] in
+			for await connections in newBusiness.connectionsManager.connectionsSequence() {
+				self?.connectionsChanged(connections)
+			}
+		}.store(in: &cancellables)
 			
 		let pushReceivedAt = Date()
-		newBusiness.paymentsManager.lastIncomingPaymentPublisher().sink {
-			[weak self](payment: Lightning_kmpIncomingPayment) in
-			
-			guard
-				let paymentReceivedAt = payment.completedAtDate,
-				paymentReceivedAt > pushReceivedAt
-			else {
-				// Ignoring - this is the most recently received incomingPayment, but not a new one
-				return
+		Task { @MainActor [newBusiness, weak self] in
+			for await payment in newBusiness.paymentsManager.lastIncomingPaymentSequence() {
+				
+				guard
+					let paymentReceivedAt = payment.completedAtDate,
+					paymentReceivedAt > pushReceivedAt
+				else {
+					// Ignoring - this is the most recently received incomingPayment, but not a new one
+					return
+				}
+
+				self?.didReceivePayment(payment)
 			}
-			
-			self?.didReceivePayment(payment)
-		}
-		.store(in: &cancellables)
+		}.store(in: &cancellables)
 	}
 	
 	private func stopPhoenix() {

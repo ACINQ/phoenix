@@ -59,8 +59,6 @@ struct LightningDualView: View {
 	)
 	@State var maxButtonWidth: CGFloat? = nil
 	
-	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
-	
 	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
 	// In particular, animating the border around the qrcode doesn't work well.
 	@Namespace private var qrCodeAnimation_inner
@@ -104,8 +102,10 @@ struct LightningDualView: View {
 		.onChange(of: activeType) {
 			activeTypeChanged($0)
 		}
-		.onReceive(lastIncomingPaymentPublisher) {
-			lastIncomingPaymentChanged($0)
+		.task {
+			for await payment in Biz.business.paymentsManager.lastIncomingPaymentSequence() {
+				lastIncomingPaymentChanged(payment)
+			}
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
