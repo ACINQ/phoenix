@@ -27,6 +27,10 @@ class PushManager {
 			switch push {
 			case .fcm(let notification):
 				processRemoteNotification_fcm(notification, completionHandler)
+			case .lnurlWithdraw(let notification):
+				Task {
+					await processRemoteNotification_aws_withdraw(notification, completionHandler)
+				}
 			}
 			
 		} else {
@@ -63,6 +67,87 @@ class PushManager {
 		} else {
 			log.warning("notification.nodeId or notification.chain is nil")
 			invoke(completionHandler, .noData)
+		}
+	}
+	
+	@MainActor
+	private static func processRemoteNotification_aws_withdraw(
+		_ request: LnurlWithdrawNotification,
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) async {
+		
+		log.trace(#function)
+		
+		let result = await Biz.business.checkWithdrawRequest(request.toWithdrawRequest())
+		
+		switch result {
+		case .failure(let error):
+			log.error("\(#function): error: \(error.description)")
+			return reject(request, error, completionHandler)
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere:
+				log.warning("\(#function): abort: handled elsewhere")
+				return invoke(completionHandler, .newData)
+			
+			case .continueAndSendPayment(let card, _, _):
+				log.debug("\(#function): continue: send payment")
+				
+				guard
+					let peer = Biz.business.peerManager.peerStateValue(),
+					let defaultTrampolineFees = peer.walletParams.trampolineFees.first
+				else {
+					return reject(
+						request,
+						.internalError(card: card, details: "peer is nil"),
+						completionHandler
+					)
+				}
+				
+				do {
+					try await Biz.business.sendManager.payBolt11Invoice(
+						amountToSend   : request.invoiceAmount,
+						trampolineFees : defaultTrampolineFees,
+						invoice        : request.invoice,
+						metadata       : WalletPaymentMetadata.withCard(card.id)
+					)
+				} catch {
+					log.error("SendManager.payBolt11Invoice(): threw error: \(error)")
+					return reject(
+						request,
+						.internalError(card: card, details: "payBolt11Invoice failed"),
+						completionHandler
+					)
+				}
+				
+				return accept(request, completionHandler)
+			} // </switch status>
+		} // </switch result>
+	}
+	
+	private static func reject(
+		_ request : LnurlWithdrawNotification,
+		_ error   : WithdrawRequestError,
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) {
+		log.trace("reject(\(error.description))")
+		
+		Task {
+			let _ = await request.postResponse(errorReason: error.description)
+			invoke(completionHandler, .newData)
+		}
+	}
+	
+	private static func accept(
+		_ request: LnurlWithdrawNotification,
+		_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) {
+		log.trace(#function)
+		
+		Task {
+			let _ = await request.postResponse(errorReason: nil)
+			invoke(completionHandler, .newData)
 		}
 	}
 	

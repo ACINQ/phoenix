@@ -175,6 +175,18 @@ class SqlitePaymentsDb(
         } ?: paymentInfo
     }
 
+    suspend fun listRecentCardPayments(count: Long, skip: Long, cardId: UUID, sinceDate: Long): List<WalletPaymentInfo> {
+        return withContext(Dispatchers.Default) {
+            database.paymentsOutgoingQueries.listRecentCardPayments(
+                card_id = cardId.toString(),
+                min_ts = sinceDate,
+                limit = count,
+                offset = skip,
+                mapper = ::mapOutgoingPaymentsAndMetadata
+            ).executeAsList()
+        }
+    }
+
     @Suppress("UNUSED_PARAMETER")
     private fun mapPaymentsAndMetadata(
         data_: ByteArray,
@@ -191,9 +203,9 @@ class SqlitePaymentsDb(
         modified_at: Long?,
         original_fiat_type: String?,
         original_fiat_rate: Double?,
-        lightning_address: String?
+        lightning_address: String?,
+        card_id: String?
     ): WalletPaymentInfo {
-
         val payment = try {
             WalletPaymentAdapter.decode(data_)
         } catch (e: Exception) {
@@ -215,10 +227,53 @@ class SqlitePaymentsDb(
             modified_at = modified_at,
             original_fiat_type = original_fiat_type,
             original_fiat_rate = original_fiat_rate,
-            lightning_address = lightning_address
+            lightning_address = lightning_address,
+            card_id = card_id
         )
 
         return WalletPaymentInfo(payment, metadata, null)
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun mapOutgoingPaymentsAndMetadata(
+        data_: OutgoingPayment,
+        payment_id: UUID?,
+        lnurl_base_type: LnurlBase.TypeVersion?,
+        lnurl_base_blob: ByteArray?,
+        lnurl_description: String?,
+        lnurl_metadata_type: LnurlMetadata.TypeVersion?,
+        lnurl_metadata_blob: ByteArray?,
+        lnurl_successAction_type: LnurlSuccessAction.TypeVersion?,
+        lnurl_successAction_blob: ByteArray?,
+        user_description: String?,
+        user_notes: String?,
+        modified_at: Long?,
+        original_fiat_type: String?,
+        original_fiat_rate: Double?,
+        lightning_address: String?,
+        card_id: String?
+    ): WalletPaymentInfo {
+        return WalletPaymentInfo(
+            payment = data_,
+            metadata = PaymentsMetadataQueries.mapAll(
+                id = data_.id,
+                lnurl_base_type = lnurl_base_type,
+                lnurl_base_blob = lnurl_base_blob,
+                lnurl_description = lnurl_description,
+                lnurl_metadata_type = lnurl_metadata_type,
+                lnurl_metadata_blob = lnurl_metadata_blob,
+                lnurl_successAction_type = lnurl_successAction_type,
+                lnurl_successAction_blob = lnurl_successAction_blob,
+                user_description = user_description,
+                user_notes = user_notes,
+                modified_at = modified_at,
+                original_fiat_type = original_fiat_type,
+                original_fiat_rate = original_fiat_rate,
+                lightning_address = lightning_address,
+                card_id = card_id
+            ),
+            contact = null
+        )
     }
 
     suspend fun getOldestCompletedDate(): Long? = withContext(Dispatchers.Default) {
