@@ -19,6 +19,13 @@ enum XpcActor: CustomStringConvertible {
 			case .notifySrvExt : return "notifySrvExt"
 		}
 	}
+	
+	static var current: XpcActor {
+		switch AppIdentifier.current {
+			case .foreground: return .mainApp
+			case .background: return .notifySrvExt
+		}
+	}
 }
 
 enum XpcMessage: CustomStringConvertible {
@@ -69,6 +76,8 @@ fileprivate let msgUnavailable_notifySrvExt: UInt64 = 0b1100
  * Using these simple primitives, we're able to determine if the other process is active.
  */
 class XPC {
+	
+	public static let shared = XPC(actor: XpcActor.current)
 	
 	private let actor: XpcActor
 	

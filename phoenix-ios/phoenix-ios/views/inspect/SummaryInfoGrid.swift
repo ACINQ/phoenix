@@ -61,6 +61,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			recipientRow()
 			paymentTypeRow()
 			channelClosingRow()
+			cardRow()
 			
 			paymentFeesRow_StandardFees()
 			paymentFeesRow_MinerFees()
@@ -514,6 +515,29 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 							.padding(.top, 4)
 					}
 				}
+				
+			} // </InfoGridRow>
+		}
+	}
+	
+	@ViewBuilder
+	func cardRow() -> some View {
+		let identifier: String = #function
+		
+		if let cardId = paymentInfo.metadata.cardId,
+		   let card = Biz.business.cardsManager.cardForId(cardId: cardId)
+		{
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				keyColumn("Card")
+				
+			} valueColumn: {
+				Text(card.sanitizedName)
 				
 			} // </InfoGridRow>
 		}

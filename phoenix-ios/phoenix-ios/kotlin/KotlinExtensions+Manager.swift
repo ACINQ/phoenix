@@ -32,6 +32,20 @@ extension BalanceManager {
 	}
 }
 
+extension CardsManager {
+	
+	var cardsListValue: [BoltCardInfo] {
+		return self.cardsList.value
+	}
+}
+
+extension CurrencyManager {
+	
+	var ratesFlowValue: [ExchangeRate] {
+		return self.ratesFlow.value
+	}
+}
+
 extension ConnectionsManager {
 	
 	var currentValue: Connections {

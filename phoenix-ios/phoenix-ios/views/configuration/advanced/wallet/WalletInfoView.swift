@@ -619,6 +619,7 @@ struct WalletInfoView: View {
 					case .finalWallet        : newNavLinkTag = NavLinkTag.FinalWalletDetails
 					case .appAccess          : break
 					case .walletMetadata     : break
+					case .bip353Registration : break
 				}
 				
 				if let newNavLinkTag {

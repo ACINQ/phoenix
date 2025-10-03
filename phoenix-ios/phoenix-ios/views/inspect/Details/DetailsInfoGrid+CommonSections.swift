@@ -666,7 +666,7 @@ extension DetailsInfoGrid {
 			identifier: #function,
 			keyColumnTitle: "Offer"
 		) {
-			let text = invoice.invoiceRequest.offer.encode()
+			let text = invoice.offer.encode()
 			Text(text)
 				.lineLimit(5)
 				.truncationMode(.tail)

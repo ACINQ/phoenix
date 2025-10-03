@@ -109,6 +109,16 @@ class Prefs_BackupTransactions {
 		}
 	}
 	
+	var hasDownloadedCards: Bool {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.bool(forKey: Key.hasDownloadedCards.value(id))
+		}
+		set {
+			defaults.set(newValue, forKey: Key.hasDownloadedCards.value(id))
+		}
+	}
+	
 	var hasReUploadedPayments: Bool {
 		get {
 			maybeLogDefaultAccess(#function)
