@@ -16,14 +16,14 @@ enum HexOptions {
 
 extension SHA256.Digest {
 	
-	func toHex(options: HexOptions = .lowerCase) -> String {
+	func toHex(_ options: HexOptions = .lowerCase) -> String {
 		return self.map { String(format: options.formatString, $0) }.joined()
 	}
 }
 
 extension Array where Element == UInt8 {
 	
-	func toHex(options: HexOptions = .lowerCase) -> String {
+	func toHex(_ options: HexOptions = .lowerCase) -> String {
 		return self.map { String(format: options.formatString, $0) }.joined()
 	}
 }
@@ -31,7 +31,7 @@ extension Array where Element == UInt8 {
 
 extension Data {
 
-	func toHex(options: HexOptions = .lowerCase) -> String {
+	func toHex(_ options: HexOptions = .lowerCase) -> String {
 		return self.map { String(format: options.formatString, $0) }.joined()
 	}
 	

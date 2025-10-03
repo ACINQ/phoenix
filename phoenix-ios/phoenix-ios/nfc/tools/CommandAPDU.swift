@@ -84,7 +84,7 @@ struct CommandAPDU: CustomStringConvertible {
 			desc += " lc(\(String(format: "%hhx", lc))"
 		}
 		if let data {
-			desc += "\n - data: \(data.toHex(options: .lowerCase))"
+			desc += "\n - data: \(data.toHex(.lowerCase))"
 		}
 		if let le {
 			desc += "\n - le(\(String(format: "%02hhx", le)))"
