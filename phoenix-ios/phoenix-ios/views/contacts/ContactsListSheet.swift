@@ -67,11 +67,11 @@ struct ContactsListSheet: View {
 	func content() -> some View {
 		
 		list()
-			.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
-				contactsListChanged($0)
-			}
 			.onChange(of: searchText) { _ in
 				searchTextChanged()
+			}
+			.task {
+				await monitorContactsList()
 			}
 	}
 	
@@ -197,6 +197,26 @@ struct ContactsListSheet: View {
 	
 	var hasZeroContacts: Bool {
 		return sortedContacts.isEmpty
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	@MainActor
+	func monitorContactsList() async {
+		log.trace(#function)
+		
+		do {
+			let contactsDb = try await Biz.business.databaseManager.contactsDb()
+			for await contacts in contactsDb.contactsList {
+				contactsListChanged(contacts)
+			}
+		} catch {
+			log.error("monitorContactsList(): error: \(error)")
+		}
+		
+		log.debug("monitorContactsList(): terminated")
 	}
 	
 	// --------------------------------------------------

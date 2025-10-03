@@ -23,14 +23,11 @@ struct TransactionsView: View {
 
 	private let paymentsPageFetcher = Biz.getPaymentsPageFetcher(name: "TransactionsView")
 	
-	let paymentsPagePublisher: AnyPublisher<PaymentsPage, Never>
 	@State var paymentsPage = PaymentsPage(offset: 0, count: 0, rows: [])
 	@State var cachedRows: [WalletPaymentInfo] = []
 	@State var sections: [PaymentsSection] = []
 	
 	@State var selectedItem: WalletPaymentInfo? = nil
-	
-	let contactsPublisher = Biz.business.databaseManager.contactsListPublisher()
 	
 	let syncStatePublisher = Biz.syncManager!.syncBackupManager.statePublisher
 	@State var isDownloadingTxs: Bool = false
@@ -47,14 +44,6 @@ struct TransactionsView: View {
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
-	
-	// --------------------------------------------------
-	// MARK: Init
-	// --------------------------------------------------
-	
-	init() {
-		paymentsPagePublisher = paymentsPageFetcher.paymentsPagePublisher()
-	}
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -84,14 +73,14 @@ struct TransactionsView: View {
 		.onAppear {
 			onAppear()
 		}
-		.onReceive(paymentsPagePublisher) {
-			paymentsPageChanged($0)
-		}
-		.onReceive(contactsPublisher) {
-			contactsChanged($0)
-		}
 		.onReceive(syncStatePublisher) {
 			syncStateChanged($0)
+		}
+		.task {
+			await monitorPaymentsPage()
+		}
+		.task {
+			await monitorContactsList()
 		}
 	}
 	
@@ -536,6 +525,37 @@ struct TransactionsView: View {
 		} else {
 			self.isDownloadingTxs = false
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	@MainActor
+	func monitorPaymentsPage() async {
+		log.trace(#function)
+		
+		for await page in paymentsPageFetcher.paymentsPageSequence() {
+			paymentsPageChanged(page)
+		}
+		
+		log.debug("monitorPaymentsPage(): terminated")
+	}
+	
+	@MainActor
+	func monitorContactsList() async {
+		log.trace(#function)
+		
+		do {
+			let contactsDb = try await Biz.business.databaseManager.contactsDb()
+			for await contacts in contactsDb.contactsList {
+				contactsChanged(contacts)
+			}
+		} catch {
+			log.error("monitorContactsList(): error: \(error)")
+		}
+		
+		log.debug("monitorContactsList(): terminated")
 	}
 	
 	// --------------------------------------------------

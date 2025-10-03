@@ -162,9 +162,6 @@ struct SendView: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
-			contactsListChanged($0)
-		}
 		.onChange(of: inputFieldText) { _ in
 			inputFieldTextChanged()
 		}
@@ -180,6 +177,9 @@ struct SendView: View {
 				ScanQrCodeView(location: .sheet, didScanQrCode: didScanQrCode)
 			
 			} // </switch>
+		}
+		.task {
+			await monitorContactsList()
 		}
 	}
 	
@@ -830,6 +830,26 @@ struct SendView: View {
 		if selectedContactId != nil {
 			selectedContactId = nil
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	@MainActor
+	func monitorContactsList() async {
+		log.trace(#function)
+		
+		do {
+			let contactsDb = try await Biz.business.databaseManager.contactsDb()
+			for await contacts in contactsDb.contactsList {
+				contactsListChanged(contacts)
+			}
+		} catch {
+			log.error("monitorContactsList(): error: \(error)")
+		}
+		
+		log.debug("monitorContactsList(): terminated")
 	}
 	
 	// --------------------------------------------------

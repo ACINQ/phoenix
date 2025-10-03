@@ -70,9 +70,6 @@ struct SummaryView: View {
 	)
 	@State var buttonHeight: CGFloat? = nil
 	
-	// If we don't store this as a variable, the publisher seems to fire continuously.
-	let contactsListPublisher = Biz.business.databaseManager.contactsListPublisher()
-	
 	@StateObject var blockchainMonitorState = BlockchainMonitorState()
 	
 	@ObservedObject var currencyPrefs = CurrencyPrefs.current
@@ -156,8 +153,8 @@ struct SummaryView: View {
 		.onChange(of: paymentInfo) { _ in
 			paymentInfoChanged()
 		}
-		.onReceive(contactsListPublisher) { _ in
-			contactsChanged()
+		.task {
+			await monitorContactsList()
 		}
 		.task {
 			await monitorBlockchain()
@@ -950,7 +947,25 @@ struct SummaryView: View {
 	// MARK: Tasks
 	// --------------------------------------------------
 	
+	@MainActor
+	func monitorContactsList() async {
+		log.trace(#function)
+		
+		do {
+			let contactsDb = try await Biz.business.databaseManager.contactsDb()
+			for await _ in contactsDb.contactsList {
+				contactsChanged()
+			}
+		} catch {
+			log.error("monitorContactsList(): error: \(error)")
+		}
+		
+		log.debug("monitorContactsList(): terminated")
+	}
+	
+	@MainActor
 	func monitorBlockchain() async {
+		log.trace(#function)
 		
 		// Architecture note:
 		// We need the ability to reset the View to display a completely different payment.
@@ -996,7 +1011,10 @@ struct SummaryView: View {
 		log.debug("monitorBlockchain: terminated")
 	}
 	
-	func monitorBlockchain(_ paymentInfo: WalletPaymentInfo) async {
+	@MainActor
+	func monitorBlockchain(
+		_ paymentInfo: WalletPaymentInfo
+	) async {
 		
 		let pid: String = paymentInfo.payment.id.description().prefix(maxLength: 8)
 		log.trace("monitorBlockchain(\(pid))")
@@ -1025,7 +1043,7 @@ struct SummaryView: View {
 		
 		// Note: When the task is cancelled, the `values` stream returns nil, and we exit the loop
 		
-		for await notification in Biz.business.electrumClient.notificationsPublisher().values {
+		for await notification in Biz.business.electrumClient.notificationsSequence() {
 			
 			if !(notification is Lightning_kmpHeaderSubscriptionResponse) {
 				log.debug("monitorBlockchain(\(pid)): notification isNot HeaderSubscriptionResponse")
@@ -1047,6 +1065,7 @@ struct SummaryView: View {
 		log.debug("monitorBlockchain(\(pid)): terminated")
 	}
 	
+	@MainActor
 	func updateConfirmations(
 		_ onChainPayment: Lightning_kmpOnChainOutgoingPayment,
 		_ pid: String
@@ -1071,6 +1090,7 @@ struct SummaryView: View {
 		}
 	}
 	
+	@MainActor
 	func fetchConfirmations(
 		_ onChainPayment: Lightning_kmpOnChainOutgoingPayment,
 		_ pid: String

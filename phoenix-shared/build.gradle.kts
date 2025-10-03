@@ -1,5 +1,4 @@
 import java.io.ByteArrayOutputStream
-import co.touchlab.skie.configuration.FlowInterop
 import co.touchlab.skie.configuration.SuspendInterop
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -200,7 +199,6 @@ skie {
     }
     features {
         group {
-            FlowInterop.Enabled(false)
             SuspendInterop.Enabled(false)
         }
     }

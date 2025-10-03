@@ -14,7 +14,6 @@ struct WalletInfoReceive: View {
 	
 	let metadata = SecurityFileManager.shared.currentWallet() ?? WalletMetadata.default()
 	
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
 	
 	@ObservedObject var currencyPrefs = CurrencyPrefs.current
@@ -83,8 +82,10 @@ struct WalletInfoReceive: View {
 			
 		}
 		.padding()
-		.onReceive(channelsPublisher) {
-			channels = $0
+		.task {
+			for await value in Biz.business.peerManager.channelsArraySequence() {
+				channels = value
+			}
 		}
 	}
 	

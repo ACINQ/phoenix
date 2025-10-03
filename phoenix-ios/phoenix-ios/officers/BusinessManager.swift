@@ -150,18 +150,16 @@ class BusinessManager {
 		let groupPrefs = GroupPrefs.wallet(walletId)
 		
 		// Connection status observer
-		business.connectionsManager.connectionsPublisher()
-			.sink { (connections: Connections) in
-			
-				self.connectionsChanged(connections)
+		Task { @MainActor [self] in
+			for await connections in business.connectionsManager.connectionsSequence() {
+				connectionsChanged(connections)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// In-flight payments observer
-		business.peerManager.peerStatePublisher()
-			.flatMap { $0.eventsFlowPublisher() }
-			.sink { (event: Lightning_kmpPeerEvent) in
-				
+		Task { @MainActor [self] in
+			let peer = try await self.business.peerManager.getPeer()
+			for await event in peer.eventsFlow {
 				if let paymentProgress = event as? Lightning_kmpPaymentProgress {
 					let paymentId = paymentProgress.request.paymentId.description()
 					self.beginLongLivedTask(id: paymentId)
@@ -175,7 +173,7 @@ class BusinessManager {
 					self.endLongLivedTask(id: paymentId)
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// Tor configuration observer
 		groupPrefs.isTorEnabledPublisher
@@ -223,18 +221,18 @@ class BusinessManager {
 			.store(in: &cancellables)
 		
 		// NodeEvents
-		business.nodeParamsManager.nodeParamsPublisher()
-			.flatMap { $0.nodeEventsPublisher() }
-			.sink { (event: Lightning_kmpNodeEvents) in
+		Task { @MainActor [self] in
+			let nodeParams = await self.business.nodeParamsManager.getNodeParams()
+			for await event in nodeParams.nodeEventsSequence() {
 				
 				if let rejected = event as? Lightning_kmpLiquidityEventsRejected,
-				   rejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet
+					rejected.source == Lightning_kmpLiquidityEventsSource.onChainWallet
 				{
 					log.debug("Received Lightning_kmpLiquidityEventsRejected: \(rejected)")
 					self.swapInRejectedPublisher.value = rejected
-					
+				
 				} else if let task = event as? Lightning_kmpSensitiveTaskEvents {
-					
+				
 					if let taskStarted = task as? Lightning_kmpSensitiveTaskEventsTaskStarted {
 						if let taskIdentifier = taskStarted.id.asInteractiveTx() {
 							self.beginLongLivedTask(id: taskIdentifier.id)
@@ -247,7 +245,7 @@ class BusinessManager {
 					}
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// LiquidityEvent.Accepted is still missing.
 		// So we're simulating it by monitoring the swapIn wallet balance.
@@ -259,8 +257,8 @@ class BusinessManager {
 		// then the entire confirmed balance is consumed,
 		// and thus the confirmed balance drops to zero.
 		//
-		business.balanceManager.swapInWalletPublisher()
-			.sink { (wallet: Lightning_kmpWalletState.WalletWithConfirmations) in
+		Task { @MainActor [self] in
+			for await wallet in business.balanceManager.swapInWalletSequence() {
 				
 				if wallet.deeplyConfirmedBalance.sat == 0 {
 					if self.swapInRejectedPublisher.value != nil {
@@ -269,17 +267,16 @@ class BusinessManager {
 					}
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// Monitor for unfinished "merge-channels for splicing" upgrade.
 		//
-		business.peerManager.channelsPublisher()
-			.sink { (channels: [LocalChannelInfo]) in
-				
+		Task { @MainActor [self] in
+			for await channels in business.peerManager.channelsArraySequence() {
 				let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 				self.canMergeChannelsForSplicingPublisher.send(shouldMigrate)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// Monitor for notifySrvExt being active & connected to Peer
 		//
@@ -334,26 +331,23 @@ class BusinessManager {
 			}.store(in: &cancellables)
 		
 		// Keep Prefs.shared.swapInAddressIndex up-to-date
-		business.peerManager.peerStatePublisher()
-			.compactMap { $0.swapInWallet }
-			.flatMap { $0.swapInAddressPublisher() }
-			.sink { (newInfo: Lightning_kmpSwapInWallet.SwapInAddressInfo?) in
-				
+		Task { @MainActor [self] in
+			let peer = try await business.peerManager.getPeer()
+			for await newInfo in peer.phoenixSwapInWallet.swapInAddressSequence() {
 				if let newInfo {
 					if prefs.swapInAddressIndex < newInfo.index {
 						prefs.swapInAddressIndex = newInfo.index
 					}
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		Task { @MainActor in
-			let channelsStream = self.business.peerManager.channelsPublisher().values
 			do {
-				for try await channels in channelsStream {
+				for try await channels in business.peerManager.channelsArraySequence() {
 					let shouldMigrate = IosMigrationHelper.shared.shouldMigrateChannels(channels: channels)
 					if !shouldMigrate {
-						let peer = try await self.business.peerManager.getPeer()
+						let peer = try await business.peerManager.getPeer()
 						try await peer.startWatchSwapInWallet()
 					}
 					break
@@ -361,7 +355,7 @@ class BusinessManager {
 			} catch {
 				log.error("peer.startWatchSwapInWallet(): error: \(error)")
 			}
-		} // </Task>
+		}.store(in: &cancellables)
 	}
 	
 	private func start(_ walletId: WalletIdentifier) {

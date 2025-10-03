@@ -11,145 +11,75 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 extension Lightning_kmpPeer {
 	
-	fileprivate struct _Key {
-		static var eventsFlowPublisher = 0
-	}
-	
-	func eventsFlowPublisher() -> AnyPublisher<Lightning_kmpPeerEvent, Never> {
+	func eventsFlowSequence() -> AnyAsyncSequence<Lightning_kmpPeerEvent> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.eventsFlowPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `eventsFlow: SharedFlow<PeerEvent>`
-			///
-			KotlinPassthroughSubject<Lightning_kmpPeerEvent>(
-				self.eventsFlow
-			)
+		return self.eventsFlow
 			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 extension Lightning_kmpElectrumClient {
 	
-	fileprivate struct _Key {
-		static var notificationsPublisher = 0
-	}
-	
-	func notificationsPublisher() -> AnyPublisher<Lightning_kmpElectrumSubscriptionResponse, Never> {
+	func notificationsSequence() -> AnyAsyncSequence<Lightning_kmpElectrumSubscriptionResponse> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.notificationsPublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `notifications: Flow<ElectrumSubscriptionResponse>`
-			///
-			KotlinPassthroughSubject<Lightning_kmpElectrumSubscriptionResponse>(
-				self.notifications
-			)
+		return self.notifications
 			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 extension Lightning_kmpElectrumMiniWallet {
 	
-	fileprivate struct _Key {
-		static var walletStatePublisher = 0
-	}
-	
-	func walletStatePublisher() -> AnyPublisher<Lightning_kmpWalletState, Never> {
+	func walletStateSequence() -> AnyAsyncSequence<Lightning_kmpWalletState> {
 		
-		self.getSetAssociatedObject(storageKey: &_Key.walletStatePublisher) {
-			
-			/// Transforming from Kotlin:
-			/// `walletStateFlow: StateFlow<WalletState>`
-			///
-			KotlinCurrentValueSubject<Lightning_kmpWalletState>(
-				self.walletStateFlow
-			)
+		return self.walletStateFlow
 			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 extension Lightning_kmpElectrumWatcher {
 	
-	fileprivate struct _Key {
-		static var upToDatePublisher = 0
-	}
-	
-	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.upToDatePublisher) {
+	func upToDateSequence() -> AnyAsyncSequence<Int64> {
 			
-			/// Transforming from Kotlin:
-			/// `openUpToDateFlow(): Flow<Long>`
-			///
-			KotlinPassthroughSubject<KotlinLong>(
-				self.openUpToDateFlow()
-			)
-			.compactMap { $0?.int64Value }
-			.eraseToAnyPublisher()
-		}
+		return self.openUpToDateFlow()
+			.compactMap { $0 }
+			.map { $0.int64Value }
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 extension Lightning_kmpNodeParams {
 	
-	fileprivate struct _Key {
-		static var nodeEventsPublisher = 0
-	}
-	
-	func nodeEventsPublisher() -> AnyPublisher<Lightning_kmpNodeEvents, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.nodeEventsPublisher) {
+	func nodeEventsSequence() -> AnyAsyncSequence<Lightning_kmpNodeEvents> {
 			
-			/// Transforming from Kotlin:
-			/// `nodeEvents: SharedFlow<NodeEvents>`
-			///
-			KotlinPassthroughSubject<Lightning_kmpNodeEvents>(
-				self.nodeEvents
-			)
+		return self.nodeEvents
 			.compactMap { $0 }
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 extension Lightning_kmpSwapInWallet {
-	
-	fileprivate struct _Key {
-		static var swapInAddressPublisher = 0
-	}
 	
 	struct SwapInAddressInfo {
 		let addr: String
 		let index: Int
 	}
 	
-	func swapInAddressPublisher() -> AnyPublisher<SwapInAddressInfo?, Never> {
-		
-		self.getSetAssociatedObject(storageKey: &_Key.swapInAddressPublisher) {
+	func swapInAddressSequence() -> AnyAsyncSequence<SwapInAddressInfo?> {
 			
-			/// Transforming from Kotlin:
-			/// `MutableStateFlow<Pair<String, Int>?>`
-			KotlinCurrentValueSubject<KotlinPair<NSString, KotlinInt>>(
-				self.swapInAddressFlow
-			)
+		return self.swapInAddressFlow
 			.map {
+				var result: SwapInAddressInfo? = nil
 				if let pair = $0,
-				   let addr = pair.first as? String,
-				   let index = pair.second
+					let addr = pair.first as? String,
+					let index = pair.second
 				{
-					return SwapInAddressInfo(addr: addr, index: index.intValue)
-				} else {
-					return nil
+					result = SwapInAddressInfo(addr: addr, index: index.intValue)
 				}
+				return result
 			}
-			.eraseToAnyPublisher()
-		}
+			.eraseToAnyAsyncSequence()
 	}
 }

@@ -68,11 +68,11 @@ struct ContactsList: View {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(Biz.business.databaseManager.contactsListPublisher()) {
-			contactsListChanged($0)
-		}
 		.onChange(of: searchText) { _ in
 			searchTextChanged()
+		}
+		.task {
+			await monitorContactsList()
 		}
 	}
 	
@@ -272,6 +272,26 @@ struct ContactsList: View {
 			popToDestination = nil
 			presentationMode.wrappedValue.dismiss()
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Tasks
+	// --------------------------------------------------
+	
+	@MainActor
+	func monitorContactsList() async {
+		log.trace(#function)
+		
+		do {
+			let contactsDb = try await Biz.business.databaseManager.contactsDb()
+			for await contacts in contactsDb.contactsList {
+				contactsListChanged(contacts)
+			}
+		} catch {
+			log.error("monitorContactsList(): error: \(error)")
+		}
+		
+		log.debug("monitorContactsList(): terminated")
 	}
 	
 	// --------------------------------------------------
