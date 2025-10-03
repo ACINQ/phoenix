@@ -143,6 +143,7 @@
     <string name="receive_bip353_info">This Lightning address uses the modern Bip353 standard that works with Bolt12 payment requests.\n\nIt is more private than LNURL-based Lightning addresses, and can even be self-hosted.\n\nHowever, it\'s is bleeding edge tech ; some wallets or services do not understand it yet and won\'t be able to pay you.</string>
     <string name="receive_bip353_link">Learn more.</string>
 
+    <string name="receive_lightning_edit_button">Add amount and description</string>
     <string name="receive_lightning_edit_title_bolt11">Customise this Bolt11 invoice</string>
     <string name="receive_lightning_edit_title_bolt12">Customise this Bolt12 invoice</string>
     <string name="receive_lightning_edit_amount_label">Amount (optional)</string>
@@ -180,6 +181,15 @@
     <string name="send_offer_fetching">Fetching payment details…</string>
     <string name="send_offer_failure_title">Payment has failed</string>
     <string name="send_offer_failure_timeout">Could not retrieve payment details within a reasonable time.\n\nThe recipient may be offline or unreachable.</string>
+
+    <string name="send_offer_fiat_main_label">Invoice requests %1$s</string>
+    <string name="send_offer_fiat_converting">Converting to BTC…</string>
+    <string name="send_offer_fiat_converting_desc">Retrieving %1$s</string>
+    <string name="send_offer_fiat_err_unsupported">%1$s is not supported by Phoenix. You must convert the amount to BTC manually.</string>
+    <string name="send_offer_fiat_err_malformed_invoice">This invoice is malformed and misses a fiat currency code.</string>
+    <string name="send_offer_fiat_converted_to">Phoenix converted that to <b>%1$s</b>, but you may adjust that value.</string>
+    <string name="send_offer_fiat_converted_rate_details">Rate: %1$s %2$s/BTC</string>
+    <string name="send_offer_fiat_converted_rate_timestamp">Refreshed: %1$s</string>
 
     <string name="send_paymentmode_onchain">Pay on-chain</string>
     <string name="send_paymentmode_onchain_desc">On-chain transactions are typically slower and best suited for large payments.</string>

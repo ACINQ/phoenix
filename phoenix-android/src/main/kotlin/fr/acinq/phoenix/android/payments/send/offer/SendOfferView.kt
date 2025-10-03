@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,27 +43,63 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
+import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.contact.ContactOrOfferView
+import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.payments.details.splash.translatePaymentError
+import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.converters.AmountConverter.toMilliSatoshi
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPlainString
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
+import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
+import fr.acinq.phoenix.data.ExchangeRate
+import fr.acinq.phoenix.data.FiatCurrency
+import kotlinx.coroutines.launch
+
+
+sealed class InitialAmount {
+    abstract val amount: MilliSatoshi?
+
+    data object None : InitialAmount() { override val amount = null }
+
+    data class MilliSat(override val amount: MilliSatoshi): InitialAmount()
+
+    sealed class Fiat : InitialAmount() {
+        abstract val value: Long
+        abstract val currencyCode: String?
+        data class ResolvingToMsat(override val value: Long, override val currencyCode: String) : Fiat() {
+            override val amount = null
+        }
+        data class ConvertedToMsat(override val value: Long, override val currencyCode: String, override val amount: MilliSatoshi, val rate: ExchangeRate.BitcoinPriceRate): Fiat()
+        data class CurrencyCodeUnsupported(override val value: Long, override val currencyCode: String): Fiat() {
+            override val amount = null
+        }
+        data class NoCurrencyInOffer(override val value: Long) : Fiat() {
+            override val amount = null
+            override val currencyCode = null
+        }
+    }
+}
 
 @Composable
 fun SendToOfferView(
@@ -79,16 +116,48 @@ fun SendToOfferView(
     val balance = business.balanceManager.balance.collectAsState(null).value
     val peer by business.peerManager.peerState.collectAsState()
     val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
+    val currencyManager = application.phoenixGlobal.currencyManager
 
     val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.peerManager, business.nodeParamsManager, business.databaseManager), key = offer.encode())
-    val requestedAmount = offer.amount
-    var amount by remember { mutableStateOf(requestedAmount) }
+    val requestedAmountState = produceState<InitialAmount?>(initialValue = null, key1 = offer) {
+        value = when (val amountInOffer = offer.amount) {
+            is Either.Left -> InitialAmount.MilliSat(amountInOffer.value)
+            is Either.Right -> {
+                val currencyCode = offer.currency
+                if (currencyCode == null) {
+                    InitialAmount.Fiat.NoCurrencyInOffer(value = amountInOffer.value)
+                } else {
+                    val fiatCurrency = FiatCurrency.valueOfOrNull(currencyCode)
+                    if (fiatCurrency == null) {
+                        InitialAmount.Fiat.CurrencyCodeUnsupported(value = amountInOffer.value, currencyCode = currencyCode)
+                    } else {
+                        launch {
+                            currencyManager.fetchRateForCurrency(fiatCurrency)?.let { rate ->
+                                value = InitialAmount.Fiat.ConvertedToMsat(
+                                    value = amountInOffer.value,
+                                    currencyCode = currencyCode,
+                                    amount = amountInOffer.value.toDouble().toMilliSatoshi(rate.price),
+                                    rate = rate,
+                                )
+                            }
+                        }
+                        InitialAmount.Fiat.ResolvingToMsat(value = amountInOffer.value, currencyCode = currencyCode)
+                    }
+                }
+            }
+            null -> InitialAmount.None
+        }
+    }
+    val requestedAmount = requestedAmountState.value?.amount
+
+    // the requested amount may be in fiat and needs to be converted first
+    var amount by remember(requestedAmount) { mutableStateOf(requestedAmount) }
     val amountErrorMessage: String = remember(amount) {
         val currentAmount = amount
         when {
             currentAmount == null -> ""
             balance != null && currentAmount > balance -> context.getString(R.string.send_error_amount_over_balance)
-            requestedAmount != null && currentAmount < requestedAmount -> context.getString(
+            requestedAmount != null && currentAmount < requestedAmount && requestedAmountState.value is InitialAmount.MilliSat -> context.getString(
                 R.string.send_error_amount_below_requested,
                 (requestedAmount).toPrettyString(prefBitcoinUnit, withUnit = true)
             )
@@ -112,6 +181,10 @@ fun SendToOfferView(
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
             )
+            when (val state = requestedAmountState.value) {
+                is InitialAmount.Fiat -> ConvertingFiatOfferAmount(state)
+                else -> Unit
+            }
         }
     ) {
         offer.description?.takeIf { it.isNotBlank() }?.let {
@@ -246,5 +319,53 @@ private fun PayerNoteInput(
         Spacer(modifier = Modifier.height(16.dp))
         FilledButton(text = stringResource(id = R.string.btn_ok), icon = R.drawable.ic_check, onClick = onDismiss, modifier = Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.height(80.dp))
+    }
+}
+
+@Composable
+private fun ConvertingFiatOfferAmount(state: InitialAmount.Fiat) {
+    var showOfferInFiatDialog by remember { mutableStateOf(false) }
+
+    Clickable(onClick = { showOfferInFiatDialog = true }, internalPadding = PaddingValues(8.dp), shape = RoundedCornerShape(12.dp)) {
+        TextWithIcon(
+            text = when (state) {
+                is InitialAmount.Fiat.ResolvingToMsat -> stringResource(R.string.send_offer_fiat_converting)
+                is InitialAmount.Fiat.CurrencyCodeUnsupported, is InitialAmount.Fiat.NoCurrencyInOffer, is InitialAmount.Fiat.ConvertedToMsat ->
+                    stringResource(R.string.send_offer_fiat_main_label, "${state.value} ${state.currencyCode}")
+            },
+            textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+            icon = when (state) {
+                is InitialAmount.Fiat.ResolvingToMsat -> R.drawable.ic_refresh
+                is InitialAmount.Fiat.CurrencyCodeUnsupported, is InitialAmount.Fiat.NoCurrencyInOffer, is InitialAmount.Fiat.ConvertedToMsat -> R.drawable.ic_info
+            },
+            iconTint = MaterialTheme.typography.caption.color,
+        )
+    }
+
+    if (showOfferInFiatDialog) {
+        Dialog(onDismiss = { showOfferInFiatDialog = false }, buttons = null) {
+            Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
+                Text(text = stringResource(id = R.string.send_offer_fiat_main_label, "${state.value} ${state.currencyCode}"), style = MaterialTheme.typography.h4)
+                Spacer(Modifier.height(12.dp))
+                when (state) {
+                    is InitialAmount.Fiat.ResolvingToMsat -> {
+                        Text(text = stringResource(id = R.string.send_offer_fiat_converting_desc, state.currencyCode))
+                    }
+                    is InitialAmount.Fiat.CurrencyCodeUnsupported -> {
+                        Text(text = stringResource(id = R.string.send_offer_fiat_err_unsupported, state.currencyCode))
+                    }
+                    is InitialAmount.Fiat.NoCurrencyInOffer -> {
+                        Text(text = stringResource(id = R.string.send_offer_fiat_err_malformed_invoice))
+                    }
+                    is InitialAmount.Fiat.ConvertedToMsat -> {
+                        Text(text = annotatedStringResource(id = R.string.send_offer_fiat_converted_to, state.amount.toPrettyString(unit = LocalBitcoinUnits.current.primary, withUnit = true)))
+                        Spacer(Modifier.height(12.dp))
+                        Text(text = stringResource(id = R.string.send_offer_fiat_converted_rate_details, state.rate.price.toPlainString(), state.rate.fiatCurrency.name), style = MaterialTheme.typography.subtitle2)
+                        Spacer(Modifier.height(2.dp))
+                        Text(text = stringResource(id = R.string.send_offer_fiat_converted_rate_timestamp, state.rate.timestampMillis.toAbsoluteDateTimeString()), style = MaterialTheme.typography.subtitle2)
+                    }
+                }
+            }
+        }
     }
 }

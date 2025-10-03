@@ -112,16 +112,16 @@ fun AmountHeroInput(
                     val rate = rates[unit]
                     if (rate != null) {
                         initialAmount?.toFiat(rate.price).toPlainString(limitDecimal = true)
-                    } else "?!"
+                    } else context.getString(R.string.utils_unknown_amount)
                 }
                 is BitcoinUnit -> {
                     initialAmount?.toUnit(u).toPlainString()
                 }
-                else -> "?!"
+                else -> context.getString(R.string.utils_unknown_amount)
             }
         ))
     }
-    var inputAmount by remember { mutableStateOf(initialAmount) }
+    var inputAmount by remember(initialAmount) { mutableStateOf(initialAmount) }
     val convertedValue: String by remember(inputAmount, unit) {
         val s = when (unit) {
             is FiatCurrency -> {

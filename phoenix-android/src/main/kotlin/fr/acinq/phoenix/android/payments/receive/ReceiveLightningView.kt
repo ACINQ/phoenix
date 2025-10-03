@@ -185,7 +185,7 @@ fun ColumnScope.LightningInvoiceView(
                     if (state is LightningInvoiceState.Done) {
                         Column(modifier = Modifier.padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (state.description.isNullOrBlank() && state.amount == null) {
-                                Text(text = "Add amount and description", style = MaterialTheme.typography.subtitle2)
+                                Text(text = stringResource(id = R.string.receive_lightning_edit_button), style = MaterialTheme.typography.subtitle2)
                             }
                             state.description?.takeIf { it.isNotBlank() }?.let { desc ->
                                 QRCodeLabel(label = stringResource(R.string.receive_lightning_desc_label)) {
