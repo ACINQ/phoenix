@@ -197,6 +197,7 @@ class BusinessManager {
 					walletId: walletId.nodeIdHash,
 					currencies: current
 				)
+				self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
 			}
 			.store(in: &cancellables)
 		
@@ -378,6 +379,7 @@ class BusinessManager {
 			walletId: walletId.nodeIdHash,
 			currencies: preferredFiatCurrencies
 		)
+		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 
 		let startupParams = StartupParams(
 			isTorEnabled: groupPrefs.isTorEnabled,
