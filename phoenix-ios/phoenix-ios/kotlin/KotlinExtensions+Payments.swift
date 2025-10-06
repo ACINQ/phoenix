@@ -76,8 +76,11 @@ extension WalletPaymentInfo {
 			
 			if let lightningPayment = outgoingPayment as? Lightning_kmpLightningOutgoingPayment {
 			
-				if let normal = lightningPayment.details.asNormal() {
-					return sanitize(normal.paymentRequest.desc)
+				if let bolt11 = lightningPayment.details.asNormal() {
+					return sanitize(bolt11.paymentRequest.desc)
+					
+				} else if let bolt12 = lightningPayment.details.asBlinded() {
+					return sanitize(bolt12.paymentRequest.description_)
 					
 				} else if let swapOut = lightningPayment.details.asSwapOut() {
 					return sanitize(swapOut.address)
