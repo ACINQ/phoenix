@@ -385,11 +385,20 @@ class NotificationService: UNNotificationServiceExtension {
 		connectionTimer = nil
 		postReceivedPaymentTimer?.invalidate()
 		postReceivedPaymentTimer = nil
+		
+		// We purposefully have the following call order:
+		// - updateRemoteNotificationContent()
+		// - stopPhoenix()
+		//
+		// Because we may need to fetch exchangeRates,
+		// and to do that we call PhoenixManager.groupPrefs().
+
+		updateRemoteNotificationContent(remoteNotificationContent)
+		displayLocalNotificationsForAdditionalPayments()
+		
 		stopXpc()
 		stopPhoenix()
 		
-		updateRemoteNotificationContent(remoteNotificationContent)
-		displayLocalNotificationsForAdditionalPayments()
 		contentHandler(remoteNotificationContent)
 	}
 	
