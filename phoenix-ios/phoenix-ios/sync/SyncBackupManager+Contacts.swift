@@ -671,7 +671,7 @@ extension SyncBackupManager {
 		
 		let hashMe = prefix + suffix
 		let digest = SHA256.hash(data: hashMe)
-		let hash = digest.toHex(options: .lowerCase)
+		let hash = digest.toHex(.lowerCase)
 		
 		return CKRecord.ID(recordName: hash, zoneID: recordZoneID())
 	}
