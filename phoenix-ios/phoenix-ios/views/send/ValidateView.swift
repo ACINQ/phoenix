@@ -1111,17 +1111,21 @@ struct ValidateView: View {
 	// --------------------------------------------------
 	
 	func balanceDidChange(_ balance: Lightning_kmpMilliSatoshi?) {
-		log.trace("balanceDidChange()")
+		log.trace(#function)
 		
 		if let balance = balance {
 			balanceMsat = balance.msat
 		} else {
 			balanceMsat = 0
 		}
+		
+		// If we were currently saying "amount exceeds your balance",
+		// we may need to refresh this.
+		refreshAltAmount()
 	}
 	
 	func currencyPickerDidChange() -> Void {
-		log.trace("currencyPickerDidChange()")
+		log.trace(#function)
 		
 		if let newCurrency = currencyList.first(where: { $0.shortName == currencyPickerChoice }) {
 			if currency != newCurrency {
@@ -1175,8 +1179,6 @@ struct ValidateView: View {
 		} else {
 			log.error("Flow doesn't contain a valid L2 payment option")
 		}
-		
-		
 	}
 	
 	// --------------------------------------------------
@@ -1265,14 +1267,7 @@ struct ValidateView: View {
 				}
 			}
 			
-			if let msat = msat, !isLnurlWithdrawFlow {
-				
-				// There are 2 scenarios that we handle slightly differently:
-				// - amount user selected (amount + tip) exceeds balance
-				// - total amount (including server-selected miner fee) exceeds balance
-				//
-				// In one scenario, the user is at fault.
-				// In the other, the user unexpectedly went over the limit.
+			if let msat, !isLnurlWithdrawFlow {
 				
 				if msat > balanceMsat {
 					problem = .amountExceedsBalance
@@ -1369,7 +1364,7 @@ struct ValidateView: View {
 			
 			if problem == nil {
 				
-				if let msat = msat {
+				if let msat {
 					
 					var altBitcoinUnit: FormattedAmount? = nil
 					var altFiatCurrency: FormattedAmount? = nil
