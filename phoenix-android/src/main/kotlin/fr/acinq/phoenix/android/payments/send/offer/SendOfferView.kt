@@ -328,16 +328,9 @@ private fun ConvertingFiatOfferAmount(state: InitialAmount.Fiat) {
 
     Clickable(onClick = { showOfferInFiatDialog = true }, internalPadding = PaddingValues(8.dp), shape = RoundedCornerShape(12.dp)) {
         TextWithIcon(
-            text = when (state) {
-                is InitialAmount.Fiat.ResolvingToMsat -> stringResource(R.string.send_offer_fiat_converting)
-                is InitialAmount.Fiat.CurrencyCodeUnsupported, is InitialAmount.Fiat.NoCurrencyInOffer, is InitialAmount.Fiat.ConvertedToMsat ->
-                    stringResource(R.string.send_offer_fiat_main_label, "${state.value} ${state.currencyCode}")
-            },
+            text = stringResource(R.string.send_offer_fiat_main_label, "${state.value} ${state.currencyCode}"),
             textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-            icon = when (state) {
-                is InitialAmount.Fiat.ResolvingToMsat -> R.drawable.ic_refresh
-                is InitialAmount.Fiat.CurrencyCodeUnsupported, is InitialAmount.Fiat.NoCurrencyInOffer, is InitialAmount.Fiat.ConvertedToMsat -> R.drawable.ic_info
-            },
+            icon = R.drawable.ic_refresh,
             iconTint = MaterialTheme.typography.caption.color,
         )
     }
