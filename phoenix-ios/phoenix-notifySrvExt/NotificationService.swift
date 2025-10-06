@@ -477,7 +477,7 @@ class NotificationService: UNNotificationServiceExtension {
 		_ content: UNMutableNotificationContent,
 		_ item: NotificationServiceQueue.Item
 	) {
-		log.trace("updateNotification_localNotification()")
+		log.trace(#function)
 		
 		content.title = item.content.title
 		content.body = item.content.body
@@ -491,7 +491,7 @@ class NotificationService: UNNotificationServiceExtension {
 		_ content: UNMutableNotificationContent,
 		_ payment: Lightning_kmpIncomingPayment
 	) {
-		log.trace("updateNotificationContent_incomingPayment()")
+		log.trace(#function)
 		
 		content.title = String(localized: "Received payment", comment: "Push notification title")
 		
@@ -526,7 +526,7 @@ class NotificationService: UNNotificationServiceExtension {
 	private func updateNotificationContent_missedPayment(
 		_ content: UNMutableNotificationContent
 	) {
-		log.trace("updateNotificationContent_missedPayment()")
+		log.trace(#function)
 		
 		content.title = String(localized: "Missed incoming payment", comment: "")
 	}
@@ -534,7 +534,7 @@ class NotificationService: UNNotificationServiceExtension {
 	private func updateNotificationContent_pendingSettlement(
 		_ content: UNMutableNotificationContent
 	) {
-		log.trace("updateNotificationContent_pendingSettlement")
+		log.trace(#function)
 		
 		content.title = String(localized: "Please start Phoenix", comment: "")
 		content.body = String(localized: "An incoming settlement is pending.", comment: "")
@@ -543,24 +543,12 @@ class NotificationService: UNNotificationServiceExtension {
 	private func updateNotificationContent_unknown(
 		_ content: UNMutableNotificationContent
 	) {
-		log.trace("updateNotificationContent_unknown()")
+		log.trace(#function)
 		
-		var exchangeRate: ExchangeRate.BitcoinPriceRate? = nil
-		if let groupPrefs = PhoenixManager.shared.groupPrefs() {
-			let fiatCurrency = groupPrefs.fiatCurrency
-			exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
-		}
-		
-		if let exchangeRate {
-			let fiatAmt = Utils.formatFiat(amount: exchangeRate.price, fiatCurrency: exchangeRate.fiatCurrency)
-			
-			content.title = String(localized: "Current bitcoin price", comment: "")
-			content.body = fiatAmt.string
-			
-		} else {
-			content.title = String(localized: "Current bitcoin price", comment: "")
-			content.body = "?"
-		}
+		content.title = "Phoenix"
+		content.body = String(localized: "is running in the background", comment: "")
+		content.relevanceScore = 0.0
+		content.threadIdentifier = "unknown"
 	}
 	
 	// --------------------------------------------------
