@@ -48,8 +48,19 @@ struct LightningDualView: View {
 
 	@State var modificationTitleType: ModifyInvoiceSheet.TitleType = .normal
 	
-	@State var nfcEligible: Bool = false
-	@State var nfcActive: Bool = false
+	@State var hceEligible: Bool = false
+	@State var hceActive: Bool = false
+
+	@State var cardPending: Bool = false
+	@State var cardErrorMessage: String? = nil
+	
+	enum CardState {
+		case scanning
+		case parsing
+		case requesting
+		case receiving
+	}
+	@State var cardState: CardState? = nil
 	
 	// For the cicular buttons: [copy, share, edit]
 	enum MaxButtonWidth: Preference {}
@@ -128,10 +139,10 @@ struct LightningDualView: View {
 			} // </switch>
 		}
 		.task {
-			// Don't show NFC button unless their device is eligible to use it.
+			// Don't show HCE (host card emulation) button unless their device is eligible to use it
 			if #available(iOS 17.4, *) {
 				if await CardSession.isEligible {
-					nfcEligible = true
+					hceEligible = true
 				}
 			}
 		}
@@ -205,9 +216,7 @@ struct LightningDualView: View {
 					.padding(.top)
 			}
 
-			if nfcActive {
-				nfcActivity()
-			}
+			nfcActivity()
 			
 			if notificationPermissions == .disabled {
 				backgroundPaymentsDisabledWarning()
@@ -420,9 +429,10 @@ struct LightningDualView: View {
 			copyButton()
 			shareButton()
 			editButton()
-			if nfcEligible {
-				nfcButton()
+			if hceEligible {
+				hceButton()
 			}
+			cardButton()
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 	}
@@ -520,7 +530,7 @@ struct LightningDualView: View {
 	}
 	
 	@ViewBuilder
-	func nfcButton() -> some View {
+	func hceButton() -> some View {
 		
 		actionButton(
 			text: String(localized: "nfc", comment: "button label - try to make it short"),
@@ -528,9 +538,23 @@ struct LightningDualView: View {
 			width: 21, height: 21,
 			xOffset: 0, yOffset: 0
 		) {
-			didTapNfcButton()
+			didTapHceButton()
 		}
-		.disabled(nfcActive)
+		.disabled(hceActive)
+	}
+
+	@ViewBuilder
+	func cardButton() -> some View {
+		
+		actionButton(
+			text: String(localized: "card", comment: "button label - try to make it short"),
+			image: Image(systemName: "creditcard"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: 0
+		) {
+			didTapCardButton()
+		}
+		.disabled(cardState != nil)
 	}
 	
 	@ViewBuilder
@@ -546,7 +570,7 @@ struct LightningDualView: View {
 	@ViewBuilder
 	func nfcActivity() -> some View {
 		
-		if nfcActive {
+		if hceActive || (cardState != nil) {
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
@@ -554,6 +578,22 @@ struct LightningDualView: View {
 					.frame(width: 240, height: 10)
 					.padding(.horizontal)
 					.padding(.bottom, 4)
+				
+				if let cardState {
+					Group {
+						switch cardState {
+						case .scanning:
+							Text("Reading card…")
+						case .parsing:
+							Text("Communicating with card's host…")
+						case .requesting:
+							Text("Requesting payment…")
+						case .receiving:
+							Text("Awaiting payment…")
+						}
+					}
+					.multilineTextAlignment(.center)
+				}
 				
 			} // </VStack>
 			.padding(.top)
@@ -759,6 +799,11 @@ struct LightningDualView: View {
 		
 		if activeType == .bolt11_invoice, model is Receive.Model_Generated {
 			updateQRCode()
+			
+			if cardPending {
+				cardPending = false
+				startCardReader()
+			}
 		}
 	}
 	
@@ -840,10 +885,21 @@ struct LightningDualView: View {
 		// - and if the activeType changes, we'll need to update the counterpart
 		//
 		needsUpdateInvoiceOrOffer = true
+		
+		if activeType == .bolt12_offer {
+			if cardPending {
+				cardPending = false
+				startCardReader()
+			}
+		}
 	}
 	
 	func modifyInvoiceSheetDidCancel() {
-		log.trace("modifyInvoiceSheetDidCancel()")
+		log.trace(#function)
+		
+		if cardPending {
+			cardPending = false
+		}
 	}
 	
 	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
@@ -1014,8 +1070,8 @@ struct LightningDualView: View {
 		}
 	}
 	
-	func didTapNfcButton() {
-		log.trace("didTapNfcButton()")
+	func didTapHceButton() {
+		log.trace(#function)
 		
 		// We're going to build a BIP-321 URI
 		
@@ -1072,6 +1128,31 @@ struct LightningDualView: View {
 			} else {
 				handleHceWriterError(.hceNotAvailable)
 			}
+		}
+	}
+
+	func didTapCardButton() {
+		log.trace(#function)
+		
+		if amountMsat == nil {
+			// We need the user to enter an amount first.
+			
+			cardPending = true
+			modificationTitleType = .cardPaymentNeedsAmount
+			smartModalState.display(dismissable: true) {
+				
+				ModifyInvoiceSheet(
+					titleType: modificationTitleType,
+					savedAmount: $modificationAmount,
+					description: $description,
+					openCurrencyConverter: openCurrencyConverter,
+					didSave: modifyInvoiceSheetDidSave,
+					didCancel: modifyInvoiceSheetDidCancel
+				)
+			}
+			
+		} else {
+			startCardReader()
 		}
 	}
 	
@@ -1147,20 +1228,21 @@ struct LightningDualView: View {
 	
 	@available(iOS 17.4, *)
 	func startHostCardEmulation(_ url: URL) {
-		log.trace("startHostCardEmulation()")
+		log.trace(#function)
 		
 		let file = Ndef.ndefDataForUrl(url)
 		
-		nfcActive = true
+		hceActive = true
 		Task { @MainActor in
 			if let error = await HceWriter.shared.start(ndefFile: file) {
 				handleHceWriterError(error)
 			}
-			nfcActive = false
+			hceActive = false
 		}
 	}
 	
 	func handleHceWriterError(_ error: HceWriterError) {
+		log.trace(#function)
 		
 		let msg: String
 		switch error {
@@ -1205,6 +1287,211 @@ struct LightningDualView: View {
 			duration: 5.0,
 			alignment: .bottom(),
 			showCloseButton: true
+		)
+	}
+
+	// --------------------------------------------------
+	// MARK: Card Payment
+	// --------------------------------------------------
+	
+	func startCardReader() {
+		log.trace(#function)
+		
+		cardState = .scanning
+		NfcReader.shared.readCard { result in
+			
+			cardState = nil
+			switch result {
+			case .failure(let failure):
+				switch failure {
+				case .readingNotAvailable:
+					cardErrorMessage = String(localized: "NFC cababilities not available on this device")
+				case .alreadyStarted:
+					cardErrorMessage = String(localized: "NFC reader is already scanning")
+				case .scanningTerminated(_):
+					cardErrorMessage = String(localized: "Nothing scanned")
+				case .errorReadingTag:
+					cardErrorMessage = String(localized: "Error reading tag")
+				}
+				
+			case .success(let result):
+				log.debug("NFCNDEFMessage: \(result)")
+				
+				var scannedUri: URL? = nil
+				
+				result.records.forEach { payload in
+					if let uri = payload.wellKnownTypeURIPayload() {
+						log.debug("found uri = \(uri)")
+						if scannedUri == nil {
+							scannedUri = uri
+						}
+						
+					} else if let text = payload.wellKnownTypeTextPayload().0 {
+						log.debug("found text = \(text)")
+						
+					} else {
+						log.debug("found tag with unknown type")
+					}
+				}
+				
+				if let scannedUri {
+					cardErrorMessage = nil
+					handleScannedUri(scannedUri)
+					
+				} else {
+					cardErrorMessage = String(localized: "No URI detected in NFC tag")
+				}
+			}
+		}
+	}
+	
+	func handleScannedUri(_ scannedUri: URL) {
+		log.trace("handleScannedUri(\(scannedUri.absoluteString))")
+		
+		cardState = .parsing
+		Task { @MainActor in
+			do {
+				let progressHandler = {(progress: SendManager.ParseProgress) -> Void in
+					// nothing to do here currently
+				}
+				
+				let result: SendManager.ParseResult = try await Biz.business.sendManager.parse(
+					request: scannedUri.absoluteString,
+					progress: progressHandler
+				)
+				
+				cardState = nil
+				handleParseResult(result)
+				
+			} catch {
+				log.error("handleScannedUri: error: \(error)")
+				
+				cardState = nil
+				cardErrorMessage = String(localized: "Could not communicate with card's wallet")
+			}
+			
+		} // </Task>
+	}
+	
+	func handleParseResult(_ result: SendManager.ParseResult) {
+		log.trace("handleParseResult()")
+		
+		guard let expectedResult = result as? SendManager.ParseResult_Lnurl_Withdraw else {
+			handleParseError(result)
+			return
+		}
+		
+		guard let model = mvi.model as? Receive.Model_Generated else {
+			return
+		}
+		
+		cardState = .requesting
+		Task { @MainActor in
+			do {
+				
+				let err: SendManager.LnurlWithdrawError? =
+					try await Biz.business.sendManager.lnurlWithdraw_sendInvoice(
+						lnurlWithdraw: expectedResult.lnurlWithdraw,
+						invoice: model.invoice
+					)
+				
+				if let remoteErr = err as? SendManager.LnurlWithdrawErrorRemoteError {
+					cardState = nil
+					handleRequestError(remoteErr)
+				} else {
+					cardState = .receiving
+				}
+				
+			} catch {
+				log.error("handleParseResult: error: \(error)")
+				
+				cardState = nil
+				cardErrorMessage = String(localized: "Cound not communicate with card's wallet")
+			}
+		} // </Task>
+	}
+	
+	func handleParseError(_ result: SendManager.ParseResult) {
+		log.trace(#function)
+		
+		var msg = String(localized: "Does not appear to be a bolt card.")
+		var websiteLink: URL? = nil
+		
+		if let badRequest = result as? SendManager.ParseResult_BadRequest {
+			
+			if let serviceError = badRequest.reason as? SendManager.BadRequestReason_ServiceError {
+				
+				let remoteFailure: LnurlError.RemoteFailure = serviceError.error
+				let origin = remoteFailure.origin
+				
+				if remoteFailure is LnurlError.RemoteFailure_IsWebsite {
+					websiteLink = URL(string: serviceError.url.description())
+					msg = String(
+						localized: "Unreadable response from service: \(origin)",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+			}
+		}
+		
+		if let websiteLink {
+			popoverState.display(dismissable: true) {
+				WebsiteLinkPopover(
+					link: websiteLink,
+					didCopyLink: didCopyLink,
+					didOpenLink: nil
+				)
+			}
+			
+		} else {
+			cardErrorMessage = msg
+		}
+	}
+	
+	func handleRequestError(_ result: SendManager.LnurlWithdrawErrorRemoteError) {
+		log.trace(#function)
+		
+		let remoteFailure = result.err
+		switch remoteFailure {
+		
+		case is LnurlError.RemoteFailure_CouldNotConnect:
+			cardErrorMessage = String(
+				localized: "Could not connect to card's host",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case is LnurlError.RemoteFailure_Unreadable:
+			cardErrorMessage = String(
+				localized: "Unreadable response from card's host",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case let rfDetailed as LnurlError.RemoteFailure_Detailed:
+			cardErrorMessage = String(
+				localized: "The card's host returned error message: \(rfDetailed.reason)",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		case let rfCode as LnurlError.RemoteFailure_Code:
+			cardErrorMessage = String(
+				localized: "The card's host returned error code: \(rfCode.code.value)",
+				comment: "Error message - processing bolt card payment"
+			)
+			
+		default:
+			cardErrorMessage = String(
+				localized: "Could not communicate with card's wallet",
+				comment: "Error message - scanning lightning invoice"
+			)
+		}
+	}
+	
+	func didCopyLink() {
+		log.trace("didCopyLink()")
+		
+		toast.pop(
+			NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+			colorScheme: colorScheme.opposite
 		)
 	}
 }
