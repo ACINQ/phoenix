@@ -345,6 +345,7 @@
 		DCA7263D2C80BC0800600716 /* SyncBackupManager+Contacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA7263C2C80BC0800600716 /* SyncBackupManager+Contacts.swift */; };
 		DCA849E02813311D000FADE1 /* aes256Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849DF2813311D000FADE1 /* aes256Tests.swift */; };
 		DCA849E2281333EB000FADE1 /* currencyFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */; };
+		DCAB8C332E9EA89A0075462A /* Array+IsNotEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAB8C322E9EA8950075462A /* Array+IsNotEmpty.swift */; };
 		DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAC5B6F27726FC80077BB98 /* DeepLink.swift */; };
 		DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
 		DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */; };
@@ -806,6 +807,7 @@
 		DCA7263C2C80BC0800600716 /* SyncBackupManager+Contacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncBackupManager+Contacts.swift"; sourceTree = "<group>"; };
 		DCA849DF2813311D000FADE1 /* aes256Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = aes256Tests.swift; sourceTree = "<group>"; };
 		DCA849E1281333EB000FADE1 /* currencyFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currencyFormattingTests.swift; sourceTree = "<group>"; };
+		DCAB8C322E9EA8950075462A /* Array+IsNotEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+IsNotEmpty.swift"; sourceTree = "<group>"; };
 		DCAC5B6F27726FC80077BB98 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLink.swift; sourceTree = "<group>"; };
 		DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Hexadecimal.swift"; sourceTree = "<group>"; };
 		DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyStoreError.swift; sourceTree = "<group>"; };
@@ -1611,6 +1613,7 @@
 		DCACF6EE2566D0A60009B01E /* extensions */ = {
 			isa = PBXGroup;
 			children = (
+				DCAB8C322E9EA8950075462A /* Array+IsNotEmpty.swift */,
 				DC5895C92E551A4E00CBCCF9 /* AnyAsyncSequence.swift */,
 				DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */,
 				DCEE3E532931446A00EB4DFF /* Collections+AsInt.swift */,
@@ -2197,6 +2200,7 @@
 				DC1844032A2690BB004D9578 /* MinerFeeSheet.swift in Sources */,
 				DC39A2662A12C04D00F59E39 /* LiquidityPolicyHelp.swift in Sources */,
 				DC49FE9B2AC49CB500D8D2E2 /* KotlinExtensions+Lightning.swift in Sources */,
+				DCAB8C332E9EA89A0075462A /* Array+IsNotEmpty.swift in Sources */,
 				DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */,
 				DC0E31BB26EFDED4002071C6 /* VSlider.swift in Sources */,
 				DC370A892B7FBD7C0093C56F /* BtcAddrOptionsSheet.swift in Sources */,

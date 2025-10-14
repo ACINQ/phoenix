@@ -29,8 +29,10 @@ struct LiquidityAdsView: View {
 	@State var isEstimating: Bool = false
 	@State var isPurchasing: Bool = false
 	@State var isPurchased: Bool = false
-	@State var channelsNotAvailable: Bool = false
 	@State var iUnderstand: Bool = false
+	
+	@State var channelsNotAvailable: Bool = false
+	@State var liquidityNotAvailable: Bool = false
 	
 	@State var showHelpSheet = false
 	
@@ -63,12 +65,18 @@ struct LiquidityAdsView: View {
 	@ViewBuilder
 	var body: some View {
 		
+		main()
+			.navigationTitle("Add Liquidity")
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func main() -> some View {
+		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			header()
 			content()
 		}
-		.navigationTitle("Add Liquidity")
-		.navigationBarTitleDisplayMode(.inline)
 		.toolbar {
 			ToolbarItem(placement: .navigationBarTrailing) {
 				Button {
@@ -80,6 +88,24 @@ struct LiquidityAdsView: View {
 		}
 		.sheet(isPresented: $showHelpSheet) {
 			LiquidityAdsHelp(isShowing: $showHelpSheet)
+		}
+		.task {
+			for await newValue in Biz.business.peerManager.channelsArraySequence() {
+				channelsChanged(newValue)
+			}
+		}
+		.task {
+			for await context in BizGlobal.walletContextManager.walletContextSequence() {
+				walletContextChanged(context)
+			}
+		}
+		.task {
+			for await newValue in Biz.business.balanceManager.balanceSequence() {
+				balanceChanged(newValue)
+			}
+		}
+		.task {
+			await fetchMempoolRecommendedFees()
 		}
 	}
 	
@@ -133,19 +159,6 @@ struct LiquidityAdsView: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.task {
-			for await newValue in Biz.business.peerManager.channelsArraySequence() {
-				channelsChanged(newValue)
-			}
-		}
-		.task {
-			for await newValue in Biz.business.balanceManager.balanceSequence() {
-				balanceChanged(newValue)
-			}
-		}
-		.task {
-			await fetchMempoolRecommendedFees()
-		}
 	}
 	
 	@ViewBuilder
@@ -271,10 +284,17 @@ struct LiquidityAdsView: View {
 					}
 				}
 				.font(.headline)
-				.disabled(isEstimating)
+				.disabled(isEstimating || channelsNotAvailable || liquidityNotAvailable)
 				
 				if channelsNotAvailable {
 					Text("Channels are not available, try again later")
+						.multilineTextAlignment(.center)
+						.font(.callout)
+						.foregroundColor(.appNegative)
+						
+				} else if liquidityNotAvailable {
+					Text("Liquidity not currently available, try again later")
+						.multilineTextAlignment(.center)
 						.font(.callout)
 						.foregroundColor(.appNegative)
 				}
@@ -753,20 +773,28 @@ struct LiquidityAdsView: View {
 	// MARK: Notifications
 	// --------------------------------------------------
 	
-	func channelsChanged(_ newValue: [LocalChannelInfo]) {
-		log.trace("channelsChanged()")
+	func channelsChanged(_ newChannels: [LocalChannelInfo]) {
+		log.trace(#function)
 		
-		channels = newValue
+		channels = newChannels
+		if channelsNotAvailable {
+			if channels.filter({ !$0.isTerminated }).isNotEmpty {
+				// Channels may now be available; Flip flag so user can try again.
+				channelsNotAvailable = false
+			}
+		}
 	}
 	
-	func balanceChanged(_ balance: Lightning_kmpMilliSatoshi?) {
-		log.trace("balanceDidChange()")
+	func walletContextChanged(_ context: WalletContext) {
+		log.trace(#function)
 		
-		if let balance = balance {
-			balanceMsat = balance.msat
-		} else {
-			balanceMsat = nil
-		}
+		liquidityNotAvailable = (context.isManualLiquidityEnabled == false)
+	}
+	
+	func balanceChanged(_ newBalance: Lightning_kmpMilliSatoshi?) {
+		log.trace(#function)
+		
+		balanceMsat = newBalance?.msat
 	}
 	
 	// --------------------------------------------------

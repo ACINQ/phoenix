@@ -38,6 +38,7 @@ struct HomeView : MVIView {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	
 	@State var channels: [LocalChannelInfo] = []
+	@State var walletContext: WalletContext? = nil
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
@@ -147,6 +148,11 @@ struct HomeView : MVIView {
 			.task {
 				for await newChannels in Biz.business.peerManager.channelsArraySequence() {
 					channelsChanged(newChannels)
+				}
+			}
+			.task {
+				for await context in BizGlobal.walletContextManager.walletContextSequence() {
+					walletContextChanged(context)
 				}
 			}
 			.task {
@@ -759,7 +765,7 @@ struct HomeView : MVIView {
 			return false
 		}
 		
-		return true
+		return walletContext?.isManualLiquidityEnabled ?? false
 	}
 	
 	// --------------------------------------------------
@@ -871,7 +877,7 @@ struct HomeView : MVIView {
 	}
 	
 	func swapInWalletChanged(_ newWallet: Lightning_kmpWalletState.WalletWithConfirmations) {
-		log.trace("swapInWalletChanged()")
+		log.trace(#function)
 		
 		let oldBalance = swapInWallet.totalBalance.sat
 		let newBalance = newWallet.totalBalance.sat
@@ -886,15 +892,21 @@ struct HomeView : MVIView {
 	}
 	
 	func finalWalletChanged(_ newValue: Lightning_kmpWalletState.WalletWithConfirmations) {
-		log.trace("finalWalletChanged()")
+		log.trace(#function)
 		
 		finalWallet = newValue
 	}
 	
 	func channelsChanged(_ channels: [LocalChannelInfo]) {
-		log.trace("channelsChanged()")
+		log.trace(#function)
 		
 		self.channels = channels
+	}
+	
+	func walletContextChanged(_ context: WalletContext) {
+		log.trace(#function)
+		
+		self.walletContext = context
 	}
 	
 	func bizNotificationsChanged(_ list: [PhoenixShared.NotificationsManager.NotificationItem]) {
