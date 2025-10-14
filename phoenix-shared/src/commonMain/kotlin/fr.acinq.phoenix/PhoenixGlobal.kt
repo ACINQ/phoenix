@@ -31,23 +31,27 @@ import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
 
 class PhoenixGlobal(val ctx: PlatformContext) {
 
+    // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
+    // create new [Logger] instances, and output logs to platform dependent writers.
     val loggerFactory = LoggerFactory(PhoenixLoggerConfig(ctx))
     private val logger = loggerFactory.newLogger(this::class)
 
     val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-    val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
+    val networkMonitor = NetworkMonitor(loggerFactory, ctx)
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDb) }
     val feerateManager by lazy { FeerateManager(loggerFactory) }
-    val walletContextManager by lazy { WalletContextManager(loggerFactory) }
+    val walletContextManager = WalletContextManager(loggerFactory)
 
     init {
         logger.info { "init PhoenixGlobal..." }
+        feerateManager.startMonitoringFeerate()
+        walletContextManager.startJobs()
     }
 
     /** Called by [AppConnectionsDaemon] when internet is available. */
     internal fun enableNetworkAccess() {
         feerateManager.startMonitoringFeerate()
-        walletContextManager.stopJobs()
+        walletContextManager.startJobs()
         currencyManager.enableNetworkAccess()
     }
 

@@ -41,12 +41,12 @@ class PhoenixApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Logging.setupLogger(applicationContext)
 
         phoenixGlobal = PhoenixGlobal(PlatformContext(applicationContext))
         globalPrefs = GlobalPrefs(applicationContext.globalPrefs)
         BusinessManager.initialize(applicationContext)
 
-        Logging.setupLogger(applicationContext)
         log.info("creating app")
         SystemNotificationHelper.registerNotificationChannels(applicationContext)
     }

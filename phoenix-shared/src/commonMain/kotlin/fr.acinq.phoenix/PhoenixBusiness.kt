@@ -41,9 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 class PhoenixBusiness(
     val phoenixGlobal: PhoenixGlobal,
 ) {
-    // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
-    // create new [Logger] instances, and output logs to platform dependent writers.
-    val loggerFactory = LoggerFactory(PhoenixLoggerConfig(phoenixGlobal.ctx))
+    val loggerFactory = phoenixGlobal.loggerFactory
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
