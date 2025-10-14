@@ -2,48 +2,50 @@
 lightningkmp = "1.10.8"
 secp256k1 = "0.19.0" # keep in check with lightning-kmp secp version
 
-kotlin = "2.1.10"
+kotlin = "2.2.10"
 ktor = "3.1.0"
-sqldelight = "2.0.2"
-okio = "3.8.0"
+sqldelight = "2.1.0"
+okio = "3.15.0"
 
 # iOS
-skie = "0.10.5"
+skie = "0.10.6"
 
 # Android
 androidx-junit = "1.1.3"
-androidx-corektx = "1.13.1"
-androidx-appcompat = "1.7.0"
-androidx-lifecycle = "2.8.7"
+androidx-corektx = "1.17.0"
+androidx-appcompat = "1.7.1"
+androidx-lifecycle = "2.9.4"
 
 androidx-biometrics = "1.1.0"
-androidx-datastore = "1.1.2"
-androidx-workmanager = "2.9.1"
+androidx-datastore = "1.1.7"
+androidx-workmanager = "2.10.5"
 
-androidx-compose-common = "1.8.0"
-androidx-compose-navigation = "2.8.7"
+androidx-compose-common = "1.9.3"
+androidx-compose-navigation = "2.9.5"
 androidx-compose-constraintlayout = "1.1.0"
 androidx-compose-material3 = "1.3.1"
 accompanist = "0.30.1"
 
-slf4j = "2.0.16"
+androidx-camera = "1.5.1"
+
+slf4j = "2.0.17"
 zxing = "3.5.3"
 logback = "3.0.0"
 
-fcm = "24.1.0"
-playservices = "18.5.0"
+fcm = "25.0.1"
+playservices = "18.9.0"
 
-junit = "4.13"
-espresso = "3.3.0"
+junit = "4.13.2"
+espresso = "3.7.0"
 robolectric = "4.13"
-agp = "8.12.2"
+agp = "8.12.3"
 
 [libraries]
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 sqldelight-plugin = { group = "app.cash.sqldelight", name = "gradle-plugin", version.ref = "sqldelight" }
-fcm-plugin = { module = "com.google.gms:google-services", version = "4.4.2" }
+fcm-plugin = { module = "com.google.gms:google-services", version = "4.4.4" }
 
 [plugins]
 compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

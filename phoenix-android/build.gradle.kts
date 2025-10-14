@@ -21,11 +21,11 @@ val chain: String by project
 
 android {
     namespace = "fr.acinq.phoenix.android"
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 109
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -131,10 +131,10 @@ dependencies {
     implementation("com.google.zxing:core:${libs.versions.zxing.get()}")
 
     // -- CameraX: camera device compatibility & fixes + lifecycle handling
-    implementation("androidx.camera:camera-core:1.4.1")
-    implementation("androidx.camera:camera-camera2:1.4.1")
-    implementation("androidx.camera:camera-lifecycle:1.4.1")
-    implementation("androidx.camera:camera-view:1.4.1")
+    implementation("androidx.camera:camera-core:${libs.versions.androidx.camera.get()}")
+    implementation("androidx.camera:camera-camera2:${libs.versions.androidx.camera.get()}")
+    implementation("androidx.camera:camera-lifecycle:${libs.versions.androidx.camera.get()}")
+    implementation("androidx.camera:camera-view:${libs.versions.androidx.camera.get()}")
 
     // -- logging
     implementation("org.slf4j:slf4j-api:${libs.versions.slf4j.get()}")
