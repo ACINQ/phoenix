@@ -449,7 +449,6 @@
 		DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF62A94066100947698 /* Task+Sleep.swift */; };
 		DCFB8DF92A94112A00947698 /* Dictionary+MapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */; };
 		DCFBC5592AE2CFEF00E3A418 /* BizNotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */; };
-		DCFBC55B2AEAC2B000E3A418 /* ImportChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFBC55A2AEAC2B000E3A418 /* ImportChannelsView.swift */; };
 		DCFC72042862237400D6B293 /* Asserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFC72032862237400D6B293 /* Asserts.swift */; };
 		DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFD079026D84A380020DD8E /* HorizontalActivity.swift */; };
 		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
@@ -897,7 +896,6 @@
 		DCFB8DF62A94066100947698 /* Task+Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+Sleep.swift"; sourceTree = "<group>"; };
 		DCFB8DF82A94112A00947698 /* Dictionary+MapKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+MapKeys.swift"; sourceTree = "<group>"; };
 		DCFBC5582AE2CFEF00E3A418 /* BizNotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BizNotificationCell.swift; sourceTree = "<group>"; };
-		DCFBC55A2AEAC2B000E3A418 /* ImportChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportChannelsView.swift; sourceTree = "<group>"; };
 		DCFC72032862237400D6B293 /* Asserts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asserts.swift; sourceTree = "<group>"; };
 		DCFD079026D84A380020DD8E /* HorizontalActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActivity.swift; sourceTree = "<group>"; };
 		F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationView.swift; sourceTree = "<group>"; };
@@ -1854,7 +1852,6 @@
 			children = (
 				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
 				DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */,
-				DCFBC55A2AEAC2B000E3A418 /* ImportChannelsView.swift */,
 			);
 			path = channels;
 			sourceTree = "<group>";
@@ -2439,7 +2436,6 @@
 				DC46CB1628D9F30500C4EAC7 /* LoadingView.swift in Sources */,
 				DC2ABAD92BED142900C11C9C /* ShakeEffect.swift in Sources */,
 				DC72CEFD2C9B25CC00C810A8 /* PaymentDetails.swift in Sources */,
-				DCFBC55B2AEAC2B000E3A418 /* ImportChannelsView.swift in Sources */,
 				DCFB8DF72A94066100947698 /* Task+Sleep.swift in Sources */,
 				DC4CF3CA2BE91FED003A957F /* SetNewPinView.swift in Sources */,
 				DC39D4EF287497440030F18D /* SmartModal.swift in Sources */,

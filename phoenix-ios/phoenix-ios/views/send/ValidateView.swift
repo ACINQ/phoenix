@@ -1902,8 +1902,8 @@ struct ValidateView: View {
 				
 				let payerKey: Bitcoin_kmpPrivateKey
 				if contact?.useOfferKey ?? false {
-					let offerData = try await Biz.business.nodeParamsManager.defaultOffer()
-					payerKey = offerData.payerKey
+					let offerAndKey = try await Biz.business.nodeParamsManager.defaultOffer()
+					payerKey = offerAndKey.privateKey
 				} else {
 					payerKey = Lightning_randomKey()
 				}
