@@ -31,18 +31,10 @@ fun ChannelState.isTerminated(): Boolean {
     }
 }
 
-fun ChannelState.isLegacyWait(): Boolean {
-    return this is LegacyWaitForFundingConfirmed
-            || (this is Offline && this.state is LegacyWaitForFundingConfirmed)
-            || (this is Syncing && this.state is LegacyWaitForFundingConfirmed)
-}
-
 fun ChannelState.isBeingCreated(): Boolean {
     return when (this) {
         is Syncing -> state.isBeingCreated()
         is Offline -> state.isBeingCreated()
-        is LegacyWaitForFundingLocked,
-        is LegacyWaitForFundingConfirmed,
         is WaitForAcceptChannel,
         is WaitForChannelReady,
         is WaitForFundingConfirmed,
@@ -70,8 +62,6 @@ fun ChannelState.localBalance(): MilliSatoshi? {
         is Aborted -> null
         // balance is unknown
         is Negotiating -> null
-        is LegacyWaitForFundingLocked -> null
-        is LegacyWaitForFundingConfirmed -> null
         is WaitForAcceptChannel -> null
         is WaitForChannelReady -> null
         is WaitForFundingConfirmed -> null
@@ -82,6 +72,5 @@ fun ChannelState.localBalance(): MilliSatoshi? {
         is WaitForRemotePublishFutureCommitment -> null
         // regular case
         is ChannelStateWithCommitments -> commitments.availableBalanceForSend()
-        else -> null
     }
 }

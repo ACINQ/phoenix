@@ -46,8 +46,6 @@ data class LocalChannelInfo(
     val isTerminated by lazy { state.isTerminated() }
     /** True if the channel can be used to send/receive payments. */
     val isUsable by lazy { state is Normal && !isBooting }
-    /** True if the channel is `LegacyWaitForFundingConfirmed`, i.e., it may be a zombie channel. */
-    val isLegacyWait by lazy { state.isLegacyWait() }
     /** A string version of the state's class. */
     val stateName by lazy { state.stateName }
     // FIXME: we should also expose the raw channel's balance, which is what should be used in the channel's details screen, rather than the "smart" spendable balance returned by `localBalance()`
@@ -70,7 +68,7 @@ data class LocalChannelInfo(
     val commitmentsInfo: List<CommitmentInfo> by lazy {
         when (state) {
             is ChannelStateWithCommitments -> {
-                val params = state.commitments.params
+                val params = state.commitments.channelParams
                 val changes = state.commitments.changes
                 state.commitments.active.map {
                     CommitmentInfo(
@@ -88,7 +86,7 @@ data class LocalChannelInfo(
     val inactiveCommitmentsInfo: List<CommitmentInfo> by lazy {
         when (state) {
             is ChannelStateWithCommitments -> {
-                val params = state.commitments.params
+                val params = state.commitments.channelParams
                 val changes = state.commitments.changes
                 state.commitments.inactive.map {
                     CommitmentInfo(
@@ -110,7 +108,7 @@ data class LocalChannelInfo(
                 buildSet {
                     state.commitments.latest.localCommit.spec.htlcs.forEach { add(it.add.paymentHash) }
                     state.commitments.latest.remoteCommit.spec.htlcs.forEach { add(it.add.paymentHash) }
-                    state.commitments.latest.nextRemoteCommit?.commit?.spec?.htlcs?.forEach { add(it.add.paymentHash) }
+                    state.commitments.latest.nextRemoteCommit?.spec?.htlcs?.forEach { add(it.add.paymentHash) }
                 }.size
             }
             else -> 0
