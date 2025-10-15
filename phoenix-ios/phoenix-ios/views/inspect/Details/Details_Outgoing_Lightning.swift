@@ -42,6 +42,11 @@ struct Details_Outgoing_Lightning: DetailsInfoGrid {
 				section_general()
 				section_timestamps()
 				section_outgoing()
+			#if DEBUG
+				if let invReq = payment.outgoingInvoiceRequest() {
+					section_blip42(invReq.contactSecret, invReq.payerOffer, invReq.payerAddress)
+				}
+			#endif
 			}
 		}
 		.background(Color.primaryBackground)
