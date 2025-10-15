@@ -16,6 +16,7 @@ import fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7Result
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
+import fr.acinq.phoenix.utils.extensions.payerKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -138,7 +139,9 @@ class SqliteContactsDb(
     private fun contactIdForPayment(payment: WalletPayment, metadata: WalletPaymentMetadata?): UUID? {
         return if (payment is Bolt12IncomingPayment) {
             payment.incomingOfferMetadata()?.let { offerMetadata ->
-                contactIdForPayerPubKey(offerMetadata.payerKey)
+                offerMetadata.payerKey?.let { payerKey ->
+                    contactIdForPayerPubKey(payerKey)
+                }
             }
         } else {
             metadata?.lightningAddress?.let { address ->

@@ -41,6 +41,8 @@ import fr.acinq.phoenix.android.components.contact.OfferContactState
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
+import fr.acinq.phoenix.utils.extensions.payerKey
+import fr.acinq.phoenix.utils.extensions.payerNote
 import fr.acinq.phoenix.utils.extensions.state
 
 

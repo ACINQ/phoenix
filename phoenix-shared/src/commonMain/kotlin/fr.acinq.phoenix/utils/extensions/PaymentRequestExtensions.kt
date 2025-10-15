@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.utils.extensions
 
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
@@ -34,8 +35,20 @@ val PaymentRequest.desc: String?
         is Bolt12Invoice -> this.description
     }
 
+val OfferPaymentMetadata.description: String?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> null
+        is OfferPaymentMetadata.V2 -> this.description
+    }
+
+val OfferPaymentMetadata.payerKey: PublicKey?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> this.payerKey
+        is OfferPaymentMetadata.V2 -> this.payerKey
+    }
+
 val OfferPaymentMetadata.payerNote: String?
-    get() = when {
-        this is OfferPaymentMetadata.V1 -> this.payerNote
-        else -> null
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> this.payerNote
+        is OfferPaymentMetadata.V2 -> this.payerNote
     }

@@ -35,6 +35,7 @@ import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.managers.PaymentMetadataQueue
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
+import fr.acinq.phoenix.utils.extensions.payerKey
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
