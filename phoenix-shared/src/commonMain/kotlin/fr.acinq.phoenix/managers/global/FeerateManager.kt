@@ -74,6 +74,10 @@ class FeerateManager(
 
     /**  Polls an HTTP endpoint every X seconds to get an estimation of the mempool feerate. */
     fun startMonitoringFeerate() {
+        if (mempoolFeerateJob?.isActive == true) {
+            log.debug { "feerate-job is already running!" }
+            return
+        }
         mempoolFeerateJob = scope.launch {
             while (isActive) {
                 try {

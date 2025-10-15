@@ -47,6 +47,7 @@ import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.buttons.MenuButton
@@ -110,7 +111,8 @@ fun SettingsView(
         Card {
             MenuButton(text = stringResource(R.string.settings_liquidity_policy), icon = R.drawable.ic_wand, onClick = { nc.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) })
             val channelsState = business.peerManager.channelsFlow.collectAsState()
-            if (channelsState.value?.canRequestLiquidity() == true) {
+            val walletContext by application.phoenixGlobal.walletContextManager.walletContext.collectAsState()
+            if (channelsState.value?.canRequestLiquidity() == true && walletContext?.isManualLiquidityEnabled == true) {
                 MenuButton(text = stringResource(R.string.settings_add_liquidity), icon = R.drawable.ic_bucket, onClick = { nc.navigate(Screen.BusinessNavGraph.LiquidityRequest.route) })
             }
         }

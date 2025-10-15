@@ -219,6 +219,7 @@ fun HomeView(
     val balance by business.balanceManager.balance.collectAsState()
     val notices = noticesViewModel.notices
     val notifications by business.notificationsManager.notifications.collectAsState(emptyList())
+    val walletContext by application.phoenixGlobal.walletContextManager.walletContext.collectAsState()
 
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         MotionLayout(
@@ -238,7 +239,7 @@ fun HomeView(
                 onTorClick = onTorClick,
                 isFCMUnavailable = fcmTokenFlow.value == null || !isFCMAvailable,
                 isPowerSaverMode = isPowerSaverModeOn,
-                showRequestLiquidity = channels.canRequestLiquidity(),
+                showRequestLiquidity = walletContext?.isManualLiquidityEnabled == true && channels.canRequestLiquidity(),
                 onRequestLiquidityClick = onRequestLiquidityClick,
             )
             HomeBalance(

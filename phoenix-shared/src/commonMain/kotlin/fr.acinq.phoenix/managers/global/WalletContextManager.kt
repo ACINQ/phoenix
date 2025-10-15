@@ -19,6 +19,7 @@ package fr.acinq.phoenix.managers.global
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.logging.info
 import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.NodeParamsManager
@@ -94,12 +95,17 @@ class WalletContextManager(
 
     /** Starts a coroutine that continuously polls the wallet-context endpoint. The coroutine is tracked in [walletContextPollingJob]. */
     private fun startWalletContextJob() {
+        if (walletContextPollingJob?.isActive == true) {
+            log.debug { "wallet-context-job is already running!" }
+            return
+        }
         walletContextPollingJob = scope.launch {
             var pause = 30.seconds
             while (isActive) {
                 pause = (pause * 2).coerceAtMost(10.minutes)
                 fetchWalletContext()?.let {
                     _walletContext.value = it
+                    log.info { "wallet_context=$it" }
                     pause = 180.minutes
                 }
                 delay(pause)
@@ -132,10 +138,12 @@ class WalletContextManager(
                 val isMempoolFull = base.jsonObject["mempool"]?.jsonObject?.get("v1")?.jsonObject?.get("high_usage")?.jsonPrimitive?.booleanOrNull
                 val androidLatestVersion = base.jsonObject["version"]?.jsonPrimitive?.intOrNull
                 val androidLatestCriticalVersion = base.jsonObject["latest_critical_version"]?.jsonPrimitive?.intOrNull
+                val isManualLiquidityEnabled = base.jsonObject["is_manual_liquidity_enabled"]?.jsonPrimitive?.booleanOrNull
                 WalletContext(
                     isMempoolFull = isMempoolFull ?: false,
                     androidLatestVersion = androidLatestVersion ?: 0,
                     androidLatestCriticalVersion = androidLatestCriticalVersion ?: 0,
+                    isManualLiquidityEnabled = isManualLiquidityEnabled ?: false,
                 )
             } catch (e: Exception) {
                 log.error { "could not parse wallet-context response: ${e.message}" }
@@ -146,6 +154,10 @@ class WalletContextManager(
 
     /** Starts a coroutine that continuously polls the wallet-notice endpoint. The coroutine is tracked in [walletNoticePollingJob]. */
     private fun startWalletNoticeJob() {
+        if (walletNoticePollingJob?.isActive == true) {
+            log.debug { "wallet-notice-job is already running!" }
+            return
+        }
         walletNoticePollingJob = scope.launch {
             var pause = 30.seconds
             while (isActive) {
