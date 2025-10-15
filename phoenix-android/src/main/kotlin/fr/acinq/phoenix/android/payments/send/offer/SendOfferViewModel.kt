@@ -76,7 +76,7 @@ class SendOfferViewModel(
             val useRandomKey = contact == null || !contact.useOfferKey
             val payerKey = when (useRandomKey) {
                 true -> Lightning.randomKey()
-                false -> nodeParamsManager.defaultOffer().payerKey
+                false -> nodeParamsManager.defaultOffer().privateKey
             }
             val peer = peerManager.getPeer()
             val payerNote = message.takeIf { it.isNotBlank() }

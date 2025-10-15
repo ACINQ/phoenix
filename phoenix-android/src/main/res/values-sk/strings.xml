@@ -127,8 +127,6 @@
     <string name="send_trampoline_fee_label">Poplatok</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Načítavanie poplatku…</string>
-    <string name="send_trampoline_amountless_warning_label">Faktúra bez sumy</string>
-    <string name="send_trampoline_amountless_warning_details">Faktúra pre túto platbu nevyžaduje konkrétnu sumu. Toto môžu zneužiť škodlivé uzly počas platby. \n\nPre istotu <b>požiadajte príjemcu, aby pri generovaní faktúry uviedol sumu</b>.</string>
     <string name="send_connecting_button">Pripájanie…</string>
     <string name="send_pay_button">Zaplatiť</string>
     <string name="send_pay_retry_button">Skúsiť znova</string>
@@ -244,20 +242,6 @@
     <string name="channeldetails_share">Zdieľať</string>
     <string name="channeldetails_share_subject">Dáta kanálov</string>
     <string name="channeldetails_share_title">Zdieľať dáta kanálov</string>
-
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Importovať surové údaje kanála</string>
-    <string name="channelimport_instructions">Táto obrazovka je nástroj na ladenie, ktorý možno použiť na ručný import zašifrovaných údajov kanálov.\n\nPoužívajte s opatrnosťou.</string>
-    <string name="channelimport_input_label">Dátový blok</string>
-    <string name="channelimport_import_button">Importovať</string>
-    <string name="channelimport_importing">Importujú sa údaje…</string>
-    <string name="channelimport_success">Import úspešný</string>
-    <string name="channelimport_success_restart">Teraz musíte reštartovať Phoenix.</string>
-    <string name="channelimport_error_title">Import zlyhal</string>
-    <string name="channelimport_error_malformed">Údaje sú poškodené. Očakáva sa zašifrovaný hex blob.</string>
-    <string name="channelimport_error_decryption">Údaje nemohla dešifrovať táto peňaženka.</string>
-    <string name="channelimport_error_unknown_version">Verzia %1$d nie je podporovaná</string>
 
     <!-- home: balance section & misc -->
 

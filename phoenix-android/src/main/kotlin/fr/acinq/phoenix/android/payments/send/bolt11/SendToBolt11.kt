@@ -47,7 +47,6 @@ import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.extensions.safeLet
-import fr.acinq.phoenix.utils.extensions.isAmountlessTrampoline
 import kotlinx.coroutines.launch
 
 @Composable
@@ -147,12 +146,6 @@ fun SendToBolt11View(
         SplashLabelRow(label = stringResource(R.string.send_destination_label), icon = R.drawable.ic_zap) {
             SelectionContainer {
                 Text(text = invoice.nodeId.toHex(), maxLines = 2, overflow = TextOverflow.MiddleEllipsis)
-            }
-        }
-        if (invoice.isAmountlessTrampoline()) {
-            Spacer(modifier = Modifier.height(16.dp))
-            SplashLabelRow(label = "", helpMessage = stringResource(id = R.string.send_trampoline_amountless_warning_details)) {
-                Text(text = stringResource(id = R.string.send_trampoline_amountless_warning_label))
             }
         }
         Spacer(modifier = Modifier.height(16.dp))

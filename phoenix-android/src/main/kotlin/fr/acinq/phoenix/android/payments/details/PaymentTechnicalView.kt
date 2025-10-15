@@ -184,7 +184,7 @@ fun Bolt12InvoiceSection(
         Text(text = payerKey.toHex())
         val nodeParamsManager = LocalBusiness.current?.nodeParamsManager
         val offerPayerKey by produceState<PrivateKey?>(initialValue = null, key1 = nodeParamsManager) {
-            value = nodeParamsManager?.defaultOffer()?.payerKey
+            value = nodeParamsManager?.defaultOffer()?.privateKey
         }
         if (offerPayerKey != null && payerKey == offerPayerKey) {
             Spacer(modifier = Modifier.heightIn(4.dp))

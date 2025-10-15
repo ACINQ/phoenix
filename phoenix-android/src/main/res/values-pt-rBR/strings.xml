@@ -129,8 +129,6 @@
     <string name="send_trampoline_fee_label">Comissão</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Carregando comissão…</string>
-    <string name="send_trampoline_amountless_warning_label">Fatura sem valor</string>
-    <string name="send_trampoline_amountless_warning_details">A fatura deste pagamento não solicita um valor específico. Nós maliciosos podem tirar vantagem disso durante a finalização da compra.\n\nPara maior segurança, <b>peça ao destinatário para especificar um valor</b> ao gerar a fatura.</string>
     <string name="send_connecting_button">Aguardando canais…</string>
     <string name="send_pay_button">Pagar</string>
 
@@ -233,20 +231,6 @@
     <string name="channeldetails_share">Compartilhar</string>
     <string name="channeldetails_share_subject">Dados do canal</string>
     <string name="channeldetails_share_title">Compartilhar dados do canal</string>
-
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Importar dados brutos do canal</string>
-    <string name="channelimport_instructions">Esta tela é uma ferramenta de depuração que pode ser usada para importar manualmente dados criptografados do canal.\n\nUse com cuidado.</string>
-    <string name="channelimport_input_label">Blob de dados</string>
-    <string name="channelimport_import_button">Importar</string>
-    <string name="channelimport_importing">Importando dados…</string>
-    <string name="channelimport_success">Importação bem-sucedida</string>
-    <string name="channelimport_success_restart">Você deve reiniciar o Phoenix agora.</string>
-    <string name="channelimport_error_title">Erro de importação</string>
-    <string name="channelimport_error_malformed">O formato dos dados está incorreto. É esperado um blob hexadecimal criptografado.</string>
-    <string name="channelimport_error_decryption">Não foi possível descriptografar os dados com esta carteira.</string>
-    <string name="channelimport_error_unknown_version">A versão %1$d não é suportada</string>
 
     <!-- home: balance section & misc -->
 

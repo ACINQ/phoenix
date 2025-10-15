@@ -164,17 +164,8 @@ fun SpendFromChannelAddress(
                                 is SpendFromChannelAddressViewState.Error.TxIndexMalformed -> {
                                     stringResource(id = R.string.spendchanneladdress_error_tx_index)
                                 }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataMalformed -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data)
-                                }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataDecryption -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data)
-                                }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataUnhandledState -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data_state, state.stateClassName ?: "??")
-                                }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataUnhandledVersion -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data_version, state.version)
+                                is SpendFromChannelAddressViewState.Error.InvalidChannelKeyPath -> {
+                                    stringResource(id = R.string.spendchanneladdress_error_channel_keypath)
                                 }
                                 is SpendFromChannelAddressViewState.Error.PublicKeyMalformed -> {
                                     stringResource(id = R.string.spendchanneladdress_error_remote_funding_pubkey, state.details)
