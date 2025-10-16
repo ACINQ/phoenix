@@ -19,6 +19,7 @@ package fr.acinq.phoenix.managers.global
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.info
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.PreferredFiatCurrencies
@@ -95,6 +96,15 @@ class CurrencyManager(
             initialValue = listOf()
         )
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val usdRate: StateFlow<ExchangeRate.BitcoinPriceRate?> = ratesFlow.mapLatest {
+        it.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull { it.fiatCurrency == FiatCurrency.USD }
+    }.stateIn(
+        scope = scope,
+        started = SharingStarted.Companion.Eagerly,
+        initialValue = null
+    )
 
     private var refreshList = mutableMapOf<FiatCurrency, RefreshInfo>()
     private var autoRefreshJob: Job? = null
@@ -214,29 +224,45 @@ class CurrencyManager(
     }
 
     /**
-     * Returns a snapshot of the ExchangeRate for the primary FiatCurrency.
-     * That is, an instance of OriginalFiat, where:
-     * - type => current primary FiatCurrency (via AppConfigurationManager)
-     * - price => BitcoinPriceRate.price for FiatCurrency type
+     * Fetches the BTC exchange rate for the given [fiatCurrency] from the adequate API. May return null. This method should not be called
+     * repeatedly as it makes an HTTP request every time. To monitor a currency on the long run, use [startMonitoringCurrencies] instead.
      */
-    fun calculateOriginalFiat(currency: FiatCurrency): ExchangeRate.BitcoinPriceRate? {
+    suspend fun fetchRateForCurrency(fiatCurrency: FiatCurrency): ExchangeRate.BitcoinPriceRate? {
         val rates = ratesFlow.value
-        val fiatRate = rates.firstOrNull { it.fiatCurrency == currency } ?: return null
+        val now = currentTimestampMillis()
+        val knownMatch = rates.firstOrNull { it.fiatCurrency == fiatCurrency && (now - it.timestampMillis) < 10.minutes.inWholeMilliseconds }
+        if (knownMatch != null) {
+            log.debug { "returning cached rate for ${fiatCurrency.name}" }
+            return toBitcoinExchangeRate(knownMatch)
+        }
 
+        val api = listOf(coinbaseAPI, blockchainInfoAPI, yadioAPI, bluelyticsAPI)
+            .firstOrNull { it.fiatCurrencies.contains(fiatCurrency) } ?: return null
+
+        val target = setOf(fiatCurrency)
+        log.debug { "fetching rate for ${fiatCurrency.name}" }
+        val rate = api.fetch(target).firstOrNull { it.fiatCurrency == fiatCurrency } ?: return null
+
+        updateRefreshList(api = api, attempted = target, refreshed = target)
+        appDb.saveExchangeRates(listOf(rate))
+        return toBitcoinExchangeRate(rate)
+    }
+
+    /** Returns a snapshot of [currency] in [ratesFlow], converted to a [ExchangeRate.BitcoinPriceRate]. */
+    fun getSnapshotRateForCurrency(currency: FiatCurrency): ExchangeRate.BitcoinPriceRate? {
+        val fiatRate = ratesFlow.value.firstOrNull { it.fiatCurrency == currency } ?: return null
+        return toBitcoinExchangeRate(fiatRate)
+    }
+
+    /** Utility method that converts a generic exchange rate to a Bitcoin price rate, using the USD rate when needed. This is needed because
+     * the exchange rate for many currency is in USD, and not BTC! */
+    private fun toBitcoinExchangeRate(fiatRate: ExchangeRate): ExchangeRate.BitcoinPriceRate? {
         return when (fiatRate) {
-            is ExchangeRate.BitcoinPriceRate -> {
-                // We have a direct exchange rate.
-                // BitcoinPriceRate.rate => The price of 1 BTC in this currency
-                fiatRate
-            }
+            is ExchangeRate.BitcoinPriceRate -> fiatRate
             is ExchangeRate.UsdPriceRate -> {
-                // We have an indirect exchange rate.
-                // UsdPriceRate.price => The price of 1 US Dollar in this currency
-                rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull {
-                    it.fiatCurrency == FiatCurrency.USD
-                }?.let { usdRate ->
+                usdRate.value?.let { usdRate ->
                     ExchangeRate.BitcoinPriceRate(
-                        fiatCurrency = currency,
+                        fiatCurrency = fiatRate.fiatCurrency,
                         price = usdRate.price * fiatRate.price,
                         source = "${fiatRate.source}/${usdRate.source}",
                         timestampMillis = fiatRate.timestampMillis.coerceAtMost(
