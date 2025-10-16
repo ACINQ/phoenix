@@ -5865,6 +5865,7 @@
       }
     },
     "An unknown error has occurred." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8085,6 +8086,9 @@
           }
         }
       }
+    },
+    "BLIP 42 (DEBUG build only)" : {
+
     },
     "Block height" : {
       "localizations" : {
@@ -11624,6 +11628,9 @@
         }
       }
     },
+    "contact secret" : {
+
+    },
     "Contact support if needed." : {
       "localizations" : {
         "ar" : {
@@ -13084,6 +13091,7 @@
       }
     },
     "Data could not be decrypted by this wallet." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13124,6 +13132,7 @@
       }
     },
     "Data is malformed. An encrypted hex blob is expected." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21220,6 +21229,7 @@
     },
     "Import channels" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21260,6 +21270,7 @@
       }
     },
     "Import has failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21300,6 +21311,7 @@
       }
     },
     "Import successful" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21380,6 +21392,7 @@
       }
     },
     "Importing data…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29069,6 +29082,7 @@
       }
     },
     "Paste encrypted data blob here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -29309,6 +29323,9 @@
         }
       }
     },
+    "payer address" : {
+
+    },
     "Payer key" : {
       "localizations" : {
         "ar" : {
@@ -29348,6 +29365,9 @@
           }
         }
       }
+    },
+    "payer offer" : {
+
     },
     "Payment" : {
       "localizations" : {
@@ -34197,6 +34217,9 @@
           }
         }
       }
+    },
+    "Secrets: (DEBUG build only)" : {
+
     },
     "Security" : {
       "extractionState" : "manual",
@@ -41519,6 +41542,7 @@
       }
     },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44514,6 +44538,7 @@
       }
     },
     "Version %d is not supported" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -47716,6 +47741,7 @@
       }
     },
     "You must now restart Phoenix." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

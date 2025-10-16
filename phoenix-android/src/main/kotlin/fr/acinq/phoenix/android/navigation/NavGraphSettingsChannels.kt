@@ -24,7 +24,6 @@ import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.settings.MutualCloseView
 import fr.acinq.phoenix.android.settings.channels.ChannelDetailsView
 import fr.acinq.phoenix.android.settings.channels.ChannelsView
-import fr.acinq.phoenix.android.settings.channels.ImportChannelsData
 import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddress
 
 fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel: AppViewModel) {
@@ -54,10 +53,6 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
     ) { backStackEntry, _, business ->
         val channelId = backStackEntry.arguments?.getString("id")
         ChannelDetailsView(business = business, onBackClick = { navController.popBackStack() }, channelId = channelId)
-    }
-
-    businessComposable(Screen.BusinessNavGraph.ImportChannelsData.route, appViewModel) { _, _, business ->
-        ImportChannelsData(business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.BusinessNavGraph.SpendChannelAddress.route, appViewModel) { _, _, business ->

@@ -159,8 +159,6 @@
     <string name="send_trampoline_fee_label">Poplatek</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Načítání poplatku…</string>
-    <string name="send_trampoline_amountless_warning_label">Faktura bez částky</string>
-    <string name="send_trampoline_amountless_warning_details">Faktura pro tuto platbu nevyžaduje konkrétní částku. Toho mohou zneužít škodlivé uzly během platby. \n\nPro jistotu <b>požádejte příjemce, aby při generování faktury uvedl částku</b>.</string>
     <string name="send_connecting_button">Připojování…</string>
     <string name="send_pay_button">Zaplatit</string>
     <string name="send_confirm_pay_button">Potvrdit &amp; Zaplatit</string>
@@ -301,20 +299,6 @@
     <string name="channeldetails_share_subject">Data kanálů</string>
     <string name="channeldetails_share_title">Sdílet data kanálu</string>
 
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Importovat holá data kanálu</string>
-    <string name="channelimport_instructions">Tato obrazovka slouží jako debugovací nástroj, který umožňuje ručně importovat zašifrovaná data kanálů.\n\nPoužívejte opatrně.</string>
-    <string name="channelimport_input_label">Blob dat</string>
-    <string name="channelimport_import_button">Importovat</string>
-    <string name="channelimport_importing">Importování dat…</string>
-    <string name="channelimport_success">Import proběhl úspěšně</string>
-    <string name="channelimport_success_restart">Nyní musíte restartovat Phoenix.</string>
-    <string name="channelimport_error_title">Import selhal</string>
-    <string name="channelimport_error_malformed">Data jsou chybná. Očekává se zašifrovaný hexadecimální blob.</string>
-    <string name="channelimport_error_decryption">Data se nepodařilo rozšifrovat touto peněženkou.</string>
-    <string name="channelimport_error_unknown_version">Verze %1$d není podporovaná</string>
-
     <!-- spend from channel address -->
 
     <string name="spendchanneladdress_title">Utratit z adresy kanálu</string>
@@ -334,10 +318,6 @@
     <string name="spendchanneladdress_error_generic">Nepodařilo se podepsat data</string>
     <string name="spendchanneladdress_error_amount">Neplatná částka</string>
     <string name="spendchanneladdress_error_tx_index">Neplatný index transakce</string>
-    <string name="spendchanneladdress_error_channel_data">Chybná data kanálu</string>
-    <string name="spendchanneladdress_error_channel_data_decryption">Nepodařilo se rozšifrovat data kanálu</string>
-    <string name="spendchanneladdress_error_channel_data_state">Neošetřený stav kanálu [%1$s]</string>
-    <string name="spendchanneladdress_error_channel_data_version">Chybná verze kanálu [%1$s]</string>
     <string name="spendchanneladdress_error_remote_pubkey">Chybný vzdálený financující funding veřejný klíč [%1$s]</string>
     <string name="spendchanneladdress_error_unsigned_tx">Chybná nepodepsaná transakce [%1$s]</string>
     <string name="spendchanneladdress_error_remote_funding_pubkey">Chybný vzdálený financující funding veřejný klíč [%1$s]</string>

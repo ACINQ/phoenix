@@ -131,8 +131,6 @@
     <string name="send_trampoline_fee_label">Comisión</string>
     <string name="send_trampoline_fee_no_amount">N/D</string>
     <string name="send_trampoline_fee_loading">Cargando comisión…</string>
-    <string name="send_trampoline_amountless_warning_label">Factura sin importe</string>
-    <string name="send_trampoline_amountless_warning_details">La factura de este pago no solicita un importe concreto. Los nodos malintencionados pueden aprovecharse de esto durante el pago.\n\nPara mayor seguridad, <b>pídele al destinatario que especifique un importe</b> al generar la factura.</string>
     <string name="send_connecting_button">Esperando canales…</string>
     <string name="send_pay_button">Pagar</string>
 
@@ -236,20 +234,6 @@
     <string name="channeldetails_share">Compartir</string>
     <string name="channeldetails_share_subject">Datos de canales</string>
     <string name="channeldetails_share_title">Compartir datos de canales</string>
-
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Importar datos de canales sin procesar</string>
-    <string name="channelimport_instructions">Esta pantalla es una herramienta de depuración que puede usarse para importar manualmente los datos de canales encriptados.\n\nUtilizar con precaución.</string>
-    <string name="channelimport_input_label">Blob de datos</string>
-    <string name="channelimport_import_button">Importar</string>
-    <string name="channelimport_importing">Importando datos…</string>
-    <string name="channelimport_success">Importación correcta</string>
-    <string name="channelimport_success_restart">Debes reiniciar Phoenix ahora.</string>
-    <string name="channelimport_error_title">Error de importación</string>
-    <string name="channelimport_error_malformed">El formato de los datos es incorrecto. Se espera un blob hexadecimal encriptado.</string>
-    <string name="channelimport_error_decryption">No se pudieron desencriptar los datos con esta billetera.</string>
-    <string name="channelimport_error_unknown_version">La versión %1$d no es compatible</string>
 
     <!-- home: balance section & misc -->
 

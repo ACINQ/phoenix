@@ -28,17 +28,17 @@ import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.Closed
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.channel.states.Offline
-import fr.acinq.lightning.crypto.KeyManager
-import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.crypto.SwapInOnChainKeys
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
-import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.payment.ContactSecrets
+import fr.acinq.lightning.payment.Contacts
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OfferManager
@@ -50,11 +50,9 @@ import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.managers.SendManager
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import platform.Foundation.NSData
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -334,13 +332,20 @@ fun Lightning_randomBytes32(): ByteVector32 = Lightning.randomBytes32()
 fun Lightning_randomBytes64(): ByteVector64 = Lightning.randomBytes64()
 fun Lightning_randomKey(): PrivateKey = Lightning.randomKey()
 
+fun Contacts_computeContactSecret(
+    ourOffer: OfferTypes.OfferAndKey,
+    theirOffer: OfferTypes.Offer
+): ContactSecrets {
+    return Contacts.computeContactSecret(ourOffer, theirOffer)
+}
+
 fun NSData_toByteArray(data: NSData): ByteArray = data.toByteArray()
 fun NSData_copyTo(data: NSData, buffer: ByteArray, offset: Int = 0) = data.copyTo(buffer, offset)
 fun ByteArray_toNSDataSlice(buffer: ByteArray, offset: Int, length: Int): NSData = buffer.toNSData(offset = offset, length = length)
 fun ByteArray_toNSData(buffer: ByteArray): NSData = buffer.toNSData()
 
 fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
-    swapInKeys: KeyManager.SwapInOnChainKeys,
+    swapInKeys: SwapInOnChainKeys,
     scriptPubKey: ByteVector,
     feerate: FeeratePerKw
 ): Pair<Transaction, Satoshi>? {
@@ -358,7 +363,7 @@ fun OfferManager.Companion._deterministicOffer(
     amount: MilliSatoshi?,
     description: String?,
     pathId: ByteVector32?,
-): Pair<OfferTypes.Offer, PrivateKey> {
+): OfferTypes.OfferAndKey {
     return deterministicOffer(
         chainHash = chainHash,
         nodePrivateKey = nodePrivateKey,

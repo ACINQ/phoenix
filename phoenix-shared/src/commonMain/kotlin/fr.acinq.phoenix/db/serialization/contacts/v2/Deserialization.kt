@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.db.serialization.contacts.v1
+package fr.acinq.phoenix.db.serialization.contacts.v2
 
 import fr.acinq.bitcoin.io.ByteArrayInput
 import fr.acinq.bitcoin.io.Input
@@ -13,15 +13,14 @@ import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ContactOffer
+import fr.acinq.phoenix.data.ContactSecret
 
 object Deserialization {
-
-    const val VERSION_MAGIC = 1
 
     fun deserialize(bin: ByteArray): ContactInfo {
         val input = ByteArrayInput(bin)
         val version = input.read()
-        require(version == VERSION_MAGIC) { "incorrect version $version, expected ${VERSION_MAGIC}" }
+        require(version == Serialization.VERSION_MAGIC) { "incorrect version $version, expected ${Serialization.VERSION_MAGIC}" }
         return input.readContactInfo()
     }
 
@@ -32,7 +31,7 @@ object Deserialization {
         useOfferKey = readBoolean(),
         offers = readCollection { readContactOffer() }.toList(),
         addresses = readCollection { readContactAddress() }.toList(),
-        secrets = listOf()
+        secrets = readCollection { readContactSecret() }.toList()
     )
 
     private fun Input.readContactOffer() = ContactOffer(
@@ -46,6 +45,12 @@ object Deserialization {
         id = readByteVector32(),
         address = readString(),
         label = readNullable { readString() },
+        createdAt = readNumber()
+    )
+
+    private fun Input.readContactSecret() = ContactSecret(
+        id = readByteVector32(),
+        incomingPaymentId = readNullable { readUuid() },
         createdAt = readNumber()
     )
 }

@@ -43,6 +43,10 @@ struct Details_Incoming_Bolt12: DetailsInfoGrid {
 				section_timestamps()
 				section_incoming()
 				section_lightningParts(payment)
+			#if DEBUG
+				let metadata = payment.metadata
+				section_blip42(metadata.contactSecret_, metadata.payerOffer_, metadata.payerAddress_)
+			#endif
 			}
 		}
 		.background(Color.primaryBackground)

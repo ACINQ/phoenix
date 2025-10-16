@@ -63,6 +63,7 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
+import fr.acinq.phoenix.utils.extensions.payerNote
 import fr.acinq.phoenix.utils.extensions.state
 
 @Composable

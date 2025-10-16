@@ -1,8 +1,5 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.phoenix.controllers.MVI
-import fr.acinq.phoenix.controllers.main.Home
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

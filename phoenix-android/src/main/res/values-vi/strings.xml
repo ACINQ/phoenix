@@ -128,8 +128,6 @@
     <string name="send_trampoline_fee_label">Phí</string>
     <string name="send_trampoline_fee_no_amount">Không áp dụng</string>
     <string name="send_trampoline_fee_loading">Đang tải phí…</string>
-    <string name="send_trampoline_amountless_warning_label">Hoá đơn không có số tiền</string>
-    <string name="send_trampoline_amountless_warning_details">Hóa đơn cho khoản thanh toán này không điền số tiền cụ thể. Các nút mạng khác có thể lợi dụng điều này và lừa đảo bạn trong quá trình thanh toán.\n\nĐể tránh nguy cơ lừa đảo, <b>hãy yêu cầu người nhận ghi rõ số tiền</b> khi lập hóa đơn.</string>
     <string name="send_connecting_button">Đang chờ các kênh…</string>
     <string name="send_pay_button">Thanh toán</string>
 
@@ -236,20 +234,6 @@
     <string name="channeldetails_share">Chia sẻ</string>
     <string name="channeldetails_share_subject">Dữ liệu các kênh</string>
     <string name="channeldetails_share_title">Chia sẻ dữ liệu kênh</string>
-
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Nhập dữ liệu thô của kênh </string>
-    <string name="channelimport_instructions">Màn hình này là một công cụ gỡ lỗi mà bạn có thể nhập bằng tay các dữ liệu mã hóa của các kênh.\n\nHãy thận trọng khi sử dụng.</string>
-    <string name="channelimport_input_label">Dữ liệu đối tượng nhị phân lớn</string>
-    <string name="channelimport_import_button">Nhập</string>
-    <string name="channelimport_importing">Đang nhập dữ liệu…</string>
-    <string name="channelimport_success">Nhập thành công</string>
-    <string name="channelimport_success_restart">Bạn cần khởi động lại Phoenix ngay bây giờ.</string>
-    <string name="channelimport_error_title">Nhập không thành công</string>
-    <string name="channelimport_error_malformed">Dữ liệu không đúng định dạng. Phải là định dạng hex đối tượng nhị phân lớn đã được mã hoá.</string>
-    <string name="channelimport_error_decryption">Dữ liệu không thể giải mã được bằng ví này.</string>
-    <string name="channelimport_error_unknown_version">Phiên bản %1$d không đuợc hỗ trợ</string>
 
     <!-- home: balance section & misc -->
 

@@ -35,6 +35,7 @@ import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
 import fr.acinq.phoenix.managers.PaymentMetadataQueue
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
+import fr.acinq.phoenix.utils.extensions.payerKey
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -164,13 +165,7 @@ class SqlitePaymentsDb(
     private fun combinePaymentAndContact(paymentInfoList: List<WalletPaymentInfo>, indexes: SqliteContactsDb.ContactIndexes): List<WalletPaymentInfo> = paymentInfoList.map { paymentInfo ->
         val payment = paymentInfo.payment
         val metadata = paymentInfo.metadata
-        val contactId: UUID? = when (payment) {
-            is Bolt12IncomingPayment -> payment.incomingOfferMetadata()?.let { indexes.publicKeysMap[it.payerKey] }
-            is LightningOutgoingPayment -> payment.outgoingInvoiceRequest()?.let { indexes.offersMap[it.offer.offerId] }
-            else -> metadata.lightningAddress?.let { indexes.addressesMap[ContactAddress.hash(it)] }
-        }
-
-        contactId?.let { indexes.contactsMap[it] }?.let {
+        indexes.contactForPayment(payment, metadata)?.let {
             paymentInfo.copy(contact = it)
         } ?: paymentInfo
     }
