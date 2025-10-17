@@ -202,7 +202,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Zahlungs-Kanäle</string>
-    <string name="channelsview_menu_import_channels">Kanäle importieren</string>
     <string name="channelsview_header">Übersicht</string>
     <string name="channelsview_balance">Guthaben</string>
     <string name="channelsview_balance_about"><b>Guthaben</b> ist das gesamte Guthaben Ihrer aktiven Kanäle. Diesen Betrag können Sie über Lightning ausgeben.</string>

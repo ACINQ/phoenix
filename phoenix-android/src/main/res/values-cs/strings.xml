@@ -268,7 +268,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Platební kanály</string>
-    <string name="channelsview_menu_import_channels">Importovat kanály</string>
     <string name="channelsview_menu_spend_channel_balance">Utratit z adresy kanálu</string>
     <string name="channelsview_header">Přehled</string>
     <string name="channelsview_balance">Zůstatek</string>

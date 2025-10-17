@@ -205,7 +205,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Kênh thanh toán</string>
-    <string name="channelsview_menu_import_channels">Nhập các kênh</string>
     <string name="channelsview_header">Tổng quan</string>
     <string name="channelsview_balance">Số dư</string>
     <string name="channelsview_balance_about"><b>Số dư</b> là số dư tổng hợp của tất các kênh đang hoạt động của bạn. Đó là số tiền bạn có thể dùng trên Lightning.</string>

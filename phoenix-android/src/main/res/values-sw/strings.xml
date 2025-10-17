@@ -227,7 +227,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Kanali za malipo</string>
-    <string name="channelsview_menu_import_channels">Ingiza kanali</string>
     <string name="channelsview_header">Muonekano</string>
     <string name="channelsview_balance">Salio</string>
     <string name="channelsview_balance_about"><b>Salio</b> ni jumla ya salio la kanali zako za kazi. Hii ndiyo unaweza kutumia kwa Lightning.</string>

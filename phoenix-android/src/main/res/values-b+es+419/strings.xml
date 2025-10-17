@@ -207,7 +207,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Canales de pago</string>
-    <string name="channelsview_menu_import_channels">Importar canales</string>
     <string name="channelsview_balance">Saldo</string>
     <string name="channelsview_balance_about">El <b>saldo</b> es el monto total de los canales activos. Es lo que puedes gastar en Lightning.</string>
     <string name="channelsview_inbound">Liquidez entrante</string>

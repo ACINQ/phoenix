@@ -213,7 +213,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Platobné kanály</string>
-    <string name="channelsview_menu_import_channels">Importovať kanály</string>
     <string name="channelsview_header">Prehľad</string>
     <string name="channelsview_balance">Zostatok</string>
     <string name="channelsview_balance_about"><b>Zostatok</b>: Toto je súhrnný zostatok vašich aktívnych kanálov. Toľko môžete poslať cez Lightning.</string>

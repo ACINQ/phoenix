@@ -56,7 +56,7 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
     }
 
     businessComposable(Screen.BusinessNavGraph.SpendChannelAddress.route, appViewModel) { _, _, business ->
-        SpendFromChannelAddress(business = business, onBackClick = { navController.popBackStack() })
+        // SpendFromChannelAddress(business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.BusinessNavGraph.MutualClose.route, appViewModel) { _, walletId, business ->

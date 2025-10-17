@@ -277,7 +277,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Payment channels</string>
-    <string name="channelsview_menu_import_channels">Import channels</string>
     <string name="channelsview_menu_spend_channel_balance">Spend channel address</string>
     <string name="channelsview_header">Overview</string>
     <string name="channelsview_balance">Balance</string>

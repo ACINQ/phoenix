@@ -82,22 +82,19 @@ fun ChannelsView(
                 var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
                 Text(text = stringResource(id = R.string.channelsview_title))
                 Spacer(modifier = Modifier.weight(1f))
-                Box(contentAlignment = Alignment.TopEnd) {
-                    DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
-                        DropdownMenuItem(onClick = onImportChannelsDataClick, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text(text = stringResource(R.string.channelsview_menu_import_channels), style = MaterialTheme.typography.body1)
-                        }
-                        DropdownMenuItem(onClick = onSpendFromChannelBalance, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text(text = stringResource(R.string.channelsview_menu_spend_channel_balance), style = MaterialTheme.typography.body1)
-                        }
-                    }
-                    Button(
-                        icon = R.drawable.ic_menu_dots,
-                        iconTint = MaterialTheme.colors.onSurface,
-                        padding = PaddingValues(12.dp),
-                        onClick = { showAdvancedMenuPopIn = true }
-                    )
-                }
+//                Box(contentAlignment = Alignment.TopEnd) {
+//                    DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
+//                        DropdownMenuItem(onClick = onSpendFromChannelBalance, contentPadding = PaddingValues(horizontal = 12.dp)) {
+//                            Text(text = stringResource(R.string.channelsview_menu_spend_channel_balance), style = MaterialTheme.typography.body1)
+//                        }
+//                    }
+//                    Button(
+//                        icon = R.drawable.ic_menu_dots,
+//                        iconTint = MaterialTheme.colors.onSurface,
+//                        padding = PaddingValues(12.dp),
+//                        onClick = { showAdvancedMenuPopIn = true }
+//                    )
+//                }
             }
         )
         if (!channelsState?.values?.filter { it.isUsable }.isNullOrEmpty()) {
