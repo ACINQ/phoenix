@@ -129,8 +129,6 @@
     <string name="send_trampoline_fee_label">Frais</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Calcul des frais…</string>
-    <string name="send_trampoline_amountless_warning_label">Requête sans montant</string>
-    <string name="send_trampoline_amountless_warning_details">La requête pour ce paiement ne précise pas de montant. Cela peut être exploité par des noeuds malicieux pendant le paiement.\n\nPour plus de sécurité, <b>demandez au destinataire de spécifier un montant</b> lorsqu\'il crée sa requête de paiement.</string>
     <string name="send_connecting_button">En attente des canaux…</string>
     <string name="send_pay_button">Payer</string>
 
@@ -219,7 +217,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Canaux de paiements</string>
-    <string name="channelsview_menu_import_channels">Importer des canaux</string>
     <string name="channelsview_balance">Solde</string>
     <string name="channelsview_balance_about">Votre <b>solde</b> est le total du solde de vos canaux actifs. C\'est ce que vous pouvez dépenser via Lightning.</string>
     <string name="channelsview_inbound">Liquidité entrante</string>
@@ -246,20 +243,6 @@
     <string name="channeldetails_share">Partager</string>
     <string name="channeldetails_share_subject">Données du canal</string>
     <string name="channeldetails_share_title">Partager les données du canal</string>
-
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Importer des données de canal</string>
-    <string name="channelimport_instructions">Cet écran est un outil de debug utilisé pour importer manuellement des données de canaux chiffrées.\n\nUtiliser avec prudence.</string>
-    <string name="channelimport_input_label">Données</string>
-    <string name="channelimport_import_button">Importer</string>
-    <string name="channelimport_importing">Import des données…</string>
-    <string name="channelimport_success">Import réussi</string>
-    <string name="channelimport_success_restart">Vous devez maintenant redémarrer Phoenix.</string>
-    <string name="channelimport_error_title">Import échoué</string>
-    <string name="channelimport_error_malformed">Les données sont malformées. Un blob hexa est attendu.</string>
-    <string name="channelimport_error_decryption">Les données n\'ont pas pu être déchiffrées.</string>
-    <string name="channelimport_error_unknown_version">La version %1$d n\'est pas supportée</string>
 
     <!-- home: balance section & misc -->
 
@@ -394,6 +377,7 @@
 
     <string name="paymentdetails_pubkey_label">Clé publique du destinataire</string>
     <string name="paymentdetails_bolt11_description_label">Description de la requête de paiement</string>
+    <string name="paymentdetails_bolt12_description_label">Description de l\'offer</string>
     <string name="paymentdetails_payment_hash_label">Hash du paiement</string>
     <string name="paymentdetails_bolt11_label">Requête de paiement</string>
     <string name="paymentdetails_preimage_label">Préimage</string>

@@ -136,8 +136,6 @@
     <string name="send_trampoline_fee_label">Gharama</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Inapakia gharama…</string>
-    <string name="send_trampoline_amountless_warning_label">Hati bila kiasi</string>
-    <string name="send_trampoline_amountless_warning_details">Hati ya malipo kwa malipo haya haitaji kiasi maalum. Hii inaweza kutumiwa vibaya na nodi hatari wakati wa malipo.\n\nIli kuwa salama, <b>uliza mpokeaji aweke kiasi</b> wakati wa kutengeneza hati.</string>
     <string name="send_connecting_button">Inasubiri njia za malipo…</string>
     <string name="send_pay_button">Lipa</string>
     <string name="send_pay_retry_button">Jaribu tena</string>
@@ -229,7 +227,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Kanali za malipo</string>
-    <string name="channelsview_menu_import_channels">Ingiza kanali</string>
     <string name="channelsview_header">Muonekano</string>
     <string name="channelsview_balance">Salio</string>
     <string name="channelsview_balance_about"><b>Salio</b> ni jumla ya salio la kanali zako za kazi. Hii ndiyo unaweza kutumia kwa Lightning.</string>
@@ -258,20 +255,6 @@
     <string name="channeldetails_share">Shiriki</string>
     <string name="channeldetails_share_subject">Data za kanali</string>
     <string name="channeldetails_share_title">Shiriki data za kanali</string>
-
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Ingiza data za kanali za raw</string>
-    <string name="channelimport_instructions">Skrini hii ni zana ya uundaji inayoweza kutumika kwa kuingiza data za kanali zilizowekwa siri kwa mkono.\n\nTumia kwa tahadhari.</string>
-    <string name="channelimport_input_label">Data blob</string>
-    <string name="channelimport_import_button">Ingiza</string>
-    <string name="channelimport_importing">Inaingiza data…</string>
-    <string name="channelimport_success">Ingizo limefanikiwa</string>
-    <string name="channelimport_success_restart">Sasa lazima upige upya Phoenix.</string>
-    <string name="channelimport_error_title">Ingizo limekosa</string>
-    <string name="channelimport_error_malformed">Data zimeharibika. Blob ya hex yenye usalama inatarajiwa.</string>
-    <string name="channelimport_error_decryption">Data haiwezi kufunguliwa na pochi hii.</string>
-    <string name="channelimport_error_unknown_version">Toleo %1$d halisaidiwi</string>
 
     <!-- home: balance section & misc -->
 

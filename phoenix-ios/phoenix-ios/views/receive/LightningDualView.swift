@@ -707,7 +707,7 @@ struct LightningDualView: View {
 				fixedDesc = finalDesc ?? ""
 			}
 			
-			let offerPair = Lightning_kmpOfferManagerCompanion.shared.deterministicOffer(
+			let offerAndKey = Lightning_kmpOfferManagerCompanion.shared.deterministicOffer(
 				chainHash: NodeParamsManager.companion.chain.chainHash,
 				nodePrivateKey: nodeParams.nodePrivateKey,
 				trampolineNodeId: NodeParamsManager.companion.trampolineNodeId,
@@ -715,7 +715,7 @@ struct LightningDualView: View {
 				description: fixedDesc,
 				pathId: nil
 			)
-			offerStr = offerPair.first!.encode()
+			offerStr = offerAndKey.offer.encode()
 		}
 	}
 	

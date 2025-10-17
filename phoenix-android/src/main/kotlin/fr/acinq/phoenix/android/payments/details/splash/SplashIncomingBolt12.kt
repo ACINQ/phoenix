@@ -33,7 +33,6 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.contact.ContactCompactView

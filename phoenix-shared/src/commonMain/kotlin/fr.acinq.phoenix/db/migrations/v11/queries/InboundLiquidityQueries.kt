@@ -66,8 +66,6 @@ object InboundLiquidityQueries {
                     is Bolt12IncomingPayment -> incomingPayment.copy(
                         liquidityPurchaseDetails = liquidityPurchaseDetails
                     ) to incomingPayment.completedAt
-
-                    else -> null to null
                 }
                 val liquidityPayment = AutomaticLiquidityPurchasePayment(
                     id = UUID.fromString(id),

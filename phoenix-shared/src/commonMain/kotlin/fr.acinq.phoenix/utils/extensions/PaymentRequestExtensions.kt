@@ -16,13 +16,12 @@
 
 package fr.acinq.phoenix.utils.extensions
 
-import fr.acinq.lightning.Feature
+import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.payment.PaymentRequest
 
-fun Bolt11Invoice.isAmountlessTrampoline() = this.amount == null && this.features.hasFeature(Feature.TrampolinePayment)
 
 /**
  * In Objective-C, the function name `description()` is already in use (part of NSObject).
@@ -36,8 +35,8 @@ val PaymentRequest.desc: String?
         is Bolt12Invoice -> this.description
     }
 
-val OfferPaymentMetadata.payerNote: String?
-    get() = when {
-        this is OfferPaymentMetadata.V1 -> this.payerNote
-        else -> null
+val OfferPaymentMetadata.description: String?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> null
+        is OfferPaymentMetadata.V2 -> this.description
     }

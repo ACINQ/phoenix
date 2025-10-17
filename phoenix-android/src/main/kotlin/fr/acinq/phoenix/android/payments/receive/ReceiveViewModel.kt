@@ -112,7 +112,7 @@ class ReceiveViewModel(
 
             if (isReusable) {
                 val nodeParams = nodeParamsManager.nodeParams.filterNotNull().first()
-                val bolt12Offer = nodeParams.randomOffer(trampolineNodeId = NodeParamsManager.trampolineNodeId, amount = amount, description = description).first
+                val bolt12Offer = nodeParams.randomOffer(trampolineNodeId = NodeParamsManager.trampolineNodeId, amount = amount, description = description).offer
                 lightningQRBitmap = QRCodeHelper.generateBitmap(bolt12Offer.encode()).asImageBitmap()
                 log.debug("generated new bolt12 offer=${bolt12Offer.encode()}")
                 lightningInvoiceState = LightningInvoiceState.Done.Bolt12(bolt12Offer)

@@ -52,15 +52,18 @@ import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toJavaDayOfWeek
+import kotlinx.datetime.toJavaMonth
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.time.ExperimentalTime
 
 
 private sealed class PaymentsGroup {
@@ -94,6 +97,7 @@ private sealed class PaymentsGroup {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun PaymentsHistoryView(
     onBackClick: () -> Unit,
@@ -111,7 +115,7 @@ fun PaymentsHistoryView(
 
     val groupedPayments = remember(payments) {
         val timezone = TimeZone.currentSystemDefault()
-        val (todaysDayOfWeek, today) = java.time.LocalDate.now().atTime(23, 59, 59).toKotlinLocalDateTime().let { it.dayOfWeek to it.toInstant(timezone) }
+        val (todaysDayOfWeek, today) = java.time.LocalDate.now().atTime(23, 59, 59).toKotlinLocalDateTime().let { it.dayOfWeek.toJavaDayOfWeek() to it.toInstant(timezone) }
         payments.values.groupBy {
             val paymentInstant = Instant.fromEpochMilliseconds(it.payment.createdAt)
             val daysElapsed = paymentInstant.daysUntil(today, timezone)
@@ -189,7 +193,7 @@ fun PaymentsHistoryView(
                                         PaymentsGroup.Yesterday -> stringResource(id = R.string.payments_history_yesterday)
                                         PaymentsGroup.ThisWeek -> stringResource(id = R.string.payments_history_thisweek)
                                         PaymentsGroup.LastWeek -> stringResource(id = R.string.payments_history_lastweek)
-                                        is PaymentsGroup.Other -> "${header.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${header.year}"
+                                        is PaymentsGroup.Other -> "${header.month.toJavaMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()} ${header.year}"
                                     },
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))

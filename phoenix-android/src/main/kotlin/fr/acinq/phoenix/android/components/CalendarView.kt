@@ -35,11 +35,13 @@ import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateString
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import kotlinx.datetime.*
+import kotlin.time.ExperimentalTime
 
 /**
  * Calendar component to pick a day. [onDateSelected] returns the timestamp in millis at the
  * **start** of day.
  */
+@OptIn(ExperimentalTime::class)
 @Composable
 fun CalendarView(
     label: String,

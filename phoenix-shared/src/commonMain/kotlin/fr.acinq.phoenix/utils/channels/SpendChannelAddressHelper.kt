@@ -19,6 +19,7 @@ package fr.acinq.phoenix.utils.channels
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector64
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.KeyPath
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.SigHash
@@ -34,7 +35,6 @@ import fr.acinq.lightning.serialization.channel.Encryption.from
 import fr.acinq.lightning.serialization.channel.Serialization
 import fr.acinq.lightning.transactions.Scripts
 import fr.acinq.lightning.transactions.Transactions
-import fr.acinq.lightning.wire.EncryptedChannelData
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.flow.filterNotNull
@@ -56,21 +56,13 @@ object SpendChannelAddressHelper {
         business: PhoenixBusiness,
         amount: Satoshi,
         fundingTxIndex: Long,
-        channelData: String,
+        channelKeyPath: String,
         remoteFundingPubkey: String,
         unsignedTx: String
     ): SpendChannelAddressResult {
         val loggerFactory = business.loggerFactory
         val log = loggerFactory.newLogger(this::class)
         val peer = business.peerManager.getPeer()
-        val nodeParams = business.nodeParamsManager.nodeParams.filterNotNull().first()
-
-        val deserializedChannelData = try {
-            EncryptedChannelData(ByteVector(Hex.decode(channelData)))
-        } catch(e: Exception) {
-            log.error(e) { "failed to deserialize channels-data blob" }
-            return SpendChannelAddressResult.Failure.ChannelDataMalformed
-        }
 
         val tx = try {
             Transaction.read(unsignedTx)
@@ -86,45 +78,35 @@ object SpendChannelAddressHelper {
             return SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed(e.message ?: e::class.simpleName.toString())
         }
 
-        try {
-            val channelKeyPath = PersistedChannelState.from(nodeParams.nodePrivateKey, deserializedChannelData)
-                .fold(
-                    onFailure = {
-                        log.error { "failed to decrypt channel" }
-                        return SpendChannelAddressResult.Failure.ChannelDataDecryption
-                    },
-                    onSuccess = {
-                        when (it) {
-                            is Serialization.DeserializationResult.Success -> {
-                                when (val s = it.state) {
-                                    is ChannelStateWithCommitments -> s.commitments.params.localParams.fundingKeyPath
-                                    else -> {
-                                        log.error { "unhandled channel data state: ${it::class.simpleName}" }
-                                        return SpendChannelAddressResult.Failure.ChannelDataUnhandledState(it::class.simpleName)
-                                    }
-                                }
-                            }
-                            is Serialization.DeserializationResult.UnknownVersion -> {
-                                log.error { "unhandled channel data version: ${it.version}" }
-                                return SpendChannelAddressResult.Failure.ChannelDataUnhandledVersion(it.version)
-                            }
-                        }
-                    }
-                )
+        val channelKeys = try {
+            peer.nodeParams.keyManager.channelKeys(KeyPath(channelKeyPath))
+        } catch (e: Exception) {
+            log.error(e) { "failed to read channel keypath=$channelKeyPath" }
+            return SpendChannelAddressResult.Failure.InvalidChannelKeyPath
+        }
 
-            val channelKeys = peer.nodeParams.keyManager.channelKeys(channelKeyPath)
+        try {
             val localFundingKey = channelKeys.fundingKey(fundingTxIndex)
             val fundingScript = Scripts.multiSig2of2(localFundingKey.publicKey(), pubkey)
 
-            val sig = Transactions.sign(tx = tx, inputIndex = 0, Script.write(fundingScript), amount, localFundingKey)
+            val sig = TODO() //Transactions.sign(tx = tx, inputIndex = 0, Script.write(fundingScript), amount, localFundingKey)
             val signedData = tx.hashForSigning(0, Script.write(fundingScript), SigHash.SIGHASH_ALL, amount, SigVersion.SIGVERSION_WITNESS_V0)
-            return if (!Crypto.verifySignature(signedData, sig, localFundingKey.publicKey())) {
+
+            try {
+                val verifySig = Crypto.verifySignature(signedData, sig, localFundingKey.publicKey())
+                if (!verifySig) {
+                    log.error { "signature not verified" }
+                    SpendChannelAddressResult.Failure.InvalidSig(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
+                } else {
+                    SpendChannelAddressResult.Success(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
+                }
+            } catch (e: Exception) {
+                log.error(e) { "failed to verify signature" }
                 SpendChannelAddressResult.Failure.InvalidSig(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
-            } else {
-                SpendChannelAddressResult.Success(tx.txid, localFundingKey.publicKey(), Script.write(fundingScript).byteVector(), sig)
             }
+
         } catch (e: Exception) {
-            log.error { "error when spending from channel address: ${e.message}" }
+            log.error(e) { "failed to sign transaction" }
             return SpendChannelAddressResult.Failure.Generic(e)
         }
     }
@@ -134,10 +116,7 @@ sealed class SpendChannelAddressResult {
     data class Success(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64) : SpendChannelAddressResult()
     sealed class Failure : SpendChannelAddressResult() {
         data class Generic(val error: Throwable) : Failure()
-        data object ChannelDataMalformed : Failure()
-        data object ChannelDataDecryption : Failure()
-        data class ChannelDataUnhandledState(val stateName: String?) : Failure()
-        data class ChannelDataUnhandledVersion(val version: Int) : Failure()
+        data object InvalidChannelKeyPath : Failure()
         data class TransactionMalformed(val details: String) : Failure()
         data class RemoteFundingPubkeyMalformed(val details: String) : Failure()
         data class InvalidSig(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64) : Failure()

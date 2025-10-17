@@ -16,26 +16,22 @@
 
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.NodeUri
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
-import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
 import fr.acinq.lightning.logging.info
-import fr.acinq.phoenix.data.OfferData
+import fr.acinq.lightning.wire.OfferTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.hours
 
 
 class NodeParamsManager(
@@ -81,11 +77,9 @@ class NodeParamsManager(
         }
     }
 
-    /** See [NodeParams.defaultOffer]. Returns an [OfferData] object. */
-    suspend fun defaultOffer(): OfferData {
-        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeId).let {
-            OfferData(it.first, it.second)
-        }
+    /** See [NodeParams.defaultOffer]. Returns an [OfferTypes.OfferAndKey] object. */
+    suspend fun defaultOffer(): OfferTypes.OfferAndKey {
+        return nodeParams.filterNotNull().first().defaultOffer(trampolineNodeId)
     }
 
     companion object {

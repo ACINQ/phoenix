@@ -160,7 +160,7 @@ fun Bolt11InvoiceSection(
         TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_invoice_requested_label), amount = it, rateThen = originalFiatRate)
     }
     (invoice.description ?: invoice.descriptionHash?.toHex())?.takeIf { it.isNotBlank() }?.let {
-        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bolt11_description_label), value = it)
+        TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt11_description_label), value = it)
     }
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = invoice.paymentHash.toHex())
     preimage?.let { TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = preimage.toHex(), helpMessage = stringResource(id = R.string.paymentdetails_preimage_help)) }
@@ -178,13 +178,13 @@ fun Bolt12InvoiceSection(
         TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_invoice_requested_label), amount = it, rateThen = originalFiatRate)
     }
     invoice.description?.takeIf { it.isNotBlank() }?.let {
-        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_bolt11_description_label), value = it)
+        TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt11_description_label), value = it)
     }
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_payerkey_label)) {
         Text(text = payerKey.toHex())
         val nodeParamsManager = LocalBusiness.current?.nodeParamsManager
         val offerPayerKey by produceState<PrivateKey?>(initialValue = null, key1 = nodeParamsManager) {
-            value = nodeParamsManager?.defaultOffer()?.payerKey
+            value = nodeParamsManager?.defaultOffer()?.privateKey
         }
         if (offerPayerKey != null && payerKey == offerPayerKey) {
             Spacer(modifier = Modifier.heightIn(4.dp))

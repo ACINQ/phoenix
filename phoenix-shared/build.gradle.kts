@@ -95,10 +95,12 @@ kotlin {
                 implementation("io.ktor:ktor-client-json:${libs.versions.ktor.get()}")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:${libs.versions.ktor.get()}")
                 implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
+                // serialization
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:${libs.versions.serialization.get()}")
                 // sqldelight
                 implementation("app.cash.sqldelight:runtime:${libs.versions.sqldelight.get()}")
                 implementation("app.cash.sqldelight:coroutines-extensions:${libs.versions.sqldelight.get()}")
-                // SKEI
+                // SKIE
                 implementation("co.touchlab.skie:configuration-annotations:${libs.versions.skie.get()}")
             }
         }

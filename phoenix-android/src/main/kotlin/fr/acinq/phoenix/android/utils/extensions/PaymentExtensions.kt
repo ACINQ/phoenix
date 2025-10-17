@@ -37,6 +37,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.utils.extensions.desc
+import fr.acinq.phoenix.utils.extensions.description
 
 @Composable
 fun LightningOutgoingPayment.smartDescription(): String? = when (val details = this.details) {
@@ -66,7 +67,7 @@ fun AutomaticLiquidityPurchasePayment.smartDescription(): String =
 @Composable
 fun IncomingPayment.smartDescription() : String? = when (this) {
     is Bolt11IncomingPayment -> paymentRequest.description
-    is Bolt12IncomingPayment -> null
+    is Bolt12IncomingPayment -> metadata.description
     is OnChainIncomingPayment -> stringResource(id = R.string.paymentdetails_desc_swapin)
     is LegacySwapInIncomingPayment -> stringResource(id = R.string.paymentdetails_desc_swapin)
     is LegacyPayToOpenIncomingPayment -> when (val origin = origin) {
