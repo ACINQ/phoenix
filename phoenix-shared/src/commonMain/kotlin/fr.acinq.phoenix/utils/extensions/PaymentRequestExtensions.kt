@@ -40,15 +40,3 @@ val OfferPaymentMetadata.description: String?
         is OfferPaymentMetadata.V1 -> null
         is OfferPaymentMetadata.V2 -> this.description
     }
-
-val OfferPaymentMetadata.payerKey: PublicKey?
-    get() = when (this) {
-        is OfferPaymentMetadata.V1 -> this.payerKey
-        is OfferPaymentMetadata.V2 -> this.payerKey
-    }
-
-val OfferPaymentMetadata.payerNote: String?
-    get() = when (this) {
-        is OfferPaymentMetadata.V1 -> this.payerNote
-        is OfferPaymentMetadata.V2 -> this.payerNote
-    }

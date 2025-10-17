@@ -479,8 +479,9 @@
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_preimage_help">Cryptographic proof that the recipient successfully received the payment.</string>
     <string name="paymentdetails_bolt11_label">Bolt11 invoice</string>
-    <string name="paymentdetails_bolt11_description_label">Invoice description</string>
     <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
+    <string name="paymentdetails_bolt11_description_label">Invoice description</string>
+    <string name="paymentdetails_bolt12_description_label">Offer description</string>
     <string name="paymentdetails_offer_label">Offer</string>
     <string name="paymentdetails_offer_metadata_label">Metadata</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>

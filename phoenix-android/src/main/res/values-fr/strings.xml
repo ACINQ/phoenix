@@ -378,6 +378,7 @@
 
     <string name="paymentdetails_pubkey_label">Clé publique du destinataire</string>
     <string name="paymentdetails_bolt11_description_label">Description de la requête de paiement</string>
+    <string name="paymentdetails_bolt12_description_label">Description de l\'offer</string>
     <string name="paymentdetails_payment_hash_label">Hash du paiement</string>
     <string name="paymentdetails_bolt11_label">Requête de paiement</string>
     <string name="paymentdetails_preimage_label">Préimage</string>

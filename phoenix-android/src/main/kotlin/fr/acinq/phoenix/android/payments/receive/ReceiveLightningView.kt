@@ -383,7 +383,7 @@ private fun EditInvoiceView(
                 onTextChange = onDescriptionChange,
                 staticLabel = stringResource(id = R.string.receive_lightning_edit_desc_label),
                 placeholder = { Text(text = stringResource(id = R.string.receive_lightning_edit_desc_placeholder), maxLines = 2, overflow = TextOverflow.Ellipsis) },
-                maxChars = 140,
+                maxChars = if (isReusable) 64 else 140,
                 minLines = 2,
                 maxLines = Int.MAX_VALUE,
                 modifier = Modifier.fillMaxWidth(),

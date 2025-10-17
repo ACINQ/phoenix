@@ -132,7 +132,7 @@ extension WalletPaymentInfo {
 		var msg: String? = nil
 		
 		if let incomingOfferMetadata = payment.incomingOfferMetadata() {
-			msg = incomingOfferMetadata.payerNote_
+			msg = incomingOfferMetadata.payerNote
 			
 		} else if let outgoingInvoiceRequest = payment.outgoingInvoiceRequest() {
 			msg = outgoingInvoiceRequest.payerNote
