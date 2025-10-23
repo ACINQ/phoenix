@@ -6,9 +6,10 @@ import fr.acinq.phoenix.data.WalletPaymentInfo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 data class PaymentsPage(
     /** The offset value you passed to the `subscribeToX()` function. */
@@ -154,6 +155,7 @@ class PaymentsPageFetcher(
         resetSubscribeToRecentJob(subscriptionIdx)
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun resetSubscribeToRecentJob(idx: Int) {
         log.debug { "resetSubscribeToRecentJob(idx=$idx)" }
 
@@ -191,6 +193,7 @@ class PaymentsPageFetcher(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun resetRefreshJob(idx: Int, rows: List<WalletPaymentInfo>) {
         log.debug { "resetRefreshJob(idx=$idx, rows=${rows.size})" }
 

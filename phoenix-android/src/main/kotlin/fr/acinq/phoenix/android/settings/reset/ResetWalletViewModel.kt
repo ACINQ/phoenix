@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.settings.reset
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -61,7 +62,9 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
 
     val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
 
-    fun deleteWalletData() {
+    fun deleteWalletData(
+        onWalletDeleted: (Context) -> Unit,
+    ) {
         if (state.value != ResetWalletStep.Confirm) return
         state.value = ResetWalletStep.Deleting.Init
 
@@ -69,7 +72,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
             log.error("failed to reset wallet data: ", e)
             state.value = ResetWalletStep.Result.Failure.Error(e)
         }) {
-            log.info("resetting wallet with wallet=$walletId")
+            log.info("resetting wallet=$walletId")
             delay(350)
 
             val context = application.applicationContext
@@ -108,7 +111,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
 
             delay(300)
             log.info("successfully deleted wallet=$walletId")
-
+            onWalletDeleted(context)
             state.value = ResetWalletStep.Result.Success
         }
     }

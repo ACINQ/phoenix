@@ -96,15 +96,14 @@ fun StartupView(
     onWalletReady: () -> Unit,
     forceWalletId: WalletId?,
 ) {
-    val showIntro = application.globalPrefs.getShowIntro.collectAsState(initial = null)
-    if (showIntro.value == true) {
+    val showIntro by application.globalPrefs.getShowIntro.collectAsState(initial = null)
+    if (showIntro == true) {
         LaunchedEffect(Unit) { onShowIntro() }
+        return
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+        modifier = Modifier.fillMaxSize().imePadding(),
         contentAlignment = Alignment.Center
     ) {
 

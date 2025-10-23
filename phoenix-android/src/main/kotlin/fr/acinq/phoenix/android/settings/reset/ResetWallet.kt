@@ -37,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +53,6 @@ import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.AmountWithFiatBeside
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.buttons.Clickable
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -102,7 +100,16 @@ fun ResetWallet(
             ResetWalletStep.Confirm -> {
                 ReviewWalletBeforeDeletion(
                     business = business,
-                    onConfirmClick = vm::deleteWalletData,
+                    onConfirmClick = {
+                        vm.deleteWalletData(onWalletDeleted = { context ->
+                            BusinessManager.stopBusiness(walletId)
+                            context.startActivity(
+                                Intent(context, MainActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                }
+                            )
+                        })
+                    },
                     onLightningBalanceClick = onLightningBalanceClick, onSwapInBalanceClick = onSwapInBalanceClick, onFinalBalanceClick = onFinalBalanceClick
                 )
             }
@@ -288,26 +295,12 @@ private fun DeletingWallet(state: ResetWalletStep.Deleting) {
 
 @Composable
 private fun WalletDeleted(walletId: WalletId) {
-    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SuccessMessage(header = stringResource(id = R.string.reset_wallet_success))
-        Spacer(modifier = Modifier.height(16.dp))
-        BorderButton(
-            text = stringResource(id = R.string.btn_ok),
-            icon = R.drawable.ic_check,
-            onClick = {
-                BusinessManager.stopBusiness(walletId)
-                context.startActivity(
-                    Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                )
-            }
-        )
     }
 }
 

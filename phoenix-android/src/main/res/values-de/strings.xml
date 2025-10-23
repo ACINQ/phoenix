@@ -126,8 +126,6 @@
     <string name="send_trampoline_fee_label">Gebühr</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Lade Gebühr…</string>
-    <string name="send_trampoline_amountless_warning_label">Rechnung ohne Betrag</string>
-    <string name="send_trampoline_amountless_warning_details">Die Rechnung für diese Zahlung hat keinen festgelegten Betrag. Dies könnte von bösartigen Nodes ausgenutzt werden.\n\nUm kein Risiko einzugehen, <b>bitten Sie den Empfänger, bei der Erstellung der Rechnung einen Betrag festzulegen</b>.</string>
     <string name="send_connecting_button">Verbinde…</string>
     <string name="send_pay_button">Zahlen</string>
 
@@ -204,7 +202,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Zahlungs-Kanäle</string>
-    <string name="channelsview_menu_import_channels">Kanäle importieren</string>
     <string name="channelsview_header">Übersicht</string>
     <string name="channelsview_balance">Guthaben</string>
     <string name="channelsview_balance_about"><b>Guthaben</b> ist das gesamte Guthaben Ihrer aktiven Kanäle. Diesen Betrag können Sie über Lightning ausgeben.</string>
@@ -233,20 +230,6 @@
     <string name="channeldetails_share">Teilen</string>
     <string name="channeldetails_share_subject">Kanal-Daten</string>
     <string name="channeldetails_share_title">Teile Kanal-Daten</string>
-
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Rohdaten der Kanäle importieren</string>
-    <string name="channelimport_instructions">Dieser Bildschirm ist ein Debugging-Tool, mit dem du verschlüsselte Kanaldaten manuell importieren kannst.</string>
-    <string name="channelimport_input_label">Datenblob</string>
-    <string name="channelimport_import_button">Importieren</string>
-    <string name="channelimport_importing">Daten importieren..</string>
-    <string name="channelimport_success">Import erfolgreich</string>
-    <string name="channelimport_success_restart">Du musst Phoenix jetzt neu starten.</string>
-    <string name="channelimport_error_title">Der Import ist fehlgeschlagen</string>
-    <string name="channelimport_error_malformed">Die Daten sind missgebildet. Es wird ein verschlüsselter Hex-Blob erwartet.</string>
-    <string name="channelimport_error_decryption">Die Daten konnten von dieser Wallet nicht entschlüsselt werden.</string>
-    <string name="channelimport_error_unknown_version">Version %1$d wird nicht unterstützt</string>
 
     <!-- home: balance section & misc -->
 

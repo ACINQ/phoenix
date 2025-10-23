@@ -48,12 +48,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlin.collections.plus
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 /**
  * Manages the routines fetching the btc exchange rates. The frontend app must add fiat currencies they
@@ -75,6 +76,7 @@ import kotlin.time.Duration.Companion.seconds
  * However, for the time being, we rely on the more liquid USD-FIAT exchange rates.
  * Thus, if we fetch both BTC-USD & USD-COP, we can easily convert between any of the 3 currencies.
  */
+@OptIn(ExperimentalTime::class)
 class CurrencyManager(
     loggerFactory: LoggerFactory,
     val appDb: SqliteAppDb,

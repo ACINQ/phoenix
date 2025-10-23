@@ -55,7 +55,7 @@ object SeedManager {
         val encryptedSeed = try {
             loadEncryptedSeedFromDisk(context)
         } catch (e: Exception) {
-            log.error("could read seed file: ", e)
+            log.error("could not read seed file: ", e)
             return DecryptSeedResult.Failure.SeedFileUnreadable
         }
 

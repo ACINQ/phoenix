@@ -70,6 +70,8 @@ extension WalletPaymentInfo {
 			
 			if let bolt11 = incomingPayment as? Lightning_kmpBolt11IncomingPayment {
 				return sanitize(bolt11.paymentRequest.description_)
+			} else if let bolt12 = incomingPayment as? Lightning_kmpBolt12IncomingPayment {
+				return sanitize(bolt12.metadata.description__)
 			}
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {

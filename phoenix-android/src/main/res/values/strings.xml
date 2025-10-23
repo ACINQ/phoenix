@@ -165,8 +165,6 @@
     <string name="send_trampoline_fee_label">Fee</string>
     <string name="send_trampoline_fee_no_amount">N/A</string>
     <string name="send_trampoline_fee_loading">Loading fee…</string>
-    <string name="send_trampoline_amountless_warning_label">Amountless invoice</string>
-    <string name="send_trampoline_amountless_warning_details">The invoice for this payment does not request a specific amount. This may be exploited by malicious nodes during the payment.\n\nTo be safe, <b>ask the recipient to specify an amount</b> when generating the invoice.</string>
     <string name="send_connecting_button">Waiting for channels…</string>
     <string name="send_pay_button">Pay</string>
     <string name="send_confirm_pay_button">Confirm &amp; Pay</string>
@@ -279,7 +277,6 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Payment channels</string>
-    <string name="channelsview_menu_import_channels">Import channels</string>
     <string name="channelsview_menu_spend_channel_balance">Spend channel address</string>
     <string name="channelsview_header">Overview</string>
     <string name="channelsview_balance">Balance</string>
@@ -310,20 +307,6 @@
     <string name="channeldetails_share_subject">Channels data</string>
     <string name="channeldetails_share_title">Share channel data</string>
 
-    <!-- manual channels data import -->
-
-    <string name="channelimport_title">Import raw channel data</string>
-    <string name="channelimport_instructions">This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution.</string>
-    <string name="channelimport_input_label">Data blob</string>
-    <string name="channelimport_import_button">Import</string>
-    <string name="channelimport_importing">Importing data…</string>
-    <string name="channelimport_success">Import successful</string>
-    <string name="channelimport_success_restart">You must now restart Phoenix.</string>
-    <string name="channelimport_error_title">Import has failed</string>
-    <string name="channelimport_error_malformed">Data are malformed. A encrypted hex blob is expected.</string>
-    <string name="channelimport_error_decryption">Data could not be decrypted by this wallet.</string>
-    <string name="channelimport_error_unknown_version">Version %1$d is not supported</string>
-
     <!-- spend from channel address -->
 
     <string name="spendchanneladdress_title">Spend channel address</string>
@@ -343,10 +326,7 @@
     <string name="spendchanneladdress_error_generic">Failed to sign data</string>
     <string name="spendchanneladdress_error_amount">Invalid amount</string>
     <string name="spendchanneladdress_error_tx_index">Invalid tx index</string>
-    <string name="spendchanneladdress_error_channel_data">Malformed channel data</string>
-    <string name="spendchanneladdress_error_channel_data_decryption">Cannot decrypt channel data</string>
-    <string name="spendchanneladdress_error_channel_data_state">Unhandled channel state [%1$s]</string>
-    <string name="spendchanneladdress_error_channel_data_version">Malformed channel version [%1$s]</string>
+    <string name="spendchanneladdress_error_channel_keypath">Invalid channel keypath</string>
     <string name="spendchanneladdress_error_remote_pubkey">Malformed remote funding pubkey [%1$s]</string>
     <string name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
     <string name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
@@ -498,8 +478,9 @@
     <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_preimage_help">Cryptographic proof that the recipient successfully received the payment.</string>
     <string name="paymentdetails_bolt11_label">Bolt11 invoice</string>
-    <string name="paymentdetails_bolt11_description_label">Invoice description</string>
     <string name="paymentdetails_bolt12_label">Bolt12 invoice</string>
+    <string name="paymentdetails_bolt11_description_label">Invoice description</string>
+    <string name="paymentdetails_bolt12_description_label">Offer description</string>
     <string name="paymentdetails_offer_label">Offer</string>
     <string name="paymentdetails_offer_metadata_label">Metadata</string>
     <string name="paymentdetails_payerkey_label">Payer key</string>

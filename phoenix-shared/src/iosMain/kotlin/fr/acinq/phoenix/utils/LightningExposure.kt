@@ -28,11 +28,9 @@ import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.Closed
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.channel.states.Offline
-import fr.acinq.lightning.crypto.KeyManager
-import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.crypto.SwapInOnChainKeys
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
-import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
@@ -50,11 +48,9 @@ import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
-import fr.acinq.phoenix.managers.SendManager
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import platform.Foundation.NSData
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -340,7 +336,7 @@ fun ByteArray_toNSDataSlice(buffer: ByteArray, offset: Int, length: Int): NSData
 fun ByteArray_toNSData(buffer: ByteArray): NSData = buffer.toNSData()
 
 fun WalletState.WalletWithConfirmations._spendExpiredSwapIn(
-    swapInKeys: KeyManager.SwapInOnChainKeys,
+    swapInKeys: SwapInOnChainKeys,
     scriptPubKey: ByteVector,
     feerate: FeeratePerKw
 ): Pair<Transaction, Satoshi>? {
@@ -358,7 +354,7 @@ fun OfferManager.Companion._deterministicOffer(
     amount: MilliSatoshi?,
     description: String?,
     pathId: ByteVector32?,
-): Pair<OfferTypes.Offer, PrivateKey> {
+): OfferTypes.OfferAndKey {
     return deterministicOffer(
         chainHash = chainHash,
         nodePrivateKey = nodePrivateKey,

@@ -28,7 +28,8 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.data.WalletPaymentMetadata
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
 
@@ -99,6 +100,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
         val description: String? = null,
     )
 
+    @OptIn(ExperimentalTime::class)
     private fun addRow(
         timestamp: Long,
         id: UUID,

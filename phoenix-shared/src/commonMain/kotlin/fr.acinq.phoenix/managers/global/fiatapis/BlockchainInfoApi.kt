@@ -18,13 +18,13 @@ package fr.acinq.phoenix.managers.global.fiatapis
 
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.error
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.BlockchainInfoResponse
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.minutes
 
 /**
@@ -57,7 +57,7 @@ class BlockchainInfoApi(loggerFactory: LoggerFactory) : ExchangeRateApi {
             }
         }
 
-        val timestampMillis = Clock.System.now().toEpochMilliseconds()
+        val timestampMillis = currentTimestampMillis()
         val fetchedRates: List<ExchangeRate> = parsedResponse?.let {
             targets.mapNotNull { fiatCurrency ->
                 parsedResponse[fiatCurrency.name]?.let { priceObject ->
