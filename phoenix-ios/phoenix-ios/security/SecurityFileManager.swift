@@ -164,10 +164,10 @@ class SecurityFileManager {
 		
 		return queue.sync {
 			
-			var shouldDeleteV0File: Bool = false
+			var shouldMoveV0File: Bool = false
 			if let cached = cachedSecurityFile {
 				if case .v0(_) = cached {
-					shouldDeleteV0File = true
+					shouldMoveV0File = true
 				}
 			}
 			
@@ -198,13 +198,30 @@ class SecurityFileManager {
 				log.error("Error excluding \(url.lastPathComponent) from backup \(error)")
 			}
 			
-			if shouldDeleteV0File {
+			if shouldMoveV0File {
+				let oldUrl = SharedSecurity.shared.securityJsonUrl_V0
+				
+				var didMove: Bool = true
 				do {
-					let oldUrl = SharedSecurity.shared.securityJsonUrl_V0
-					try FileManager.default.removeItem(at: oldUrl)
-					log.debug("Deleted SecurityFile.V0")
+					let newUrl = oldUrl
+						.deletingLastPathComponent()
+						.appendingPathComponent("security.v0.deprecated.json", isDirectory: false)
+					
+					try FileManager.default.moveItem(at: oldUrl, to: newUrl)
+					log.debug("Moved SecurityFile.V0")
+					
 				} catch {
-					log.error("Error deleting SecurityFile.V0: \(error)")
+					log.error("Error moving SecurityFile.V0: \(error)")
+					didMove = false
+				}
+				
+				if !didMove {
+					do {
+						try FileManager.default.removeItem(at: oldUrl)
+						log.debug("Deleted SecurityFile.V0")
+					} catch {
+						log.error("Error deleting SecurityFile.V0: \(error)")
+					}
 				}
 			}
 			
