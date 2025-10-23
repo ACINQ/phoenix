@@ -83,6 +83,12 @@ data class ContactAddress(
     }
 }
 
+data class ContactSecret(
+    val id: ByteVector32,
+    val incomingPaymentId: UUID?,
+    val createdAt: Long
+)
+
 data class ContactInfo(
     val id: UUID,
     val name: String,
@@ -90,26 +96,11 @@ data class ContactInfo(
     val useOfferKey: Boolean,
     val offers: List<ContactOffer>,
     val addresses: List<ContactAddress>,
-    val publicKeys: List<PublicKey>,
+    val secrets: List<ContactSecret>
 ) {
-    constructor(
-        id: UUID,
-        name: String,
-        photoUri: String?,
-        useOfferKey: Boolean,
-        offers: List<ContactOffer>,
-        addresses: List<ContactAddress>
-    ) : this(
-        id = id,
-        name = name,
-        photoUri = photoUri,
-        useOfferKey = useOfferKey,
-        offers = offers,
-        addresses = addresses,
-        publicKeys = offers.map { it.offer.contactInfos.map { it.nodeId } }.flatten()
-    )
+    val publicKeys: List<PublicKey>
+        get() = offers.map { it.offer.contactInfos.map { it.nodeId } }.flatten()
 
     /** List the offers and LN addresses attached to the contact, ordered by creation date (most recent on top). */
     val paymentCodes: List<ContactPaymentCode> by lazy { (offers + addresses).sortedByDescending { it.createdAt } }
-
 }

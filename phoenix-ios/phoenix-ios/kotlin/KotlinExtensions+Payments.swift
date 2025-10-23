@@ -132,7 +132,7 @@ extension WalletPaymentInfo {
 		var msg: String? = nil
 		
 		if let incomingOfferMetadata = payment.incomingOfferMetadata() {
-			msg = incomingOfferMetadata.payerNote
+			msg = incomingOfferMetadata.payerNote_
 			
 		} else if let outgoingInvoiceRequest = payment.outgoingInvoiceRequest() {
 			msg = outgoingInvoiceRequest.payerNote
@@ -165,7 +165,24 @@ extension WalletPaymentInfo {
 	
 	func addToContactsInfo() -> AddToContactsInfo? {
 	
-		if payment is Lightning_kmpOutgoingPayment {
+		if let incoming = payment as? Lightning_kmpIncomingPayment {
+
+			if let metadata = payment.incomingOfferMetadata() {
+				if let rawSecret = metadata.contactSecret_ {
+					let offer = metadata.payerOffer_
+					let address = metadata.payerAddress_?.description()
+					if (offer != nil) || (address != nil) {
+						let secret = ContactSecret(
+							id: rawSecret,
+							incomingPaymentId: incoming.id,
+							createdAt: Date.now.toMilliseconds()
+						)
+						return AddToContactsInfo(offer: offer, address: address, secret: secret)
+					}
+				}
+			}
+
+		} else if payment is Lightning_kmpOutgoingPayment {
 			
 			// First check for a lightning address.
 			// Remember that an outgoing payment might have both an address & offer (i.e. BIP-353).
@@ -177,12 +194,11 @@ extension WalletPaymentInfo {
 			// But that's a different feature. The user's perspective remains the same.
 			//
 			if let address = self.metadata.lightningAddress {
-				return AddToContactsInfo(offer: nil, address: address)
+				return AddToContactsInfo(offer: nil, address: address, secret: nil)
 			}
 			
-			let invoiceRequest = payment.outgoingInvoiceRequest()
-			if let offer = invoiceRequest?.offer {
-				return AddToContactsInfo(offer: offer, address: nil)
+			if let offer = payment.outgoingInvoiceRequest()?.offer {
+				return AddToContactsInfo(offer: offer, address: nil, secret: nil)
 			}
 		}
 

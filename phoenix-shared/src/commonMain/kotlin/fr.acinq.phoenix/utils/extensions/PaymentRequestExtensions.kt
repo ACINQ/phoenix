@@ -16,11 +16,14 @@
 
 package fr.acinq.phoenix.utils.extensions
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.Bolt12Invoice
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.payment.UnverifiedContactAddress
+import fr.acinq.lightning.wire.OfferTypes
 
 
 /**
@@ -39,4 +42,40 @@ val OfferPaymentMetadata.description: String?
     get() = when (this) {
         is OfferPaymentMetadata.V1 -> null
         is OfferPaymentMetadata.V2 -> this.description
+        is OfferPaymentMetadata.V3 -> this.description
+    }
+
+val OfferPaymentMetadata.payerKey: PublicKey?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> this.payerKey
+        is OfferPaymentMetadata.V2 -> this.payerKey
+        is OfferPaymentMetadata.V3 -> this.payerKey
+    }
+
+val OfferPaymentMetadata.payerNote: String?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> this.payerNote
+        is OfferPaymentMetadata.V2 -> this.payerNote
+        is OfferPaymentMetadata.V3 -> this.payerNote
+    }
+
+val OfferPaymentMetadata.contactSecret: ByteVector32?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> null
+        is OfferPaymentMetadata.V2 -> null
+        is OfferPaymentMetadata.V3 -> this.contactSecret
+    }
+
+val OfferPaymentMetadata.payerOffer: OfferTypes.Offer?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> null
+        is OfferPaymentMetadata.V2 -> null
+        is OfferPaymentMetadata.V3 -> this.payerOffer
+    }
+
+val OfferPaymentMetadata.payerAddress: UnverifiedContactAddress?
+    get() = when (this) {
+        is OfferPaymentMetadata.V1 -> null
+        is OfferPaymentMetadata.V2 -> null
+        is OfferPaymentMetadata.V3 -> this.payerAddress
     }

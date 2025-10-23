@@ -1,4 +1,4 @@
-package fr.acinq.phoenix.db.serialization.contacts.v1
+package fr.acinq.phoenix.db.serialization.contacts.v2
 
 import fr.acinq.bitcoin.io.ByteArrayOutput
 import fr.acinq.bitcoin.io.Output
@@ -12,10 +12,11 @@ import fr.acinq.lightning.serialization.OutputExtensions.writeUuid
 import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ContactOffer
+import fr.acinq.phoenix.data.ContactSecret
 
 object Serialization {
 
-    const val VERSION_MAGIC = 1
+    const val VERSION_MAGIC = 2
 
     fun serialize(o: ContactInfo): ByteArray {
         val out = ByteArrayOutput()
@@ -31,6 +32,7 @@ object Serialization {
         writeBoolean(o.useOfferKey)
         writeCollection(o.offers) { writeContactOffer(it) }
         writeCollection(o.addresses) { writeContactAddress(it) }
+        writeCollection(o.secrets) { writeContactSecret(it) }
     }
 
     private fun Output.writeContactOffer(o: ContactOffer) {
@@ -44,6 +46,12 @@ object Serialization {
         writeByteVector32(o.id)
         writeString(o.address)
         writeNullable(o.label) { writeString(it) }
+        writeNumber(o.createdAt)
+    }
+
+    private fun Output.writeContactSecret(o: ContactSecret) {
+        writeByteVector32(o.id)
+        writeNullable(o.incomingPaymentId) { writeUuid(it) }
         writeNumber(o.createdAt)
     }
 }

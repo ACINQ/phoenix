@@ -50,7 +50,8 @@ sealed class CloudContact {
                 photoUri = photoUri,
                 useOfferKey = this.useOfferKey,
                 offers = mappedOffers,
-                addresses = listOf()
+                addresses = listOf(),
+                secrets = listOf()
             )
         }
 
