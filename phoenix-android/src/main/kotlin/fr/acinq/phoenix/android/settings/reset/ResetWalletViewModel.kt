@@ -95,6 +95,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
 
             state.value = ResetWalletStep.Deleting.Prefs
             DataStoreManager.deleteNodeUserPrefs(application.applicationContext, walletId)
+            application.globalPrefs.deleteWalletMeta(walletId)
 
             delay(400)
 

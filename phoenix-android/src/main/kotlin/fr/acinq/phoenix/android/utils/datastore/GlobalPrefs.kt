@@ -106,6 +106,11 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         ))
         it[AVAILABLE_WALLETS_META] = jsonFormat.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
     }
+    suspend fun deleteWalletMeta(walletId: WalletId) = data.edit {
+        val existingMap: Map<WalletId, UserWalletMetadata> = getAvailableWalletsMeta.first()
+        val newMap = existingMap - walletId
+        it[AVAILABLE_WALLETS_META] = jsonFormat.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
+    }
 
     val getDefaultWallet: Flow<BaseWalletId> = safeData.map { it[DEFAULT_WALLET_ID]?.let { WalletId(it) } ?: EmptyWalletId }
     suspend fun saveDefaultWallet(walletId: WalletId) = data.edit { it[DEFAULT_WALLET_ID] = walletId.nodeIdHash }
