@@ -130,7 +130,8 @@ fun AfterVersion7(
             photoUri = photo_uri,
             useOfferKey = use_offer_key,
             offers = listOf(),
-            addresses = listOf()
+            addresses = listOf(),
+            secrets = listOf()
         )
     }
 

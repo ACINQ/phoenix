@@ -455,6 +455,88 @@ extension DetailsInfoGrid {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Section: BLIP 42
+	// --------------------------------------------------
+	#if DEBUG
+	
+	@ViewBuilder
+	func section_blip42(
+		_ secret: Bitcoin_kmpByteVector32?,
+		_ offer: Lightning_kmpOfferTypesOffer?,
+		_ address: Lightning_kmp_coreUnverifiedContactAddress?
+	) -> some View {
+		
+		InlineSection {
+			header("BLIP 42 (DEBUG build only)")
+		} content: {
+			blip42_contactSecret(secret)
+			blip42_offer(offer)
+			blip42_address(address)
+		}
+	}
+	
+	@ViewBuilder
+	func blip42_contactSecret(
+		_ secret: Bitcoin_kmpByteVector32?
+	) -> some View {
+		
+		detailsRow(
+			identifier: #function,
+			keyColumnTitle: "contact secret"
+		) {
+			if let str = secret?.toHex() {
+				Text(str)
+					.lineLimit(2)
+					.truncationMode(.middle)
+			} else {
+				Text(verbatim: "<null>")
+					.foregroundStyle(Color.secondary)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func blip42_offer(
+		_ offer: Lightning_kmpOfferTypesOffer?
+	) -> some View {
+		
+		detailsRow(
+			identifier: #function,
+			keyColumnTitle: "payer offer"
+		) {
+			if let str = offer?.encode() {
+				Text(str)
+					.lineLimit(2)
+					.truncationMode(.middle)
+			} else {
+				Text(verbatim: "<null>")
+					.foregroundStyle(Color.secondary)
+			}
+		}
+	}
+
+	@ViewBuilder
+	func blip42_address(
+		_ address: Lightning_kmp_coreUnverifiedContactAddress?
+	) -> some View {
+		
+		detailsRow(
+			identifier: #function,
+			keyColumnTitle: "payer address"
+		) {
+			if let str = address?.description() {
+				Text(str)
+					.lineLimit(2)
+					.truncationMode(.middle)
+			} else {
+				Text(verbatim: "<null>")
+					.foregroundStyle(Color.secondary)
+			}
+		}
+	}
+	
+	#endif
+	// --------------------------------------------------
 	// MARK: SubSection: Bolt11 Invoice
 	// --------------------------------------------------
 	

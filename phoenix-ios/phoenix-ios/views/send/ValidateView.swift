@@ -1718,7 +1718,7 @@ struct ValidateView: View {
 			return
 		}
 		
-		let info = AddToContactsInfo(offer: offer, address: address)
+		let info = AddToContactsInfo(offer: offer, address: address, secret: nil)
 		
 		let count: Int = Biz.business.databaseManager.contactsDbValue()?.contactsListCount() ?? 0
 		if count == 0 {
@@ -1901,11 +1901,54 @@ struct ValidateView: View {
 				Biz.beginLongLivedTask(id: paymentId.description())
 				
 				let payerKey: Bitcoin_kmpPrivateKey
-				if contact?.useOfferKey ?? false {
+				let contactSecret: Bitcoin_kmpByteVector32?
+				
+				if let contact, contact.useOfferKey {
 					let offerAndKey = try await Biz.business.nodeParamsManager.defaultOffer()
+										
 					payerKey = offerAndKey.privateKey
+					
+					if let existingSecret = contact.secrets.first {
+						// We already have a known secret with this contact.
+						// This could be because:
+						// A) we added the contact from an incoming payment which contained a secet
+						// B) we've already sent them a payment, and generated the secret in the past
+						contactSecret = existingSecret.id
+						
+					} else {
+						// Generate a new secret using the recommended derivation algorithm.
+						let rawSecret: Lightning_kmpContactSecrets =
+							LightningExposureKt.Contacts_computeContactSecret(
+								ourOffer: offerAndKey,
+								theirOffer: model.offer
+							)
+						
+						// Store the new secret to the database
+						let newSecret = ContactSecret(
+							id: rawSecret.primarySecret,
+							incomingPaymentId: nil,
+							createdAt: Date.now.toMilliseconds()
+						)
+						let updatedContact = contact.doCopy(
+							id          : contact.id,
+							name        : contact.name,
+							photoUri    : contact.photoUri,
+							useOfferKey : contact.useOfferKey,
+							offers      : contact.offers,
+							addresses   : contact.addresses,
+							secrets     : [newSecret]
+						)
+						
+						let contactsDb = try await Biz.business.databaseManager.contactsDb()
+						try await contactsDb.saveContact(contact: updatedContact)
+						
+						// Use the newly generated secret for this payment
+						contactSecret = newSecret.id
+					}
+					
 				} else {
 					payerKey = Lightning_randomKey()
+					contactSecret = nil
 				}
 				
 				let response: Lightning_kmpOfferNotPaid? =
@@ -1916,6 +1959,7 @@ struct ValidateView: View {
 						lightningAddress: model.lightningAddress,
 						payerKey: payerKey,
 						payerNote: payerNote,
+						contactSecret: contactSecret,
 						fetchInvoiceTimeoutInSeconds: 30
 					)
 				

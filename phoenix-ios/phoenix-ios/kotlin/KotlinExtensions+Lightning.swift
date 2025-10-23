@@ -46,11 +46,7 @@ extension Lightning_kmpPaymentRequest {
 extension Lightning_kmpPeer {
 	
 	var bootChannelsFlowValue: Dictionary<Bitcoin_kmpByteVector32, Lightning_kmpChannelState> {
-		if let value = self.bootChannelsFlow.value as? Dictionary<Bitcoin_kmpByteVector32, Lightning_kmpChannelState> {
-			return value
-		} else {
-			return [:]
-		}
+		return self.bootChannelsFlow.value ?? [:]
 	}
 }
 
