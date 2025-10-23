@@ -66,8 +66,8 @@ class GroupPrefs {
 		if targetBuild.isVersion(equalTo: "65") {
 			performMigration_toBuild65()
 		}
-		if targetBuild.isVersion(equalTo: "92") {
-			performMigration_toBuild92()
+		if targetBuild.isVersion(equalTo: "96") {
+			performMigration_toBuild96()
 		}
 	}
 	
@@ -101,7 +101,7 @@ class GroupPrefs {
 		}
 	}
 	
-	private static func performMigration_toBuild92() {
+	private static func performMigration_toBuild96() {
 		log.trace(#function)
 		
 		// Migration to a per-wallet design:
@@ -115,7 +115,7 @@ class GroupPrefs {
 		// during the normal migration process.
 		// That is, before we've unlocked the wallet, and before we know the walletId.
 		//
-		// For step 2, see "loadWallet".
+		// For step 2, see "didLoadWallet".
 		
 		let d = self.defaults
 		
