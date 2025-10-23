@@ -75,9 +75,9 @@ class AppMigration {
 			GroupPrefs.performMigration("65", completionPublisher)
 		}
 		
-		// v2.7.0 (build 92)
+		// v2.7.0 (build 96)
 		// - Prefs & GroupPrefs moved to wallet-specific keys
-		if currentBuild.isVersion(greaterThanOrEqualTo: "92") { //}&& previousBuild.isVersion(lessThan: "92") {
+		if currentBuild.isVersion(greaterThanOrEqualTo: "96") && previousBuild.isVersion(lessThan: "96") {
 		#if DEBUG
 			log.debug("--------------------------------------------------")
 			log.debug("# PREFS: PHASE 0:")
@@ -88,9 +88,9 @@ class AppMigration {
 			Keychain.printKeysAndValues(nil)
 			log.debug("--------------------------------------------------")
 		#endif
-			Prefs.performMigration("92", completionPublisher)
-			GroupPrefs.performMigration("92", completionPublisher)
-			Keychain.performMigration("92", completionPublisher)
+			Prefs.performMigration("96", completionPublisher)
+			GroupPrefs.performMigration("96", completionPublisher)
+			Keychain.performMigration("96", completionPublisher)
 		#if DEBUG
 			log.debug("--------------------------------------------------")
 			log.debug("# PREFS: PHASE 1:")

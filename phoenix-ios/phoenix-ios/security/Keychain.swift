@@ -158,8 +158,8 @@ class Keychain {
 		if targetBuild.isVersion(equalTo: "41") {
 			performMigration_toBuild41(completionPublisher)
 		}
-		if targetBuild.isVersion(equalTo: "92") {
-			performMigration_toBuild92(completionPublisher)
+		if targetBuild.isVersion(equalTo: "96") {
+			performMigration_toBuild96(completionPublisher)
 		}
 	}
 	
@@ -226,7 +226,7 @@ class Keychain {
 		)
 	}
 	
-	private static func performMigration_toBuild92(
+	private static func performMigration_toBuild96(
 		_ completionPublisher: CurrentValueSubject<Int, Never>
 	) {
 		log.trace(#function)
@@ -242,7 +242,7 @@ class Keychain {
 		// during the normal migration process.
 		// That is, before we've unlocked the wallet, and before we know the walletId.
 		//
-		// For step 2, see "loadWallet".
+		// For step 2, see "didLoadWallet".
 		
 		runWhenProtectedDataAvailable(completionPublisher) {
 			
