@@ -23,12 +23,8 @@ enum PayOfferProblem {
 	}
 	
 	static func fromResponse(
-		_ response: Lightning_kmpOfferNotPaid?
-	) -> PayOfferProblem? {
-		
-		guard let response else {
-			return nil
-		}
+		_ response: Lightning_kmpOfferNotPaid
+	) -> PayOfferProblem {
 		
 		switch onEnum(of: response.reason) {
 			case .noResponse(_)         : return PayOfferProblem.noResponse

@@ -41,6 +41,21 @@
         }
       }
     },
+    " - Counter:" : {
+
+    },
+    " - Name:" : {
+
+    },
+    " - Status:" : {
+
+    },
+    " - UID:" : {
+
+    },
+    " - Verified:" : {
+
+    },
     " (not available)" : {
       "localizations" : {
         "ar" : {
@@ -244,6 +259,30 @@
       }
     },
     " [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
+
+    },
+    " • [Bolt Ring](https://bitcoin-ring.com/)" : {
+
+    },
+    " • [CoinCorner.com](https://www.coincorner.com/BuyTheBoltCard)" : {
+
+    },
+    " • [Hirsch](https://shop.hirschsecure.com/products/printed-nxp-ntag-424-dna-tag-5-pack)" : {
+
+    },
+    " • [Laser Eyes Cards](https://lasereyes.cards/)" : {
+
+    },
+    " • [NFC.cards](https://nfc.cards/en/white-cards/46-nfc-card-ntag424-dna.html)" : {
+
+    },
+    " • [PlebTag](https://plebtag.com/)" : {
+
+    },
+    " • [Yanabu Bolt Card - Korea](https://marpple.shop/kr/yanabu/products/13356281)" : {
+
+    },
+    " • [ZipNFC.com](https://zipnfc.com/nfc-pvc-card-credit-card-size-ntag424-dna.html)" : {
 
     },
     "-" : {
@@ -952,6 +991,9 @@
     "(wait a few seconds and then retry)" : {
 
     },
+    "**Daily** spending limit:" : {
+
+    },
     "**disabled**: sent payments will be anonymous" : {
       "localizations" : {
         "ar" : {
@@ -1153,6 +1195,9 @@
           }
         }
       }
+    },
+    "**Monthly** spending limit:" : {
+
     },
     "**This Bolt12 payment request is the Lightning equivalent to a Bitcoin address.**\n\nUnlike traditional Lightning invoices, it does not expire and can be reused.\n\nShare it widely : for donations, tips, or to get paid by your friends.\n\n🛟 **Who supports Bolt12?**\n\nFor the moment, few services support Bolt12. If a service rejects this invoice, let them know they're missing out!\n\n🪫 **Restrictions**\n\nYour phone must be turned on and connected to the internet to receive a payment. Also enabling TOR in Phoenix may cause issues." : {
       "localizations" : {
@@ -4118,6 +4163,9 @@
         }
       }
     },
+    "A sheet will appear to guide you through the process" : {
+
+    },
     "A temporary error occurred, and Phoenix is unable to continue loading." : {
       "localizations" : {
         "ar" : {
@@ -4482,6 +4530,9 @@
       }
     },
     "Access hidden wallet" : {
+
+    },
+    "Active" : {
 
     },
     "active commitments" : {
@@ -4974,6 +5025,12 @@
           }
         }
       }
+    },
+    "Afterwards, the card will be Archived, and can never be activated again. The card will remain in your list, but will be moved to the Archived section." : {
+
+    },
+    "All payment attempts will be rejected." : {
+
     },
     "All payment channels will be closed." : {
       "localizations" : {
@@ -5704,6 +5761,9 @@
         }
       }
     },
+    "An active card can be used for payments." : {
+
+    },
     "An error occurred on a node in the payment route. The payment may succeed if you try again." : {
       "localizations" : {
         "ar" : {
@@ -5743,6 +5803,12 @@
           }
         }
       }
+    },
+    "An error occurred while attempting to write to the NFC tag." : {
+
+    },
+    "An NFC session is already running." : {
+
     },
     "An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %@." : {
       "localizations" : {
@@ -5864,6 +5930,9 @@
         }
       }
     },
+    "An unexpected error occurred while attempting to reset the card. Please try resetting it again. If the problem persists, you may need to destroy the card by cutting it up." : {
+
+    },
     "An unknown error has occurred." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5944,6 +6013,9 @@
           }
         }
       }
+    },
+    "An unknown error occurred while attempting to clear the keys from the card. Please try resetting it again. If the problem persists, you may need to destroy the card by cutting it up." : {
+
     },
     "An unknown error occurred." : {
       "comment" : "error details",
@@ -6067,6 +6139,9 @@
           }
         }
       }
+    },
+    "Any payments made with this card will remain in your transaction history, but will no longer be linked with any card." : {
+
     },
     "App access" : {
       "localizations" : {
@@ -6269,6 +6344,21 @@
           }
         }
       }
+    },
+    "Archive" : {
+
+    },
+    "Archive card" : {
+
+    },
+    "Archive card…" : {
+
+    },
+    "Archived Cards" : {
+
+    },
+    "Are you sure you want to delete this card?" : {
+
     },
     "Are you sure you want to pay this invoice?" : {
       "extractionState" : "manual",
@@ -7443,6 +7533,9 @@
         }
       }
     },
+    "Be your own bank" : {
+
+    },
     "Below the expected fee. Some payments may be rejected." : {
       "localizations" : {
         "ar" : {
@@ -8009,6 +8102,9 @@
         }
       }
     },
+    "Bitcoin payments over the lightning network with a contactless payment card." : {
+
+    },
     "Bitcoin supercharged" : {
       "localizations" : {
         "ar" : {
@@ -8210,6 +8306,18 @@
           }
         }
       }
+    },
+    "Bolt Card" : {
+
+    },
+    "Bolt Card not detected in NFC tag" : {
+
+    },
+    "Bolt Card:" : {
+
+    },
+    "Bolt Cards" : {
+
     },
     "Bolt12 invoice" : {
       "localizations" : {
@@ -8742,6 +8850,34 @@
     },
     "card" : {
       "comment" : "button label - try to make it short"
+    },
+    "Card" : {
+
+    },
+    "Card not associated with this wallet." : {
+
+    },
+    "Card options" : {
+
+    },
+    "Card payment" : {
+
+    },
+    "Card's wallet didn't respond to payment request." : {
+
+    },
+    "Card's wallet rejected payment request.\nError code: %lld\nMessage: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Card's wallet rejected payment request.\nError code: %1$lld\nMessage: %2$@"
+          }
+        }
+      }
+    },
+    "Card's wallet rejected payment request.\nMessage: %@" : {
+
     },
     "Caused by" : {
       "localizations" : {
@@ -11958,6 +12094,9 @@
         }
       }
     },
+    "Copy and paste into simulator:" : {
+
+    },
     "Copy certificate" : {
       "localizations" : {
         "ar" : {
@@ -12118,6 +12257,9 @@
         }
       }
     },
+    "Copy simulator's info:" : {
+
+    },
     "Copy transaction id" : {
       "localizations" : {
         "ar" : {
@@ -12197,6 +12339,9 @@
           }
         }
       }
+    },
+    "Could not authenticate with card." : {
+
     },
     "Could not communicate with card's wallet" : {
       "comment" : "Error message - scanning lightning invoice"
@@ -12327,6 +12472,9 @@
         }
       }
     },
+    "Could not connect to the NFC tag." : {
+
+    },
     "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
       "localizations" : {
         "ar" : {
@@ -12407,10 +12555,16 @@
         }
       }
     },
+    "Cound not communicate with card's host" : {
+
+    },
     "Cound not communicate with card's wallet" : {
 
     },
     "Create new contact" : {
+
+    },
+    "Create New Debit Card" : {
 
     },
     "Create new wallet" : {
@@ -13386,6 +13540,12 @@
           }
         }
       }
+    },
+    "Delete card" : {
+
+    },
+    "Delete card…" : {
+
     },
     "Delete contact" : {
       "localizations" : {
@@ -14431,6 +14591,9 @@
           }
         }
       }
+    },
+    "Details: %@" : {
+
     },
     "Disable Lock PIN" : {
       "comment" : "Navigation bar title"
@@ -16438,6 +16601,9 @@
           }
         }
       }
+    },
+    "Error fetching registration. Please check internet connection." : {
+
     },
     "Error fetching wallet backups from iCloud" : {
       "localizations" : {
@@ -18831,6 +18997,12 @@
         }
       }
     },
+    "Frozen" : {
+
+    },
+    "Frozen (archived)" : {
+      "comment" : "translate: archived"
+    },
     "full payment history" : {
       "localizations" : {
         "ar" : {
@@ -19313,6 +19485,9 @@
         }
       }
     },
+    "Get address" : {
+
+    },
     "Get started" : {
       "localizations" : {
         "ar" : {
@@ -19394,6 +19569,9 @@
       }
     },
     "Go back to visible wallets list" : {
+
+    },
+    "Go to: Configuration > Bolt cards" : {
 
     },
     "Good news! Your transaction has been mined!" : {
@@ -19642,6 +19820,12 @@
           }
         }
       }
+    },
+    "Hold your card near the device to program it." : {
+      "comment" : "Message in iOS NFC dialog"
+    },
+    "Hold your card near the device to reset it." : {
+      "comment" : "Message in iOS NFC dialog"
     },
     "Hold your device near the reader." : {
 
@@ -19937,6 +20121,9 @@
           }
         }
       }
+    },
+    "How does Bolt card work ?" : {
+
     },
     "How it works" : {
       "localizations" : {
@@ -21000,6 +21187,9 @@
           }
         }
       }
+    },
+    "If you still have access to the physical card, it's recommended that you **reset** the card first. This will allow it to be linked again with any wallet." : {
+
     },
     "If you switch to a new device (or reinstall the app) then you'll lose this information." : {
       "localizations" : {
@@ -23305,6 +23495,9 @@
         }
       }
     },
+    "It can be linked again with any wallet." : {
+
+    },
     "just now" : {
       "comment" : "Timestamp for notification",
       "localizations" : {
@@ -23467,6 +23660,9 @@
           }
         }
       }
+    },
+    "Key slots unavailable" : {
+
     },
     "know when fees may occur" : {
       "localizations" : {
@@ -23632,6 +23828,9 @@
           }
         }
       }
+    },
+    "learn more" : {
+
     },
     "Learn more" : {
       "localizations" : {
@@ -24463,6 +24662,12 @@
         }
       }
     },
+    "Limit applies from 1st of the month at midnight to the following 1st (local time)." : {
+
+    },
+    "Limit applies from midnight to midnight (local time)." : {
+
+    },
     "Link" : {
       "comment" : "lnurl-auth: login button title",
       "localizations" : {
@@ -24504,6 +24709,12 @@
         }
       }
     },
+    "Link a **physical card** to your Phoenix wallet." : {
+
+    },
+    "Link a card to a simulator wallet for testing." : {
+
+    },
     "Linked" : {
       "comment" : "lnurl-auth: success text",
       "localizations" : {
@@ -24544,6 +24755,9 @@
           }
         }
       }
+    },
+    "Linked Cards" : {
+
     },
     "Liquidity" : {
 
@@ -25247,7 +25461,13 @@
         }
       }
     },
+    "Manage Card" : {
+
+    },
     "Manage or switch wallets" : {
+
+    },
+    "Management Tasks" : {
 
     },
     "Manual Backup" : {
@@ -25984,6 +26204,9 @@
         }
       }
     },
+    "Message Authentication Code:" : {
+
+    },
     "Metadata" : {
       "localizations" : {
         "ar" : {
@@ -26597,6 +26820,9 @@
         }
       }
     },
+    "My Bolt Card" : {
+      "comment" : "Default name for a bolt card when creating a new one"
+    },
     "N/A" : {
       "localizations" : {
         "ar" : {
@@ -27047,6 +27273,15 @@
 
     },
     "NFC capabilities not available on this device" : {
+
+    },
+    "NFC capabilities not available on this device." : {
+
+    },
+    "NFC error: %@" : {
+
+    },
+    "NFC process terminated unexpectedly" : {
 
     },
     "NFC reader is already scanning" : {
@@ -27618,9 +27853,6 @@
         }
       }
     },
-    "No URI detected in NFC tag" : {
-
-    },
     "No URI or text detected in NFC tag" : {
 
     },
@@ -27747,6 +27979,9 @@
           }
         }
       }
+    },
+    "Note that simulators do not support background execution" : {
+
     },
     "Note: Server must have a certificate" : {
       "localizations" : {
@@ -28114,6 +28349,9 @@
         }
       }
     },
+    "On a real device:" : {
+
+    },
     "on-chain <-> lightning" : {
       "localizations" : {
         "ar" : {
@@ -28442,6 +28680,9 @@
         }
       }
     },
+    "Once a card is archived it can never be activated again. The card will remain in your list, but will be moved to the Archived section." : {
+
+    },
     "Only show in-flight outgoing payments." : {
       "comment" : "Recent payments option",
       "extractionState" : "manual",
@@ -28645,6 +28886,9 @@
       }
     },
     "Open Orbot website" : {
+
+    },
+    "Open Phoenix app (debug build)" : {
 
     },
     "Open Tor settings" : {
@@ -29139,6 +29383,12 @@
           }
         }
       }
+    },
+    "Paste here" : {
+
+    },
+    "Paste JSON output from device here" : {
+
     },
     "Path" : {
       "extractionState" : "manual",
@@ -31158,6 +31408,9 @@
         }
       }
     },
+    "Picc Data:" : {
+
+    },
     "PIN" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -31682,6 +31935,9 @@
         }
       }
     },
+    "Please try again. And be sure to hold the card close to the phone until the writing process completes." : {
+
+    },
     "plus hidden amount incoming" : {
       "localizations" : {
         "ar" : {
@@ -31882,6 +32138,15 @@
         }
       }
     },
+    "Preparing system for NFC..." : {
+
+    },
+    "Prerequisites" : {
+
+    },
+    "Press and hold \"create new debit card\" button for 3 seconds" : {
+
+    },
     "Privacy" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -32003,6 +32268,9 @@
           }
         }
       }
+    },
+    "Protocol error: %@" : {
+
     },
     "Public key" : {
       "localizations" : {
@@ -32408,6 +32676,12 @@
           }
         }
       }
+    },
+    "Read card" : {
+
+    },
+    "Read card…" : {
+
     },
     "Reading card…" : {
 
@@ -33179,6 +33453,12 @@
         }
       }
     },
+    "Remaining" : {
+
+    },
+    "Remember:" : {
+
+    },
     "Remote" : {
       "localizations" : {
         "ar" : {
@@ -33302,6 +33582,15 @@
           }
         }
       }
+    },
+    "Reset" : {
+
+    },
+    "Reset card" : {
+
+    },
+    "Reset physical card…" : {
+
     },
     "Reset user preferences" : {
       "localizations" : {
@@ -34195,6 +34484,9 @@
           }
         }
       }
+    },
+    "Scanned NDEF tag with unknown type" : {
+
     },
     "Search" : {
       "localizations" : {
@@ -37057,6 +37349,15 @@
         }
       }
     },
+    "Simulator debugging" : {
+
+    },
+    "Simulator Info:" : {
+
+    },
+    "Simulator instructions" : {
+
+    },
     "Since you've enabled Tor, you should use an onion address for this server." : {
       "localizations" : {
         "ar" : {
@@ -37219,6 +37520,9 @@
           }
         }
       }
+    },
+    "So to make a payment using the card, the simulator must be open, with Phoenix running in the foreground" : {
+
     },
     "Something is amiss with this invoice..." : {
       "extractionState" : "manual",
@@ -37384,7 +37688,13 @@
     "Spending Control" : {
 
     },
+    "Spending Limits" : {
+
+    },
     "Spending PIN" : {
+
+    },
+    "Spent" : {
 
     },
     "Splice already in progress" : {
@@ -37787,6 +38097,12 @@
           }
         }
       }
+    },
+    "Status: Active" : {
+
+    },
+    "Status: Frozen" : {
+
     },
     "Step #%lld" : {
       "localizations" : {
@@ -38722,6 +39038,9 @@
         }
       }
     },
+    "The card is **NOT** ready to be used. Please try writing it again." : {
+
+    },
     "The card's host returned error code: %d" : {
       "comment" : "Error message - processing bolt card payment"
     },
@@ -39483,6 +39802,9 @@
         }
       }
     },
+    "The merchant can use these values to make a one time request to your wallet. After that, the card must be tapped again to get fresh values." : {
+
+    },
     "The migration will cost %@ (≈ %@)" : {
       "localizations" : {
         "ar" : {
@@ -39528,6 +39850,9 @@
           }
         }
       }
+    },
+    "The NFC card is programmed with a BLIP XX address and a set of secure keys. The card then produces the address plus two unique hashes that change each time the card is scanned." : {
+
     },
     "The payment amount is invalid." : {
       "localizations" : {
@@ -40187,6 +40512,12 @@
         }
       }
     },
+    "The simulator doesn't support NFC. But you can link a card to this wallet for testing." : {
+
+    },
+    "The simulator must be running on a Mac with either Apple Silicon or the T2 security chip (to receive push notifications)" : {
+
+    },
     "The swap-in wallet is a bridge to Lightning. Funds on this wallet will automatically be moved to Lightning according to your liquidity policy setting." : {
       "localizations" : {
         "ar" : {
@@ -40466,6 +40797,9 @@
           }
         }
       }
+    },
+    "Then make **contactless payments** at supporting merchants." : {
+
     },
     "These funds come from closed Lightning channels. They must be spent manually." : {
       "localizations" : {
@@ -40793,6 +41127,12 @@
     "This appears to be a website:" : {
 
     },
+    "This card has been improperly programmed or reset too many times, and it's now impossible to use the card." : {
+
+    },
+    "This card is already linked to another wallet. To re-use this card you must first unlink the card. In Phoenix there is an option called \"reset physical card\" which will unlink it." : {
+
+    },
     "This doesn't appear to be a Lightning invoice" : {
       "comment" : "Error message - scanning lightning invoice",
       "localizations" : {
@@ -40833,6 +41173,9 @@
           }
         }
       }
+    },
+    "This doesn't appear to be the linked card. Perhaps this card is associated with a different wallet, or a different card in this wallet." : {
+
     },
     "This feature is not a \"fix everything magic button\". It is here as a safety measure and **should only be used in extreme scenarios**. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, **if you experience issues with Phoenix you should contact support**." : {
       "comment" : "ForceCloseChannelsView",
@@ -41724,6 +42067,12 @@
       }
     },
     "This wallet is **hidden**, and a hidden wallet requires a Lock PIN to be set." : {
+
+    },
+    "This will clear the card, allowing it to be linked again with any wallet." : {
+
+    },
+    "This will create a new card that is linked to a wallet running on a simulator" : {
 
     },
     "This will reset the app, as if you had just installed it." : {
@@ -42940,6 +43289,9 @@
           }
         }
       }
+    },
+    "True" : {
+
     },
     "Trust certificate & pin public key" : {
       "localizations" : {
@@ -44361,6 +44713,12 @@
         }
       }
     },
+    "Use this option if your card is permanantly lost or stolen." : {
+
+    },
+    "Use this screen to manage your card anytime you need." : {
+
+    },
     "Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels." : {
       "localizations" : {
         "ar" : {
@@ -44601,6 +44959,15 @@
           }
         }
       }
+    },
+    "Version 1 (lnurl-withdraw)" : {
+
+    },
+    "Version 1 & 2 (lnurl-withdraw + v2 param)" : {
+
+    },
+    "Version 2 (bip-353 & onion messages)" : {
+
     },
     "Version 2.5.0: Tor changes" : {
       "localizations" : {
@@ -46061,6 +46428,9 @@
         }
       }
     },
+    "What you need are blank NFC \"NTAG 424 DNA\" cards. You can buy them from many different vendors." : {
+
+    },
     "What's new:" : {
       "localizations" : {
         "ar" : {
@@ -46140,6 +46510,9 @@
           }
         }
       }
+    },
+    "Where can I buy bolt cards ?" : {
+
     },
     "Which PIN?" : {
       "localizations" : {
@@ -46631,6 +47004,12 @@
         }
       }
     },
+    "Write card for simulator" : {
+
+    },
+    "Write error" : {
+
+    },
     "Yes" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -46998,6 +47377,9 @@
       }
     },
     "You can enter the PIN for this wallet anytime in the lock screen, and Phoenix will **switch** to this wallet." : {
+
+    },
+    "You can link multiple debit cards to your wallet. Set custom spending limits per card, and freeze a card at anytime." : {
 
     },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
@@ -47845,6 +48227,9 @@
         }
       }
     },
+    "You need a BIP-353 address before you can create a card." : {
+
+    },
     "You need at least one channel to claim your address. Try adding funds to your wallet and try again." : {
       "localizations" : {
         "ar" : {
@@ -48178,7 +48563,17 @@
     "Your balance of:" : {
 
     },
+    "Your bank (this device) needs to be online to process payments with your card." : {
+
+    },
+    "Your card is now ready to use." : {
+
+    },
+    "Your card is now reset." : {
+
+    },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -48257,6 +48652,9 @@
           }
         }
       }
+    },
+    "Your channels are not connected yet. Wait for a stable connection and try again." : {
+
     },
     "Your comment will be sent when you pay." : {
       "localizations" : {
@@ -48700,6 +49098,9 @@
           }
         }
       }
+    },
+    "Your wallet verifies the card is not frozen, and checks the payment amount against any daily/monthly spending limits you may have configured." : {
+
     }
   },
   "version" : "1.0"

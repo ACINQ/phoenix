@@ -48,6 +48,22 @@ expect fun didSaveContact(contactId: UUID, database: PaymentsDatabase)
 expect fun didDeleteContact(contactId: UUID, database: PaymentsDatabase)
 
 /**
+ * Implement this function to execute platform specific code when a contact is saved to the database.
+ * For example, on iOS this is used to enqueue the (encrypted) contact for upload to CloudKit.
+ *
+ * This function is invoked inside the same transaction used to add/modify the row.
+ * This means any database operations performed in this function are atomic,
+ * with respect to the referenced row.
+ */
+expect fun didSaveCard(cardId: UUID, database: PaymentsDatabase)
+
+/**
+ * Implement this function to execute platform specific code when a card is deleted.
+ * For example, on iOS this is used to enqueue an operation to delete the card from CloudKit.
+ */
+expect fun didDeleteCard(cardId: UUID, database: PaymentsDatabase)
+
+/**
  * Implemented on Apple platforms with support for CloudKit.
  */
 expect fun makeCloudKitDb(appDb: SqliteAppDb, paymentsDb: SqlitePaymentsDb): CloudKitInterface?

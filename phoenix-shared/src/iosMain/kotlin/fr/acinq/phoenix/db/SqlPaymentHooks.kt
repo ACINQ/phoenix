@@ -33,6 +33,20 @@ actual fun didDeleteContact(contactId: UUID, database: PaymentsDatabase) {
     )
 }
 
+actual fun didSaveCard(cardId: UUID, database: PaymentsDatabase) {
+    database.cloudKitCardsQueries.addToQueue(
+        id = cardId.toString(),
+        date_added = currentTimestampMillis()
+    )
+}
+
+actual fun didDeleteCard(cardId: UUID, database: PaymentsDatabase) {
+    database.cloudKitCardsQueries.addToQueue(
+        id = cardId.toString(),
+        date_added = currentTimestampMillis()
+    )
+}
+
 actual fun makeCloudKitDb(appDb: SqliteAppDb, paymentsDb: SqlitePaymentsDb): CloudKitInterface? {
     return CloudKitDb(appDb, paymentsDb)
 }

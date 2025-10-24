@@ -36,7 +36,7 @@ class PhoenixGlobal(val ctx: PlatformContext) {
     val loggerFactory = LoggerFactory(PhoenixLoggerConfig(ctx))
     private val logger = loggerFactory.newLogger(this::class)
 
-    val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
+    val appDb by lazy { SqliteAppDb(loggerFactory, createAppDbDriver(ctx)) }
     val networkMonitor = NetworkMonitor(loggerFactory, ctx)
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDb) }
     val feerateManager by lazy { FeerateManager(loggerFactory) }

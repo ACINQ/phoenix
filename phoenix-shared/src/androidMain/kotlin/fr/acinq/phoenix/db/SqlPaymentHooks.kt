@@ -12,6 +12,9 @@ actual fun didUpdateWalletPaymentMetadata(id: UUID, database: PaymentsDatabase) 
 actual fun didSaveContact(contactId: UUID, database: PaymentsDatabase) {}
 actual fun didDeleteContact(contactId: UUID, database: PaymentsDatabase) {}
 
+actual fun didSaveCard(cardId: UUID, database: PaymentsDatabase) {}
+actual fun didDeleteCard(cardId: UUID, database: PaymentsDatabase) {}
+
 actual fun makeCloudKitDb(appDb: SqliteAppDb, paymentsDb: SqlitePaymentsDb): CloudKitInterface? {
     return null
 }

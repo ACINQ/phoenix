@@ -8,6 +8,7 @@ class CloudKitDb(
     paymentsDb: SqlitePaymentsDb
 ): CloudKitInterface, CoroutineScope by MainScope() {
 
+    val cards = CloudKitCardsDb(paymentsDb)
     val contacts = CloudKitContactsDb(paymentsDb)
     val payments = CloudKitPaymentsDb(paymentsDb)
 }

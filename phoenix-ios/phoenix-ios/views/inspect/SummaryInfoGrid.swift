@@ -21,6 +21,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
+	@State var card: BoltCardInfo? = nil
+	
 	@State var popoverPresent_standardFees = false
 	@State var popoverPresent_minerFees = false
 	@State var popoverPresent_serviceFees = false
@@ -61,6 +63,7 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			recipientRow()
 			paymentTypeRow()
 			channelClosingRow()
+			cardRow()
 			
 			paymentFeesRow_StandardFees()
 			paymentFeesRow_MinerFees()
@@ -70,6 +73,14 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 			paymentErrorRow()
 		}
 		.padding([.leading, .trailing])
+		.task(id: paymentInfo) {
+			if let cardId = paymentInfo.metadata.cardId {
+				let cardsDb = try? await Biz.business.databaseManager.cardsDb()
+				card = cardsDb?.cardForId(cardId: cardId)
+			} else {
+				card = nil
+			}
+		}
 	}
 	
 	@ViewBuilder
@@ -514,6 +525,27 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 							.padding(.top, 4)
 					}
 				}
+				
+			} // </InfoGridRow>
+		}
+	}
+	
+	@ViewBuilder
+	func cardRow() -> some View {
+		let identifier: String = #function
+		
+		if let card {
+			InfoGridRow(
+				identifier: identifier,
+				vAlignment: .firstTextBaseline,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier),
+				keyColumnAlignment: .trailing
+			) {
+				keyColumn("Card")
+				
+			} valueColumn: {
+				Text(card.sanitizedName)
 				
 			} // </InfoGridRow>
 		}
