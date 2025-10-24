@@ -10,6 +10,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.phoenix.db.cards.SqliteCardsDb
 import fr.acinq.phoenix.db.contacts.SqliteContactsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.db.createPaymentsDbDriver
@@ -97,19 +98,11 @@ class DatabaseManager(
         }
     }
 
-    suspend fun paymentsDb(): SqlitePaymentsDb {
-        val db = databases.filterNotNull().first()
-        return db.payments
-    }
+    suspend fun paymentsDb(): SqlitePaymentsDb = databases.filterNotNull().first().payments
+    suspend fun cardsDb(): SqliteCardsDb = paymentsDb().cards
+    suspend fun contactsDb(): SqliteContactsDb = paymentsDb().contacts
 
-    suspend fun contactsDb(): SqliteContactsDb {
-        return paymentsDb().contacts
-    }
-
-    suspend fun cloudKitDb(): CloudKitInterface? {
-        val db = databases.filterNotNull().first()
-        return db.cloudKit
-    }
+    suspend fun cloudKitDb(): CloudKitInterface? = databases.filterNotNull().first().cloudKit
 
     companion object {
         fun channelsDbName(chain: Chain, nodeId: PublicKey): String {

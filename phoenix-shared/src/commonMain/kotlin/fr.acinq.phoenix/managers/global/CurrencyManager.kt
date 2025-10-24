@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.managers.global
 
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.info
@@ -223,31 +224,7 @@ class CurrencyManager(
      */
     fun calculateOriginalFiat(currency: FiatCurrency): ExchangeRate.BitcoinPriceRate? {
         val rates = ratesFlow.value
-        val fiatRate = rates.firstOrNull { it.fiatCurrency == currency } ?: return null
-
-        return when (fiatRate) {
-            is ExchangeRate.BitcoinPriceRate -> {
-                // We have a direct exchange rate.
-                // BitcoinPriceRate.rate => The price of 1 BTC in this currency
-                fiatRate
-            }
-            is ExchangeRate.UsdPriceRate -> {
-                // We have an indirect exchange rate.
-                // UsdPriceRate.price => The price of 1 US Dollar in this currency
-                rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull {
-                    it.fiatCurrency == FiatCurrency.USD
-                }?.let { usdRate ->
-                    ExchangeRate.BitcoinPriceRate(
-                        fiatCurrency = currency,
-                        price = usdRate.price * fiatRate.price,
-                        source = "${fiatRate.source}/${usdRate.source}",
-                        timestampMillis = fiatRate.timestampMillis.coerceAtMost(
-                            usdRate.timestampMillis
-                        )
-                    )
-                }
-            }
-        }
+        return exchangeRate(currency, rates)
     }
 
     /**
@@ -419,6 +396,83 @@ class CurrencyManager(
                 nextRefresh = now + delay,
                 failCount = newFailCount
             )
+        }
+    }
+
+    companion object {
+
+        /**
+         * Exchange rates can be confusing.
+         * - BitcoinPriceRate: converts between BTC and fiat
+         * - UsdPriceRate: converts between USD and fiat
+         *
+         * This function takes a list of exchange rates,
+         * and returns a standardized BitcoinPriceRate,
+         * which is easier to work with.
+         */
+        fun exchangeRate(
+            fiatCurrency: FiatCurrency,
+            rates: List<ExchangeRate>
+        ): ExchangeRate.BitcoinPriceRate? {
+
+            val fiatRate = rates.firstOrNull { it.fiatCurrency == fiatCurrency } ?: return null
+
+            return when (fiatRate) {
+                is ExchangeRate.BitcoinPriceRate -> {
+                    // We have a direct exchange rate.
+                    // BitcoinPriceRate.rate => The price of 1 BTC in this currency
+                    fiatRate
+                }
+                is ExchangeRate.UsdPriceRate -> {
+                    // We have an indirect exchange rate.
+                    // UsdPriceRate.price => The price of 1 US Dollar in this currency
+                    rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull {
+                        it.fiatCurrency == FiatCurrency.USD
+                    }?.let { usdRate ->
+                        ExchangeRate.BitcoinPriceRate(
+                            fiatCurrency = fiatCurrency,
+                            price = usdRate.price * fiatRate.price,
+                            source = "${fiatRate.source}/${usdRate.source}",
+                            timestampMillis = fiatRate.timestampMillis.coerceAtMost(
+                                usdRate.timestampMillis
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        /**
+         * Converts the given amount (in MilliSatoshi) into a fiat value.
+         */
+        fun convertToFiat(
+            msat: MilliSatoshi,
+            exchangeRate: ExchangeRate.BitcoinPriceRate
+        ): Double {
+
+            // exchangeRate.price => value of 1.0 BTC in fiat
+            // data class MilliSatoshi(val msat: Long)
+
+            val btc = msat.toLong().toDouble() / 100_000_000_000.0
+            val fiat = btc * exchangeRate.price
+
+            return fiat
+        }
+
+        /**
+         * Converts the given amount (in fiat) into a bitcoin amount.
+         */
+        fun convertToMsat(
+            fiatAmount: Double,
+            exchangeRate: ExchangeRate.BitcoinPriceRate
+        ): MilliSatoshi {
+
+            // exchangeRate.price => value of 1.0 BTC in fiat
+
+            val btc: Double = fiatAmount / exchangeRate.price
+            val msat = (btc * 100_000_000_000.0).toLong()
+
+            return MilliSatoshi(msat)
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-  "originHash" : "653895f3cf5de8736e109a9ddd2552da4dbecc49c096d31ff1dcbb9c5314a3b4",
+  "originHash" : "8748739a34c7f198eabeaf2257b7dc847a116026ae29688e1c68721fe9db7b7f",
   "pins" : [
     {
       "identity" : "abseil-cpp-swiftpm",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "cffe67e293c6493a489d434e52a19e5627bd904e",
         "version" : "0.4.1"
+      }
+    },
+    {
+      "identity" : "dnacommunicator",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ACINQ/DnaCommunicator/",
+      "state" : {
+        "revision" : "be4589e9403f67fc52fce0872ca7a2712f286c5b",
+        "version" : "1.0.1"
       }
     },
     {

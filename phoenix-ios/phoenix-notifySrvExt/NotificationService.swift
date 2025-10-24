@@ -46,6 +46,10 @@ class NotificationService: UNNotificationServiceExtension {
 	private var isConnectedToPeer = false
 	private var receivedPayments: [Lightning_kmpIncomingPayment] = []
 	
+	private var withdrawRequestResult: Result<WithdrawRequestStatus, WithdrawRequestError>? = nil
+	private var withdrawResponseSent: Bool = false
+	private var sentPayment: Lightning_kmpLightningOutgoingPayment? = nil
+
 	private var totalTimer: Timer? = nil
 	private var connectionTimer: Timer? = nil
 	private var postReceivedPaymentTimer: Timer? = nil
@@ -104,13 +108,17 @@ class NotificationService: UNNotificationServiceExtension {
 		// - Amazon Web Services (AWS) (only used for debugging)
 		
 		if let notification = PushNotification.parse(userInfo) {
-					
+			
 			self.pushNotification = notification
 			switch notification {
 			case .fcm(let notification):
 				processNotification_fcm(notification)
+			case .lnurlWithdraw(let notification):
+				Task {
+					await processNotification_lnurlWithdraw(notification)
+				}
 			}
-					
+			
 		} else {
 			
 			log.warning("processNotification(): Failed to parse userInfo as PushNotification")
@@ -122,6 +130,106 @@ class NotificationService: UNNotificationServiceExtension {
 		log.trace(#function)
 		
 		targetNodeIdHash = notification.nodeIdHash
+	}
+	
+	@MainActor
+	private func processNotification_lnurlWithdraw(
+		_ request: LnurlWithdrawNotification
+	) async {
+		log.trace(#function)
+		
+		guard let business else {
+			log.warning("\(#function): business is nil")
+			return
+		}
+		
+		let reject = { @MainActor (error: WithdrawRequestError) async -> Void in
+		
+			// Stop other processing
+			self.stopPhoenix()
+			self.stopXpc()
+			
+			// Send the response to the merchant
+			let _ = await request.postResponse(errorReason: error.description)
+			
+			// And finally, display notification to the user
+			self.finish()
+		}
+		
+		let result = await business.checkWithdrawRequest(request.toWithdrawRequest())
+		withdrawRequestResult = result
+		
+		switch result {
+		case .failure(let error):
+			log.error("\(#function): error: \(error.description)")
+			await reject(error)
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere:
+				log.warning("\(#function): abort: handled elsewhere")
+				finish()
+			
+			case .continueAndSendPayment(let card, _, _):
+				log.debug("\(#function): continue: send payment")
+				
+				guard
+					let peer = business.peerManager.peerStateValue(),
+					let defaultTrampolineFees = peer.walletParams.trampolineFees.first
+				else {
+					return await reject(.internalError(card: card, details: "peer is nil"))
+				}
+				
+				// Send the payment
+				do {
+					try await business.sendManager.payBolt11Invoice(
+						amountToSend   : request.invoiceAmount,
+						trampolineFees : defaultTrampolineFees,
+						invoice        : request.invoice,
+						metadata       : WalletPaymentMetadata.withCard(card.id)
+					)
+				} catch {
+					log.error("SendManager.payBolt11Invoice(): threw error: \(error)")
+					return await reject(.internalError(card: card, details: "payBolt11Invoice failed"))
+				}
+				
+				// We have 2 tasks to finish before we're done:
+				// 1). Send the response to the merchant
+				// 2). Wait for our outgoing payment to complete
+				//
+				// We can perform these in parallel.
+				
+				Task { @MainActor in
+					let _ = await request.postResponse(errorReason: nil)
+					
+					self.withdrawResponseSent = true
+					log.debug("withdrawResponseSent = true")
+					
+					if self.sentPayment != nil {
+						self.finish()
+					}
+				}.store(in: &cancellables)
+				
+				Task { @MainActor in
+					for await payment in business.paymentsManager.lastCompletedPaymentSequence() {
+						if let lnPayment = payment as? Lightning_kmpLightningOutgoingPayment,
+						   let details = lnPayment.details as? Lightning_kmpLightningOutgoingPayment.DetailsNormal
+						{
+							if details.paymentHash == request.invoice.paymentHash {
+								self.sentPayment = lnPayment
+								log.debug("sentPayment = \(lnPayment)")
+								
+								if self.withdrawResponseSent {
+									self.finish()
+									break
+								}
+							}
+						}
+					}
+				}.store(in: &cancellables)
+				
+			} // </switch status>
+		} // </switch result>
 	}
 	
 	// --------------------------------------------------
@@ -325,6 +433,24 @@ class NotificationService: UNNotificationServiceExtension {
 				self?.didReceivePayment(payment)
 			}
 		}.store(in: &cancellables)
+		
+		Task { @MainActor [newBusiness, weak self] in
+			let peer = try await newBusiness.peerManager.getPeer()
+			for await event in peer.eventsFlow {
+				if let msg = event as? Lightning_kmp_coreCardPaymentRequestReceived {
+					log.debug("found event: CardPaymentRequestReceived")
+					
+					if let cardRequest = CardRequest.fromOnionMessage(msg) {
+						Task { @MainActor [weak self] in
+							await self?.handleCardRequest(cardRequest)
+						}
+					} else {
+						log.debug("CardRequest.fromOnionMessage() failed")
+					}
+				}
+			}
+			
+		}.store(in: &cancellables)
 	}
 	
 	private func stopPhoenix() {
@@ -361,12 +487,91 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 	}
 	
+	@MainActor
+	private func handleCardRequest(
+		_ cardRequest: CardRequest
+	) async {
+		log.trace(#function)
+		
+		guard let business else {
+			log.warning("handleCardRequest: business is nil")
+			return
+		}
+		
+		let reject = { @MainActor (error: WithdrawRequestError) async -> Void in
+		
+			// Stop other processing
+			self.stopPhoenix()
+			self.stopXpc()
+			
+			// Display notification to the user
+			self.finish()
+		}
+		
+		let result = await business.checkWithdrawRequest(cardRequest.toWithdrawRequest())
+		withdrawRequestResult = result
+		
+		switch result {
+		case .failure(let error):
+			log.error("\(#function): error: \(error.description)")
+			
+			// Send error message to merchant
+			do {
+				let peer = try await business.peerManager.getPeer()
+				try await peer.sendCardResponse(
+					request : cardRequest.invoice,
+					msg     : error.cardResponseMessage,
+					code    : error.cardResponseCode.rawValue
+				)
+			} catch {
+				log.error("peer.sendCardResponse(): error: \(error)")
+			}
+			
+			await reject(error)
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere(_):
+				log.warning("\(#function): abort: handled elsewhere")
+				
+			case .continueAndSendPayment(let card, _, _):
+				log.debug("\(#function): continue: send payment")
+				
+				// Send payment to merchant
+				do {
+					try await business.sendManager.payUnsolicitedInvoice(
+						invoice: cardRequest.invoice,
+						metadata: WalletPaymentMetadata.withCard(card.id)
+					)
+				} catch {
+					log.error("peer.payUnsolicitedInvoice(): error: \(error)")
+				}
+				
+				// Wait for the outgoing payment to complete
+				Task { @MainActor [weak self] in
+					for await payment in business.paymentsManager.lastCompletedPaymentSequence() {
+						if let lnPayment = payment as? Lightning_kmpLightningOutgoingPayment {
+							if lnPayment.details.paymentHash == cardRequest.invoice.paymentHash {
+								self?.sentPayment = lnPayment
+								log.debug("sentPayment = \(lnPayment)")
+								
+								self?.finish()
+							} else {
+								log.debug("!sentPayment: \(lnPayment)")
+							}
+						}
+					}
+				}.store(in: &cancellables)
+			}
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Finish
 	// --------------------------------------------------
 	
 	private func finish() {
-		log.trace("finish()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard !srvExtDone else {
@@ -375,7 +580,7 @@ class NotificationService: UNNotificationServiceExtension {
 		srvExtDone = true
 		
 		guard let contentHandler, let remoteNotificationContent else {
-			log.error("finish(): invalid state")
+			log.error("\(#function): invalid state")
 			return
 		}
 		
@@ -426,13 +631,17 @@ class NotificationService: UNNotificationServiceExtension {
 					}
 					
 				case .incomingOnionMessage:
-					// This was probably an incoming Bolt 12 payment.
+					// This was probably:
+					// - an incoming Bolt 12 payment
+					// - or a CardPayment request
 					// But it could be anything, so let's code defensively.
 					
 					if let item = NotificationServiceQueue.shared.dequeue() {
 						updateNotificationContent_localNotification(content, item)
 					} else if let payment = popFirstReceivedPayment() {
 						updateNotificationContent_receivedPayment(content, payment)
+					} else if let result = withdrawRequestResult {
+						updateNotificationContent_outgoingPayment(content, result)
 					} else {
 						updateNotificationContent_unknown(content)
 					}
@@ -441,6 +650,14 @@ class NotificationService: UNNotificationServiceExtension {
 					updateNotificationContent_pendingSettlement(content)
 					
 				case .unknown:
+					updateNotificationContent_unknown(content)
+				}
+				
+			case .lnurlWithdraw(_):
+				
+				if let result = withdrawRequestResult {
+					updateNotificationContent_outgoingPayment(content, result)
+				} else {
 					updateNotificationContent_unknown(content)
 				}
 			}
@@ -496,15 +713,16 @@ class NotificationService: UNNotificationServiceExtension {
 		content.title = String(localized: "Received payment", comment: "Push notification title")
 		
 		let groupPrefs = PhoenixManager.shared.groupPrefs()
+		let discreetNotifications = groupPrefs?.discreetNotifications ?? false
 		
-		if let groupPrefs, !groupPrefs.discreetNotifications {
+		if !discreetNotifications {
 			let paymentInfo = WalletPaymentInfo(
 				payment: payment,
 				metadata: WalletPaymentMetadata.empty(),
 				contact: nil
 			)
 			
-			let amountString = formatAmount(groupPrefs, msat: payment.amount.msat)
+			let amountString = formatAmount(msat: payment.amount.msat)
 			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
 				content.body = "\(amountString): \(desc)"
 			} else {
@@ -540,6 +758,144 @@ class NotificationService: UNNotificationServiceExtension {
 		content.body = String(localized: "An incoming settlement is pending.", comment: "")
 	}
 	
+	private func updateNotificationContent_outgoingPayment(
+		_ content: UNMutableNotificationContent,
+		_ result: Result<WithdrawRequestStatus, WithdrawRequestError>
+	) {
+		log.trace(#function)
+		
+		switch result {
+		case .failure(let error):
+			content.title = String(localized: "Payment rejected")
+			
+			switch error {
+			case .unknownCard:
+				content.body = String(localized: "Unknown bolt card")
+				
+			case .replayDetected(let card):
+				content.body = String(localized:
+					"""
+					Replay attempt detected
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .frozenCard(let card):
+				content.body = String(localized:
+					"""
+					Card is frozen
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .dailyLimitExceeded(let card, let amount):
+				let amtStr = Utils.format(currencyAmount: amount).string
+				content.body = String(localized:
+					"""
+					Daily limit exceeded
+					Payment amount: \(amtStr)
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .monthlyLimitExceeded(let card, let amount):
+				let amtStr = Utils.format(currencyAmount: amount).string
+				content.body = String(localized:
+					"""
+					Monthly limit exceeded
+					Payment amount: \(amtStr)
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .badInvoice(let card, let details):
+				content.body = String(localized:
+					"""
+					Bad invoice: \(details)
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .alreadyPaidInvoice(let card):
+				content.body = String(localized:
+					"""
+					You've already paid this invoice
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .paymentPending(let card):
+				content.body = String(localized:
+					"""
+					A payment for this invoice is in-flight
+					Card: \(card.sanitizedName)
+					""")
+				
+			case .internalError(let card, let details):
+				if let card {
+					content.body = String(localized:
+						"""
+						Internal error: \(details)
+						Card: \(card.sanitizedName)
+						""")
+				} else {
+					content.body = String(localized:
+						"""
+						Internal error: \(details)
+						""")
+				}
+			}
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere(let card):
+				content.title = String(localized: "Payment attempt ignored")
+				content.subtitle = card.sanitizedName
+				content.body = String(localized: "Handled elsewhere in the system")
+				
+			case .continueAndSendPayment(let card, let method, let amount):
+					
+				if let sentPayment, let failedStatus = sentPayment.status.asFailed() {
+					
+					content.title = String(localized: "Payment attempt failed")
+						
+					let localizedReason = failedStatus.reason.localizedDescription()
+						
+					if failedStatus.reason is Lightning_kmpFinalFailure.InsufficientBalance {
+						let amountString = formatAmount(msat: amount.msat)
+						content.body = String(localized:
+							"""
+							\(localizedReason)
+							Payment amount: \(amountString)
+							Card: \(card.sanitizedName)
+							""")
+						
+					} else {
+						content.body = String(localized:
+							"""
+							\(localizedReason)
+							Card: \(card.sanitizedName)
+							""")
+					}
+						
+				} else {
+					
+					content.title = String(localized: "Payment successful 💳")
+					let amountString = formatAmount(msat: amount.msat)
+					
+					if let desc = method.description {
+						content.body = String(localized:
+							"""
+							\(amountString)
+							For: \(desc)
+							Card: \(card.sanitizedName) 
+							""")
+					} else {
+						content.body = String(localized:
+							"""
+							\(amountString)
+							Card: \(card.sanitizedName) 
+							""")
+					}
+				}
+			} // </switch status {>
+		} // </switch result>
+	}
+	
 	private func updateNotificationContent_unknown(
 		_ content: UNMutableNotificationContent
 	) {
@@ -564,20 +920,30 @@ class NotificationService: UNNotificationServiceExtension {
 		}
 	}
 	
-	private func formatAmount(_ groupPrefs: GroupPrefs_Wallet, msat: Int64) -> String {
+	private func formatAmount(msat: Int64) -> String {
 		
-		let bitcoinUnit = groupPrefs.bitcoinUnit
-		let fiatCurrency = groupPrefs.fiatCurrency
-		let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
-		
-		let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-		var amountString = bitcoinAmt.string
-		
-		if let exchangeRate {
-			let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-			amountString += " (≈\(fiatAmt.string))"
+		if let groupPrefs = PhoenixManager.shared.groupPrefs() {
+			
+			let bitcoinUnit = groupPrefs.bitcoinUnit
+			let fiatCurrency = groupPrefs.fiatCurrency
+			let exchangeRate = PhoenixManager.shared.exchangeRate(fiatCurrency: fiatCurrency)
+			
+			let bitcoinAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+			var amountString = bitcoinAmt.string
+			
+			if let exchangeRate {
+				let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+				amountString += " (≈\(fiatAmt.string))"
+			}
+			
+			return amountString
+			
+		} else {
+			
+			// Something is wrong - but let's at least display some amount.
+			// We can default to showing the amount in sats.
+			
+			return Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat).string
 		}
-		
-		return amountString
 	}
 }

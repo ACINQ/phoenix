@@ -3,11 +3,14 @@ package fr.acinq.phoenix.db
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.db.SqlDriver
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.data.BoltCardInfo
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.Notification
+import fr.acinq.phoenix.db.cards.BoltCardQueries
 import fr.acinq.phoenix.db.notifications.NotificationsQueries
 import fr.acinq.phoenix.db.sqldelight.AppDatabase
 import fr.acinq.phoenix.db.sqldelight.Exchange_rates
@@ -17,7 +20,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class SqliteAppDb(val driver: SqlDriver) {
+class SqliteAppDb(
+    loggerFactory: LoggerFactory,
+    val driver: SqlDriver
+) {
+    private val log = loggerFactory.newLogger(this::class)
 
     internal val database = AppDatabase(
         driver = driver,
@@ -121,28 +128,55 @@ class SqliteAppDb(val driver: SqlDriver) {
     }
 
     suspend fun getValue(key: String): Pair<ByteArray, Long>? {
-        return keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
-            Pair(it.value_, it.updated_at)
+        return withContext(Dispatchers.Default) {
+            keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
+                Pair(it.value_, it.updated_at)
+            }
         }
     }
 
     suspend fun <T> getValue(key: String, transform: (ByteArray) -> T): Pair<T, Long>? {
-        return keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
-            val tValue = transform(it.value_)
-            Pair(tValue, it.updated_at)
+        return withContext(Dispatchers.Default) {
+            keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
+                val tValue = transform(it.value_)
+                Pair(tValue, it.updated_at)
+            }
         }
     }
 
     suspend fun setValue(value: ByteArray, key: String): Long {
-        return database.transactionWithResult {
-            val exists = keyValueStoreQueries.exists(key).executeAsOne() > 0
-            val now = currentTimestampMillis()
-            if (exists) {
-                keyValueStoreQueries.update(key = key, value_ = value, updated_at = now)
-            } else {
-                keyValueStoreQueries.insert(key = key, value_ = value, updated_at = now)
+        return withContext(Dispatchers.Default) {
+            database.transactionWithResult {
+                val exists = keyValueStoreQueries.exists(key).executeAsOne() > 0
+                val now = currentTimestampMillis()
+                if (exists) {
+                    keyValueStoreQueries.update(key = key, value_ = value, updated_at = now)
+                } else {
+                    keyValueStoreQueries.insert(key = key, value_ = value, updated_at = now)
+                }
+                now
             }
-            now
+        }
+    }
+
+    suspend fun setValueIfUnchanged(value: ByteArray, key: String, lastUpdated: Long?): Long? {
+        return withContext(Dispatchers.Default) {
+            database.transactionWithResult {
+                val updated = keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
+                    it.updated_at
+                }
+                if (updated == lastUpdated) {
+                    val now = currentTimestampMillis()
+                    if (updated != null) {
+                        keyValueStoreQueries.update(key = key, value_ = value, updated_at = now)
+                    } else {
+                        keyValueStoreQueries.insert(key = key, value_ = value, updated_at = now)
+                    }
+                    now
+                } else {
+                    null
+                }
+            }
         }
     }
 

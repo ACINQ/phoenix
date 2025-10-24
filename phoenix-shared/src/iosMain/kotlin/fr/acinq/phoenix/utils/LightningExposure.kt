@@ -13,6 +13,7 @@ import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.ChannelEvents
 import fr.acinq.lightning.DefaultSwapInParams
 import fr.acinq.lightning.Lightning
+import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.NodeEvents
@@ -28,15 +29,21 @@ import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.channel.states.Closed
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.channel.states.Offline
+import fr.acinq.lightning.crypto.KeyManager
 import fr.acinq.lightning.crypto.SwapInOnChainKeys
 import fr.acinq.lightning.db.LightningOutgoingPayment
 import fr.acinq.lightning.io.NativeSocketException
+import fr.acinq.lightning.io.OfferInvoiceReceived
+import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentProgress
 import fr.acinq.lightning.io.PaymentSent
+import fr.acinq.lightning.io.PayOffer
 import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.io.Peer.CardPaymentInfo
 import fr.acinq.lightning.io.PeerEvent
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.payment.OfferManager
@@ -48,9 +55,14 @@ import fr.acinq.lightning.utils.toByteArray
 import fr.acinq.lightning.utils.toNSData
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.lightning.wire.OfferTypes
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import platform.Foundation.NSData
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Class types from lightning-kmp & bitcoin-kmp are not exported to iOS unless we explicitly
@@ -371,4 +383,57 @@ fun UUID.Companion.tryFromString(string: String): UUID? {
     } catch (e: Exception) {
         null
     }
+}
+
+suspend fun Peer.betterPayOffer(
+    paymentId: UUID,
+    amount: MilliSatoshi,
+    offer: OfferTypes.Offer,
+    payerKey: PrivateKey,
+    payerNote: String?,
+    fetchInvoiceTimeoutInSeconds: Int
+): Either<OfferNotPaid, OfferInvoiceReceived> {
+    val res = CompletableDeferred<Either<OfferNotPaid, OfferInvoiceReceived>>()
+    launch {
+        eventsFlow.collect {
+            if (it is OfferNotPaid && it.request.paymentId == paymentId) {
+                res.complete(Either.Left(it))
+                cancel()
+            } else if (it is OfferInvoiceReceived && it.request.paymentId == paymentId) {
+                res.complete(Either.Right(it))
+                cancel()
+            }
+        }
+    }
+    send(PayOffer(paymentId, payerKey, payerNote, amount, offer, fetchInvoiceTimeoutInSeconds.seconds))
+    return res.await()
+}
+
+suspend fun Peer._createInvoice(
+    amount: MilliSatoshi?,
+    description: String,
+    expiryInSeconds: Long
+): Bolt11Invoice {
+    return createInvoice(
+        paymentPreimage = randomBytes32(),
+        amount = amount,
+        description = Either.Left(description),
+        expiry = expiryInSeconds.seconds
+    )
+}
+
+suspend fun Peer._requestCardPayment(
+    amount: MilliSatoshi,
+    description: String,
+    timeoutInSeconds: Long,
+    cardHolderOffer: OfferTypes.Offer,
+    cardParams: String
+): CardPaymentInfo {
+    return requestCardPayment(
+        amount = amount,
+        description = description,
+        timeout = timeoutInSeconds.seconds,
+        cardHolderOffer = cardHolderOffer,
+        cardParams = cardParams
+    )
 }

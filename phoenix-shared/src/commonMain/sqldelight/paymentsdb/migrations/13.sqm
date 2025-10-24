@@ -1,0 +1,46 @@
+-- Migration: v13 -> v14
+--
+-- Changes:
+-- * Added a new table: bolt_cards
+-- * Added a new table: cloudkit_cards_metadata
+-- * Added a new index: record_creation_idx on: cloudkit_cards_metadata
+-- * Added a new table: cloudkit_cards_queue
+
+import kotlin.Boolean;
+
+-- See: BoltCards.sq
+CREATE TABLE IF NOT EXISTS bolt_cards (
+     id TEXT NOT NULL PRIMARY KEY,
+     name TEXT NOT NULL,
+     key0 BLOB NOT NULL,
+     uid BLOB NOT NULL,
+     counter INTEGER NOT NULL,
+     is_frozen INTEGER AS Boolean NOT NULL,
+     is_archived INTEGER AS Boolean NOT NULL,
+     is_reset INTEGER AS Boolean NOT NULL,
+     is_foreign INTEGER AS Boolean NOT NULL,
+     daily_limit_currency TEXT,
+     daily_limit_amount REAL,
+     monthly_limit_currency TEXT,
+     monthly_limit_amount REAL,
+     created_at INTEGER NOT NULL,
+     updated_at INTEGER DEFAULT NULL
+);
+
+-- See: CloudKitCards.sq
+CREATE TABLE IF NOT EXISTS cloudkit_cards_metadata (
+    id TEXT NOT NULL PRIMARY KEY,
+    record_creation INTEGER NOT NULL,
+    record_blob BLOB NOT NULL
+);
+
+-- See: CloudKitCards.sq
+CREATE INDEX IF NOT EXISTS record_creation_idx
+ON cloudkit_cards_metadata(record_creation);
+
+-- See: CloudKitCards.sq
+CREATE TABLE IF NOT EXISTS cloudkit_cards_queue (
+    rowid INTEGER PRIMARY KEY,
+    id TEXT NOT NULL,
+    date_added INTEGER NOT NULL
+);

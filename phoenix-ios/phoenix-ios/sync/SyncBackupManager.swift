@@ -95,7 +95,8 @@ class SyncBackupManager: @unchecked Sendable {
 			isEnabled: prefs.backupTransactions.isEnabled,
 			recordZoneCreated: prefs.backupTransactions.recordZoneCreated,
 			hasDownloadedPayments: prefs.backupTransactions.hasDownloadedPayments,
-			hasDownloadedContacts: prefs.backupTransactions.hasDownloadedContacts
+			hasDownloadedContacts: prefs.backupTransactions.hasDownloadedContacts,
+			hasDownloadedCards: prefs.backupTransactions.hasDownloadedCards
 		)
 		
 		waitForDatabases()
@@ -258,28 +259,36 @@ class SyncBackupManager: @unchecked Sendable {
 		
 		log.trace("state = \(newState)")
 		switch newState {
-			case .updatingCloud(let details):
-				switch details.kind {
-					case .creatingRecordZone:
-						createRecordZone(details)
-					case .deletingRecordZone:
-						deleteRecordZone(details)
-				}
-			case .downloading(let details):
-				if details.needsDownloadPayments {
-					downloadPayments(details)
-				}
-				if details.needsDownloadContacts {
-					downloadContacts(details)
-				}
-			case .uploading(let details):
-				if details.payments_pendingCount > 0 {
-					uploadPayments(details)
-				} else {
-					uploadContacts(details)
-				}
-			default:
-				break
+		case .updatingCloud(let details):
+			switch details.kind {
+			case .creatingRecordZone:
+				createRecordZone(details)
+			case .deletingRecordZone:
+				deleteRecordZone(details)
+			}
+		
+		case .downloading(let details):
+			if details.needsDownloadPayments {
+				downloadPayments(details)
+			}
+			if details.needsDownloadContacts {
+				downloadContacts(details)
+			}
+			if details.needsDownloadCards {
+				downloadCards(details)
+			}
+		
+		case .uploading(let details):
+			if details.payments_pendingCount > 0 {
+				uploadPayments(details)
+			} else if details.contacts_pendingCount > 0 {
+				uploadContacts(details)
+			} else {
+				uploadCards(details)
+			}
+		
+		default:
+			break
 		}
 		
 		publishNewState(newState)
@@ -306,6 +315,7 @@ class SyncBackupManager: @unchecked Sendable {
 					self.startPaymentsQueueCountMonitor()
 					self.startPaymentsMigrations()
 					self.startContactsQueueCountMonitor()
+					self.startCardsQueueCountMonitor()
 					self.startPreferencesMonitor()
 				}
 				
