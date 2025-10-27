@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.auth.spendinglock
+package fr.acinq.phoenix.android.components.auth.screenlock
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.globalPrefs
 
 @Composable
-fun CheckSpendingPinFlow(
-    walletId: WalletId,
+fun CheckHiddenLockPinFlow(
     onCancel: () -> Unit,
     onPinValid: (WalletId) -> Unit,
-    prompt: @Composable () -> Unit,
+    prompt: @Composable () -> Unit = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_screenlock_title)) }
 ) {
-    val walletMetadataMap = globalPrefs.getAvailableWalletsMeta.collectAsState(null)
-    val walletMetadata = walletMetadataMap.value?.get(walletId)
-
-    val vm = viewModel<CheckSpendingPinViewModel>(factory = CheckSpendingPinViewModel.Factory(application, walletId), key = walletId.nodeIdHash)
-    CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt, walletId = walletId, walletMetadata = walletMetadata)
+    val vm = viewModel<CheckHiddenLockPinViewModel>(factory = CheckHiddenLockPinViewModel.Factory(application))
+    CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt, walletId = null, walletMetadata = null)
 }

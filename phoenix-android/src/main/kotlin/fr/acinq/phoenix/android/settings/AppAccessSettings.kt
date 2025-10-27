@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
@@ -40,6 +41,7 @@ import fr.acinq.phoenix.android.components.auth.screenlock.NewScreenLockPinFlow
 import fr.acinq.phoenix.android.components.auth.spendinglock.CheckSpendingPinFlow
 import fr.acinq.phoenix.android.components.auth.spendinglock.NewSpendingPinFlow
 import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.CardHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -203,20 +205,21 @@ private fun ScreenLockCustomPinView(
 ) {
     val context = LocalContext.current
     val userPrefs = LocalUserPrefs.current ?: return
-    var errorMessage by remember { mutableStateOf("") }
+    val globalPrefs = application.globalPrefs
     val scope = rememberCoroutineScope()
 
     var isInNewPinFlow by rememberSaveable { mutableStateOf(false) }
     var isInDisablingCustomPinFlow by rememberSaveable { mutableStateOf(false) }
+    val walletMetadataMap by globalPrefs.getAvailableWalletsMeta.collectAsState(null)
+    val walletMetadata = walletMetadataMap?.let { it[walletId] }
 
     SettingSwitch(
         title = stringResource(id = R.string.accessctrl_screenlock_pin_label),
         description = stringResource(id = R.string.accessctrl_screenlock_pin_desc),
         icon = R.drawable.ic_pin,
-        enabled = !isInDisablingCustomPinFlow && !isInNewPinFlow,
+        enabled = walletMetadata != null && !isInDisablingCustomPinFlow && !isInNewPinFlow,
         isChecked = isCustomPinLockEnabled,
         onCheckChangeAttempt = { isChecked ->
-            errorMessage = ""
             if (isChecked) {
                 // user is enabling custom PIN
                 isInNewPinFlow = true
@@ -235,32 +238,40 @@ private fun ScreenLockCustomPinView(
                     userPrefs.saveIsScreenLockPinEnabled(true)
                     isInNewPinFlow = false
                 }
-                Toast.makeText(context, "Pin code saved!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.accessctrl_screenlock_saved), Toast.LENGTH_SHORT).show()
             }
         )
     }
 
     if (isInDisablingCustomPinFlow) {
-        CheckScreenLockPinFlow(
-            walletId = walletId,
-            onCancel = { isInDisablingCustomPinFlow = false },
-            onPinValid = {
-                scope.launch {
-                    userPrefs.saveIsScreenLockPinEnabled(false)
+        if (walletMetadata == null) return
+        var showHiddenWalletWarningDialog by remember { mutableStateOf(walletMetadata.isHidden) }
+        if (showHiddenWalletWarningDialog) {
+            ConfirmDialog(
+                title = stringResource(R.string.accessctrl_screenlock_hiddenwallet_dialog_title),
+                message = stringResource(R.string.accessctrl_screenlock_hiddenwallet_dialog_body),
+                onDismiss = {
+                    showHiddenWalletWarningDialog = false
                     isInDisablingCustomPinFlow = false
-                }
-                Toast.makeText(context, "Pin disabled", Toast.LENGTH_SHORT).show()
-            },
-            prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
-        )
-    }
-
-    if (errorMessage.isNotBlank()) {
-        Text(
-            text = errorMessage,
-            modifier = Modifier.padding(start = 46.dp, top = 0.dp, bottom = 16.dp, end = 16.dp),
-            color = negativeColor,
-        )
+                },
+                onConfirm = { showHiddenWalletWarningDialog = false }
+            )
+        } else {
+            CheckScreenLockPinFlow(
+                walletId = walletId,
+                acceptHiddenPin = false,
+                onCancel = { isInDisablingCustomPinFlow = false },
+                onPinValid = {
+                    scope.launch {
+                        userPrefs.saveIsScreenLockPinEnabled(false)
+                        globalPrefs.saveAvailableWalletMeta(walletMetadata.copy(isHidden = false))
+                        isInDisablingCustomPinFlow = false
+                    }
+                    Toast.makeText(context, context.getString(R.string.accessctrl_screenlock_disabled), Toast.LENGTH_SHORT).show()
+                },
+                prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
+            )
+        }
     }
 }
 
@@ -300,7 +311,7 @@ private fun SpendLockCustomPinView(walletId: WalletId, isSpendingPinEnabled: Boo
                     userPrefs.saveIsSpendLockPinEnabled(true)
                     isNewPinFlow = false
                 }
-                Toast.makeText(context, "Spending PIN saved!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.accessctrl_spendlock_saved), Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -314,7 +325,7 @@ private fun SpendLockCustomPinView(walletId: WalletId, isSpendingPinEnabled: Boo
                     userPrefs.saveIsSpendLockPinEnabled(false)
                     isDisablingPinFlow = false
                 }
-                Toast.makeText(context, "Spending PIN disabled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.accessctrl_spendlock_disabled), Toast.LENGTH_SHORT).show()
             },
             prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
         )
@@ -335,9 +346,9 @@ private fun AutoScreenLockDelayPicker(
     onUpdateDelay: (Duration) -> Unit,
 ) {
     val preferences = listOf(
-        PreferenceItem(item = 1.minutes, title = "1 minute"),
-        PreferenceItem(item = 10.minutes, title = "10 minutes"),
-        PreferenceItem(item = Duration.INFINITE, title = "Never"),
+        PreferenceItem(item = 1.minutes, title = stringResource(R.string.accessctrl_autolock_desc_1min)),
+        PreferenceItem(item = 10.minutes, title = stringResource(R.string.accessctrl_autolock_desc_10min)),
+        PreferenceItem(item = Duration.INFINITE, title = stringResource(R.string.accessctrl_autolock_desc_never)),
     )
     ListPreferenceButton(
         title = stringResource(id = R.string.accessctrl_autolock_label),

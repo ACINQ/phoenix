@@ -27,16 +27,24 @@ import fr.acinq.phoenix.android.components.auth.pincode.CheckPinFlow
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
 import fr.acinq.phoenix.android.globalPrefs
 
+/**
+ * @param walletId the wallet we are trying to unlock
+ * @param acceptHiddenPin whether entering a hidden lock pin should be accepted or not. Should be false
+ *          in most screens, and true in the startup screen.
+ * @param onPinValid callback called with the id of the wallet to unlock. Note that this id may be
+ *          different from [walletId], if [acceptHiddenPin] is true and the user entered a hidden pin.
+ */
 @Composable
 fun CheckScreenLockPinFlow(
     walletId: WalletId,
+    acceptHiddenPin: Boolean,
     onCancel: () -> Unit,
-    onPinValid: () -> Unit,
+    onPinValid: (WalletId) -> Unit,
     prompt: @Composable () -> Unit = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_screenlock_title)) }
 ) {
     val walletMetadataMap = globalPrefs.getAvailableWalletsMeta.collectAsState(null)
     val walletMetadata = walletMetadataMap.value?.get(walletId)
 
-    val vm = viewModel<CheckScreenLockPinViewModel>(factory = CheckScreenLockPinViewModel.Factory(application, walletId), key = walletId.nodeIdHash)
+    val vm = viewModel<CheckScreenLockPinViewModel>(factory = CheckScreenLockPinViewModel.Factory(application, walletId, acceptHiddenPin = acceptHiddenPin), key = walletId.nodeIdHash)
     CheckPinFlow(onCancel = onCancel, onPinValid = onPinValid, vm = vm, prompt = prompt, walletId = walletId, walletMetadata = walletMetadata)
 }

@@ -26,9 +26,9 @@ import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 @Composable
 fun CheckPinFlow(
     onCancel: () -> Unit,
-    onPinValid: () -> Unit,
+    onPinValid: (WalletId) -> Unit,
     vm: CheckPinViewModel,
-    walletId: WalletId,
+    walletId: WalletId?,
     walletMetadata: UserWalletMetadata?,
     prompt: @Composable () -> Unit,
 ) {

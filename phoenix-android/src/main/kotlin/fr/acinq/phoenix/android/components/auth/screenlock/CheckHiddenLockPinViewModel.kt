@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 ACINQ SAS
+ * Copyright 2024 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.components.auth.spendinglock
+package fr.acinq.phoenix.android.components.auth.screenlock
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.auth.pincode.CheckPinState
@@ -26,39 +27,29 @@ import fr.acinq.phoenix.android.components.auth.pincode.CheckPinViewModel
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialog.PIN_LENGTH
 import fr.acinq.phoenix.android.security.PinManager
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class CheckSpendingPinViewModel(override val application: PhoenixApplication, val walletId: WalletId) : CheckPinViewModel() {
-
-    val userPrefs: UserPrefs by lazy { DataStoreManager.loadUserPrefsForWallet(context = application.applicationContext, walletId) }
+class CheckHiddenLockPinViewModel(override val application: PhoenixApplication) : CheckPinViewModel() {
 
     init {
         viewModelScope.launch { monitorPinCodeAttempts() }
     }
 
     override suspend fun getPinCodeAttempt(): Flow<Int> {
-        return userPrefs.getSpendingPinCodeAttempt
+        return application.globalPrefs.getHiddenLockPinCodeAttempt
     }
 
-    suspend fun savePinCodeSuccess() {
-        userPrefs.saveSpendingPinCodeSuccess()
+    suspend fun savePinCodeSuccess(walletId: WalletId) {
+        application.globalPrefs.saveHiddenLockPinCodeSuccess()
+        DataStoreManager.loadUserPrefsForWallet(context = application.applicationContext, walletId = walletId).saveLockPinCodeSuccess()
     }
 
     suspend fun savePinCodeFailure() {
-        userPrefs.saveSpendingPinCodeFailure()
-    }
-
-    fun getExpectedPin(): String? {
-        return PinManager.getSpendingPinMapFromDisk(application.applicationContext)[walletId]
-    }
-
-    suspend fun resetPinPrefs() {
-        userPrefs.saveIsSpendLockPinEnabled(false)
-        userPrefs.saveSpendingPinCodeSuccess()
+        application.globalPrefs.saveHiddenLockPinCodeFailure()
     }
 
     override fun checkPinAndSaveOutcome(pin: String, onPinValid: (WalletId) -> Unit) {
@@ -74,34 +65,31 @@ class CheckSpendingPinViewModel(override val application: PhoenixApplication, va
                     savePinCodeFailure()
                 }
 
-                val expected = getExpectedPin()
-                when {
-                    expected == null -> {
-                        log.info("no expected pin for $walletId, aborting pin-check and reset pin settings")
-                        resetPinPrefs()
-                        viewModelScope.launch(Dispatchers.Main) {
-                            onPinValid(walletId)
-                        }
-                    }
-                    pin == expected -> {
-                        log.debug("valid pin")
-                        delay(20)
-                        savePinCodeSuccess()
-                        pinInput = ""
-                        state = CheckPinState.CanType
-                        viewModelScope.launch(Dispatchers.Main) {
-                            onPinValid(walletId)
-                        }
-                    }
-                    else -> {
-                        log.debug("incorrect pin")
+                val pinMap = PinManager.getLockPinMapFromDisk(application.applicationContext)
+                val metadata = application.globalPrefs.getAvailableWalletsMeta.first()
+                // we only consider hidden wallets!
+                val firstMatch = pinMap.filter { (walletId, walletPin) -> pin == walletPin && metadata[walletId]?.isHidden == true }.entries.firstOrNull()
+
+                when (firstMatch) {
+                    null -> {
                         delay(80)
                         state = CheckPinState.IncorrectPin
                         delay(1300)
                         pinInput = ""
                         savePinCodeFailure()
                     }
+                    else -> {
+                        log.debug("found pin for {}", firstMatch.key)
+                        delay(20)
+                        savePinCodeSuccess(firstMatch.key)
+                        pinInput = ""
+                        state = CheckPinState.CanType
+                        viewModelScope.launch(Dispatchers.Main) {
+                            onPinValid(firstMatch.key)
+                        }
+                    }
                 }
+
             } catch (e: Exception) {
                 log.error("error when checking pin code: ", e)
                 state = CheckPinState.Error(e)
@@ -111,10 +99,10 @@ class CheckSpendingPinViewModel(override val application: PhoenixApplication, va
         }
     }
 
-    class Factory(val application: PhoenixApplication, val walletId: WalletId) : ViewModelProvider.Factory {
+    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return CheckSpendingPinViewModel(application, walletId) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            return CheckHiddenLockPinViewModel(application) as T
         }
     }
 }

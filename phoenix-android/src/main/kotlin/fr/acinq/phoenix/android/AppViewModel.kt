@@ -42,9 +42,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -68,7 +66,7 @@ sealed class ListWalletState {
 }
 
 sealed class BaseWalletId
-data object EmptyWalletId: BaseWalletId()
+data object UnknownWalletId: BaseWalletId()
 /** Wraps a nodeIdHash (hash160 of a nodeId). Easier to maintain and upgrade than a plain String. */
 @Serializable
 data class WalletId(val nodeIdHash: String): BaseWalletId() {

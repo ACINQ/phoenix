@@ -67,6 +67,7 @@ import fr.acinq.phoenix.android.UserWallet
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.HSeparator
+import fr.acinq.phoenix.android.components.auth.screenlock.CheckHiddenLockPinFlow
 import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -84,6 +85,7 @@ import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.android.utils.shareFile
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.collections.get
 
 
 @Composable
@@ -103,7 +105,9 @@ fun StartupView(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         contentAlignment = Alignment.Center
     ) {
 
@@ -170,7 +174,21 @@ fun StartupView(
                                                 Spacer(Modifier.height(16.dp))
                                             },
                                             bottomContent = {
-                                                Spacer(Modifier.height(128.dp))
+                                                Column {
+                                                    Spacer(Modifier.height(128.dp))
+                                                }
+                                            }
+                                        )
+                                        UnlockHiddenWallet(
+                                            onPinValid = { walletId ->
+                                                availableWallets[walletId]?.let { userWallet ->
+                                                    loadingWallet = userWallet
+                                                    startupViewModel.startupNode(walletId = userWallet.walletId, words = userWallet.words, onStartupSuccess = {
+                                                        appViewModel.setActiveWallet(walletId = userWallet.walletId, business = it)
+                                                        onWalletReady()
+                                                    })
+                                                    loadingWallet = null
+                                                }
                                             }
                                         )
                                     }
@@ -180,12 +198,15 @@ fun StartupView(
                                             userWallet = wallet,
                                             metadata = metadata,
                                             promptScreenLockImmediately = startWalletImmediately,
-                                            doLoadWallet = { userWallet ->
-                                                startupViewModel.startupNode(walletId = userWallet.walletId, words = userWallet.words, onStartupSuccess = {
-                                                    appViewModel.setActiveWallet(walletId = userWallet.walletId, business = it)
-                                                    onWalletReady()
-                                                })
-                                                loadingWallet = null
+                                            doLoadWallet = { walletId ->
+                                                availableWallets[walletId]?.let { userWallet ->
+                                                    loadingWallet = userWallet
+                                                    startupViewModel.startupNode(walletId = userWallet.walletId, words = userWallet.words, onStartupSuccess = {
+                                                        appViewModel.setActiveWallet(walletId = userWallet.walletId, business = it)
+                                                        onWalletReady()
+                                                    })
+                                                    loadingWallet = null
+                                                }
                                             },
                                             // only show back-to-selector button if there's more than one wallet
                                             goToWalletSelector = availableWallets.takeIf { it.size > 1 }?.let {
@@ -226,7 +247,9 @@ private fun WalletStartupView(
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
-            modifier = Modifier.size(64.dp).clip(CircleShape),
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             if (metadata == null) {
@@ -330,7 +353,7 @@ private fun BoxScope.LoadWallet(
     userWallet: UserWallet,
     metadata: UserWalletMetadata,
     promptScreenLockImmediately: Boolean,
-    doLoadWallet: (UserWallet) -> Unit,
+    doLoadWallet: (WalletId) -> Unit,
     goToWalletSelector: (() -> Unit)?
 ) {
     val context = LocalContext.current
@@ -359,7 +382,7 @@ private fun BoxScope.LoadWallet(
                 walletId = userWallet.walletId,
                 walletName = metadata.nameOrDefault(),
                 promptScreenLockImmediately = promptScreenLockImmediately,
-                onUnlock = { doLoadWallet(userWallet) },
+                onUnlock = doLoadWallet,
                 onLock = { },
                 goToWalletSelector = goToWalletSelector,
             )
@@ -367,9 +390,36 @@ private fun BoxScope.LoadWallet(
         false -> {
             WalletStartupView(text = stringResource(id = R.string.startup_starting), metadata = metadata)
             LaunchedEffect(Unit) {
-                doLoadWallet(userWallet)
+                doLoadWallet(userWallet.walletId)
             }
         }
+    }
+}
+
+/** Similar to LoadWallet above, but restricted to the custom pin lock dialog. */
+@Composable
+private fun BoxScope.UnlockHiddenWallet(
+    onPinValid: (WalletId) -> Unit
+) {
+    Column(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
+        var showPinLockDialog by rememberSaveable { mutableStateOf(false) }
+        if (showPinLockDialog) {
+            CheckHiddenLockPinFlow(
+                onCancel = { showPinLockDialog = false },
+                onPinValid = onPinValid
+            )
+        }
+        Spacer(Modifier.height(16.dp))
+        TransparentFilledButton(
+            text = stringResource(id = R.string.lockprompt_pin_button),
+            icon = R.drawable.ic_pin,
+            textStyle = MaterialTheme.typography.caption,
+            iconTint = MaterialTheme.typography.caption.color,
+            onClick = { showPinLockDialog = true },
+            modifier = Modifier.fillMaxWidth(),
+            padding = PaddingValues(16.dp),
+        )
+        Spacer(Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
     }
 }
 
@@ -379,7 +429,7 @@ private fun BoxScope.ScreenLockPrompt(
     walletName: String,
     promptScreenLockImmediately: Boolean,
     onLock: () -> Unit,
-    onUnlock: () -> Unit,
+    onUnlock: (WalletId) -> Unit,
     goToWalletSelector: (() -> Unit)?,
 ) {
     val context = LocalContext.current
@@ -401,7 +451,7 @@ private fun BoxScope.ScreenLockPrompt(
             activity = context.findActivity(),
             onSuccess = {
                 scope.launch { userPrefs.saveLockPinCodeSuccess() }
-                onUnlock()
+                onUnlock(walletId)
             },
             onFailure = { onLock() },
             onCancel = { }
@@ -412,8 +462,9 @@ private fun BoxScope.ScreenLockPrompt(
     if (showPinLockDialog) {
         CheckScreenLockPinFlow(
             walletId = walletId,
+            acceptHiddenPin = true,
             onCancel = { showPinLockDialog = false },
-            onPinValid = { onUnlock() }
+            onPinValid = onUnlock
         )
     }
 
@@ -428,7 +479,9 @@ private fun BoxScope.ScreenLockPrompt(
     }
 
     Column(
-        modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

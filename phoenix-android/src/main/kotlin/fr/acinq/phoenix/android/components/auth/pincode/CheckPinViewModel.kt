@@ -21,14 +21,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.acinq.phoenix.android.BaseWalletId
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.UnknownWalletId
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialog.PIN_LENGTH
+import fr.acinq.phoenix.android.security.PinManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -52,19 +56,13 @@ sealed class CheckPinState {
 abstract class CheckPinViewModel() : ViewModel() {
 
     abstract val application: PhoenixApplication
-    abstract val walletId: WalletId
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
     var state by mutableStateOf<CheckPinState>(CheckPinState.Init)
-        private set
 
     var pinInput by mutableStateOf("")
 
     abstract suspend fun getPinCodeAttempt(): Flow<Int>
-    abstract suspend fun savePinCodeSuccess()
-    abstract suspend fun savePinCodeFailure()
-    abstract suspend fun getExpectedPin(): String?
-    abstract suspend fun resetPinPrefs()
 
     suspend fun monitorPinCodeAttempts() {
         var countdownJob: Job? = null
@@ -106,53 +104,11 @@ abstract class CheckPinViewModel() : ViewModel() {
         }
     }
 
-    fun checkPinAndSaveOutcome(pin: String, onPinValid: () -> Unit) {
-        if (state is CheckPinState.Checking || state is CheckPinState.Locked) return
-        state = CheckPinState.Checking
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (pin.isBlank() || pin.length != PIN_LENGTH) {
-                    log.debug("malformed pin")
-                    state = CheckPinState.MalformedInput
-                    delay(1300)
-                    savePinCodeFailure()
-                }
-
-                val expected = getExpectedPin()
-                when {
-                    expected == null -> {
-                        log.info("no expected pin for $walletId, aborting pin-check and reset pin settings")
-                        resetPinPrefs()
-                        viewModelScope.launch(Dispatchers.Main) {
-                            onPinValid()
-                        }
-                    }
-                    pin == expected -> {
-                        log.debug("valid pin")
-                        delay(20)
-                        savePinCodeSuccess()
-                        pinInput = ""
-                        state = CheckPinState.CanType
-                        viewModelScope.launch(Dispatchers.Main) {
-                            onPinValid()
-                        }
-                    }
-                    else -> {
-                        log.debug("incorrect pin")
-                        delay(80)
-                        state = CheckPinState.IncorrectPin
-                        delay(1300)
-                        pinInput = ""
-                        savePinCodeFailure()
-                    }
-                }
-            } catch (e: Exception) {
-                log.error("error when checking pin code: ", e)
-                state = CheckPinState.Error(e)
-                delay(1300)
-                savePinCodeFailure()
-            }
-        }
-    }
+    /**
+     * Tests the provided [pin] against the expected pin, and saves the attempt outcome in the relevant preference.
+     *
+     * @param pin a pin code, should be [PIN_LENGTH] long
+     * @param onPinValid the parameter is a wallet id because the unlocked wallet may be different from the expected one (hidden wallet).
+     */
+    abstract fun checkPinAndSaveOutcome(pin: String, onPinValid: (WalletId) -> Unit)
 }

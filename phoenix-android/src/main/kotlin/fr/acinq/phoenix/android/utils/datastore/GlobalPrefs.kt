@@ -27,7 +27,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BaseWalletId
-import fr.acinq.phoenix.android.EmptyWalletId
+import fr.acinq.phoenix.android.UnknownWalletId
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.utils.UserTheme
@@ -60,6 +60,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         // tracks which wallet the app should try to load first, may be null
         private val DEFAULT_WALLET_ID = stringPreferencesKey("DEFAULT_WALLET_ID")
         private val AVAILABLE_WALLETS_META = stringPreferencesKey("AVAILABLE_WALLETS_META")
+        val HIDDEN_WALLET_ATTEMPTS_COUNT = intPreferencesKey("HIDDEN_WALLET_ATTEMPTS_COUNT")
 
         // the FCM token is global for the application and is shared across node_ids
         private val FCM_TOKEN = stringPreferencesKey("FCM_TOKEN")
@@ -112,7 +113,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         it[AVAILABLE_WALLETS_META] = jsonFormat.encodeToString(newMap.map { it.key.nodeIdHash to it.value }.toMap())
     }
 
-    val getDefaultWallet: Flow<BaseWalletId> = safeData.map { it[DEFAULT_WALLET_ID]?.let { WalletId(it) } ?: EmptyWalletId }
+    val getDefaultWallet: Flow<BaseWalletId> = safeData.map { it[DEFAULT_WALLET_ID]?.let { WalletId(it) } ?: UnknownWalletId }
     suspend fun saveDefaultWallet(walletId: WalletId) = data.edit { it[DEFAULT_WALLET_ID] = walletId.nodeIdHash }
     suspend fun clearDefaultWallet() = data.edit { it.remove(DEFAULT_WALLET_ID) }
 
@@ -137,6 +138,17 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
     /** Fallback theme used when no wallet theme is available yet. Set to the theme used by last active wallet. */
     val getFallbackTheme: Flow<UserTheme> = safeData.map { UserTheme.safeValueOf(it[APP_THEME_FALLBACK]) }
     suspend fun saveFallbackTheme(theme: UserTheme) = data.edit { it[APP_THEME_FALLBACK] = theme.name }
+
+    /** Get attempt count for hidden wallets. Attempts for specific wallets are stored in UserPrefs. */
+    val getHiddenLockPinCodeAttempt: Flow<Int> = safeData.map {
+        it[HIDDEN_WALLET_ATTEMPTS_COUNT] ?: 0
+    }
+    suspend fun saveHiddenLockPinCodeFailure() = data.edit {
+        it[HIDDEN_WALLET_ATTEMPTS_COUNT] = (it[HIDDEN_WALLET_ATTEMPTS_COUNT] ?: 0) + 1
+    }
+    suspend fun saveHiddenLockPinCodeSuccess() = data.edit {
+        it[HIDDEN_WALLET_ATTEMPTS_COUNT] = 0
+    }
 }
 
 @Serializable

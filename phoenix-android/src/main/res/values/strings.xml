@@ -582,14 +582,22 @@
     <string name="accessctrl_screenlock_biometrics_desc">Secures app entry behind the Android user credentials</string>
     <string name="accessctrl_screenlock_pin_label">Lock PIN</string>
     <string name="accessctrl_screenlock_pin_desc">Secures app entry behind a 6-digits PIN code</string>
+    <string name="accessctrl_screenlock_hiddenwallet_dialog_title">Wallet is hidden</string>
+    <string name="accessctrl_screenlock_hiddenwallet_dialog_body">If you disable the Lock PIN, the wallet will be visible.</string>
+    <string name="accessctrl_screenlock_saved">Lock PIN saved!</string>
+    <string name="accessctrl_screenlock_disabled">Lock PIN disabled</string>
 
     <string name="accessctrl_autolock_label">Lock timeout</string>
     <string name="accessctrl_autolock_desc">After %1$s minute(s) of inactivity</string>
+    <string name="accessctrl_autolock_desc_1min">1 minute</string>
+    <string name="accessctrl_autolock_desc_10min">10 minutes</string>
     <string name="accessctrl_autolock_desc_never">Never</string>
 
     <string name="accessctrl_spendlock_header">Sending payments</string>
     <string name="accessctrl_spendlock_pin_label">Spending PIN</string>
     <string name="accessctrl_spendlock_pin_desc">If enabled, a PIN code is required to spend funds from the wallet.</string>
+    <string name="accessctrl_spendlock_saved">Spending PIN saved!</string>
+    <string name="accessctrl_spendlock_disabled">Spending PIN disabled</string>
 
     <string name="accessctrl_misc_header">Misc</string>
     <string name="accessctrl_shuffle_pin">Shuffle PIN keypad</string>
@@ -1007,12 +1015,19 @@
     <string name="wallet_add_new">Add new wallet</string>
     <string name="wallet_lock">Lock</string>
 
-
     <string name="wallet_edit_name_placeholder">Enter a name</string>
     <string name="wallet_edit_default_label">Default Wallet</string>
     <string name="wallet_edit_default_description">If a default wallet is selected, it will be automatically opened on app launch.</string>
-    <string name="wallet_edit_secret_label">Hidden Wallet (WIP)</string>
+    <string name="wallet_edit_secret_label">Hidden Wallet</string>
     <string name="wallet_edit_secret_description">Wallet will not be visible in selector screens. To access the wallet, you must enter its lock PIN.</string>
+    <string name="wallet_edit_secret_description_disabled">To enable this feature, first define a Lock PIN for this wallet.</string>
     <string name="wallet_edit_pick_avatar">Pick an avatar</string>
+
+    <string name="wallet_hide_instructions_1">Enabling this option will hide the wallet from the selector screen.</string>
+    <string name="wallet_hide_instructions_2">Only by entering its PIN code will you be able to open this wallet.</string>
+    <string name="wallet_hide_instructions_3">This feature pairs well with a secondary, less sensitive wallet that is also using a Lock PIN code.</string>
+    <string name="wallet_hide_confirm_button">Hide the wallet</string>
+    <string name="wallet_hide_confirm_body">Are you sure you want to hide the wallet?</string>
+    <string name="wallet_hide_cancel_button">Nevermind</string>
 
 </resources>

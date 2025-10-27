@@ -37,9 +37,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,7 +48,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.TextWithIcon
@@ -59,20 +58,23 @@ import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
+import kotlinx.coroutines.flow.first
 
 @Composable
 internal fun BasePinDialog(
     prompt: @Composable () -> Unit,
     stateLabel: (@Composable () -> Unit)?,
-    walletId: WalletId,
+    walletId: WalletId?,
     walletMetadata: UserWalletMetadata?,
     onDismiss: () -> Unit,
     onPinSubmit: (String) -> Unit,
     enabled: Boolean,
     initialPin: String = "",
 ) {
-    val userPrefs = DataStoreManager.loadUserPrefsForWallet(LocalContext.current, walletId)
-    val isPinShuffled = userPrefs.getIsPinKeyboardShuffled.collectAsState(null)
+    val context = LocalContext.current
+    val isPinShuffled = produceState<Boolean?>(initialValue = null, key1 = walletId) {
+        value = walletId?.let { DataStoreManager.loadUserPrefsForWallet(context, walletId).getIsPinKeyboardShuffled.first() }
+    }
     var pinValue by remember(initialPin) { mutableStateOf(initialPin) }
 
     ModalBottomSheet(

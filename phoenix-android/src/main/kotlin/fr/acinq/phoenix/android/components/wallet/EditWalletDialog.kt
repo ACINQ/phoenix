@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,8 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
+import fr.acinq.phoenix.android.components.auth.screenlock.CheckScreenLockPinFlow
+import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.buttons.SwitchView
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -46,6 +52,7 @@ import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.launch
 
@@ -55,6 +62,8 @@ fun EditWalletDialog(
     metadata: UserWalletMetadata,
     onDismiss: () -> Unit,
 ) {
+    val userPrefs = LocalUserPrefs.current ?: return
+
     ModalBottomSheet(
         onDismiss = onDismiss,
         containerColor = MaterialTheme.colors.background,
@@ -66,10 +75,14 @@ fun EditWalletDialog(
 
         var nameInput by remember { mutableStateOf(metadata.name ?: "") }
         var avatarInput by remember { mutableStateOf(metadata.avatar) }
-        val defaultWalletPref by globalPrefs.getDefaultWallet.collectAsState(null)
-        val isDefaultWalletInPref = remember(defaultWalletPref) { defaultWalletPref == walletId }
+        val defaultWalletInPref by globalPrefs.getDefaultWallet.collectAsState(null)
+        val isDefaultWalletInPref = remember(defaultWalletInPref) { defaultWalletInPref == walletId }
         var isDefaultWalletInput by remember(isDefaultWalletInPref) { mutableStateOf(isDefaultWalletInPref) }
-//        var isHiddenWallet by remember { mutableStateOf(metadata.isHidden) }
+
+        var isHiddenWallet by remember { mutableStateOf(metadata.isHidden) }
+        val isCustomPinLockEnabled by userPrefs.getLockPinEnabled.collectAsState(null)
+
+        var showEnableHiddenWalletDialog by remember { mutableStateOf(false) }
 
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
             AvatarPicker(
@@ -91,46 +104,113 @@ fun EditWalletDialog(
             SwitchView(
                 text = stringResource(R.string.wallet_edit_default_label),
                 description = stringResource(R.string.wallet_edit_default_description),
+                // this input is disabled if the wallet is not already the default, and it is hidden
+                enabled = !(isHiddenWallet && !isDefaultWalletInPref),
                 checked = isDefaultWalletInput,
                 onCheckedChange = { isDefaultWalletInput = !isDefaultWalletInput }
             )
+            Spacer(Modifier.height(8.dp))
+            SwitchView(
+                text = stringResource(R.string.wallet_edit_secret_label),
+                description = if (isCustomPinLockEnabled == false) stringResource(R.string.wallet_edit_secret_description_disabled) else stringResource(R.string.wallet_edit_secret_description),
+                checked = isHiddenWallet,
+                enabled = isCustomPinLockEnabled == true,
+                onCheckedChange = {
+                    if (!isHiddenWallet) {
+                        showEnableHiddenWalletDialog = true
+                    } else {
+                        isHiddenWallet = false
+                    }
+                }
+            )
         }
-//        Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-//            SwitchView(
-//                text = stringResource(R.string.wallet_edit_secret_label),
-//                description = stringResource(R.string.wallet_edit_secret_description),
-//                checked = isHiddenWallet,
-//                onCheckedChange = { isHiddenWallet = !isHiddenWallet }
-//            )
-//        }
 
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp).align(Alignment.End)) {
+        val saveChanges: (Boolean) -> Unit = { alsoDismiss ->
+            scope.launch {
+                globalPrefs.saveAvailableWalletMeta(walletId = walletId, name = nameInput.takeIf { it.isNotBlank() }, avatar = avatarInput, isHidden = isHiddenWallet)
+                when {
+                    // we only update the default preferences when relevant: goes from default to not ; or goes from not default to default wallet.
+                    isDefaultWalletInPref && !isDefaultWalletInput -> globalPrefs.clearDefaultWallet()
+                    // if the wallet is hidden, it cannot be default
+                    isDefaultWalletInPref && isHiddenWallet -> globalPrefs.clearDefaultWallet()
+                    isDefaultWalletInput -> globalPrefs.saveDefaultWallet(walletId)
+                }
+                if (alsoDismiss) {
+                    onDismiss()
+                }
+            }
+        }
+
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp).align(Alignment.End)) {
             FilledButton(
                 text = stringResource(R.string.btn_save),
                 icon = R.drawable.ic_check,
-                enabled = nameInput != (metadata.name ?: "") || avatarInput != metadata.avatar || isDefaultWalletInput != isDefaultWalletInPref, // || isHiddenWallet != metadata.isHidden,
-                onClick = {
-                    scope.launch {
-                        globalPrefs.saveAvailableWalletMeta(walletId = walletId, name = nameInput.takeIf { it.isNotBlank() }, avatar = avatarInput, isHidden = false)
-                        when {
-                            // we only update the default preferences when relevant: goes from default to not ; or goes from not default to default wallet.
-                            defaultWalletPref == walletId && !isDefaultWalletInput -> globalPrefs.clearDefaultWallet()
-                            isDefaultWalletInput -> globalPrefs.saveDefaultWallet(walletId)
-                        }
-                        onDismiss()
-                    }
-                },
+                enabled = nameInput != (metadata.name ?: "") || avatarInput != metadata.avatar || isDefaultWalletInput != isDefaultWalletInPref || isHiddenWallet != metadata.isHidden,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                onClick = { saveChanges(true) },
             )
 
             Spacer(Modifier.height(16.dp))
             TransparentFilledButton(
-                text = stringResource(R.string.btn_cancel),
+                text = stringResource(R.string.btn_close),
                 textStyle = MaterialTheme.typography.caption,
                 icon = R.drawable.ic_cross,
                 iconTint = MaterialTheme.typography.caption.color,
+                modifier = Modifier.fillMaxWidth(),
                 onClick = onDismiss,
             )
             Spacer(Modifier.height(16.dp))
+        }
+
+        if (showEnableHiddenWalletDialog) {
+            EnabledHiddenOptionDialog(
+                walletId = walletId,
+                onConfirm = { isHiddenWallet = true ; saveChanges(false) },
+                onDismiss = { showEnableHiddenWalletDialog = false },
+            )
+        }
+    }
+}
+
+@Composable
+private fun EnabledHiddenOptionDialog(walletId: WalletId, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    ModalBottomSheet(
+        onDismiss = onDismiss,
+        containerColor = MaterialTheme.colors.background,
+        internalPadding = PaddingValues(0.dp),
+        skipPartiallyExpanded = true,
+        scrimAlpha = .4f
+    ) {
+        var isCheckingLockPin by remember { mutableStateOf(false) }
+
+        Card(internalPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)) {
+            Text(text = stringResource(R.string.wallet_hide_instructions_1))
+            Spacer(Modifier.height(8.dp))
+            Text(text = stringResource(R.string.wallet_hide_instructions_2))
+            Spacer(Modifier.height(8.dp))
+            Text(text = stringResource(R.string.wallet_hide_instructions_3))
+            Spacer(Modifier.height(16.dp))
+
+            var hasAckedCheckbox by remember { mutableStateOf(false) }
+            Surface(shape = RoundedCornerShape(12.dp), color = mutedBgColor) {
+                Checkbox(text = stringResource(R.string.utils_ack), checked = hasAckedCheckbox, onCheckedChange = { hasAckedCheckbox = it }, padding = PaddingValues(16.dp), modifier = Modifier.fillMaxWidth())
+            }
+
+            Spacer(Modifier.height(16.dp))
+            FilledButton(text = stringResource(R.string.wallet_hide_confirm_button), onClick = { isCheckingLockPin = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), enabled = hasAckedCheckbox)
+            Spacer(Modifier.height(12.dp))
+            TransparentFilledButton(text = stringResource(R.string.wallet_hide_cancel_button), onClick = onDismiss, modifier = Modifier.fillMaxWidth())
+        }
+
+        if (isCheckingLockPin) {
+            CheckScreenLockPinFlow(
+                walletId = walletId,
+                acceptHiddenPin = false,
+                onCancel = { isCheckingLockPin = false },
+                onPinValid = { onConfirm() ; onDismiss() },
+                prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_check_disabling_title)) }
+            )
         }
     }
 }

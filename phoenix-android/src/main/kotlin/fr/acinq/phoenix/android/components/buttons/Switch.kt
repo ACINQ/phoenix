@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.components.enableOrFade
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.utils.gray300
@@ -65,10 +66,10 @@ fun SwitchView(
                 .weight(1f)
                 .padding(top = 6.dp, bottom = 6.dp, end = 16.dp)
         ) {
-            Text(text = text, style = textStyle)
+            Text(text = text, style = if (enabled) textStyle else MaterialTheme.typography.caption)
             if (description != null) {
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = description, style = MaterialTheme.typography.subtitle2)
+                Text(text = description, style = if (enabled) MaterialTheme.typography.subtitle2 else MaterialTheme.typography.caption.copy(fontSize = 14.sp))
             }
         }
         Switch(
