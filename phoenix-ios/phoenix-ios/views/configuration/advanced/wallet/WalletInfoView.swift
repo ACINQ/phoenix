@@ -27,10 +27,7 @@ struct WalletInfoView: View {
 	@State var final_mpk_truncationDetected = false
 	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
-	
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
-	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
@@ -41,10 +38,11 @@ struct WalletInfoView: View {
 	
 	@StateObject var toast = Toast()
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -78,11 +76,15 @@ struct WalletInfoView: View {
 		.onChange(of: navLinkTag) {
 			navLinkTagChanged($0)
 		}
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
+		.task {
+			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+				swapInWalletChanged(wallet)
+			}
 		}
-		.onReceive(finalWalletPublisher) {
-			finalWalletChanged($0)
+		.task {
+			for await wallet in Biz.business.peerManager.finalWalletSequence() {
+				finalWalletChanged(wallet)
+			}
 		}
 	}
 	
@@ -105,7 +107,7 @@ struct WalletInfoView: View {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 				
-				let nodeId = Biz.nodeId ?? "?"
+				let nodeId = Biz.walletInfo?.nodeIdString ?? "?"
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					Text("Node id").font(.headline.bold())
@@ -611,9 +613,12 @@ struct WalletInfoView: View {
 					case .electrum           : break
 					case .backgroundPayments : break
 					case .liquiditySettings  : break
+					case .torSettings        : break
 					case .forceCloseChannels : break
 					case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
 					case .finalWallet        : newNavLinkTag = NavLinkTag.FinalWalletDetails
+					case .appAccess          : break
+					case .walletMetadata     : break
 				}
 				
 				if let newNavLinkTag {

@@ -22,9 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 
 @Composable
 fun NewPinFlow(
@@ -32,8 +33,9 @@ fun NewPinFlow(
     onDone: () -> Unit,
     vm: NewPinViewModel,
     prompt: @Composable () -> Unit,
+    walletId: WalletId,
+    walletMetadata: UserWalletMetadata?,
 ) {
-    val context = LocalContext.current
     val onDismiss = {
         vm.reset()
         onCancel()
@@ -45,6 +47,8 @@ fun NewPinFlow(
                 onDismiss = onDismiss,
                 onPinEntered = { vm.moveToConfirmPin(it) },
                 prompt = prompt,
+                walletId = walletId,
+                walletMetadata = walletMetadata
             )
         }
         is NewPinState.ConfirmNewPin -> {
@@ -53,7 +57,6 @@ fun NewPinFlow(
                 onDismiss = onDismiss,
                 onPinConfirmed = {
                     vm.checkAndSavePin(
-                        context = context,
                         expectedPin =  state.expectedPin,
                         confirmedPin = it,
                         onPinWritten = {
@@ -61,7 +64,9 @@ fun NewPinFlow(
                             onDone()
                         }
                     )
-                }
+                },
+                walletId = walletId,
+                walletMetadata = walletMetadata
             )
         }
     }
@@ -70,6 +75,8 @@ fun NewPinFlow(
 @Composable
 private fun EnterNewPinDialog(
     state: NewPinState.EnterNewPin,
+    walletId: WalletId,
+    walletMetadata: UserWalletMetadata?,
     onDismiss: () -> Unit,
     onPinEntered: (String) -> Unit,
     prompt: @Composable () -> Unit,
@@ -78,6 +85,8 @@ private fun EnterNewPinDialog(
         onDismiss = onDismiss,
         onPinSubmit = onPinEntered,
         prompt = prompt,
+        walletId = walletId,
+        walletMetadata = walletMetadata,
         stateLabel = when (state) {
             is NewPinState.EnterNewPin.Init, is NewPinState.EnterNewPin.Frozen.Validating -> null
             is NewPinState.EnterNewPin.Frozen.InvalidPin -> {
@@ -91,6 +100,8 @@ private fun EnterNewPinDialog(
 @Composable
 private fun ConfirmNewPinDialog(
     state: NewPinState.ConfirmNewPin,
+    walletId: WalletId,
+    walletMetadata: UserWalletMetadata?,
     onDismiss: () -> Unit,
     onPinConfirmed: (String) -> Unit,
 ) {
@@ -109,6 +120,8 @@ private fun ConfirmNewPinDialog(
             onPinConfirmed(it)
         },
         prompt = { PinDialogTitle(text = stringResource(id = R.string.pincode_confirm_title)) },
+        walletId = walletId,
+        walletMetadata = walletMetadata,
         stateLabel = when (state) {
             is NewPinState.ConfirmNewPin.Init -> null
             is NewPinState.ConfirmNewPin.Frozen.PinsDoNoMatch -> {

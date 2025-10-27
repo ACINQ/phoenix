@@ -1,6 +1,28 @@
 import Foundation
 import UIKit
 import SwiftUI
+import LocalAuthentication
+
+/// Represents the availability of Biometrics on the current device.
+/// Devices either support TouchID or FaceID,
+/// but the user needs to have enabled and enrolled in the service.
+///
+enum BiometricSupport {
+	
+	case touchID_available
+	case touchID_notAvailable
+	case touchID_notEnrolled
+	
+	case faceID_available
+	case faceID_notAvailable
+	case faceID_notEnrolled
+	
+	case notAvailable
+	
+	func isAvailable() -> Bool {
+		return (self == .touchID_available) || (self == .faceID_available)
+	}
+}
 
 /// An ObservableObject that provides device info & categories.
 /// Available as an EnvironmentObject:
@@ -42,7 +64,7 @@ class DeviceInfo: ObservableObject {
 	}
 	
 	var isIPadLandscapeFullscreen: Bool {
-		if UIDevice.current.userInterfaceIdiom != .pad {
+		if !self.isIPad {
 			return false
 		}
 		if !self.isLandscape {
@@ -53,7 +75,7 @@ class DeviceInfo: ObservableObject {
 	}
 	
 	var isFaceID: Bool {
-		switch AppSecurity.shared.deviceBiometricSupport() {
+		switch Self.biometricSupport() {
 			case .faceID_available    : return true
 			case .faceID_notAvailable : return true
 			case .faceID_notEnrolled  : return true
@@ -144,5 +166,40 @@ class DeviceInfo: ObservableObject {
 	
 	static var textColumnMaxWidth: CGFloat {
 		return 500
+	}
+	
+	/// Returns the device's current status concerning biometric support.
+	///
+	static func biometricSupport() -> BiometricSupport {
+		
+		let context = LAContext()
+		
+		var error : NSError?
+		let result = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+		
+		if context.biometryType == .touchID {
+			if result && (error == nil) {
+				return .touchID_available
+			} else {
+				if let error = error as? LAError, error.code == .biometryNotEnrolled {
+					return .touchID_notEnrolled
+				} else {
+					return .touchID_notAvailable
+				}
+			}
+		}
+		if context.biometryType == .faceID {
+			if result && (error == nil) {
+				return .faceID_available
+			} else {
+				if let error = error as? LAError, error.code == .biometryNotEnrolled {
+					return .faceID_notEnrolled
+				} else {
+					return .faceID_notAvailable
+				}
+			}
+		}
+		
+		return .notAvailable
 	}
 }

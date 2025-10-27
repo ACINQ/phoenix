@@ -24,7 +24,7 @@ import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.payments.details.ChannelIdRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount

@@ -25,17 +25,17 @@ class ServerMessageMonitor: ObservableObject {
 	
 	init() {
 		
-		Prefs.shared.serverMessageReadIndexPublisher
+		Prefs.current.serverMessageReadIndexPublisher
 			.sink {[weak self] (value: Int?) in
 				self?.readIndexDidChange(value)
 			}
 			.store(in: &cancellables)
 		
-		Biz.business.appConfigurationManager.walletNoticePublisher()
-			.sink {[weak self] (notice: WalletNotice) in
+		Task { @MainActor [weak self] in
+			for await notice in BizGlobal.walletContextManager.walletNoticeSequence() {
 				self?.noticeDidChange(notice)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 	}
 	
 	private func readIndexDidChange(_ readIndex: Int?) {

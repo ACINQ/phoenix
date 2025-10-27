@@ -12,7 +12,6 @@ import fr.acinq.lightning.io.OfferInvoiceReceived
 import fr.acinq.lightning.io.OfferNotPaid
 import fr.acinq.lightning.io.PayInvoice
 import fr.acinq.lightning.io.PayOffer
-import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
@@ -368,6 +367,7 @@ class SendManager(
                         }
                     }
                 } catch (e: Exception) {
+                    log.error { "failed to process lnurl: $e" }
                     log.error(e) { "failed to process lnurl=$lnurl" }
                     when (e) {
                         is LnurlError.RemoteFailure ->
@@ -459,7 +459,7 @@ class SendManager(
 
         // save lnurl metadata if any
         metadata?.let { row ->
-            databaseManager.metadataQueue.enqueue(row = row, id = paymentId)
+            databaseManager.paymentMetadataQueue.enqueue(row = row, id = paymentId)
         }
 
         peer.send(
@@ -485,7 +485,7 @@ class SendManager(
 
         lightningAddress?.let {
             val metadata = WalletPaymentMetadata(lightningAddress = it)
-            databaseManager.metadataQueue.enqueue(metadata, paymentId)
+            databaseManager.paymentMetadataQueue.enqueue(metadata, paymentId)
         }
 
         val res = CompletableDeferred<OfferNotPaid?>()

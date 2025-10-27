@@ -172,7 +172,7 @@ struct RecentPaymentsSelector: View {
 	func didSelect(_ newValue: RecentPaymentsConfig) {
 		
 		self.recentPaymentsConfig = newValue
-		Prefs.shared.recentPaymentsConfig = newValue
+		Prefs.current.recentPaymentsConfig = newValue
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
 			presentationMode.wrappedValue.dismiss()

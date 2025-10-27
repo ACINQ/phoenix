@@ -29,7 +29,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix inaendesha nyuma</string>
-    <string name="notif_headless_received">Imepokelewa +%1$s</string>
+    <string name="notif_headless_received">%1$s Imepokelewa %2$s</string>
 
     <string name="notif_pending_settlement_title">Tafadhali anzisha Phoenix</string>
     <string name="notif_pending_settlement_message">Malipo yanayokuja yanangoja kukamilishwa.</string>
@@ -70,7 +70,7 @@
     <string name="settings_list_channels">Chaneli za malipo</string>
     <string name="settings_logs">Magogo</string>
     <string name="settings_electrum">Seva ya Electrum</string>
-    <string name="settings_reset_wallet">Weka upya pochi</string>
+    <string name="settings_reset_wallet">Futa mkoba</string>
     <string name="settings_mutual_close">Funga chaneli</string>
     <string name="settings_force_close">Funga chaneli kwa nguvu</string>
     <string name="settings_tor">Tor</string>
@@ -98,6 +98,7 @@
 
     <string name="home_final_title">Mkoba wa mwisho</string>
     <string name="home_final_desc">Fedha hizi hutoka kwa vituo vya umeme vilivyofungwa. Ni lazima zitumike mwenyewe.</string>
+    <string name="home_onchain_balance_only">Salio la mtandaoni</string>
 
     <string name="home_background_restriction_title">Usindikaji wa nyuma umepunguzwa</string>
     <string name="home_background_restriction_body_1">Phoenix haitaweza kupokea malipo wakati iko nyuma, au wakati imefungwa.</string>
@@ -215,6 +216,7 @@
     <string name="inappnotif_backup_seed_message">Hifadhi nakala ya pochi yako ili kuepuka kupoteza bitcoins zako.</string>
     <string name="inappnotif_backup_seed_action">Hifadhi pochi yangu</string>
 
+    <string name="inappnotif_notification_permission_message_short">Washa arifa za Android</string>
     <string name="inappnotif_notification_permission_message">Arifa zimelemazwa katika mipangilio ya Android. Phoenix haitakuwa na uwezo wa kukutaarifu wakati malipo yanashughulikiwa.</string>
     <string name="inappnotif_notification_permission_enable">Wezesha</string>
 

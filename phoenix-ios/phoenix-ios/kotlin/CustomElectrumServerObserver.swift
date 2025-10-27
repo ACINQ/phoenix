@@ -30,21 +30,23 @@ class CustomElectrumServerObserver: ObservableObject {
 	private var cancellables = Set<AnyCancellable>()
 	
 	init() {
-		Biz.business.connectionsManager.connectionsPublisher()
-			.sink {[weak self](newConnections: Connections) in
-				self?.connectionsChanged(newConnections)
-			}.store(in: &cancellables)
+		Task { @MainActor [weak self] in
+			for await newValue in Biz.business.connectionsManager.connectionsSequence() {
+				self?.connectionsChanged(newValue)
+			}
+		}.store(in: &cancellables)
 		
-		Biz.business.appConfigurationManager.isTorEnabledPublisher()
-			.sink {[weak self](newValue: Bool) in
+		Task { @MainActor [weak self] in
+			for await newValue in Biz.business.appConfigurationManager.isTorEnabledSequence() {
 				self?.isTorEnabledChanged(newValue)
-			}.store(in: &cancellables)
+			}
+		}.store(in: &cancellables)
 		
-		
-		Biz.business.appConfigurationManager.electrumConfigPublisher()
-			.sink {[weak self](newValue: ElectrumConfig) in
+		Task { @MainActor [weak self] in
+			for await newValue in Biz.business.appConfigurationManager.electrumConfigSequence() {
 				self?.electrumConfigChanged(newValue)
-			}.store(in: &cancellables)
+			}
+		}.store(in: &cancellables)
 		
 		connectionsChanged(Biz.business.connectionsManager.currentValue)
 	}

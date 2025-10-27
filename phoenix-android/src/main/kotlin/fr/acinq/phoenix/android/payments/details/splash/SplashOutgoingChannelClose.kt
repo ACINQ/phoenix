@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,8 +29,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.SplashLabelRow
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
@@ -49,9 +46,7 @@ fun SplashChannelClose(
     metadata: WalletPaymentMetadata,
     onMetadataDescriptionUpdate: (UUID, String?) -> Unit,
 ) {
-    val peer by business.peerManager.peerState.collectAsState()
-
-    val isLegacyMigration = payment.isLegacyMigration(metadata, peer)
+    val isLegacyMigration = payment.isLegacyMigration(metadata)
     val description = when (isLegacyMigration) {
         null -> stringResource(id = R.string.paymentdetails_desc_closing_channel) // not sure yet, but we still know it's a closing
         true -> stringResource(id = R.string.paymentdetails_desc_legacy_migration)

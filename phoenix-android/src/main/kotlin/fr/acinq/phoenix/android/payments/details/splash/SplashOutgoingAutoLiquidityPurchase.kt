@@ -30,13 +30,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.db.AutomaticLiquidityPurchasePayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.SplashLabelRow
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.navigateToPaymentDetails
+import fr.acinq.phoenix.android.navigation.navigateToPaymentDetails
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
@@ -48,6 +48,7 @@ import fr.acinq.phoenix.utils.extensions.state
 
 @Composable
 fun SplashAutoLiquidityPurchase(
+    business: PhoenixBusiness,
     payment: AutomaticLiquidityPurchasePayment,
 ) {
     SplashAmount(amount = payment.amount, state = payment.state(), isOutgoing = true)

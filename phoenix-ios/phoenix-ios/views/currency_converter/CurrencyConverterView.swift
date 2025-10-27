@@ -31,7 +31,7 @@ struct CurrencyConverterView: View {
 	
 	@State var lastChange: CurrencyAmount?
 	
-	@State var currencies: [Currency] = GroupPrefs.shared.currencyConverterList
+	@State var currencies: [Currency] = GroupPrefs.current.currencyConverterList
 	
 	@State var parsedRow: ParsedRow? = nil
 	
@@ -41,8 +41,6 @@ struct CurrencyConverterView: View {
 	@State var currencySelectorOpen = false
 	
 	@State var isRefreshingExchangeRates = false
-	
-	let refreshingExchangeRatesPublisher = Biz.business.currencyManager.refreshPublisher()
 	
 	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -65,10 +63,11 @@ struct CurrencyConverterView: View {
 	@State var navLinkTag: NavLinkTag? = nil
 	// </iOS_16_workarounds>
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.colorScheme) var colorScheme
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	// --------------------------------------------------
 	// MARK: Init
@@ -121,11 +120,13 @@ struct CurrencyConverterView: View {
 		.onChange(of: parsedRow) { _ in
 			parsedRowDidChange()
 		}
-		.onReceive(refreshingExchangeRatesPublisher) {
-			refreshingExchangeRatesChanged($0)
-		}
 		.onReceive(timer) { _ in
 			self.currentDate = Date()
+		}
+		.task {
+			for await flag in BizGlobal.currencyManager.refreshSequence() {
+				refreshingExchangeRatesChanged(flag)
+			}
 		}
 	}
 	
@@ -411,9 +412,9 @@ struct CurrencyConverterView: View {
 		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies) ?? "<empty>")")
 		
 		if currencies == defaultCurrencies() {
-			GroupPrefs.shared.currencyConverterList = []
+			GroupPrefs.current.currencyConverterList = []
 		} else {
-			GroupPrefs.shared.currencyConverterList = currencies
+			GroupPrefs.current.currencyConverterList = currencies
 		}
 	}
 	
@@ -573,7 +574,7 @@ struct CurrencyConverterView: View {
 	private func refreshRates() {
 		log.trace("refreshRates()")
 		
-		Biz.business.currencyManager.refreshAll(
+		BizGlobal.currencyManager.refreshAll(
 			targets : FiatCurrency.companion.values,
 			force   : true
 		)

@@ -30,12 +30,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,11 +46,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialog.PIN_LENGTH
+import fr.acinq.phoenix.android.components.wallet.WalletAvatar
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 
@@ -56,11 +64,15 @@ import fr.acinq.phoenix.android.utils.negativeColor
 internal fun BasePinDialog(
     prompt: @Composable () -> Unit,
     stateLabel: (@Composable () -> Unit)?,
+    walletId: WalletId,
+    walletMetadata: UserWalletMetadata?,
     onDismiss: () -> Unit,
     onPinSubmit: (String) -> Unit,
     enabled: Boolean,
     initialPin: String = "",
 ) {
+    val userPrefs = DataStoreManager.loadUserPrefsForWallet(LocalContext.current, walletId)
+    val isPinShuffled = userPrefs.getIsPinKeyboardShuffled.collectAsState(null)
     var pinValue by remember(initialPin) { mutableStateOf(initialPin) }
 
     ModalBottomSheet(
@@ -70,7 +82,13 @@ internal fun BasePinDialog(
         internalPadding = PaddingValues(horizontal = 12.dp),
         containerColor = MaterialTheme.colors.background,
     ) {
-        prompt()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            walletMetadata?.let {
+                WalletAvatar(walletMetadata.avatar, fontSize = MaterialTheme.typography.h4.fontSize)
+                Spacer(Modifier.width(8.dp))
+            }
+            prompt()
+        }
         Spacer(Modifier.height(16.dp))
         Column(modifier = Modifier.background(MaterialTheme.colors.surface, shape = RoundedCornerShape(24.dp)), horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.height(32.dp))
@@ -86,6 +104,7 @@ internal fun BasePinDialog(
             }
             Spacer(modifier = Modifier.height(40.dp))
             PinKeyboard(
+                isPinShuffled = isPinShuffled.value == true,
                 onPinPress = { digit ->
                     when (pinValue.length + 1) {
                         in 0..<PIN_LENGTH -> {

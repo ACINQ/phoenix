@@ -18,8 +18,6 @@ struct NotificationsView : View {
 	
 	@StateObject var noticeMonitor = NoticeMonitor()
 	
-	let bizNotificationsPublisher = Biz.business.notificationsManager.notificationsPublisher()
-	
 	@State var bizNotifications_payment: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	@State var bizNotifications_watchtower: [PhoenixShared.NotificationsManager.NotificationItem] = []
 	
@@ -27,6 +25,7 @@ struct NotificationsView : View {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var popoverState: PopoverState
+	@EnvironmentObject var smartModalState: SmartModalState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -45,8 +44,10 @@ struct NotificationsView : View {
 				body_embedded()
 			}
 		}
-		.onReceive(bizNotificationsPublisher) {
-			bizNotificationsChanged($0)
+		.task {
+			for await notifications in Biz.business.notificationsManager.notificationsSequence() {
+				bizNotificationsChanged(notifications)
+			}
 		}
 	}
 	
@@ -177,6 +178,15 @@ struct NotificationsView : View {
 				.font(.callout)
 				.contentShape(Rectangle()) // make Spacer area tappable
 				.onTapGesture { openMempoolFullURL() }
+			}
+			
+			if noticeMonitor.hasNotice_torNetworkIssue {
+				NoticeBox(backgroundColor: .mutedBackground) {
+					NotificationCell.torNetworkIssue()
+				}
+				.font(.callout)
+				.contentShape(Rectangle()) // make Spacer area tappable
+				.onTapGesture { showTorNetworkIssueSheet() }
 			}
 			
 		} header: {
@@ -337,14 +347,22 @@ struct NotificationsView : View {
 		}
 	}
 	
+	func showTorNetworkIssueSheet() {
+		log.trace(#function)
+		
+		smartModalState.display(dismissable: true) {
+			TorNetworkIssueSheet()
+		}
+	}
+	
 	func deleteNotification(_ item: PhoenixShared.NotificationsManager.NotificationItem) {
-		log.trace("deleteNotification()")
+		log.trace(#function)
 		
 		Biz.business.notificationsManager.dismissNotifications(ids: item.ids)
 	}
 	
 	func closeSheet() {
-		log.trace("closeSheet()")
+		log.trace(#function)
 		
 		presentationMode.wrappedValue.dismiss()
 	}

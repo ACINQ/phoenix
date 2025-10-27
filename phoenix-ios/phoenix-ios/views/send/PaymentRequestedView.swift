@@ -17,12 +17,11 @@ struct PaymentRequestedView: View {
 	
 	let popTo: (PopToDestination) -> Void // For iOS 16
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	
-	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
 	
 	// --------------------------------------------------
 	// MARK: View Builders
@@ -35,8 +34,10 @@ struct PaymentRequestedView: View {
 			.navigationTitle(NSLocalizedString("Payment Requested", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarBackButtonHidden()
-			.onReceive(lastIncomingPaymentPublisher) {
-				lastIncomingPaymentChanged($0)
+			.task {
+				for await payment in Biz.business.paymentsManager.lastIncomingPaymentSequence() {
+					lastIncomingPaymentChanged(payment)
+				}
 			}
 	}
 	
@@ -47,7 +48,7 @@ struct PaymentRequestedView: View {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
@@ -122,7 +123,7 @@ struct PaymentRequestedView: View {
 	// --------------------------------------------------
 	
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
-		log.trace("lastIncomingPaymentChanged()")
+		log.trace(#function)
 		log.debug("lastIncomingPayment.paymentHash = \(lastIncomingPayment.id.description())")
 		
 		let paymentState = lastIncomingPayment.state()

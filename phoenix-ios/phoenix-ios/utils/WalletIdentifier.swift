@@ -1,24 +1,33 @@
 import Foundation
 import PhoenixShared
 
-struct WalletIdentifier {
+protocol WalletIdentifiable {
+	var nodeIdHash: String { get }
+}
+
+struct WalletIdentifier: WalletIdentifiable, Hashable {
 	let chain: Bitcoin_kmpChain
+	let nodeIdHash: String
 	let encryptedNodeId: String
 	
-	init(chain: Bitcoin_kmpChain, encryptedNodeId: String) {
-		self.chain = chain
-		self.encryptedNodeId = encryptedNodeId
-	}
-	
 	init(chain: Bitcoin_kmpChain, walletInfo: WalletManager.WalletInfo) {
-		self.init(chain: chain, encryptedNodeId: walletInfo.encryptedNodeId)
+		self.chain = chain
+		self.nodeIdHash = walletInfo.nodeIdHash
+		self.encryptedNodeId = walletInfo.encryptedNodeId
 	}
 	
-	var prefsKeySuffix: String {
+	var deprecatedKeyId: String {
 		if chain.isMainnet() {
 			return encryptedNodeId
 		} else {
 			return "\(encryptedNodeId)-\(chain.phoenixName)"
 		}
+	}
+}
+
+extension WalletIdentifiable {
+	
+	var standardKeyId: String {
+		return nodeIdHash
 	}
 }

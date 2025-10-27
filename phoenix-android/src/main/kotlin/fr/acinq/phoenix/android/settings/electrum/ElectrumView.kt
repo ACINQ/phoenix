@@ -41,9 +41,16 @@ import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.PhoenixIcon
+import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.inputs.TextInput
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.components.settings.Setting
 import fr.acinq.phoenix.android.utils.*
@@ -64,8 +71,8 @@ fun ElectrumView(
     onBackClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
-    val electrumConfigInPrefs by userPrefs.getElectrumServer.collectAsState(initial = null)
+    val userPrefs = LocalUserPrefs.current
+    val electrumConfigInPrefs = userPrefs?.getElectrumServer?.collectAsState(initial = null)?.value
     var showCustomServerDialog by rememberSaveable { mutableStateOf(false) }
 
     DefaultScreenLayout {
@@ -84,9 +91,11 @@ fun ElectrumView(
                         initialConfig = electrumConfigInPrefs,
                         onConfirm = { newConfig ->
                             scope.launch {
-                                userPrefs.saveElectrumServer(newConfig)
-                                postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(newConfig))
-                                showCustomServerDialog = false
+                                userPrefs?.let {
+                                    it.saveElectrumServer(newConfig)
+                                    postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(newConfig))
+                                    showCustomServerDialog = false
+                                }
                             }
                         },
                         onDismiss = { showCustomServerDialog = false }
@@ -95,7 +104,7 @@ fun ElectrumView(
 
                 // -- connection detail
                 val connection = model.connection
-                val torEnabled = userPrefs.getIsTorEnabled.collectAsState(initial = null)
+                val torEnabled = userPrefs?.getIsTorEnabled?.collectAsState(initial = null)
                 Setting(
                     title = when {
                         model.currentServer == null -> {
@@ -122,7 +131,7 @@ fun ElectrumView(
                                         text = stringResource(id = R.string.electrum_description_bad_certificate),
                                         style = MaterialTheme.typography.subtitle2.copy(color = negativeColor)
                                     )
-                                } else if (torEnabled.value == true && !config.server.isOnion && config.requireOnionIfTorEnabled) {
+                                } else if (torEnabled?.value == true && !config.server.isOnion && config.requireOnionIfTorEnabled) {
                                     Text(
                                         text = stringResource(id = R.string.electrum_description_not_onion),
                                         style = MaterialTheme.typography.subtitle2.copy(color = negativeColor),
@@ -160,7 +169,7 @@ fun ElectrumView(
 }
 
 @Composable
-private fun ElectrumServerDialog(
+fun ElectrumServerDialog(
     initialConfig: ElectrumConfig.Custom?,
     onConfirm: (ElectrumConfig.Custom?) -> Unit,
     onDismiss: () -> Unit
@@ -174,12 +183,12 @@ private fun ElectrumServerDialog(
     val host = remember(address) { address.trim().substringBeforeLast(":").takeIf { it.isNotBlank() } }
     val port = remember(address) { address.trim().substringAfterLast(":").toIntOrNull() ?: 50002 }
     val isOnionHost = remember(address) { host?.endsWith(".onion") ?: false }
-    val isTorEnabled by userPrefs.getIsTorEnabled.collectAsState(initial = null)
+    val isTorEnabled = LocalUserPrefs.current?.getIsTorEnabled?.collectAsState(initial = null)
 
     var addressError by rememberSaveable { mutableStateOf(false) }
-    val showOnionOnCustomServerWarning = remember(isOnionHost, isTorEnabled, useCustomServer) { useCustomServer && isTorEnabled == true && !isOnionHost }
+    val showOnionOnCustomServerWarning = remember(isOnionHost, isTorEnabled, useCustomServer) { useCustomServer && isTorEnabled?.value == true && !isOnionHost }
     var requireOnionIfTorEnabled by remember { mutableStateOf(initialConfig?.requireOnionIfTorEnabled ?: true) }
-    val isViolatingTorRule = remember(isOnionHost, isTorEnabled, useCustomServer, requireOnionIfTorEnabled) { useCustomServer && isTorEnabled == true && !isOnionHost && requireOnionIfTorEnabled }
+    val isViolatingTorRule = remember(isOnionHost, isTorEnabled, useCustomServer, requireOnionIfTorEnabled) { useCustomServer && isTorEnabled?.value == true && !isOnionHost && requireOnionIfTorEnabled }
 
     val vm = viewModel<ElectrumDialogViewModel>()
 

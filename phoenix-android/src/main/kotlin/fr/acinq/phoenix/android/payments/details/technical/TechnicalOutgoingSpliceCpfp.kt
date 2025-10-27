@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.SpliceCpfpOutgoingPayment
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.payments.details.OutgoingAmountSection
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TimestampSection

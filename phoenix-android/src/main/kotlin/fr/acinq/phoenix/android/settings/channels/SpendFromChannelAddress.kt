@@ -41,14 +41,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.inputs.AmountInput
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
@@ -57,6 +57,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 
 @Composable
 fun SpendFromChannelAddress(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val vm = viewModel<SpendFromChannelAddressViewModel>(factory = SpendFromChannelAddressViewModel.Factory(business))
@@ -163,17 +164,8 @@ fun SpendFromChannelAddress(
                                 is SpendFromChannelAddressViewState.Error.TxIndexMalformed -> {
                                     stringResource(id = R.string.spendchanneladdress_error_tx_index)
                                 }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataMalformed -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data)
-                                }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataDecryption -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data)
-                                }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataUnhandledState -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data_state, state.stateClassName ?: "??")
-                                }
-                                is SpendFromChannelAddressViewState.Error.ChannelDataUnhandledVersion -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_data_version, state.version)
+                                is SpendFromChannelAddressViewState.Error.InvalidChannelKeyPath -> {
+                                    stringResource(id = R.string.spendchanneladdress_error_channel_keypath)
                                 }
                                 is SpendFromChannelAddressViewState.Error.PublicKeyMalformed -> {
                                     stringResource(id = R.string.spendchanneladdress_error_remote_funding_pubkey, state.details)

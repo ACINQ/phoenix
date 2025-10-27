@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import fr.acinq.phoenix.android.components.SplashClickableContent
+import fr.acinq.phoenix.android.components.layouts.SplashClickableContent
 import fr.acinq.phoenix.data.ContactInfo
 
 

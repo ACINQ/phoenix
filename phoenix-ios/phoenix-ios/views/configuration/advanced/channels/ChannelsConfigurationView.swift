@@ -10,13 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct ChannelsConfigurationView: View {
 	
-	enum NavLinkTag: String, Codable {
-		case ImportChannels
-	}
-	
 	@State var sharing: String? = nil
-	
-	let channelsPublisher = Biz.business.peerManager.channelsPublisher()
 	@State var channels: [LocalChannelInfo] = []
 	
 	enum CapacityHeight: Preference {}
@@ -26,17 +20,13 @@ struct ChannelsConfigurationView: View {
 	)
 	@State var capacityHeight: CGFloat? = nil
 	
-	// <iOS_16_workarounds>
-	@State var navLinkTag: NavLinkTag? = nil
-	// </iOS_16_workarounds>
-	
 	@StateObject var toast = Toast()
+	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	// --------------------------------------------------
@@ -50,12 +40,6 @@ struct ChannelsConfigurationView: View {
 			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarItems(trailing: menuButton())
-			.navigationStackDestination(isPresented: navLinkTagBinding()) {
-				navLinkView()
-			}
-			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
-				navLinkView(tag)
-			}
 	}
 	
 	@ViewBuilder
@@ -67,8 +51,10 @@ struct ChannelsConfigurationView: View {
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.sharing($sharing)
-		.onReceive(channelsPublisher) {
-			channels = $0
+		.task {
+			for await newChannels in Biz.business.peerManager.channelsArraySequence() {
+				channels = newChannels
+			}
 		}
 	}
 	
@@ -201,9 +187,7 @@ struct ChannelsConfigurationView: View {
 						.foregroundColor(Color.primary)
 				}
 			} // </HStack>
-		//	.padding([.leading], 10)
 			.padding([.top, .bottom], 8)
-		//	.padding(.trailing)
 		} // </Button>
 	}
 	
@@ -211,15 +195,6 @@ struct ChannelsConfigurationView: View {
 	func menuButton() -> some View {
 		
 		Menu {
-			Button {
-				importChannels()
-			} label: {
-				Label {
-					Text("Import channels")
-				} icon: {
-					Image(systemName: "square.and.arrow.down")
-				}
-			}
 			if !channels.isEmpty {
 				Button {
 					closeAllChannels()
@@ -246,36 +221,9 @@ struct ChannelsConfigurationView: View {
 		}
 	}
 	
-	@ViewBuilder
-	func navLinkView() -> some View {
-		
-		if let tag = self.navLinkTag {
-			navLinkView(tag)
-		} else {
-			EmptyView()
-		}
-	}
-	
-	@ViewBuilder
-	func navLinkView(_ tag: NavLinkTag) -> some View {
-		
-		switch tag {
-		case .ImportChannels:
-			ImportChannelsView()
-		}
-	}
-	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
-	func navLinkTagBinding() -> Binding<Bool> {
-		
-		return Binding<Bool>(
-			get: { navLinkTag != nil },
-			set: { if !$0 { navLinkTag = nil }}
-		)
-	}
 	
 	func hasUsableChannels() -> Bool {
 		
@@ -283,7 +231,7 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	func localBalanceColor() -> Color {
-		if BusinessManager.isTestnet {
+		if Biz.isTestnet {
 			return Color.appAccentTestnet
 		} else {
 			return Color.appAccentMainnet
@@ -334,18 +282,8 @@ struct ChannelsConfigurationView: View {
 	// MARK: Actions
 	// --------------------------------------------------
 	
-	func navigateTo(_ tag: NavLinkTag) {
-		log.trace("navigateTo(\(tag.rawValue))")
-		
-		if #available(iOS 17, *) {
-			navCoordinator.path.append(tag)
-		} else {
-			navLinkTag = tag
-		}
-	}
-	
 	func showChannelInfoPopover(_ channel: LocalChannelInfo) {
-		log.trace("showChannelInfoPopover()")
+		log.trace(#function)
 		
 		popoverState.display(dismissable: true) {
 			ChannelInfoPopup(
@@ -356,14 +294,8 @@ struct ChannelsConfigurationView: View {
 		}
 	}
 	
-	func importChannels() {
-		log.trace("importChannels()")
-		
-		navigateTo(.ImportChannels)
-	}
-	
 	func closeAllChannels() {
-		log.trace("closeAllChannels()")
+		log.trace(#function)
 		
 		presentationMode.wrappedValue.dismiss()
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
@@ -372,7 +304,7 @@ struct ChannelsConfigurationView: View {
 	}
 	
 	func forceCloseAllChannels() {
-		log.trace("forceCloseAllChannels()")
+		log.trace(#function)
 		
 		presentationMode.wrappedValue.dismiss()
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {

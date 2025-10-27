@@ -63,11 +63,10 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 import fr.acinq.phoenix.android.utils.images.ZxingQrCodeAnalyzer
 import java.util.concurrent.Executors

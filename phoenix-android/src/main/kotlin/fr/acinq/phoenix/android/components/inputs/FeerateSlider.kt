@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.utils.mutedBgColor

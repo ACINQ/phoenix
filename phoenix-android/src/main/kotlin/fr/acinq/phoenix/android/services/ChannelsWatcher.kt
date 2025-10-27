@@ -27,18 +27,15 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import fr.acinq.lightning.channel.states.Closing
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.BuildConfig
-import fr.acinq.phoenix.android.PhoenixApplication
-import fr.acinq.phoenix.android.security.EncryptedSeed
+import fr.acinq.phoenix.android.BusinessManager
+import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
-import fr.acinq.phoenix.data.StartupParams
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import fr.acinq.phoenix.managers.NotificationsManager
-import fr.acinq.phoenix.utils.MnemonicLanguage
-import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
@@ -51,36 +48,58 @@ import java.util.concurrent.TimeUnit
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        log.info("starting channels-watcher job")
-        var notificationsManager: NotificationsManager? = null
+        log.info("starting $name")
 
-        val application = applicationContext as PhoenixApplication
-        val internalData = application.internalDataRepository
-        val userPrefs = application.userPrefs
+        if (BusinessManager.businessFlow.first().isNotEmpty()) {
+            log.info("there already are active businesses, aborting $name")
+            return Result.success()
+        }
 
-        val business = PhoenixBusiness(PlatformContext(applicationContext))
+        val userWallets = SeedManager.loadAndDecryptOrNull(applicationContext)
+        if (userWallets.isNullOrEmpty()) {
+            log.info("could not load any seed, aborting $name")
+            return Result.success()
+        }
+
+        val watchResult = userWallets.map { (walletId, wallet) ->
+            watchWallet(walletId, wallet.words)
+        }
+
+        BusinessManager.stopAllHeadlessBusinesses()
+
+        return if (watchResult.all { it }) {
+            log.info("finished $name, watchers have all terminated successfully")
+            Result.success()
+        } else {
+            log.info("finished $name, one or more watchers encountered an error")
+            Result.failure()
+        }
+    }
+
+    /** Watches channels for a given node id ; return false if an error occurred. */
+    private suspend fun watchWallet(walletId: WalletId, words: List<String>): Boolean {
+
+        val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
+        val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId)
+        if (res is StartBusinessResult.Failure) {
+            log.info("failed to start business for wallet=$walletId")
+            internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
+            return true
+        }
+
+        val business = BusinessManager.businessFlow.value[walletId]?.business
+        if (business == null) {
+            log.info("failed to access business for wallet=$walletId")
+            internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
+            return true
+        }
+
+        val notificationsManager = business.notificationsManager
         try {
-            notificationsManager = business.notificationsManager
-            when (val encryptedSeed = SeedManager.loadSeedFromDisk(applicationContext)) {
-                is EncryptedSeed.V2.NoAuth -> {
-                    val seed = business.walletManager.mnemonicsToSeed(EncryptedSeed.toMnemonics(encryptedSeed.decrypt()), wordList = MnemonicLanguage.English.wordlist())
-                    business.walletManager.loadWallet(seed)
-
-                    val isTorEnabled = userPrefs.getIsTorEnabled.first()
-                    val liquidityPolicy = userPrefs.getLiquidityPolicy.first()
-                    val electrumServer = userPrefs.getElectrumServer.first()
-
-                    business.appConfigurationManager.updateElectrumConfig(electrumServer)
-                    business.start(StartupParams(isTorEnabled = isTorEnabled, liquidityPolicy = liquidityPolicy))
-                }
-                else -> {
-                    internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
-                    return Result.success()
-                }
-            }
 
             business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Peer)
             business.appConnectionsDaemon!!.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Http)
+
             val peer = withTimeout(5_000) {
                 business.peerManager.getPeer()
             }
@@ -88,8 +107,8 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             val channelsAtBoot = peer.bootChannelsFlow.filterNotNull().first()
             if (channelsAtBoot.isEmpty()) {
                 log.info("no channels found, nothing to watch")
-                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
-                return Result.success()
+                internalPrefs.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
+                return true
             } else {
                 log.info("watching ${channelsAtBoot.size} channel(s)")
             }
@@ -120,29 +139,26 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
             if (unknownRevokedAfterWatching.isNotEmpty()) {
                 log.warn("new revoked commits found, notifying user")
                 notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.RevokedFound(channels = unknownRevokedAfterWatching))
-                internalData.saveChannelsWatcherOutcome(Outcome.RevokedFound(currentTimestampMillis()))
+                internalPrefs.saveChannelsWatcherOutcome(Outcome.RevokedFound(currentTimestampMillis()))
                 SystemNotificationHelper.notifyRevokedCommits(applicationContext)
             } else {
                 log.info("no revoked commit found, channels-watcher job completed successfully")
                 notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Nominal(channelsWatchedCount = peer.channels.size))
-                internalData.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
+                internalPrefs.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
             }
 
-            return Result.success()
+            return true
         } catch (e: Exception) {
             log.error("failed to run channels-watcher job: ", e)
-            notificationsManager?.saveWatchTowerOutcome(WatchTowerOutcome.Unknown())
-            internalData.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
-            return Result.failure()
-        } finally {
-            business.appConnectionsDaemon?.incrementDisconnectCount(AppConnectionsDaemon.ControlTarget.All)
-            business.stop()
-            log.info("stopped channels-watcher business")
+            notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Unknown())
+            internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
+            return false
         }
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(ChannelsWatcher::class.java)
+        private val name = "channels-watcher-job"
         const val TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
         private const val ELECTRUM_TIMEOUT_MILLIS = 5 * 60_000L
 
@@ -169,8 +185,10 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
         @Serializable
         data class Unknown(override val timestamp: Long) : Outcome()
+
         @Serializable
         data class Nominal(override val timestamp: Long) : Outcome()
+
         @Serializable
         data class RevokedFound(override val timestamp: Long) : Outcome()
     }

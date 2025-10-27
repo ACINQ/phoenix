@@ -53,6 +53,7 @@ fun FiatCurrency.getLabel(context: Context): Pair<String, String> {
         this == FiatCurrency.CUP_FM -> context.getString(R.string.currency_cup_fm)
         this == FiatCurrency.LBP -> context.getString(R.string.currency_lbp_official)
         this == FiatCurrency.LBP_BM -> context.getString(R.string.currency_lbp_bm)
+        this == FiatCurrency.ANG -> Currency.getInstance(this.name).displayName
         // use the JVM API otherwise to get the name
         this.displayCode.length == 3 -> try {
             Currency.getInstance(this.displayCode).displayName

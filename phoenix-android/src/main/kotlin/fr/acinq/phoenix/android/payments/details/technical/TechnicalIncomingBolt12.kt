@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.db.Bolt12IncomingPayment
 import fr.acinq.lightning.payment.OfferPaymentMetadata
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.payments.details.TechnicalRow
 import fr.acinq.phoenix.android.payments.details.TechnicalRowAmount
 import fr.acinq.phoenix.android.payments.details.TechnicalRowSelectable
@@ -30,6 +30,7 @@ import fr.acinq.phoenix.android.payments.details.TechnicalRowWithCopy
 import fr.acinq.phoenix.android.payments.details.TimestampSection
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.data.ExchangeRate
+import fr.acinq.phoenix.utils.extensions.description
 
 @Composable
 fun TechnicalIncomingBolt12(
@@ -75,10 +76,13 @@ fun IncomingBolt12Details(
         amount = metadata.amount,
         rateThen = originalFiatRate
     )
+    metadata.description?.let { description ->
+        TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_bolt12_description_label), value = description)
+    }
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_payment_hash_label), value = metadata.paymentHash.toHex())
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_preimage_label), value = metadata.preimage.toHex())
     TechnicalRowWithCopy(label = stringResource(id = R.string.paymentdetails_offer_metadata_label), value = metadata.encode().toHex())
-    if (metadata is OfferPaymentMetadata.V1) {
-        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = metadata.payerKey.toHex())
+    metadata.payerKey?.let { payerKey ->
+        TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_payerkey_label), value = payerKey.toHex())
     }
 }

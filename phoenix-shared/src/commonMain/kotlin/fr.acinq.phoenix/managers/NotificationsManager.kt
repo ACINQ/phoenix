@@ -29,16 +29,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class NotificationsManager(
     private val loggerFactory: LoggerFactory,
     private val appDb: SqliteAppDb,
+    private val walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
-        appDb = business.appDb,
+        appDb = business.phoenixGlobal.appDb,
+        walletManager = business.walletManager
     )
 
     private val log = loggerFactory.newLogger(this::class)
@@ -54,8 +58,14 @@ class NotificationsManager(
         launch { monitorNotifications() }
     }
 
+    private suspend fun getNodeIdHash(): String {
+        return walletManager.keyManager.filterNotNull().first().nodeIdHash()
+    }
+
     private suspend fun monitorNotifications() {
-        appDb.listUnreadNotification().collect {
+        val nodeIdHash = getNodeIdHash()
+        appDb.initializeNodeIdHashColumn(nodeIdHash)
+        appDb.listUnreadNotification(nodeIdHash).collect {
             _notifications.value = it
         }
     }
@@ -66,11 +76,13 @@ class NotificationsManager(
 
     suspend fun saveWatchTowerOutcome(outcome: WatchTowerOutcome) {
         log.debug { "persisting watch-tower-outcome=$outcome" }
-        appDb.saveNotification(outcome)
+        val nodeIdHash = getNodeIdHash()
+        appDb.saveNotification(outcome, nodeIdHash)
     }
 
     internal suspend fun saveLiquidityEventNotification(event: LiquidityEvents) {
         log.debug { "persisting liquidity_event=$event" }
+        val nodeIdHash = getNodeIdHash()
         when (event) {
             is LiquidityEvents.Rejected -> {
                 val notification = when (val reason = event.reason) {
@@ -116,7 +128,7 @@ class NotificationsManager(
                         source = event.source,
                     )
                 }
-                appDb.saveNotification(notification)
+                appDb.saveNotification(notification, nodeIdHash)
             }
             else -> {}
         }

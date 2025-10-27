@@ -146,44 +146,52 @@ struct SwapInAddresses: View {
 	}
 	
 	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func swapInWalletChanged(_ wallet: Lightning_kmpWalletState) {
+		log.trace(#function)
+		
+		let legacyAddr: String? = wallet.addresses.first {
+			(address: String, state: Lightning_kmpWalletState.AddressState) in
+			
+			state.meta is Lightning_kmpWalletState.AddressMetaSingle
+		}?.key
+		
+		let currentTaprootAddr: String? = wallet.firstUnusedDerivedAddress?.first as? String
+		let taprootAddrList: [TaprootAddress] = wallet.addresses.compactMap {
+			(address: String, state: Lightning_kmpWalletState.AddressState) in
+			
+			if let meta = state.meta as? Lightning_kmpWalletState.AddressMetaDerived {
+				let isCurrent = if let currentTaprootAddr { address == currentTaprootAddr } else { false }
+				return TaprootAddress(
+					address   : address,
+					index     : meta.index,
+					state     : state,
+					isCurrent : isCurrent
+				)
+			} else {
+				return nil
+			}
+		}.sorted()
+		
+		self.legacyAddress = legacyAddr
+		self.taprootAddressList = taprootAddrList
+	}
+	
+	// --------------------------------------------------
 	// MARK: Tasks
 	// --------------------------------------------------
 	
+	@MainActor
 	func monitorSwapAddresses() async {
 		log.trace(#function)
 		
 		do {
 			let peer = try await Biz.business.peerManager.getPeer()
-			
-			for try await wallet in peer.phoenixSwapInWallet.wallet.walletStatePublisher().values {
-				
-				let legacyAddr: String? = wallet.addresses.first {
-					(address: String, state: Lightning_kmpWalletState.AddressState) in
-					
-					state.meta is Lightning_kmpWalletState.AddressMetaSingle
-				}?.key
-				
-				let currentTaprootAddr: String? = wallet.firstUnusedDerivedAddress?.first as? String
-				let taprootAddrList: [TaprootAddress] = wallet.addresses.compactMap {
-					(address: String, state: Lightning_kmpWalletState.AddressState) in
-					
-					if let meta = state.meta as? Lightning_kmpWalletState.AddressMetaDerived {
-						let isCurrent = if let currentTaprootAddr { address == currentTaprootAddr } else { false }
-						return TaprootAddress(
-							address   : address,
-							index     : meta.index,
-							state     : state,
-							isCurrent : isCurrent
-						)
-					} else {
-						return nil
-					}
-				}.sorted()
-				
-				self.legacyAddress = legacyAddr
-				self.taprootAddressList = taprootAddrList
+			for try await wallet in peer.phoenixSwapInWallet.wallet.walletStateSequence() {
+				swapInWalletChanged(wallet)
 			}
-			
 		} catch {
 			log.error("monitorSwapAddresses(): \(error)")
 		}

@@ -22,7 +22,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix se está ejecutando en segundo plano</string>
-    <string name="notif_headless_received">Recibiste +%1$s</string>
+    <string name="notif_headless_received">%1$s Recibiste %2$s</string>
 
     <string name="notif_pending_settlement_title">Inicia Phoenix</string>
     <string name="notif_pending_settlement_message">Un pago entrante está pendiente.</string>
@@ -63,7 +63,7 @@
     <string name="settings_list_channels">Canales de pago</string>
     <string name="settings_logs">Registros</string>
     <string name="settings_electrum">Servidor de Electrum</string>
-    <string name="settings_reset_wallet">Restablecer billetera</string>
+    <string name="settings_reset_wallet">Eliminar billetera</string>
     <string name="settings_mutual_close">Cerrar canales</string>
     <string name="settings_force_close">Forzar cierre de canales</string>
     <string name="settings_tor">Tor</string>
@@ -91,6 +91,7 @@
 
     <string name="home_final_title">Billetera final</string>
     <string name="home_final_desc">Estos fondos provienen de canales Lightning cerrados. Deben gastarse manualmente.</string>
+    <string name="home_onchain_balance_only">On-chain saldo</string>
 
     <string name="home_background_restriction_title">Procesamiento en segundo plano restringido</string>.
     <string name="home_background_restriction_body_1">Phoenix no podrá recibir pagos cuando esté en segundo plano, o cuando esté cerrado.</string>
@@ -210,6 +211,7 @@
     <string name="inappnotif_backup_seed_message">Haz una copia de seguridad de la billetera para evitar la pérdida de tu Bitcoin.</string>
     <string name="inappnotif_backup_seed_action">Hacer una copia de seguridad de mi billetera</string>
 
+    <string name="inappnotif_notification_permission_message_short">Habilitar notificaciones de Android</string>
     <string name="inappnotif_notification_permission_message">Las notificaciones están desactivadas en los ajustes de Android. Phoenix no podrá notificarte cuándo se esté procesando un pago.</string>
     <string name="inappnotif_notification_permission_enable">Activar</string>
 

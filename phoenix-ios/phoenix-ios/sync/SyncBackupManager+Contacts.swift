@@ -38,28 +38,29 @@ fileprivate struct UploadContactsOperationInfo {
 extension SyncBackupManager {
 	
 	func startContactsQueueCountMonitor() {
-		log.trace("startContactsQueueCountMonitor()")
+		log.trace(#function)
 		
-		// Kotlin suspend functions are currently only supported on the main thread
-		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
-		
-		self.cloudKitDb.contacts.queueCountPublisher().sink {[weak self] (queueCount: Int64) in
-			log.debug("contacts.queueCountPublisher().sink(): count = \(queueCount)")
-			
-			guard let self = self else {
-				return
+		let queueCountSequnece = cloudKitDb.contacts.queueCountSequence()
+		Task { @MainActor [weak self] in
+			for await count in queueCountSequnece {
+				self?.queueCountChanged(count)
 			}
-			
-			// Note: Upload delay doesn't apply to contacts.
-			
-			let count = Int(clamping: queueCount)
-			Task {
-				if let newState = await self.actor.contactsQueueCountChanged(count, wait: nil) {
-					self.handleNewState(newState)
-				}
-			}
-
 		}.store(in: &cancellables)
+	}
+	
+	// ----------------------------------------
+	// MARK: Notifications
+	// ----------------------------------------
+	
+	private func queueCountChanged(_ queueCount: Int64) {
+		log.trace("contacts.queueCountChanged(): count = \(queueCount)")
+		
+		let count = Int(clamping: queueCount)
+		Task {
+			if let newState = await self.actor.contactsQueueCountChanged(count, wait: nil) {
+				self.handleNewState(newState)
+			}
+		}
 	}
 	
 	// ----------------------------------------
@@ -260,7 +261,7 @@ extension SyncBackupManager {
 				
 				log.trace("downloadContacts(): finish: success")
 				
-				Prefs.shared.backupTransactions.markHasDownloadedContacts(walletId)
+				prefs.backupTransactions.hasDownloadedContacts = true
 				self.consecutiveErrorCount = 0
 				
 				if let newState = await self.actor.didDownloadContacts() {
@@ -385,7 +386,7 @@ extension SyncBackupManager {
 			let container = CKContainer.default()
 			
 			let configuration = CKOperation.Configuration()
-			configuration.allowsCellularAccess = Prefs.shared.backupTransactions.useCellular
+			configuration.allowsCellularAccess = self.prefs.backupTransactions.useCellular
 			
 			return try await container.privateCloudDatabase.configuredWith(configuration: configuration) { database in
 				
@@ -670,7 +671,7 @@ extension SyncBackupManager {
 		
 		let hashMe = prefix + suffix
 		let digest = SHA256.hash(data: hashMe)
-		let hash = digest.toHex(options: .lowerCase)
+		let hash = digest.toHex(.lowerCase)
 		
 		return CKRecord.ID(recordName: hash, zoneID: recordZoneID())
 	}

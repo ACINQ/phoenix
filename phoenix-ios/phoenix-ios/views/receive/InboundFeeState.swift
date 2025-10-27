@@ -14,7 +14,7 @@ class InboundFeeState: ObservableObject {
 	
 	@Published var connections: Connections = Biz.business.connectionsManager.currentValue
 	@Published var channels: [LocalChannelInfo] = Biz.business.peerManager.channelsValue()
-	@Published var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
+	@Published var liquidityPolicy: LiquidityPolicy = GroupPrefs.current.liquidityPolicy
 	@Published var mempoolRecommendedResponse: MempoolRecommendedResponse? = nil
 	
 	private var cancellables = Set<AnyCancellable>()
@@ -23,19 +23,19 @@ class InboundFeeState: ObservableObject {
 	init() {
 		log.trace("init()")
 		
-		Biz.business.connectionsManager.connectionsPublisher()
-			.sink {[weak self](newValue: Connections) in
+		Task { @MainActor [weak self] in
+			for await newValue in Biz.business.connectionsManager.connectionsSequence() {
 				self?.connectionsChanged(newValue)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
-		Biz.business.peerManager.channelsPublisher()
-			.sink {[weak self](newValue: [LocalChannelInfo]) in
+		Task { @MainActor [weak self] in
+			for await newValue in Biz.business.peerManager.channelsArraySequence() {
 				self?.channelsChanged(newValue)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
-		GroupPrefs.shared.liquidityPolicyPublisher
+		GroupPrefs.current.liquidityPolicyPublisher
 			.sink {[weak self](newValue: LiquidityPolicy) in
 				self?.liquidityPolicyChanged(newValue)
 			}

@@ -58,8 +58,8 @@ object IosMigrationHelper {
 
     private fun ChannelState.isLegacy(): Boolean {
         return this is ChannelStateWithCommitments
-            && this !is ShuttingDown && this !is Negotiating && this !is Closing && this !is Closed && this !is Aborted
-            && !this.commitments.params.channelFeatures.hasFeature(Feature.DualFunding)
+            && this !is ShuttingDown && this !is Negotiating && this !is Closing && this !is Closed
+            && !this.commitments.channelParams.channelFeatures.hasFeature(Feature.DualFunding)
     }
 
     /**
@@ -115,7 +115,7 @@ object IosMigrationHelper {
 
             log.info { "migrating ${channelsToMigrate.size} channels to $swapInAddress" }
             // Close all channels in parallel
-            val mempoolFeerate = biz.appConfigurationManager.mempoolFeerate.filterNotNull().first()
+            val mempoolFeerate = biz.phoenixGlobal.feerateManager.mempoolFeerate.filterNotNull().first()
             val command = ChannelCommand.Close.MutualClose(
                 replyTo = CompletableDeferred(),
                 scriptPubKey = closingScript,

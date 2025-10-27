@@ -41,30 +41,34 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.inputs.FeerateSlider
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.SplashLabelRow
 import fr.acinq.phoenix.android.components.TextWithIcon
+import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.inputs.FeerateSlider
+import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.payments.send.spliceout.spliceFailureDetails
-import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.BitcoinUnit
 
 
 @Composable
 fun CpfpView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     channelId: ByteVector32,
     onSuccess: () -> Unit,
 ) {
     val peerManager = business.peerManager
     val vm = viewModel<CpfpViewModel>(factory = CpfpViewModel.Factory(peerManager))
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
 
     val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()
     var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
@@ -88,7 +92,7 @@ fun CpfpView(
         }
     }
 
-    val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
+    val mayDoPayments by peerManager.mayDoPayments.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,6 +118,7 @@ fun CpfpView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 SmartSpendButton(
+                    walletId = walletId,
                     text = stringResource(id = R.string.cpfp_execute_button),
                     icon = R.drawable.ic_check,
                     enabled = mayDoPayments,

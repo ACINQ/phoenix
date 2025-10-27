@@ -1,0 +1,135 @@
+/*
+ * Copyright 2025 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package fr.acinq.phoenix.android.navigation
+
+import android.content.Intent
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.payments.details.PaymentDetailsView
+import fr.acinq.phoenix.android.payments.receive.ReceiveView
+import fr.acinq.phoenix.android.payments.send.SendView
+import org.slf4j.LoggerFactory
+
+fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel: AppViewModel) {
+    val log = LoggerFactory.getLogger("Navigation")
+
+    businessComposable(Screen.BusinessNavGraph.Receive.route, appViewModel) { _, walletId, business ->
+        ReceiveView(
+            walletId = walletId,
+            business = business,
+            onBackClick = { navController.popBackStack() },
+            onScanDataClick = { navController.navigate("${Screen.BusinessNavGraph.Send.route}?openScanner=true&fromRoute=${Screen.BusinessNavGraph.Receive.route}") },
+            onFeeManagementClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) },
+        )
+    }
+
+    businessComposable(
+        route = "${Screen.BusinessNavGraph.PaymentDetails.route}?id={id}&fromEvent={fromEvent}",
+        appViewModel = appViewModel,
+        arguments = listOf(
+            navArgument("id") { type = NavType.StringType },
+            navArgument("fromEvent") {
+                type = NavType.BoolType
+                defaultValue = false
+            }
+        ),
+        deepLinks = listOf(navDeepLink { uriPattern = "phoenix:payments/{walletid}/{id}" })
+    ) { backstackEntry, walletId, business ->
+        val walletIdDeeplink = backstackEntry.arguments?.getString("walletid")?.let { WalletId(it) }
+        val paymentId = try {
+            UUID.fromString(backstackEntry.arguments!!.getString("id")!!)
+        } catch (_: Exception) {
+            null
+        }
+        if (walletIdDeeplink != null && walletIdDeeplink != walletId) {
+            LaunchedEffect(Unit) { navController.popToHome() }
+        } else if (paymentId != null) {
+            val fromEvent = backstackEntry.arguments?.getBoolean("fromEvent") ?: false
+            PaymentDetailsView(
+                business = business,
+                paymentId = paymentId,
+                onBackClick = {
+                    val previousNav = navController.previousBackStackEntry
+                    if (fromEvent && previousNav?.destination?.route == Screen.BusinessNavGraph.Send.route) {
+                        navController.popToHome()
+                    } else {
+                        navController.popBackStackOrHome()
+                    }
+                },
+                fromEvent = fromEvent
+            )
+        }
+    }
+
+    businessComposable(
+        route = "${Screen.BusinessNavGraph.Send.route}?input={input}&openScanner={openScanner}&fromRoute={fromRoute}",
+        appViewModel = appViewModel,
+        deepLinkPrefix = "scanview:",
+        arguments = listOf(
+            navArgument("input") { type = NavType.StringType ; nullable = true },
+            navArgument("openScanner") { type = NavType.BoolType ; defaultValue = false },
+            navArgument("fromRoute") { type = NavType.StringType ; nullable = true ; defaultValue = null },
+        ),
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "lightning:{data}" },
+            navDeepLink { uriPattern = "bitcoin:{data}" },
+            navDeepLink { uriPattern = "lnurl:{data}" },
+            navDeepLink { uriPattern = "lnurlp:{data}" },
+            navDeepLink { uriPattern = "lnurlw:{data}" },
+            navDeepLink { uriPattern = "keyauth:{data}" },
+            navDeepLink { uriPattern = "phoenix:lightning:{data}" },
+            navDeepLink { uriPattern = "phoenix:bitcoin:{data}" },
+            navDeepLink { uriPattern = "scanview:{data}" },
+        )
+    ) { backStackEntry, walletId, business ->
+        @Suppress("DEPRECATION")
+        val intent = try {
+            backStackEntry.arguments?.getParcelable<Intent>(NavController.KEY_DEEP_LINK_INTENT)
+        } catch (e: Exception) {
+            null
+        }
+        // prevents forwarding an internal deeplink intent coming from androidx-navigation framework.
+        // TODO properly parse deeplinks following f0ae90444a23cc17d6d7407dfe43c0c8d20e62fc
+        val isIntentFromNavigation = intent?.dataString?.contains("androidx.navigation") ?: true
+        log.debug("isIntentFromNavigation=$isIntentFromNavigation")
+        val input = if (isIntentFromNavigation) {
+            backStackEntry.arguments?.getString("input")
+        } else {
+            intent.data?.toString()?.substringAfter("scanview:")
+        }
+
+        log.info("navigating to send-payment with input=$input")
+        SendView(
+            walletId = walletId,
+            business = business,
+            initialInput = input,
+            immediatelyOpenScanner = backStackEntry.arguments?.getBoolean("openScanner") ?: false,
+            fromRoute = backStackEntry.arguments?.getString("fromRoute") ?: run {
+                if (!isIntentFromNavigation) {
+                    Screen.BusinessNavGraph.Home.route
+                } else null
+            }
+        )
+    }
+}

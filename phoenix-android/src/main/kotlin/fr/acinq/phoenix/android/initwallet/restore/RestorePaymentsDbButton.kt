@@ -37,9 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.MutedFilledButton
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.MutedFilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.InfoMessage

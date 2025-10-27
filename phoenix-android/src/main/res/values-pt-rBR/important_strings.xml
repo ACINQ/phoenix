@@ -25,7 +25,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">O Phoenix está sendo executado em segundo plano</string>
-    <string name="notif_headless_received">Recebeu +%1$s</string>
+    <string name="notif_headless_received">%1$s Recebeu %2$s</string>
 
     <string name="notif_pending_settlement_title">Por favor, inicie o Phoenix</string>
     <string name="notif_pending_settlement_message">Uma liquidação recebida está pendente.</string>
@@ -66,7 +66,7 @@
     <string name="settings_list_channels">Canais de pagamento</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum servers</string>
-    <string name="settings_reset_wallet">Redefinir carteira</string>
+    <string name="settings_reset_wallet">Excluir carteira</string>
     <string name="settings_mutual_close">Fechar canais</string>
     <string name="settings_force_close">Fechar canais à força</string>
     <string name="settings_tor">Tor</string>
@@ -94,6 +94,7 @@
 
     <string name="home_final_title">Carteira final</string>
     <string name="home_final_desc">Esses fundos vêm de canais Lightning fechados. Eles devem ser gastos manualmente.</string>
+    <string name="home_onchain_balance_only">On-chain saldo</string>
 
     <string name="home_background_restriction_title">Processamento em segundo plano restrito</string>
     <string name="home_background_restriction_body_1">O Phoenix não poderá receber pagamentos quando estiver em segundo plano ou quando estiver fechado.</string>
@@ -212,6 +213,7 @@
     <string name="inappnotif_backup_seed_message">Faça backup de sua carteira para evitar a perda de seus bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Fazer backup da minha carteira</string>
 
+    <string name="inappnotif_notification_permission_message_short">Ativar notificações do Android</string>
     <string name="inappnotif_notification_permission_message">As notificações estão desativadas nas configurações do Android. O Phoenix não poderá notificá-lo quando um pagamento estiver sendo processado.</string>
     <string name="inappnotif_notification_permission_enable">Ativar</string>
 

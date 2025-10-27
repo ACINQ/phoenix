@@ -11,16 +11,30 @@ struct UnlockErrorView: View {
 	
 	let danger: UnlockError
 	
+	@ViewBuilder
+	var body: some View {
+		
+		GlobalEnvironmentView {
+			_UnlockErrorView(danger: danger)
+		}
+	}
+}
+
+fileprivate struct _UnlockErrorView: View {
+	
+	let danger: UnlockError
+	
 	@EnvironmentObject var popoverState: PopoverState
 	@State var popoverItem: PopoverItem? = nil
 	
 	@StateObject var toast = Toast()
 	
+	@ViewBuilder
 	var body: some View {
 		
 		ZStack {
 			
-			main.zIndex(0) // needed for proper animation
+			main().zIndex(0) // needed for proper animation
 
 			if let popoverItem = popoverItem {
 				PopoverWrapper(dismissable: popoverState.dismissable) {
@@ -40,14 +54,14 @@ struct UnlockErrorView: View {
 	}
 	
 	@ViewBuilder
-	var main: some View {
+	func main() -> some View {
 		
 		ZStack {
 			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if BusinessManager.showTestnetBackground {
+			if Biz.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -148,7 +162,7 @@ struct UnlockErrorView: View {
 	}
 }
 
-struct ErrorDetailsView: View, ViewName {
+fileprivate struct ErrorDetailsView: View, ViewName {
 	
 	let danger: UnlockError
 	@ObservedObject var toast: Toast
@@ -226,60 +240,7 @@ struct ErrorDetailsView: View, ViewName {
 	}
 	
 	func errorText() -> String {
-		
-		var txt: String = ""
-		
-		txt += "readSecurityFileError: "
-		if let err = danger.readSecurityFileError {
-			switch err {
-				case .fileNotFound:
-					txt += "fileNotFound"
-				case .errorReadingFile(let underlying):
-					txt += "readingFile:\n\(String(describing: underlying))"
-				case .errorDecodingFile(let underlying):
-					txt += "decodingFile:\n\(String(describing: underlying))"
-			}
-		} else {
-			txt += "none"
-		}
-		
-		txt += "\n\n"
-		
-		txt += "readKeychainError: "
-		if let err = danger.readKeychainError {
-			switch err {
-				case .keychainOptionNotEnabled:
-					txt += "keychainOptionNotEnabled"
-				case .keychainBoxCorrupted(let underlying):
-					txt += "keychainBoxCorrupted:\n\(String(describing: underlying))"
-				case .errorReadingKey(let underlying):
-					txt += "errorReadingKey:\n\(String(describing: underlying))"
-				case .keyNotFound:
-					txt += "keyNotFound"
-				case .errorOpeningBox(let underlying):
-					txt += "errorOpeningBox:\n\(String(describing: underlying))"
-			}
-		} else {
-			txt += "none"
-		}
-		
-		txt += "\n\n"
-		
-		txt += "readRecoveryPhraseError: "
-		if let err = danger.readRecoveryPhraseError {
-			switch err {
-				case .invalidCiphertext:
-					txt += "invalidCiphertext"
-				case .invalidJSON:
-					txt += "invalidJSON"
-			}
-		} else {
-			txt += "none"
-		}
-
-		txt += "\n"
-		
-		return txt
+		return "\(danger)\n" // UnlockError implements CustomStringConvertible protocol
 	}
 	
 	func closePopover() {

@@ -99,7 +99,7 @@
 
         <!-- node service -->
         <service
-            android:name="fr.acinq.phoenix.android.services.NodeService"
+            android:name="fr.acinq.phoenix.android.services.PaymentsForegroundService"
             android:foregroundServiceType="shortService"
             android:exported="false"
             android:stopWithTask="false" />

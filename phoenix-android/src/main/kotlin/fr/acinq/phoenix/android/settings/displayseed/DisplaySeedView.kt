@@ -17,16 +17,29 @@
 package fr.acinq.phoenix.android.settings.displayseed
 
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,37 +49,43 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.phoenix.android.LocalInternalPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialogTitle
+import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
-import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.extensions.safeLet
+import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun DisplaySeedView() {
-    val nc = navController
-    val context = LocalContext.current
-    val internalData = application.internalDataRepository
+fun DisplaySeedView(
+    onBackClick: () -> Unit,
+    walletId: WalletId,
+) {
+    val internalPrefs = LocalInternalPrefs.current!!
     val scope = rememberCoroutineScope()
 
-    val isBackupDone by internalData.isManualSeedBackupDone.collectAsState(initial = null)
-    val isDisclaimerRead by internalData.isSeedLossDisclaimerRead.collectAsState(initial = null)
-    val showBackupNotice by internalData.showSeedBackupNotice.collectAsState(initial = false)
+    val isBackupDone by internalPrefs.isManualSeedBackupDone.collectAsState(initial = null)
+    val isDisclaimerRead by internalPrefs.isSeedLossDisclaimerRead.collectAsState(initial = null)
+    val showBackupNotice by internalPrefs.showSeedBackupNotice.collectAsState(initial = false)
 
-    val vm = viewModel<DisplaySeedViewModel>()
+    val vm = viewModel<DisplaySeedViewModel>(factory = DisplaySeedViewModel.Factory(application))
 
     DefaultScreenLayout {
-        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
+        DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.displayseed_title))
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
         }
@@ -75,12 +94,13 @@ fun DisplaySeedView() {
             when (val state = vm.state.value) {
                 is DisplaySeedViewModel.ReadingSeedState.Init -> {
                     SmartSpendButton(
+                        walletId = walletId,
                         text = stringResource(R.string.displayseed_authenticate_button),
                         icon = R.drawable.ic_key,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         enabled = true,
-                        onSpend = { vm.readSeed(SeedManager.getSeedState(context)) },
+                        onSpend = { vm.readActiveSeed(walletId) },
                         prompt = { PinDialogTitle(text = stringResource(R.string.pincode_check_spending_displayseed_title)) },
                         ignoreChannelsState = true,
                     )
@@ -94,7 +114,10 @@ fun DisplaySeedView() {
                 is DisplaySeedViewModel.ReadingSeedState.Error -> {
                     ErrorMessage(
                         header = stringResource(id = R.string.displayseed_error_details),
-                        details = state.message,
+                        details = when(state) {
+                            is DisplaySeedViewModel.ReadingSeedState.Error.CouldNotFindMatch -> "Seed is unavailable"
+                            is DisplaySeedViewModel.ReadingSeedState.Error.CouldNotReadSeedFile -> "Could not read seed file, try again"
+                        },
                         alignment = Alignment.CenterHorizontally,
                     )
                 }
@@ -123,7 +146,7 @@ fun DisplaySeedView() {
                     padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     checked = backupChecked,
                     onCheckedChange = {
-                        scope.launch { internalData.saveManualSeedBackupDone(it) }
+                        scope.launch { internalPrefs.saveManualSeedBackupDone(it) }
                     },
                 )
                 Checkbox(
@@ -131,7 +154,7 @@ fun DisplaySeedView() {
                     padding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                     checked = disclaimerChecked,
                     onCheckedChange = {
-                        scope.launch { internalData.saveSeedLossDisclaimerRead(it) }
+                        scope.launch { internalPrefs.saveSeedLossDisclaimerRead(it) }
                     }
                 )
             } ?: ProgressView(text = stringResource(id = R.string.displayseed_loading_prefs))

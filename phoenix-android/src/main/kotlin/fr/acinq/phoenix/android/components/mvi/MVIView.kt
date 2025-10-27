@@ -18,7 +18,7 @@ package fr.acinq.phoenix.android.components.mvi
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.phoenix.android.controllerFactory
+import fr.acinq.phoenix.android.LocalControllerFactory
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.MVI
 
@@ -29,9 +29,10 @@ fun <M : MVI.Model, I : MVI.Intent> MVIView(
     getController: ControllerFactory.() -> MVI.Controller<M, I>,
     children: @Composable (model: M, postIntent: (I) -> Unit) -> Unit
 ) {
-    // store controller in a view model to survive configuration changes
-    val viewModel: MVIControllerViewModel<M, I> = viewModel(factory = MVIControllerViewModel.Factory(controllerFactory, getController))
-    MVIView(viewModel, children)
+    LocalControllerFactory.current?.let {
+        val viewModel: MVIControllerViewModel<M, I> = viewModel(factory = MVIControllerViewModel.Factory(it, getController))
+        MVIView(viewModel, children)
+    }
 }
 
 /** Get a composable view that refreshes when the controller's model updates. You must provide a custom view model that contains a controller. */

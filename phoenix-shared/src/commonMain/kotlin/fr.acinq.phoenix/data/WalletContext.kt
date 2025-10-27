@@ -5,4 +5,5 @@ data class WalletContext(
     val isMempoolFull: Boolean,
     val androidLatestVersion: Int,
     val androidLatestCriticalVersion: Int,
+    val isManualLiquidityEnabled: Boolean,
 )

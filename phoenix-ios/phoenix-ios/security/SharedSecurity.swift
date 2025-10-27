@@ -9,25 +9,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
-enum ReadSecurityFileError: Error {
-	case fileNotFound
-	case errorReadingFile(underlying: Error)
-	case errorDecodingFile(underlying: Error)
-}
-
-enum ReadKeychainError: Error {
-	case keychainOptionNotEnabled
-	case keychainBoxCorrupted(underlying: Error)
-	case errorReadingKey(underlying: Error)
-	case keyNotFound
-	case errorOpeningBox(underlying: Error)
-}
-
-enum ReadRecoveryPhraseError: Error {
-	case invalidCiphertext
-	case invalidJSON
-}
-
+fileprivate typealias Key = KeychainKey
 
 /// Encompasses security operations shared between phoenix & phoenix-notifySrvExt
 ///
@@ -39,39 +21,35 @@ class SharedSecurity {
 	
 	private init() {/* must use shared instance */}
 	
-	// --------------------------------------------------------------------------------
-	// MARK: Access Groups
-	// --------------------------------------------------------------------------------
-	
-	/// Represents the keychain domain for our app group.
-	/// I.E. can be accessed by our app extensions (e.g. notification-service-extension).
-	///
-	public func sharedAccessGroup() -> String {
-		
-		return "group.co.acinq.phoenix"
-	}
-	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: Security JSON File
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
-	public lazy var securityJsonUrl: URL = {
-		
-		// lazy == thread-safe (uses dispatch_once primitives internally)
+	private lazy var groupDirectoryUrl: URL = {
 		
 		let fm = FileManager.default
 		guard let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.co.acinq.phoenix") else {
 			fatalError("FileManager returned nil containerUrl !")
 		}
 		
-		return groupDir.appendingPathComponent("security.json", isDirectory: false)
+		return groupDir
+	}()
+	
+	public lazy var securityJsonUrl_V0: URL = {
+		
+		return groupDirectoryUrl.appendingPathComponent(SecurityFile.V0.filename, isDirectory: false)
+	}()
+	
+	public lazy var securityJsonUrl_V1: URL = {
+		
+		return groupDirectoryUrl.appendingPathComponent(SecurityFile.V1.filename, isDirectory: false)
 	}()
 	
 	/// Performs disk IO - use in background thread.
 	///
-	public func readSecurityJsonFromDisk() -> Result<SecurityFile, ReadSecurityFileError> {
+	private func readSecurityJsonFromDisk_V0() -> Result<SecurityFile.V0, ReadSecurityFileError> {
 		
-		let fileUrl = self.securityJsonUrl
+		let fileUrl = self.securityJsonUrl_V0
 		
 		if !FileManager.default.fileExists(atPath: fileUrl.path) {
 			return .failure(.fileNotFound)
@@ -81,49 +59,99 @@ class SharedSecurity {
 		do {
 			data = try Data(contentsOf: fileUrl)
 		} catch {
-			log.error("readSecurityJsonFromDisk(): error reading file: \(String(describing: error))")
+			log.error("readSecurityJsonFromDisk_V0(): error reading file: \(String(describing: error))")
 			return .failure(.errorReadingFile(underlying: error))
 		}
 		
-		let result: SecurityFile
+		let result: SecurityFile.V0
 		do {
-			result = try JSONDecoder().decode(SecurityFile.self, from: data)
+			result = try JSONDecoder().decode(SecurityFile.V0.self, from: data)
 		} catch {
-			log.error("readSecurityJsonFromDisk(): error decoding file: \(String(describing: error))")
+			log.error("readSecurityJsonFromDisk_V0(): error decoding file: \(String(describing: error))")
 			return .failure(.errorDecodingFile(underlying: error))
 		}
 		
 		return .success(result)
 	}
 	
-	// --------------------------------------------------------------------------------
-	// MARK: Keychain
-	// --------------------------------------------------------------------------------
-	
-	public func readKeychainEntry(_ securityFile: SecurityFile) -> Result<Data, ReadKeychainError> {
+	private func readSecurityJsonFromDisk_V1() -> Result<SecurityFile.V1, ReadSecurityFileError> {
 		
-		// The securityFile tells us which security options have been enabled.
-		// If there isn't a keychain entry, then we cannot unlock the seed.
-		guard let keyInfo = securityFile.keychain as? KeyInfo_ChaChaPoly else {
-			return .failure(.keychainOptionNotEnabled)
+		let fileUrl = self.securityJsonUrl_V1
+		
+		if !FileManager.default.fileExists(atPath: fileUrl.path) {
+			return .failure(.fileNotFound)
 		}
 		
-		let sealedBox: ChaChaPoly.SealedBox
+		let data: Data
 		do {
-			sealedBox = try keyInfo.toSealedBox()
+			data = try Data(contentsOf: fileUrl)
+		} catch {
+			log.error("readSecurityJsonFromDisk_V1(): error reading file: \(String(describing: error))")
+			return .failure(.errorReadingFile(underlying: error))
+		}
+		
+		let result: SecurityFile.V1
+		do {
+			result = try JSONDecoder().decode(SecurityFile.V1.self, from: data)
+		} catch {
+			log.error("readSecurityJsonFromDisk_V1(): error decoding file: \(String(describing: error))")
+			return .failure(.errorDecodingFile(underlying: error))
+		}
+		
+		return .success(result)
+	}
+	
+	func readSecurityJsonFromDisk() -> Result<SecurityFile.Version, ReadSecurityFileError> {
+		
+		switch readSecurityJsonFromDisk_V1() {
+		case .success(let v1):
+			return .success(SecurityFile.Version.v1(file: v1))
+			
+		case .failure(let reason):
+			switch reason {
+			case .errorReadingFile(_):
+				return .failure(reason)
+				
+			case .errorDecodingFile(_):
+				return .failure(reason)
+				
+			case .fileNotFound:
+				break
+			}
+		}
+		
+		switch readSecurityJsonFromDisk_V0() {
+		case .success(let v0):
+			return .success(SecurityFile.Version.v0(file: v0))
+			
+		case .failure(let reason):
+			return .failure(reason)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Keychain
+	// --------------------------------------------------
+	
+	public func readKeychainEntry(
+		_ id: String,
+		_ sealedBox: SealedBox_ChaChaPoly
+	) -> Result<Data, ReadKeychainError> {
+		
+		let rawSealedBox: ChaChaPoly.SealedBox
+		do {
+			rawSealedBox = try sealedBox.toRaw()
 		} catch {
 			log.error("readKeychainEntry(): error: keychainBoxCorrupted: \(String(describing: error))")
 			return .failure(.keychainBoxCorrupted(underlying: error))
 		}
 		
-		let keychain = GenericPasswordStore()
-		
 		// Read the lockingKey from the OS keychain
 		let fetchedKey: SymmetricKey?
 		do {
-			fetchedKey = try keychain.readKey(
-				account     : keychain_accountName_keychain,
-				accessGroup : sharedAccessGroup()
+			fetchedKey = try SystemKeychain.readItem(
+				account     : Key.lockingKey.account(id),
+				accessGroup : Key.lockingKey.accessGroup.value
 			)
 		} catch {
 			log.error("readKeychainEntry(): error: readingKey: \(String(describing: error))")
@@ -138,7 +166,7 @@ class SharedSecurity {
 		// Decrypt the databaseKey using the lockingKey
 		let cleartextData: Data
 		do {
-			cleartextData = try ChaChaPoly.open(sealedBox, using: lockingKey)
+			cleartextData = try ChaChaPoly.open(rawSealedBox, using: lockingKey)
 		} catch {
 			log.error("readKeychainEntry(): error: openingBox: \(String(describing: error))")
 			return .failure(.errorOpeningBox(underlying: error))
@@ -147,9 +175,9 @@ class SharedSecurity {
 		return .success(cleartextData)
 	}
 	
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	// MARK: Recovery Phrase
-	// --------------------------------------------------------------------------------
+	// --------------------------------------------------
 	
 	public func decodeRecoveryPhrase(_ cleartextData: Data) -> Result<RecoveryPhrase, ReadRecoveryPhraseError> {
 		

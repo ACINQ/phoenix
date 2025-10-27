@@ -40,7 +40,7 @@ enum class FiatCurrency(override val displayCode: String, val flag: String = "�
     AFN(displayCode = "AFN", flag = "🇦🇫"), // Afghan Afghani
     ALL(displayCode = "ALL", flag = "🇦🇱"), // Albanian Lek
     AMD(displayCode = "AMD", flag = "🇦🇲"), // Armenian Dram
-    ANG(displayCode = "ANG", flag = "🇳🇱"), // Netherlands Antillean Guilder
+    ANG(displayCode = "XCG", flag = "🇳🇱"), // Netherlands Antillean Guilder
     AOA(displayCode = "AOA", flag = "🇦🇴"), // Angolan Kwanza
     ARS_BM(displayCode = "ARS", flag = "🇦🇷"), // Argentine Peso (blue market)
     ARS(displayCode = "ARS_OFF", flag = "🇦🇷"), // Argentine Peso (official rate)
@@ -247,3 +247,21 @@ data class StartupParams(
     val liquidityPolicy: LiquidityPolicy,
     // TODO: add custom electrum address, fiat currencies, ...
 )
+
+@Serializable
+data class PreferredFiatCurrencies(
+    val primary: FiatCurrency,
+    val others: Set<FiatCurrency>
+) {
+    constructor(primary: FiatCurrency, others: List<FiatCurrency>) :
+            this(primary = primary, others = others.toSet())
+
+    val all: Set<FiatCurrency>
+        get() {
+            return if (others.contains(primary)) {
+                others
+            } else {
+                others.toMutableSet().apply { add(primary) }
+            }
+        }
+}

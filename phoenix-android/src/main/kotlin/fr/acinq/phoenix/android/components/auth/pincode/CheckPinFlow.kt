@@ -17,10 +17,10 @@
 package fr.acinq.phoenix.android.components.auth.pincode
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 
 
 @Composable
@@ -28,22 +28,23 @@ fun CheckPinFlow(
     onCancel: () -> Unit,
     onPinValid: () -> Unit,
     vm: CheckPinViewModel,
+    walletId: WalletId,
+    walletMetadata: UserWalletMetadata?,
     prompt: @Composable () -> Unit,
 ) {
-    val context = LocalContext.current
     val isUIFrozen = vm.state !is CheckPinState.CanType
-
-    LaunchedEffect(Unit) { vm.evaluateLockState() }
 
     BasePinDialog(
         onDismiss = onCancel,
         initialPin = vm.pinInput,
         onPinSubmit = {
             vm.pinInput = it
-            vm.checkPinAndSaveOutcome(context, it, onPinValid)
+            vm.checkPinAndSaveOutcome(it, onPinValid)
         },
         prompt = prompt,
-        stateLabel = when(val state = vm.state) {
+        walletId = walletId,
+        walletMetadata = walletMetadata,
+        stateLabel = when (val state = vm.state) {
             is CheckPinState.Init, is CheckPinState.CanType -> null
             is CheckPinState.Locked -> {
                 { PinStateMessage(text = stringResource(id = R.string.pincode_locked_label, state.timeToWait.toString()), icon = R.drawable.ic_clock) }

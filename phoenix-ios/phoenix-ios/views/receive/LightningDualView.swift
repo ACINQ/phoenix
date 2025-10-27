@@ -41,7 +41,7 @@ struct LightningDualView: View {
 	@State var notificationPermissions = NotificationsManager.shared.permissions.value
 	
 	@State var modificationAmount: CurrencyAmount? = nil
-	@State var description: String = Prefs.shared.defaultPaymentDescription ?? ""
+	@State var description: String = Prefs.current.defaultPaymentDescription ?? ""
 	
 	@State var amountMsat: Lightning_kmpMilliSatoshi? = nil
 	@State var needsUpdateInvoiceOrOffer: Bool = true
@@ -59,19 +59,18 @@ struct LightningDualView: View {
 	)
 	@State var maxButtonWidth: CGFloat? = nil
 	
-	let lastIncomingPaymentPublisher = Biz.business.paymentsManager.lastIncomingPaymentPublisher()
-	
 	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
 	// In particular, animating the border around the qrcode doesn't work well.
 	@Namespace private var qrCodeAnimation_inner
 	@Namespace private var qrCodeAnimation_outer
+	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var smartModalState: SmartModalState
@@ -103,8 +102,10 @@ struct LightningDualView: View {
 		.onChange(of: activeType) {
 			activeTypeChanged($0)
 		}
-		.onReceive(lastIncomingPaymentPublisher) {
-			lastIncomingPaymentChanged($0)
+		.task {
+			for await payment in Biz.business.paymentsManager.lastIncomingPaymentSequence() {
+				lastIncomingPaymentChanged(payment)
+			}
 		}
 		.onReceive(NotificationsManager.shared.permissions) {
 			notificationPermissionsChanged($0)
@@ -689,7 +690,7 @@ struct LightningDualView: View {
 			mvi.intent(Receive.IntentAsk(
 				amount: amountMsat,
 				desc: finalDesc,
-				expirySeconds: Prefs.shared.invoiceExpirationSeconds
+				expirySeconds: Prefs.current.invoiceExpirationSeconds
 			))
 			
 		} else {
@@ -706,7 +707,7 @@ struct LightningDualView: View {
 				fixedDesc = finalDesc ?? ""
 			}
 			
-			let offerPair = Lightning_kmpOfferManagerCompanion.shared.deterministicOffer(
+			let offerAndKey = Lightning_kmpOfferManagerCompanion.shared.deterministicOffer(
 				chainHash: NodeParamsManager.companion.chain.chainHash,
 				nodePrivateKey: nodeParams.nodePrivateKey,
 				trampolineNodeId: NodeParamsManager.companion.trampolineNodeId,
@@ -714,7 +715,7 @@ struct LightningDualView: View {
 				description: fixedDesc,
 				pathId: nil
 			)
-			offerStr = offerPair.first!.encode()
+			offerStr = offerAndKey.offer.encode()
 		}
 	}
 	
@@ -877,7 +878,7 @@ struct LightningDualView: View {
 		
 		if case .bolt12_offer = newType {
 			if bip353Address == nil {
-				bip353Address = AppSecurity.shared.getBip353Address()
+				bip353Address = Keychain.current.getBip353Address()
 			}
 		}
 	}
@@ -1202,7 +1203,7 @@ struct LightningDualView: View {
 			colorScheme: colorScheme.opposite,
 			style: .chrome,
 			duration: 5.0,
-			alignment: .bottom,
+			alignment: .bottom(),
 			showCloseButton: true
 		)
 	}

@@ -55,20 +55,22 @@ import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.inputs.FeerateSlider
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.TransparentFilledButton
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.mvi.MVIView
@@ -86,6 +88,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MutualCloseView(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -93,7 +97,7 @@ fun MutualCloseView(
 
     var address by remember { mutableStateOf("") }
     var addressErrorMessage by remember { mutableStateOf<String?>(null) }
-    val mempoolFeerate by business.appConfigurationManager.mempoolFeerate.collectAsState()
+    val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
     val recommendedFeerate by business.peerManager.recommendedFeerateFlow.collectAsState()
     var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
 
@@ -253,11 +257,12 @@ fun MutualCloseView(
                                         }
                                         Spacer(modifier = Modifier.height(24.dp))
                                         SmartSpendButton(
+                                            walletId = walletId,
                                             text = stringResource(id = R.string.btn_confirm),
                                             icon = R.drawable.ic_check,
                                             onSpend = {
                                                 addressErrorMessage = ""
-                                                feerate?.let { postIntent(CloseChannelsConfiguration.Intent.MutualCloseAllChannels(address, FeeratePerKw(FeeratePerByte(it)))) }
+                                                feerate.let { postIntent(CloseChannelsConfiguration.Intent.MutualCloseAllChannels(address, FeeratePerKw(FeeratePerByte(it)))) }
                                                 showConfirmationDialog = false
                                             },
                                             shape = RoundedCornerShape(12.dp),

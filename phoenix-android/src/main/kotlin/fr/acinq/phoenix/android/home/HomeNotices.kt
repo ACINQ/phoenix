@@ -47,10 +47,10 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.LocalNavController
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
+import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.openLink
+import fr.acinq.phoenix.android.components.buttons.openLink
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.Notification
@@ -104,7 +104,7 @@ private fun FirstNoticeView(
     val onClick = if (messagesCount == 1) {
         when (notice) {
             is Notice.BackupSeedReminder -> {
-                { navController?.navigate(Screen.DisplaySeed.route) ?: Unit }
+                { navController?.navigate(Screen.BusinessNavGraph.DisplaySeed.route) ?: Unit }
             }
 
             is Notice.CriticalUpdateAvailable, is Notice.UpdateAvailable -> {
@@ -174,7 +174,7 @@ private fun FirstNoticeView(
             }
 
             Notice.NotificationPermission -> {
-                NoticeTextView(text = stringResource(id = R.string.inappnotif_notification_permission_message), icon = R.drawable.ic_notification)
+                NoticeTextView(text = stringResource(id = R.string.inappnotif_notification_permission_message_short), icon = R.drawable.ic_notification)
             }
 
             is Notice.SwapInCloseToTimeout -> {

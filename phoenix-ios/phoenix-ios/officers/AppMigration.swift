@@ -36,7 +36,7 @@ class AppMigration {
 				if previousBuild.isVersion(lessThan: currentBuild) {
 					UserDefaults.standard.set(currentBuild, forKey: key)
 				}
-				LockState.shared.migrationStepsCompleted = true
+				AppState.shared.migrationStepsCompleted = true
 			}
 		}.store(in: &cancellables)
 
@@ -51,28 +51,56 @@ class AppMigration {
 		//
 		if previousBuild.isVersion(lessThan: "40") {
 			migrateDbFilesToGroup()
-			GroupPrefs.shared.performMigration("40", completionPublisher)
-			AppSecurity.shared.performMigration("40", completionPublisher)
+			GroupPrefs.performMigration("40", completionPublisher)
+			Keychain.performMigration("40", completionPublisher)
 		}
 		
 		// v1.5.2 (build 41)
 		// - hot-fix for `!protectedDataAvailable`
 		//
 		if previousBuild.isVersion(lessThan: "41") {
-			AppSecurity.shared.performMigration("41", completionPublisher)
+			Keychain.performMigration("41", completionPublisher)
 		}
 		
 		// v1.6.0 (build 44)
 		// - recentPaymentsSeconds -> recentPayments (enum)
 		//
 		if previousBuild.isVersion(lessThan: "44") {
-			Prefs.shared.performMigration("44", completionPublisher)
+			Prefs.performMigration("44", completionPublisher)
 		}
 		
 		// v2.0.6 (build 65)
 		// - UserDefault value (liquidityPolicy) moved to shared group
 		if currentBuild.isVersion(greaterThanOrEqualTo: "65") && previousBuild.isVersion(lessThan: "65") {
-			GroupPrefs.shared.performMigration("65", completionPublisher)
+			GroupPrefs.performMigration("65", completionPublisher)
+		}
+		
+		// v2.7.0 (build 96)
+		// - Prefs & GroupPrefs moved to wallet-specific keys
+		if currentBuild.isVersion(greaterThanOrEqualTo: "96") && previousBuild.isVersion(lessThan: "96") {
+		#if DEBUG
+			log.debug("--------------------------------------------------")
+			log.debug("# PREFS: PHASE 0:")
+			Prefs.printAllKeyValues()
+			log.debug("# GROUP_PREFS: PHASE 0:")
+			GroupPrefs.printAllKeyValues()
+			log.debug("# KEYCHAIN(nil): PHASE 0:")
+			Keychain.printKeysAndValues(nil)
+			log.debug("--------------------------------------------------")
+		#endif
+			Prefs.performMigration("96", completionPublisher)
+			GroupPrefs.performMigration("96", completionPublisher)
+			Keychain.performMigration("96", completionPublisher)
+		#if DEBUG
+			log.debug("--------------------------------------------------")
+			log.debug("# PREFS: PHASE 1:")
+			Prefs.printAllKeyValues()
+			log.debug("# GROUP_PREFS: PHASE 1:")
+			GroupPrefs.printAllKeyValues()
+			log.debug("# KEYCHAIN(default): PHASE 1:")
+			Keychain.printKeysAndValues(KEYCHAIN_DEFAULT_ID)
+			log.debug("--------------------------------------------------")
+		#endif
 		}
 		
 		completionPublisher.value -= 1

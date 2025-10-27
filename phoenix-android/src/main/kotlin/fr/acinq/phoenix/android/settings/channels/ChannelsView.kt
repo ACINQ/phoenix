@@ -48,9 +48,14 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.sum
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -60,14 +65,15 @@ import fr.acinq.phoenix.data.LocalChannelInfo
 
 @Composable
 fun ChannelsView(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onChannelClick: (String) -> Unit,
     onImportChannelsDataClick: () -> Unit,
     onSpendFromChannelBalance: () -> Unit,
 ) {
-    val channelsState by business.peerManager.channelsFlow.collectAsState()
     val balance by business.balanceManager.balance.collectAsState()
-    val inboundLiquidity = channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()
+    val channelsState by business.peerManager.channelsFlow.collectAsState()
+    val inboundLiquidity = remember(channelsState) { channelsState?.values?.mapNotNull { it.availableForReceive }?.sum()}
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(
@@ -76,22 +82,19 @@ fun ChannelsView(
                 var showAdvancedMenuPopIn by remember { mutableStateOf(false) }
                 Text(text = stringResource(id = R.string.channelsview_title))
                 Spacer(modifier = Modifier.weight(1f))
-                Box(contentAlignment = Alignment.TopEnd) {
-                    DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
-                        DropdownMenuItem(onClick = onImportChannelsDataClick, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text(text = stringResource(R.string.channelsview_menu_import_channels), style = MaterialTheme.typography.body1)
-                        }
-                        DropdownMenuItem(onClick = onSpendFromChannelBalance, contentPadding = PaddingValues(horizontal = 12.dp)) {
-                            Text(text = stringResource(R.string.channelsview_menu_spend_channel_balance), style = MaterialTheme.typography.body1)
-                        }
-                    }
-                    Button(
-                        icon = R.drawable.ic_menu_dots,
-                        iconTint = MaterialTheme.colors.onSurface,
-                        padding = PaddingValues(12.dp),
-                        onClick = { showAdvancedMenuPopIn = true }
-                    )
-                }
+//                Box(contentAlignment = Alignment.TopEnd) {
+//                    DropdownMenu(expanded = showAdvancedMenuPopIn, onDismissRequest = { showAdvancedMenuPopIn = false }) {
+//                        DropdownMenuItem(onClick = onSpendFromChannelBalance, contentPadding = PaddingValues(horizontal = 12.dp)) {
+//                            Text(text = stringResource(R.string.channelsview_menu_spend_channel_balance), style = MaterialTheme.typography.body1)
+//                        }
+//                    }
+//                    Button(
+//                        icon = R.drawable.ic_menu_dots,
+//                        iconTint = MaterialTheme.colors.onSurface,
+//                        padding = PaddingValues(12.dp),
+//                        onClick = { showAdvancedMenuPopIn = true }
+//                    )
+//                }
             }
         )
         if (!channelsState?.values?.filter { it.isUsable }.isNullOrEmpty()) {

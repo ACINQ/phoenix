@@ -38,28 +38,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.payment.LiquidityPolicy
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.inputs.InlineNumberInput
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.components.enableOrFade
-import fr.acinq.phoenix.android.userPrefs
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
 fun AdvancedIncomingFeePolicy(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val userPrefs = userPrefs
+    val userPrefs = LocalUserPrefs.current ?: return
     val peerManager = business.peerManager
     val notificationsManager = business.notificationsManager
 

@@ -16,12 +16,13 @@
 
 package fr.acinq.phoenix.android.components.auth.pincode
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.auth.pincode.PinDialog.PIN_LENGTH
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -55,12 +56,15 @@ sealed class NewPinState {
 
 abstract class NewPinViewModel: ViewModel() {
 
+    abstract val application: PhoenixApplication
+    abstract val walletId: WalletId
+
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<NewPinState>(NewPinState.EnterNewPin.Init)
         private set
 
-    abstract fun writePinToDisk(context: Context, pin: String)
+    abstract suspend fun writePinToDisk(pin: String)
 
     fun reset() {
         state = NewPinState.EnterNewPin.Init
@@ -82,7 +86,7 @@ abstract class NewPinViewModel: ViewModel() {
         }
     }
 
-    fun checkAndSavePin(context: Context, expectedPin: String, confirmedPin: String, onPinWritten: () -> Unit) {
+    fun checkAndSavePin(expectedPin: String, confirmedPin: String, onPinWritten: () -> Unit) {
         if (state is NewPinState.ConfirmNewPin.Frozen) return
         state = NewPinState.ConfirmNewPin.Frozen.Writing(confirmedPin)
 
@@ -93,7 +97,7 @@ abstract class NewPinViewModel: ViewModel() {
                 state = NewPinState.ConfirmNewPin.Init(expectedPin)
             } else {
                 try {
-                    writePinToDisk(context, confirmedPin)
+                    writePinToDisk(confirmedPin)
                     viewModelScope.launch(Dispatchers.Main) {
                         onPinWritten()
                     }

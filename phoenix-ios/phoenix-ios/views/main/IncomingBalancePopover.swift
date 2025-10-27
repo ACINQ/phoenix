@@ -14,16 +14,14 @@ struct IncomingBalancePopover: View {
 	let showFinalWallet: () -> Void
 	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
-	let swapInWalletPublisher = Biz.business.balanceManager.swapInWalletPublisher()
-	
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
-	let finalWalletPublisher = Biz.business.peerManager.finalWalletPublisher()
 	
-	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.shared.liquidityPolicy
-	let liquidityPolicyPublisher = GroupPrefs.shared.liquidityPolicyPublisher
+	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.current.liquidityPolicy
+	let liquidityPolicyPublisher = GroupPrefs.current.liquidityPolicyPublisher
+	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
 	@EnvironmentObject var popoverState: PopoverState
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@ViewBuilder
 	var body: some View {
@@ -36,14 +34,18 @@ struct IncomingBalancePopover: View {
 		}
 		.padding(.vertical, 10)
 		.background(Color.primaryBackground)
-		.onReceive(swapInWalletPublisher) {
-			swapInWalletChanged($0)
-		}
-		.onReceive(finalWalletPublisher) {
-			finalWalletChanged($0)
-		}
 		.onReceive(liquidityPolicyPublisher) {
 			liquidityPolicyChanged($0)
+		}
+		.task {
+			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
+				swapInWalletChanged(wallet)
+			}
+		}
+		.task {
+			for await wallet in Biz.business.peerManager.finalWalletSequence() {
+				finalWalletChanged(wallet)
+			}
 		}
 	}
 	

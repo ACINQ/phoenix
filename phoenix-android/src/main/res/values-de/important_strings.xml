@@ -22,7 +22,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix läuft im Hintergrund</string>
-    <string name="notif_headless_received">+%1$s empfangen</string>
+    <string name="notif_headless_received">%1$s %2$s empfangen</string>
 
     <string name="notif_pending_settlement_title">Bitte öffnen Sie Phoenix</string>
     <string name="notif_pending_settlement_message">Eine eingehende Zahlung steht aus.</string>
@@ -63,7 +63,7 @@
     <string name="settings_list_channels">Zahlungskanäle</string>
     <string name="settings_logs">Logs</string>
     <string name="settings_electrum">Electrum-Server</string>
-    <string name="settings_reset_wallet">Wallet zurücksetzen</string>
+    <string name="settings_reset_wallet">Wallet löschen</string>
     <string name="settings_mutual_close">Kanäle schließen</string>
     <string name="settings_force_close">Kanäle force-closen</string>
     <string name="settings_tor">Tor</string>
@@ -91,6 +91,7 @@
 
     <string name="home_final_title">Final wallet</string>
     <string name="home_final_desc">Diese Gelder stammen aus geschlossenen Lightning-Kanäle. Sie müssen manuell ausgegeben werden.</string>
+    <string name="home_onchain_balance_only">On-Chain-Guthaben</string>
 
     <string name="home_background_restriction_title">Hintergrundverarbeitung eingeschränkt</string>
     <string name="home_background_restriction_body_1">Phoenix kann keine Zahlungen empfangen, wenn es im Hintergrund läuft oder geschlossen ist.</string>
@@ -209,6 +210,7 @@
     <string name="inappnotif_backup_seed_message">Erstellen Sie ein Backup Ihrer Wallet, um keine Bitcoins zu verlieren.</string>
     <string name="inappnotif_backup_seed_action">Wallet-Backup erstellen</string>
 
+    <string name="inappnotif_notification_permission_message_short">Android-Benachrichtigungen aktivieren</string>
     <string name="inappnotif_notification_permission_message">Benachrichtigungen sind in den Android-Einstellungen deaktiviert. Phoenix kann Sie nicht benachrichtigen, wenn eine Zahlung durchgeführt wird.</string>
     <string name="inappnotif_notification_permission_enable">Aktivieren</string>
 

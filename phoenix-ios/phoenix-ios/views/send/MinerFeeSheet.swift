@@ -28,9 +28,10 @@ struct MinerFeeSheet: View {
 	@State var feeBelowMinimum: Bool = false
 	@State var showLowMinerFeeWarning: Bool = false
 	
+	@ObservedObject var currencyPrefs = CurrencyPrefs.current
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deviceInfo: DeviceInfo
 	@EnvironmentObject var smartModalState: SmartModalState
 	

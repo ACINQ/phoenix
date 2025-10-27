@@ -32,7 +32,7 @@
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix đang chạy trên nền.</string>
-    <string name="notif_headless_received">Đã nhận +%1$s</string>
+    <string name="notif_headless_received">%1$s Đã nhận %2$s</string>
 
     <string name="notif_pending_settlement_title">Xin hãy khởi động Phoenix.</string>
     <string name="notif_pending_settlement_message">Một khoản thanh toán đến đang chờ được xử lý.</string>
@@ -73,7 +73,7 @@
     <string name="settings_list_channels">Kênh thanh toán</string>
     <string name="settings_logs">Nhật ký</string>
     <string name="settings_electrum">Máy chủ Electrum</string>
-    <string name="settings_reset_wallet">Đặt lại ví</string>
+    <string name="settings_reset_wallet">Xóa ví</string>
     <string name="settings_mutual_close">Đóng kênh</string>
     <string name="settings_force_close">Buộc đóng kênh</string>
     <string name="settings_tor">Tor</string>
@@ -101,6 +101,7 @@
 
     <string name="home_final_title">Ví cuối cùng</string>
     <string name="home_final_desc">Những quỹ này đến từ các kênh Lightning đã đóng. Chúng phải được chi tiêu thủ công.</string>
+    <string name="home_onchain_balance_only">Số dư trên chuỗi</string>
 
     <string name="home_background_restriction_title">Hạn chế xử lý nền</string>
     <string name="home_background_restriction_body_1">Phoenix sẽ không thể nhận thanh toán khi nó ở chế độ nền hoặc khi nó bị đóng.</string>
@@ -219,6 +220,7 @@
     <string name="inappnotif_backup_seed_message">Sao lưu ví của bạn để tránh bị mất Bitcoins.</string>
     <string name="inappnotif_backup_seed_action">Sao lưu ví của tôi</string>
 
+    <string name="inappnotif_notification_permission_message_short">Bật thông báo Android</string>
     <string name="inappnotif_notification_permission_message">Chức năng thông báo đã bị tắt trong mục cài đặt Android. Phoenix sẽ không thể thông báo cho bạn khi một thanh toán nào đó đang được xử lý.</string>
     <string name="inappnotif_notification_permission_enable">Bật chức năng</string>
 

@@ -23,11 +23,10 @@ import fr.acinq.phoenix.managers.phoenixSwapInWallet
 
 
 /** Returns true if the payment is a channel-close made by the legacy app to the node's swap-in address. */
-fun WalletPayment.isLegacyMigration(metadata: WalletPaymentMetadata, peer: Peer?): Boolean? {
+fun WalletPayment.isLegacyMigration(metadata: WalletPaymentMetadata): Boolean? {
     return when {
         this !is ChannelCloseOutgoingPayment -> false
-        peer == null -> null
-        this.address == peer.phoenixSwapInWallet.legacySwapInAddress && metadata.userDescription == "kmp-migration-override" -> true
+        metadata.userDescription == "kmp-migration-override" -> true
         else -> false
     }
 }

@@ -44,10 +44,7 @@ sealed class SpendFromChannelAddressViewState {
         data class Generic(val cause: Throwable) : Error()
         data object AmountMissing : Error()
         data object TxIndexMalformed : Error()
-        data object ChannelDataMalformed : Error()
-        data object ChannelDataDecryption : Error()
-        data class ChannelDataUnhandledState(val stateClassName: String?) : Error()
-        data class ChannelDataUnhandledVersion(val version: Int) : Error()
+        data object InvalidChannelKeyPath: Error()
         data class PublicKeyMalformed(val details: String) : Error()
         data class TransactionMalformed(val details: String) : Error()
         data class InvalidSig(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64): Error()
@@ -92,7 +89,7 @@ class SpendFromChannelAddressViewModel(
                 business = business,
                 amount = amount,
                 fundingTxIndex = fundingTxIndex,
-                channelData = channelData,
+                channelKeyPath = "FIXME",
                 remoteFundingPubkey = remoteFundingPubkey,
                 unsignedTx = unsignedTx,
             )
@@ -102,17 +99,8 @@ class SpendFromChannelAddressViewModel(
                     delay(300.milliseconds)
                     state.value = SpendFromChannelAddressViewState.SignedTransaction(result.publicKey, result.signature)
                 }
-                is SpendChannelAddressResult.Failure.ChannelDataDecryption -> {
-                    state.value = SpendFromChannelAddressViewState.Error.ChannelDataDecryption
-                }
-                is SpendChannelAddressResult.Failure.ChannelDataMalformed -> {
-                    state.value = SpendFromChannelAddressViewState.Error.ChannelDataMalformed
-                }
-                is SpendChannelAddressResult.Failure.ChannelDataUnhandledState -> {
-                    state.value = SpendFromChannelAddressViewState.Error.ChannelDataUnhandledState(result.stateName)
-                }
-                is SpendChannelAddressResult.Failure.ChannelDataUnhandledVersion -> {
-                    state.value = SpendFromChannelAddressViewState.Error.ChannelDataUnhandledVersion(result.version)
+                is SpendChannelAddressResult.Failure.InvalidChannelKeyPath -> {
+                    state.value = SpendFromChannelAddressViewState.Error.InvalidChannelKeyPath
                 }
                 is SpendChannelAddressResult.Failure.Generic -> {
                     state.value = SpendFromChannelAddressViewState.Error.Generic(result.error)

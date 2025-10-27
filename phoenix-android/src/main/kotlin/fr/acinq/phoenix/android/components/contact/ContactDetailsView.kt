@@ -69,21 +69,20 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.Screen
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Clickable
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.navigation.Screen
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.Clickable
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.PhoenixIcon
-import fr.acinq.phoenix.android.components.SwitchView
+import fr.acinq.phoenix.android.components.buttons.SwitchView
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
 import fr.acinq.phoenix.android.components.dialogs.FullScreenDialog
 import fr.acinq.phoenix.android.components.dialogs.ModalBottomSheet
 import fr.acinq.phoenix.android.components.scanner.ScannerView
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.invisibleOutlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
@@ -92,8 +91,8 @@ import fr.acinq.phoenix.data.ContactAddress
 import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.ContactOffer
 import fr.acinq.phoenix.data.ContactPaymentCode
-import fr.acinq.phoenix.db.contacts.SqliteContactsDb
 import fr.acinq.phoenix.utils.Parser
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 
@@ -114,24 +113,32 @@ fun ContactDetailsView(
     onContactChange: (ContactInfo?) -> Unit,
     newOffer: OfferTypes.Offer? = null,
 ) {
-    ModalBottomSheet(
-        onDismiss = onDismiss,
-        skipPartiallyExpanded = true,
-        isContentScrollable = false,
-        contentHeight = 550.dp,
-        contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal) },
-        internalPadding = PaddingValues(0.dp),
-        containerColor = Color.Transparent,
-        dragHandle = null
-    ) {
-        ContactNameAndPhoto(
-            contact = contact,
-            newOffer = newOffer,
-            onContactChange = { newContact ->
-                onContactChange(newContact)
-                onDismiss()
-            },
-        )
+    LocalBusiness.current?.let { business ->
+        val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
+
+        ModalBottomSheet(
+            onDismiss = onDismiss,
+            skipPartiallyExpanded = true,
+            isContentScrollable = false,
+            contentHeight = 550.dp,
+            contentWindowInsets = { WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal) },
+            internalPadding = PaddingValues(0.dp),
+            containerColor = Color.Transparent,
+            dragHandle = null
+        ) {
+            ContactNameAndPhoto(
+                contact = contact,
+                newOffer = newOffer,
+                saveContactToDb = { contactsDb?.saveContact(it) },
+                deleteContactFromDb = { contactsDb?.deleteContact(it) },
+                getContactForOfferInDb = { contactsDb?.contactForOffer(it) },
+                getContactForAddressInDb = { contactsDb?.contactForLightningAddress(it) },
+                onContactChange = { newContact ->
+                    onContactChange(newContact)
+                    onDismiss()
+                },
+            )
+        }
     }
 }
 
@@ -139,12 +146,15 @@ fun ContactDetailsView(
 private fun ColumnScope.ContactNameAndPhoto(
     contact: ContactInfo?,
     newOffer: OfferTypes.Offer?,
+    saveContactToDb: suspend (ContactInfo) -> Unit,
+    deleteContactFromDb: suspend (UUID) -> Unit,
+    getContactForOfferInDb: (OfferTypes.Offer) -> ContactInfo?,
+    getContactForAddressInDb: (String) -> ContactInfo?,
     onContactChange: (ContactInfo?) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val navController = navController
-    val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
 
     val contactId = remember { contact?.id ?: UUID.randomUUID() }
     var name by remember(contact) { mutableStateOf(contact?.name ?: "") }
@@ -178,9 +188,9 @@ private fun ColumnScope.ContactNameAndPhoto(
                 ConfirmDialog(
                     message = stringResource(R.string.contact_delete_contact_confirm),
                     onConfirm = {
-                        safeLet(contactsDb, contact?.id) { db, id ->
+                        contact?.id?.let {
                             scope.launch {
-                                db.deleteContact(id)
+                                deleteContactFromDb(it)
                                 onContactChange(null)
                             }
                         }
@@ -224,11 +234,9 @@ private fun ColumnScope.ContactNameAndPhoto(
                         return@Button
                     }
                     scope.launch {
-                        contactsDb?.run {
-                            val newContact = ContactInfo(id = contactId, name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contactOffers, addresses = contactAddresses)
-                            saveContact(newContact)
-                            onContactChange(newContact)
-                        }
+                        val newContact = ContactInfo(id = contactId, name = name, photoUri = photoUri, useOfferKey = useOfferKey, offers = contactOffers, addresses = contactAddresses)
+                        saveContactToDb(newContact)
+                        onContactChange(newContact)
                     }
                 },
             )
@@ -272,7 +280,7 @@ private fun ColumnScope.ContactNameAndPhoto(
                     .background(color = MaterialTheme.colors.surface, shape = RoundedCornerShape(16.dp))
             ) {
                 val paymentCodes = paymentsCodeList.values.toList()
-                val onSendClick: (String) -> Unit = { navController.navigate("${Screen.Send.route}?input=$it&forceNavOnBack=true") }
+                val onSendClick: (String) -> Unit = { navController.navigate("${Screen.BusinessNavGraph.Send.route}?input=$it&fromRoute=back") }
                 var showSendToAddressPickerDialog by remember { mutableStateOf(false) }
 
                 if (showSendToAddressPickerDialog) {
@@ -282,7 +290,7 @@ private fun ColumnScope.ContactNameAndPhoto(
                 Button(
                     text = stringResource(R.string.contact_pay_button),
                     icon = R.drawable.ic_send,
-                    enabled = paymentsCodeList.isNotEmpty(),
+                    enabled = contact != null && paymentsCodeList.isNotEmpty(),
                     padding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                     maxLines = 1,
@@ -318,6 +326,8 @@ private fun ColumnScope.ContactNameAndPhoto(
             contactId = contactId,
             newOffer = newOffer,
             paymentCodeList = paymentsCodeList.values.toList(),
+            getContactForOfferInDb = getContactForOfferInDb,
+            getContactForAddressInDb = getContactForAddressInDb,
             onSaveContactPaymentCode = {
                 paymentsCodeList = paymentsCodeList + (it.id to it)
             },
@@ -333,6 +343,8 @@ private fun ListPaymentCodesForContact(
     contactId: UUID,
     newOffer: OfferTypes.Offer?,
     paymentCodeList: List<ContactPaymentCode>,
+    getContactForOfferInDb: (OfferTypes.Offer) -> ContactInfo?,
+    getContactForAddressInDb: (String) -> ContactInfo?,
     onSaveContactPaymentCode: (ContactPaymentCode) -> Unit,
     onDeletePaymentCode: (ByteVector32) -> Unit,
 ) {
@@ -430,6 +442,8 @@ private fun ListPaymentCodesForContact(
         ContactOfferDetailDialog(
             contactId = contactId,
             paymentCode = paymentCode,
+            getContactForOfferInDb = getContactForOfferInDb,
+            getContactForAddressInDb = getContactForAddressInDb,
             onSavePaymentCode = {
                 onSaveContactPaymentCode(it)
                 onDismiss()
@@ -445,6 +459,8 @@ private fun ListPaymentCodesForContact(
             ContactOfferDetailDialog(
                 contactId = contactId,
                 paymentCode = null,
+                getContactForOfferInDb = getContactForOfferInDb,
+                getContactForAddressInDb = getContactForAddressInDb,
                 onSavePaymentCode = {
                     onSaveContactPaymentCode(it)
                     onDismiss()
@@ -463,6 +479,8 @@ private fun ListPaymentCodesForContact(
 private fun ContactOfferDetailDialog(
     contactId: UUID,
     paymentCode: ContactPaymentCode?,
+    getContactForOfferInDb: (OfferTypes.Offer) -> ContactInfo?,
+    getContactForAddressInDb: (String) -> ContactInfo?,
     onSavePaymentCode: (ContactPaymentCode) -> Unit,
     onDeletePaymentCode: (ByteVector32) -> Unit,
     onDismiss: () -> Unit
@@ -474,7 +492,6 @@ private fun ContactOfferDetailDialog(
         internalPadding = PaddingValues(horizontal = 16.dp),
     ) {
         val context = LocalContext.current
-        val contactsDb by business.databaseManager.contactsDb.collectAsState(null)
         var code by remember { mutableStateOf(
             when (paymentCode) {
                 is ContactOffer -> paymentCode.offer.encode()
@@ -578,11 +595,11 @@ private fun ContactOfferDetailDialog(
                 icon = R.drawable.ic_check,
                 onClick = {
 
-                    fun attemptOffer(contactsDb: SqliteContactsDb, code: String, onFailure: (String, Boolean) -> Unit) {
+                    fun attemptOffer(code: String, onFailure: (String, Boolean) -> Unit) {
                         when (val result = Parser.readOffer(code)) {
                             null -> onFailure(context.getString(R.string.contact_error_offer_invalid), false)
                             else -> {
-                                val match = contactsDb.contactForOffer(result)
+                                val match = getContactForOfferInDb(result)
                                 when {
                                     match == null || match.id == contactId -> onSavePaymentCode(ContactOffer(offer = result, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
                                     else -> onFailure(context.getString(R.string.contact_error_offer_known, match.name), true)
@@ -591,11 +608,11 @@ private fun ContactOfferDetailDialog(
                         }
                     }
 
-                    fun attemptAddress(contactsDb: SqliteContactsDb, code: String, onFailure: (String) -> Unit) {
+                    fun attemptAddress(code: String, onFailure: (String) -> Unit) {
                         when (Parser.parseEmailLikeAddress(code)) {
                             null -> onFailure(context.getString(R.string.contact_error_address_invalid))
                             else -> {
-                                val match = contactsDb.contactForLightningAddress(code)
+                                val match = getContactForAddressInDb(code)
                                 when {
                                     match == null || match.id == contactId -> onSavePaymentCode(ContactAddress(address = code, label = label.takeIf { it.isNotBlank() }, createdAt = currentTimestampMillis()))
                                     else -> onFailure(context.getString(R.string.contact_error_address_known, match.name))
@@ -604,15 +621,13 @@ private fun ContactOfferDetailDialog(
                         }
                     }
 
-                    contactsDb?.let { db ->
-                        when (paymentCode) {
-                            is ContactOffer -> attemptOffer(db, code, onFailure = { message, _ -> errorMessage = message })
-                            is ContactAddress -> attemptAddress(db, code, onFailure = { errorMessage = it })
-                            null -> attemptOffer(db, code, onFailure = { message, isFatal ->
-                                if (isFatal) errorMessage = message
-                                else attemptAddress(db, code, onFailure = { errorMessage = context.getString(R.string.contact_error_invalid) })
-                            })
-                        }
+                    when (paymentCode) {
+                        is ContactOffer -> attemptOffer(code, onFailure = { message, _ -> errorMessage = message })
+                        is ContactAddress -> attemptAddress(code, onFailure = { errorMessage = it })
+                        null -> attemptOffer(code, onFailure = { message, isFatal ->
+                            if (isFatal) errorMessage = message
+                            else attemptAddress(code, onFailure = { errorMessage = context.getString(R.string.contact_error_invalid) })
+                        })
                     }
                 }
             )

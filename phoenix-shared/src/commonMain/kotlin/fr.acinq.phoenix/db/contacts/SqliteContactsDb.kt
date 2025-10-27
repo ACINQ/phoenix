@@ -138,7 +138,9 @@ class SqliteContactsDb(
     private fun contactIdForPayment(payment: WalletPayment, metadata: WalletPaymentMetadata?): UUID? {
         return if (payment is Bolt12IncomingPayment) {
             payment.incomingOfferMetadata()?.let { offerMetadata ->
-                contactIdForPayerPubKey(offerMetadata.payerKey)
+                offerMetadata.payerKey?.let { payerKey ->
+                    contactIdForPayerPubKey(payerKey)
+                }
             }
         } else {
             metadata?.lightningAddress?.let { address ->

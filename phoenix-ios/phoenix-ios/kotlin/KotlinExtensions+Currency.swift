@@ -212,7 +212,7 @@ extension FiatCurrency {
 		case .afn   : return NSLocalizedString("AFN", tableName: "Currencies", comment: "Afghan Afghani")
 		case .all   : return NSLocalizedString("ALL", tableName: "Currencies", comment: "Albanian Lek")
 		case .amd   : return NSLocalizedString("AMD", tableName: "Currencies", comment: "Armenian Dram")
-		case .ang   : return NSLocalizedString("ANG", tableName: "Currencies", comment: "Netherlands Antillean Guilder")
+		case .ang   : return NSLocalizedString("XCG", tableName: "Currencies", comment: "Netherlands Antillean Guilder")
 		case .aoa   : return NSLocalizedString("AOA", tableName: "Currencies", comment: "Angolan Kwanza")
 		case .ars   : fallthrough
 		case .arsBm : return NSLocalizedString("ARS", tableName: "Currencies", comment: "Argentine Peso")

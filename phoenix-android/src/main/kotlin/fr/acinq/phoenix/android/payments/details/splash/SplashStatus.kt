@@ -51,15 +51,18 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.LocalBusiness
+import fr.acinq.phoenix.android.LocalWalletId
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Card
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.TextWithIcon
-import fr.acinq.phoenix.android.components.openLink
-import fr.acinq.phoenix.android.components.txUrl
+import fr.acinq.phoenix.android.components.buttons.openLink
+import fr.acinq.phoenix.android.components.buttons.txUrl
 import fr.acinq.phoenix.android.payments.send.cpfp.CpfpView
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.annotatedStringResource
@@ -140,88 +143,101 @@ fun SplashConfirmationView(
     canBeBumped: Boolean,
     onCpfpSuccess: () -> Unit,
 ) {
-    val txUrl = txUrl(txId = txId)
-    val context = LocalContext.current
-    val electrumClient = business.electrumClient
-    var showBumpTxDialog by remember { mutableStateOf(false) }
-
-    if (isConfirmed) {
-        FilledButton(
-            text = stringResource(id = R.string.paymentdetails_status_confirmed),
-            icon = R.drawable.ic_chain,
-            backgroundColor = Color.Transparent,
-            padding = PaddingValues(8.dp),
-            textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
-            iconTint = MaterialTheme.colors.primary,
-            space = 6.dp,
-            onClick = { openLink(context, txUrl) }
-        )
-    } else {
-
-        suspend fun getConfirmations(): Int {
-            val confirmations = electrumClient.getConfirmations(txId)
-            return confirmations ?: run {
-                delay(5_000)
-                getConfirmations()
-            }
-        }
-
-        val confirmations by produceState<Int?>(initialValue = null) {
-            electrumClient.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
-            val confirmations = getConfirmations()
-            value = confirmations
-        }
-        confirmations?.absoluteValue?.let { conf ->
-            if (conf == 0) {
-                Card(
-                    internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                    onClick = if (canBeBumped) {
-                        { showBumpTxDialog = true }
-                    } else null,
-                    backgroundColor = Color.Transparent,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    TextWithIcon(
-                        text = stringResource(R.string.paymentdetails_status_unconfirmed_zero),
-                        icon = if (canBeBumped) R.drawable.ic_rocket else R.drawable.ic_clock,
-                        textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary),
-                        iconTint = MaterialTheme.colors.primary
-                    )
-
-                    if (canBeBumped) {
-                        Text(
-                            text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
-                            style = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold),
-                        )
-                    }
-                }
-            } else {
-                FilledButton(
-                    text = stringResource(R.string.paymentdetails_status_unconfirmed_default, conf),
-                    icon = R.drawable.ic_chain,
-                    onClick = { openLink(context, txUrl) },
-                    backgroundColor = Color.Transparent,
-                    padding = PaddingValues(8.dp),
-                    textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
-                    iconTint = MaterialTheme.colors.primary,
-                    space = 6.dp,
-                )
-            }
-
-            if (conf == 0 && showBumpTxDialog) {
-                BumpTransactionDialog(channelId = channelId, onSuccess = onCpfpSuccess, onDismiss = { showBumpTxDialog = false })
-            }
-        } ?: ProgressView(
+    val business = LocalBusiness.current
+    val walletId = LocalWalletId.current
+    if (business == null || walletId == null) {
+        ProgressView(
             text = stringResource(id = R.string.paymentdetails_status_unconfirmed_fetching),
             textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
             padding = PaddingValues(8.dp),
             progressCircleSize = 16.dp,
         )
+    } else {
+        val txUrl = txUrl(txId = txId)
+        val context = LocalContext.current
+        val electrumClient = business.electrumClient
+        var showBumpTxDialog by remember { mutableStateOf(false) }
+
+        if (isConfirmed) {
+            FilledButton(
+                text = stringResource(id = R.string.paymentdetails_status_confirmed),
+                icon = R.drawable.ic_chain,
+                backgroundColor = Color.Transparent,
+                padding = PaddingValues(8.dp),
+                textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
+                iconTint = MaterialTheme.colors.primary,
+                space = 6.dp,
+                onClick = { txUrl?.let { openLink(context, txUrl) } }
+            )
+        } else {
+
+            suspend fun getConfirmations(): Int {
+                val confirmations = electrumClient.getConfirmations(txId)
+                return confirmations ?: run {
+                    delay(5_000)
+                    getConfirmations()
+                }
+            }
+
+            val confirmations by produceState<Int?>(initialValue = null) {
+                electrumClient.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
+                val confirmations = getConfirmations()
+                value = confirmations
+            }
+            confirmations?.absoluteValue?.let { conf ->
+                if (conf == 0) {
+                    Card(
+                        internalPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                        onClick = if (canBeBumped) {
+                            { showBumpTxDialog = true }
+                        } else null,
+                        backgroundColor = Color.Transparent,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        TextWithIcon(
+                            text = stringResource(R.string.paymentdetails_status_unconfirmed_zero),
+                            icon = if (canBeBumped) R.drawable.ic_rocket else R.drawable.ic_clock,
+                            textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary),
+                            iconTint = MaterialTheme.colors.primary
+                        )
+
+                        if (canBeBumped) {
+                            Text(
+                                text = stringResource(id = R.string.paymentdetails_status_unconfirmed_zero_bump),
+                                style = MaterialTheme.typography.button.copy(fontSize = 14.sp, color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold),
+                            )
+                        }
+                    }
+                } else {
+                    FilledButton(
+                        text = stringResource(R.string.paymentdetails_status_unconfirmed_default, conf),
+                        icon = R.drawable.ic_chain,
+                        onClick = { txUrl?.let { openLink(context, txUrl) } },
+                        backgroundColor = Color.Transparent,
+                        padding = PaddingValues(8.dp),
+                        textStyle = MaterialTheme.typography.button.copy(fontSize = 14.sp),
+                        iconTint = MaterialTheme.colors.primary,
+                        space = 6.dp,
+                    )
+                }
+
+                if (conf == 0 && showBumpTxDialog) {
+                    BumpTransactionDialog(walletId = walletId, business = business, channelId = channelId, onSuccess = onCpfpSuccess, onDismiss = { showBumpTxDialog = false })
+                }
+            } ?: ProgressView(
+                text = stringResource(id = R.string.paymentdetails_status_unconfirmed_fetching),
+                textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
+                padding = PaddingValues(8.dp),
+                progressCircleSize = 16.dp,
+            )
+        }
     }
 }
 
 @Composable
 private fun BumpTransactionDialog(
+    walletId: WalletId,
+    business: PhoenixBusiness,
     channelId: ByteVector32,
     onSuccess: () -> Unit,
     onDismiss: () -> Unit,
@@ -231,6 +247,6 @@ private fun BumpTransactionDialog(
         title = stringResource(id = R.string.cpfp_title),
         buttons = null,
     ) {
-        CpfpView(channelId = channelId, onSuccess = onSuccess)
+        CpfpView(walletId = walletId, business = business, channelId = channelId, onSuccess = onSuccess)
     }
 }

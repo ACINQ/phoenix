@@ -32,17 +32,18 @@ import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.CardHeader
-import fr.acinq.phoenix.android.components.DefaultScreenHeader
-import fr.acinq.phoenix.android.components.DefaultScreenLayout
-import fr.acinq.phoenix.android.components.FilledButton
+import fr.acinq.phoenix.android.components.layouts.Card
+import fr.acinq.phoenix.android.components.layouts.CardHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.utils.extensions.confirmed
 
 @Composable
 fun FinalWalletInfo(
+    business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onSpendClick: () -> Unit,
 ) {
@@ -69,7 +70,7 @@ private fun ConfirmedBalanceView(
         if (balance != null && balance > 0.msat) {
             Spacer(modifier = Modifier.height(12.dp))
             FilledButton(
-                text = "Spend",
+                text = stringResource(R.string.walletinfo_onchain_final_spend_button),
                 icon = R.drawable.ic_send,
                 onClick = onSpendClick,
             )

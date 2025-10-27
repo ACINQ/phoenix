@@ -72,5 +72,5 @@ fun WalletPayment.errorMessage(): String? = when (this) {
     is IncomingPayment -> null
 }
 
-fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata.V1? = (this as? Bolt12IncomingPayment)?.metadata as? OfferPaymentMetadata.V1
+fun WalletPayment.incomingOfferMetadata(): OfferPaymentMetadata? = (this as? Bolt12IncomingPayment)?.metadata
 fun WalletPayment.outgoingInvoiceRequest(): OfferTypes.InvoiceRequest? = ((this as? LightningOutgoingPayment)?.details as? LightningOutgoingPayment.Details.Blinded)?.paymentRequest?.invoiceRequest

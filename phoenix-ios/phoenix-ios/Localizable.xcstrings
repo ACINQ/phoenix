@@ -903,6 +903,9 @@
         }
       }
     },
+    "(The only way to access a hidden wallet is by typing in the Lock PIN)" : {
+
+    },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "localizations" : {
         "ar" : {
@@ -942,6 +945,9 @@
           }
         }
       }
+    },
+    "(This means it works as a duress PIN.)" : {
+
     },
     "(wait a few seconds and then retry)" : {
 
@@ -3989,6 +3995,9 @@
         }
       }
     },
+    "A hidden wallet requires a **Lock PIN** to be set." : {
+
+    },
     "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
       "localizations" : {
         "ar" : {
@@ -4472,6 +4481,9 @@
         }
       }
     },
+    "Access hidden wallet" : {
+
+    },
     "active commitments" : {
       "localizations" : {
         "ar" : {
@@ -4511,6 +4523,9 @@
           }
         }
       }
+    },
+    "Add another wallet" : {
+
     },
     "Add contact" : {
       "localizations" : {
@@ -5850,6 +5865,7 @@
       }
     },
     "An unknown error has occurred." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8558,6 +8574,9 @@
         }
       }
     },
+    "Cannot access the Tor network. Phoenix will not function correctly." : {
+
+    },
     "Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually." : {
       "localizations" : {
         "ar" : {
@@ -8798,6 +8817,9 @@
           }
         }
       }
+    },
+    "Change Hidden Wallet" : {
+
     },
     "Change lock PIN" : {
 
@@ -10788,6 +10810,9 @@
         }
       }
     },
+    "Configure Lock PIN" : {
+
+    },
     "Confirm" : {
       "localizations" : {
         "ar" : {
@@ -12692,6 +12717,9 @@
         }
       }
     },
+    "Current wallet" : {
+
+    },
     "Custom electrum server: bad certificate !" : {
       "localizations" : {
         "ar" : {
@@ -13057,6 +13085,7 @@
       }
     },
     "Data could not be decrypted by this wallet." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13097,6 +13126,7 @@
       }
     },
     "Data is malformed. An encrypted hex blob is expected." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13255,6 +13285,9 @@
           }
         }
       }
+    },
+    "Default wallet" : {
+
     },
     "Delete" : {
       "localizations" : {
@@ -15356,6 +15389,9 @@
         }
       }
     },
+    "Duress PIN option" : {
+
+    },
     "edit" : {
       "comment" : "button label - try to make it short",
       "localizations" : {
@@ -16544,6 +16580,9 @@
           }
         }
       }
+    },
+    "Even when Phoenix is prompting you for the PIN for a different wallet." : {
+
     },
     "example payment" : {
       "localizations" : {
@@ -19333,6 +19372,9 @@
         }
       }
     },
+    "Go back to visible wallets list" : {
+
+    },
     "Good news! Your transaction has been mined!" : {
       "localizations" : {
         "ar" : {
@@ -19533,6 +19575,12 @@
           }
         }
       }
+    },
+    "Hidden wallet" : {
+
+    },
+    "Hidden wallet requirements" : {
+
     },
     "High Priority" : {
       "localizations" : {
@@ -20555,6 +20603,9 @@
         }
       }
     },
+    "If a default wallet is selected, it will automatically be opened on app launch." : {
+
+    },
     "If done correctly, self-backup is the most secure option." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20845,6 +20896,9 @@
           }
         }
       }
+    },
+    "If you don't have a Tor VPN app, install one. We recommend Orbot." : {
+
     },
     "If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it." : {
       "localizations" : {
@@ -21169,6 +21223,7 @@
     },
     "Import channels" : {
       "comment" : "Navigation bar title",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21209,6 +21264,7 @@
       }
     },
     "Import has failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21249,6 +21305,7 @@
       }
     },
     "Import successful" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21329,6 +21386,7 @@
       }
     },
     "Importing data…" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -21489,6 +21547,9 @@
           }
         }
       }
+    },
+    "Inbound liquidity" : {
+
     },
     "Inbound Liquidity" : {
       "localizations" : {
@@ -24466,6 +24527,9 @@
     "Liquidity" : {
 
     },
+    "Liquidity not currently available, try again later" : {
+
+    },
     "Liquidity requested" : {
       "localizations" : {
         "ar" : {
@@ -24710,6 +24774,9 @@
       }
     },
     "Lock PIN" : {
+
+    },
+    "Lock PIN Required" : {
 
     },
     "Logged In" : {
@@ -24996,6 +25063,9 @@
         }
       }
     },
+    "Make sure your Tor Proxy VPN app is up and running, and that it's connected to Tor." : {
+
+    },
     "Make sure your Tor VPN is active and running." : {
       "localizations" : {
         "ar" : {
@@ -25155,6 +25225,9 @@
           }
         }
       }
+    },
+    "Manage or switch wallets" : {
+
     },
     "Manual Backup" : {
       "comment" : "Navigation bar title",
@@ -26999,6 +27072,9 @@
         }
       }
     },
+    "No access to the Tor network" : {
+
+    },
     "No address yet..." : {
       "localizations" : {
         "ar" : {
@@ -28544,6 +28620,12 @@
         }
       }
     },
+    "Open Orbot website" : {
+
+    },
+    "Open Tor settings" : {
+
+    },
     "Opening the app" : {
 
     },
@@ -28994,6 +29076,7 @@
       }
     },
     "Paste encrypted data blob here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30886,6 +30969,9 @@
           }
         }
       }
+    },
+    "Phoenix needs access to Tor to function properly." : {
+
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {
@@ -34037,6 +34123,9 @@
         }
       }
     },
+    "Scan QR code" : {
+
+    },
     "Scan QR Code" : {
       "localizations" : {
         "ar" : {
@@ -34238,6 +34327,9 @@
         }
       }
     },
+    "Select emoji" : {
+
+    },
     "Select image" : {
       "localizations" : {
         "ar" : {
@@ -34317,6 +34409,12 @@
           }
         }
       }
+    },
+    "Select photo" : {
+
+    },
+    "Select wallet emoji" : {
+
     },
     "Send" : {
       "localizations" : {
@@ -38146,6 +38244,9 @@
         }
       }
     },
+    "Switch to another wallet" : {
+
+    },
     "System" : {
       "comment" : "App theme option",
       "localizations" : {
@@ -41426,6 +41527,7 @@
       }
     },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -41584,6 +41686,9 @@
           }
         }
       }
+    },
+    "This wallet is **hidden**, and a hidden wallet requires a Lock PIN to be set." : {
+
     },
     "This will reset the app, as if you had just installed it." : {
       "localizations" : {
@@ -44418,6 +44523,7 @@
       }
     },
     "Version %d is not supported" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44616,6 +44722,9 @@
           }
         }
       }
+    },
+    "Visible wallets" : {
+
     },
     "Waiting For 3 Confirmations" : {
       "localizations" : {
@@ -45219,6 +45328,12 @@
         }
       }
     },
+    "Wallet %@" : {
+      "comment" : "Default wallet name"
+    },
+    "Wallet balance" : {
+
+    },
     "Wallet Balance" : {
       "localizations" : {
         "ar" : {
@@ -45339,6 +45454,9 @@
         }
       }
     },
+    "Wallet Image" : {
+
+    },
     "Wallet info" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -45420,6 +45538,9 @@
           }
         }
       }
+    },
+    "Wallet will not be visible in selector screens. To access the wallet you must enter it's lock PIN." : {
+
     },
     "wallet: %@" : {
       "localizations" : {
@@ -46837,6 +46958,9 @@
         }
       }
     },
+    "You can enter the PIN for this wallet anytime in the lock screen, and Phoenix will **switch** to this wallet." : {
+
+    },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
       "localizations" : {
         "ar" : {
@@ -47602,6 +47726,7 @@
       }
     },
     "You must now restart Phoenix." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
