@@ -202,8 +202,12 @@ struct HomeView : MVIView {
 	func balance() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-			totalBalance()
-			incomingBalance()
+			
+			let isSpecialCase = isZeroBalanceWithIncoming()
+			if !isSpecialCase {
+				totalBalance()
+			}
+			incomingBalance(isSpecialCase)
 		}
 		.padding([.top, .leading, .trailing])
 		.padding(.bottom, 30)
@@ -299,72 +303,83 @@ struct HomeView : MVIView {
 				.accessibilityAddTraits(.isButton)
 				.accessibilitySortPriority(49)
 			}
-		}
+		} // </ZStack>
 	}
 	
 	@ViewBuilder
-	func incomingBalance() -> some View {
+	func incomingBalance(_ prominent: Bool) -> some View {
 		
 		let swapInWalletBalance: Int64 = swapInWallet.totalBalance.sat
 		let finalWalletBalance: Int64 = finalWallet.totalBalance.sat
 		
 		let incomingBalance = swapInWalletBalance + finalWalletBalance
 		if incomingBalance > 0 {
+			
 			let formattedAmount = currencyPrefs.hideAmounts
 				? Utils.hiddenAmount(currencyPrefs)
 				: Utils.format(currencyPrefs, sat: incomingBalance)
 			
 			let hasNonSwapInBalance = (finalWalletBalance > 0)
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			
-				Group {
-					if hasNonSwapInBalance {
-						Image(systemName: "link")
-					} else {
-						let unconfirmedBalance = swapInWallet.unconfirmedBalance.sat
-						let weaklyConfirmedBalance = swapInWallet.weaklyConfirmedBalance.sat
-						
-						if let days = swapInWallet.expirationWarningInDays(), days <= 7 {
-							Image(systemName: "exclamationmark.triangle")
-								.foregroundColor(.appNegative)
-						} else if unconfirmedBalance == 0 && weaklyConfirmedBalance == 0 {
-							Image(systemName: "zzz")
-								.foregroundColor(.appWarn)
-								
-						} else {
-							Image(systemName: "clock")
-						}
-					}
-				} // </Group>
-				.padding(.trailing, 2)
+			VStack(alignment: HorizontalAlignment.center, spacing: 8) {
 				
-				if currencyPrefs.hideAmounts {
-					Text("+\(formattedAmount.digits)".lowercased()) // digits => "***"
-						.accessibilityLabel("plus hidden amount incoming")
+				if prominent {
+					Text("On-chain balance")
+						.font(.callout)
+						.foregroundStyle(Color(UIColor.systemGray2))
+				}
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					
-				} else {
-					Text("+\(formattedAmount.string)".lowercased())
+					Group {
+						if hasNonSwapInBalance {
+							Image(systemName: "link")
+						} else {
+							let unconfirmedBalance = swapInWallet.unconfirmedBalance.sat
+							let weaklyConfirmedBalance = swapInWallet.weaklyConfirmedBalance.sat
+							
+							if let days = swapInWallet.expirationWarningInDays(), days <= 7 {
+								Image(systemName: "exclamationmark.triangle")
+									.foregroundColor(.appNegative)
+							} else if unconfirmedBalance == 0 && weaklyConfirmedBalance == 0 {
+								Image(systemName: "zzz")
+									.foregroundColor(.appWarn)
+								
+							} else {
+								Image(systemName: "clock")
+							}
+						}
+					} // </Group>
+					.padding(.trailing, 2)
+					
+					if currencyPrefs.hideAmounts {
+						Text("+\(formattedAmount.digits)".lowercased()) // digits => "***"
+							.accessibilityLabel("plus hidden amount incoming")
+						
+					} else {
+						Text("+\(formattedAmount.string)".lowercased())
+					}
+				} // </HStack>
+				.font(prominent ? .title3.weight(.medium) : .callout)
+				.foregroundColor(prominent ? .primary : .secondary)
+				.onTapGesture {
+					if hasNonSwapInBalance {
+						showIncomingBalancePopover()
+					} else {
+						showSwapInWallet()
+					}
 				}
-			}
-			.font(.callout)
-			.foregroundColor(.secondary)
-			.onTapGesture {
-				if hasNonSwapInBalance {
-					showIncomingBalancePopover()
-				} else {
-					showSwapInWallet()
+				.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+				.onAnimationCompleted(for: incomingSwapScaleFactor) {
+					incomingSwapAnimationCompleted()
 				}
-			}
-			.padding(.top, 7)
-			.padding(.bottom, 2)
-			.scaleEffect(incomingSwapScaleFactor, anchor: .top)
-			.onAnimationCompleted(for: incomingSwapScaleFactor) {
-				incomingSwapAnimationCompleted()
-			}
-			.accessibilityElement(children: .combine)
-			.accessibilityHint("pending on-chain confirmation")
-			.accessibilitySortPriority(48)
+				.accessibilityElement(children: .combine)
+				.accessibilityHint("pending on-chain confirmation")
+				.accessibilitySortPriority(48)
+				
+			} // </VStack>
+			.padding(.top, prominent ? 0 : 7)
+			.padding(.bottom, prominent ? 0 : 2)
 		}
 	}
 	
@@ -381,7 +396,7 @@ struct HomeView : MVIView {
 				.padding(.horizontal, -1)
 		}
 		.buttonStyle(.bordered)
-		.buttonBorderShape(ButtonBorderShape.capsule)
+		.buttonBorderShape(.capsule)
 	}
 	
 	@ViewBuilder
@@ -627,6 +642,21 @@ struct HomeView : MVIView {
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
+	
+	/// When there is a zero balance, but the user has incoming funds,
+	/// we avoid displaying a big "0 sat" balance message because it scary to users.
+	/// So insteady we skip the "0 sat" message, and just show the incoming funds.
+	///
+	func isZeroBalanceWithIncoming() -> Bool {
+		
+		let balance = mvi.model.balance?.msat ?? 0
+		if balance == 0 {
+			let incoming = swapInWallet.totalBalance.sat + finalWallet.totalBalance.sat
+			return incoming > 0
+		} else {
+			return false
+		}
+	}
 	
 	func isDownloadingMoreTxs() -> Bool {
 		

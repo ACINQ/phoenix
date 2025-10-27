@@ -261,6 +261,14 @@ struct IncomingBalancePopover: View {
 					.font(.callout)
 					.foregroundStyle(.secondary)
 				
+				Button {
+					didTapSection_finalWallet()
+				} label: {
+					Label("Spend", systemImage: "paperplane.fill")
+				}
+				.buttonStyle(.bordered)
+				.buttonBorderShape(.roundedRectangle)
+				
 			} // </VStack>
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(10)
