@@ -149,7 +149,7 @@ class SyncBackupManager: @unchecked Sendable {
 	// ----------------------------------------
 	
 	func publishNewState(_ state: SyncBackupManager_State) {
-		log.trace("publishNewState()")
+		log.trace("publishNewState(): \(state)")
 		
 		// Contract: Changes to this publisher will always occur on the main thread.
 		runOnMainThread {

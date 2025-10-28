@@ -66,6 +66,7 @@ extension SyncBackupManager {
 		log.debug("startPaymentsMigrations(): starting...")
 		Task { @MainActor in
 		
+			if await isShutdown() { return }
 			try await self.cloudKitDb.payments.enqueueOutdatedItems()
 			prefs.backupTransactions.hasReUploadedPayments = true
 		}
@@ -113,6 +114,7 @@ extension SyncBackupManager {
 			// We are downloading payments from newest to oldest.
 			// So first we fetch the oldest payment date in the table (if there is one)
 			
+			if await isShutdown() { return }
 			let millis: KotlinLong? = try await self.cloudKitDb.payments.fetchOldestCreation()
 			
 			let oldestCreationDate = millis?.int64Value.toDate(from: .milliseconds)
@@ -225,7 +227,7 @@ extension SyncBackupManager {
 						//
 						// Save the downloaded results to the database.
 						
-						try await Task { @MainActor [items] in
+						let dbSuccess = try await Task { @MainActor [items] in
 							
 							var oldest: Date? = nil
 							
@@ -260,8 +262,9 @@ extension SyncBackupManager {
 								}
 							}
 							
-							log.trace("downloadPayments(): cloudKitDb.updateRows()...")
+							if await isShutdown() { return false }
 							
+							log.trace("downloadPayments(): cloudKitDb.updateRows()...")
 							try await self.cloudKitDb.payments.updateRows(
 								downloadedPayments: paymentRows,
 								downloadedPaymentsMetadata: paymentMetadataRows,
@@ -269,11 +272,15 @@ extension SyncBackupManager {
 							)
 							
 							downloadProgress.payments_finishBatch(completed: items.count, oldest: oldest)
+							return true
 							
 						}.value
 						// </Task @MainActor>
 						
-						if (cursor == nil) {
+						if !dbSuccess {
+							log.trace("downloadPayments(): isShutdown => aborting")
+							done = true
+						} else if cursor == nil {
 							log.trace("downloadPayments(): moreInCloud = false")
 							done = true
 						} else {
@@ -284,12 +291,12 @@ extension SyncBackupManager {
 					} // </while !done>
 				} // </configuredWith>
 				
-				log.trace("downloadPayments(): enqueueMissingItems()...")
-				
 				// Step 4 of 6:
 				//
 				// Run the `finishCloudKitRestore` task to cleanup any old payments.
 				
+				if await isShutdown() { return }
+				log.trace("downloadPayments(): finishCloudkitRestore()...")
 				let sqlitePaymentsDb = try await Biz.business.databaseManager.paymentsDb()
 				try await sqlitePaymentsDb.finishCloudkitRestore()
 				
@@ -298,6 +305,8 @@ extension SyncBackupManager {
 				// If there were any "old" versions in the cloud (CloudData.V0),
 				// let's re-upload those using the new version (CloudData.V1).
 				
+				if await isShutdown() { return }
+				log.trace("downloadPayments(): enqueueOutdatedItems()...")
 				try await self.cloudKitDb.payments.enqueueOutdatedItems()
 				
 				// Step 6 of 6:
@@ -305,7 +314,11 @@ extension SyncBackupManager {
 				// There may be payments that we've added to the database since we started the download process.
 				// So we enqueue these for upload now.
 				
+				if await isShutdown() { return }
+				log.trace("downloadPayments(): enqueueMissingItems()...")
 				try await self.cloudKitDb.payments.enqueueMissingItems()
+				
+				// Finished
 				
 				log.trace("downloadPayments(): finish: success")
 				
@@ -695,6 +708,7 @@ extension SyncBackupManager {
 				//
 				// Process the upload results.
 				
+				if await isShutdown() { return }
 				try await updateDatabase(opInfo)
 				
 				// Done !
@@ -910,6 +924,22 @@ extension SyncBackupManager {
 			)
 		} else {
 			return nil
+		}
+	}
+	
+	/// When the user switches wallets, we close the databases and change our state to `.shutdown`.
+	/// However, there may still be Tasks running (such as downloading payments).
+	/// So we regularly check this function before accessing the database,
+	/// otherwise we risk attempting to access a closed database, and crashing.
+	///
+	private func isShutdown() async -> Bool {
+		
+		if await actor.isShutdown {
+			log.debug("state is shutdown => aborting task")
+			return true
+		} else {
+			log.debug("state !is shutdown")
+			return false
 		}
 	}
 	
