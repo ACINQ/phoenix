@@ -263,10 +263,14 @@ actor SyncSeedManager_Actor {
 	}
 	
 	func shutdown() -> SyncSeedManager_State? {
+		log.trace(#function)
 		
 		switch state {
-			case .shutdown: return nil       // already shutdown
-			default       : return .shutdown
+		case .shutdown:
+			return nil // already shutdown
+		default:
+			state = .shutdown
+			return state
 		}
 	}
 	

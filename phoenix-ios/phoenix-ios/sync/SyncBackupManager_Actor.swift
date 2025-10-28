@@ -33,6 +33,10 @@ actor SyncBackupManager_Actor {
 		return state
 	}
 	
+	var isShutdown: Bool {
+		return state == .shutdown
+	}
+	
 	init(
 		isEnabled: Bool,
 		recordZoneCreated: Bool,
@@ -439,10 +443,14 @@ actor SyncBackupManager_Actor {
 	}
 	
 	func shutdown() -> SyncBackupManager_State? {
+		log.trace(#function)
 		
 		switch state {
-			case .shutdown: return nil       // already shutdown
-			default       : return .shutdown
+		case .shutdown:
+			return nil // already shutdown
+		default:
+			state = .shutdown
+			return state
 		}
 	}
 	

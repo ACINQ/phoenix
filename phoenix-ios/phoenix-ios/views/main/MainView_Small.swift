@@ -109,7 +109,7 @@ struct MainView_Small: View {
 		
 		NavigationStack(path: $navCoordinator.path) {
 			layers()
-				.navigationTitle("")
+				.navigationTitle("Home")
 				.navigationBarTitleDisplayMode(.inline)
 				.navigationBarHidden(true)
 				.navigationStackDestination(isPresented: navLinkTagBinding()) { // iOS 16
