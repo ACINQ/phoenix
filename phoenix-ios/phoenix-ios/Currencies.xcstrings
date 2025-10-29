@@ -177,7 +177,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "marché noir"
+            "value" : "marché libre"
           }
         }
       }
@@ -193,7 +193,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "marché bleu"
+            "value" : "marché libre"
           }
         }
       }
@@ -1679,6 +1679,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Florín caribeño"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Florin caraïbe"
           }
         }
       }
