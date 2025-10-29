@@ -4,7 +4,6 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.OutPoint
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.byteVector32
 import fr.acinq.bitcoin.utils.Either
@@ -34,7 +33,7 @@ import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.db.cloud.payments.CloudAsset
 import fr.acinq.phoenix.db.cloud.payments.CloudData
 import fr.acinq.phoenix.db.cloud.payments.cborDeserialize
-import fr.acinq.phoenix.runTest
+import fr.acinq.phoenix.utils.runTest
 import fr.acinq.secp256k1.Hex
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray

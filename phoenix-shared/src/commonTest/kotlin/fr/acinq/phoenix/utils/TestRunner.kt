@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.db
+package fr.acinq.phoenix.utils
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-import app.cash.sqldelight.db.SqlDriver
-import fr.acinq.phoenix.utils.runTest
-import kotlin.test.*
-
-@Ignore
-class SqliteChannelsDbTest {
-    private val db = createSqliteChannelsDb(testChannelsDriver())
-
-    @Test
-    fun basic() = runTest {
-
-
+fun runTest(timeout: Duration = 30.seconds, test: suspend CoroutineScope.() -> Unit) {
+    runBlocking {
+        withTimeout(timeout) {
+            launch {
+                test()
+                cancel()
+            }.join()
+        }
     }
 }
-
-expect fun testChannelsDriver(): SqlDriver
