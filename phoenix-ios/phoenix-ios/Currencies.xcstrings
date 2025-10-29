@@ -69,23 +69,6 @@
         }
       }
     },
-    "ANG" : {
-      "comment" : "Netherlands Antillean Guilder",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Florín de las Antillas Neerlandesas"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ANG"
-          }
-        }
-      }
-    },
     "AOA" : {
       "comment" : "Angolan Kwanza",
       "localizations" : {
@@ -498,7 +481,15 @@
       }
     },
     "CNH" : {
-      "comment" : "Chinese Yuan (offshore)"
+      "comment" : "Chinese Yuan (offshore)",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yuan Chino"
+          }
+        }
+      }
     },
     "CNY" : {
       "comment" : "Chinese Yuan (onshore)",
@@ -2523,6 +2514,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "XCD"
+          }
+        }
+      }
+    },
+    "XCG" : {
+      "comment" : "Netherlands Antillean Guilder",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Florín de las Antillas Neerlandesas"
           }
         }
       }
