@@ -297,9 +297,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 					
 				case .v1(let v1):
 					
-					if v1.wallets.isEmpty {
+					if v1.matchingWallets(Biz.chain).isEmpty {
 						self.noWalletsAvailable()
-					} else if let defaultKey = v1.defaultKey, let _ = v1.defaultWallet() {
+					} else if let (defaultKey, _) = v1.defaultWallet(Biz.chain) {
 						self.tryWalletUnlock(defaultKey)
 					} else {
 						self.showLockWindow(target: .automatic)

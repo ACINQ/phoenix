@@ -65,7 +65,7 @@ class PhoenixManager {
 		// Setup complete
 		business = newBusiness
 		
-		startAsyncUnlock(target)
+		startAsyncUnlock(target, newBusiness.chain)
 		return newBusiness
 	}
 
@@ -123,7 +123,7 @@ class PhoenixManager {
 	// MARK: Flow
 	// --------------------------------------------------
 
-	private func startAsyncUnlock(_ target: String?) {
+	private func startAsyncUnlock(_ target: String?, _ chain: Bitcoin_kmpChain) {
 		log.trace("startAsyncUnlock()")
 		
 		let unlockWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
@@ -154,10 +154,14 @@ class PhoenixManager {
 
 				case .v1(let v1):
 					if let target {
-						sealedBox = v1.wallets[target]?.keychain
-						id = target
-					} else if let defaultTarget = v1.defaultKey {
-						sealedBox = v1.wallets[defaultTarget]?.keychain
+						if let wallet = v1.getWallet(target), wallet.chain == chain {
+							sealedBox = wallet.keychain
+							id = target
+						} else {
+							log.warning("startAsyncUnlock(): ignoring target: chain mismatch")
+						}
+					} else if let (defaultTarget, defaultWallet) = v1.defaultWallet(chain) {
+						sealedBox = defaultWallet.keychain
 						id = defaultTarget
 					}
 				}

@@ -96,63 +96,115 @@ class SecurityFile {
 			}
 		}
 		
-		let wallets: [String: Wallet]
-		let defaultKey: String?
+		private let wallets: [String: Wallet]
+		private let defaultKeyList: String?
 		
-		private init(wallets: [String: Wallet], defaultKey: String?) {
+		private enum CodingKeys: String, CodingKey {
+			case wallets
+			case defaultKeyList = "defaultKey"
+		}
+		
+		private init(wallets: [String: Wallet], defaultKeyList: String?) {
 			self.wallets = wallets
-			self.defaultKey = defaultKey
+			self.defaultKeyList = defaultKeyList
 		}
 		
 		init() {
 			self.wallets = [:]
-			self.defaultKey = nil
+			self.defaultKeyList = nil
 		}
 		
 		init(wallet: Wallet, id: WalletIdentifiable) {
 			let key = id.standardKeyId
 			self.wallets = [key: wallet]
-			self.defaultKey = key
+			self.defaultKeyList = key
+		}
+		
+		func getWallet(_ id: String) -> Wallet? {
+			return wallets[id]
 		}
 		
 		func getWallet(_ id: WalletIdentifiable) -> Wallet? {
 			return wallets[id.standardKeyId]
 		}
 		
-		func allKeys() -> [String] {
-			return Array(wallets.keys)
+		func matchingWallets(_ chain: Bitcoin_kmpChain) -> [String: Wallet] {
+			return wallets.filter({ $0.value.chain == chain })
 		}
 		
-		func copyWithWallet(_ wallet: Wallet, id: WalletIdentifiable) -> V1 {
+		private var defaultKeys: [Bitcoin_kmpChain: String] {
+			
+			let allKeys: [String] = defaultKeyList?
+				.split(separator: ",")
+				.map { $0.trimmingCharacters(in: .alphanumerics.inverted) } ?? []
+			
+			var result: [Bitcoin_kmpChain: String] = [:]
+			for key in allKeys {
+				if let wallet = wallets[key] {
+					if result[wallet.chain] == nil {
+						result[wallet.chain] = key
+					}
+				}
+			}
+			
+			return result
+		}
+		
+		func isDefaultWalletId(_ id: WalletIdentifier) -> Bool {
+			return defaultKeys[id.chain] == id.standardKeyId
+		}
+		
+		func defaultWallet(_ chain: Bitcoin_kmpChain) -> (String, Wallet)? {
+			
+			guard let key = defaultKeys[chain], let wallet = wallets[key] else {
+				return nil
+			}
+			return (key, wallet)
+		}
+		
+		func copyAddingWallet(_ wallet: Wallet, id: WalletIdentifiable) -> V1 {
+			
 			var newWallets = self.wallets
 			newWallets[id.standardKeyId] = wallet
 			
-			return V1(wallets: newWallets, defaultKey: self.defaultKey)
+			return V1(wallets: newWallets, defaultKeyList: self.defaultKeyList)
 		}
 		
 		func copyRemovingWallet(_ id: WalletIdentifiable) -> V1 {
-			var newWallets = self.wallets
-			newWallets.removeValue(forKey: id.standardKeyId)
 			
-			let newDefaultKey: String? = if (defaultKey == id.standardKeyId) { nil } else { defaultKey }
-			
-			return V1(wallets: newWallets, defaultKey: newDefaultKey)
-		}
-		
-		func copyWithDefaultWalletId(_ id: WalletIdentifiable?) -> V1 {
-			
-			return V1(wallets: self.wallets, defaultKey: id?.standardKeyId)
-		}
-		
-		func isDefaultWalletId(_ id: WalletIdentifiable) -> Bool {
-			return id.standardKeyId == self.defaultKey
-		}
-		
-		func defaultWallet() -> Wallet? {
-			guard let defaultKey else {
-				return nil
+			let key = id.standardKeyId
+			guard let wallet = wallets[key] else {
+				return self
 			}
-			return wallets[defaultKey]
+			
+			var newWallets = wallets
+			newWallets.removeValue(forKey: key)
+			
+			var newDefaultKeys = defaultKeys
+			if newDefaultKeys[wallet.chain] == key {
+				newDefaultKeys[wallet.chain] = nil
+			}
+			
+			let newDefaultKeyList: String = newDefaultKeys.values.joined(separator: ",")
+			return V1(wallets: newWallets, defaultKeyList: newDefaultKeyList)
+		}
+		
+		func copySettingDefaultWalletId(_ id: WalletIdentifier) -> V1 {
+			
+			var newDefaultKeys = defaultKeys
+			newDefaultKeys[id.chain] = id.standardKeyId
+			
+			let newDefaultKeyList: String = newDefaultKeys.values.joined(separator: ",")
+			return V1(wallets: self.wallets, defaultKeyList: newDefaultKeyList)
+		}
+		
+		func copyClearingDefaultWalletId(_ chain: Bitcoin_kmpChain) -> V1 {
+			
+			var newDefaultKeys = defaultKeys
+			newDefaultKeys[chain] = nil
+			
+			let newDefaultKeyList: String = newDefaultKeys.values.joined(separator: ",")
+			return V1(wallets: self.wallets, defaultKeyList: newDefaultKeyList)
 		}
 	}
 }

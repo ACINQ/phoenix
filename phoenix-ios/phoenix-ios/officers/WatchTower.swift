@@ -130,7 +130,7 @@ class WatchTower {
 		}
 		
 		let currentWalletId = Biz.walletId
-		let allTargets: [WatchTowerTarget] = v1.allKeys().map { id in
+		let allTargets: [WatchTowerTarget] = v1.matchingWallets(Biz.chain).keys.map { id in
 			
 			let prefs = Prefs_Wallet(id: id)
 			
@@ -166,12 +166,7 @@ class WatchTower {
 			return targetA.nextAttemptDate < targetB.nextAttemptDate
 		}
 		
-	#if DEBUG && true
-		// Test running WatchTower task on non-current wallet
-		return sortedTargets.filter { !$0.isCurrent }.first
-	#else
 		return sortedTargets.first
-	#endif
 	}
 	
 	// --------------------------------------------------
@@ -273,12 +268,16 @@ class WatchTower {
 			log.warning("SecurityFile.current(): v0 found")
 			return completeTask(task, success: true)
 		}
-		guard let sealedBox = v1.wallets[id]?.keychain else {
+		guard let wallet = v1.getWallet(id) else {
 			log.warning("SecurityFile.current().getWallet(): nil found")
 			return completeTask(task, success: true)
 		}
+		guard wallet.chain == Biz.chain else {
+			log.warning("SecurityFile.current().getWallet(): chain mismatch")
+			return completeTask(task, success: true)
+		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(id, sealedBox)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(id, wallet.keychain)
 		guard case .success(let cleartextData) = keychainResult else {
 			log.warning("readKeychainEntry(): failed")
 			return completeTask(task, success: true)

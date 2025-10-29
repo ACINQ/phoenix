@@ -87,13 +87,16 @@ class MultiBusinessManager {
 			log.warning("launchBackgroundBiz(): SecurityFile.current(): v0 found")
 			return
 		}
-		
-		guard let sealedBox = v1.wallets[nodeIdHash]?.keychain else {
+		guard let wallet = v1.getWallet(nodeIdHash) else {
 			log.warning("launchBackgroundBiz(): SecurityFile.current().getWallet(): nil found")
 			return
 		}
+		guard wallet.chain == Biz.chain else {
+			log.warning("launchBackgroundBiz(): SecurityFile.current().getWallet(): chain mismatch")
+			return
+		}
 		
-		let keychainResult = SharedSecurity.shared.readKeychainEntry(nodeIdHash, sealedBox)
+		let keychainResult = SharedSecurity.shared.readKeychainEntry(nodeIdHash, wallet.keychain)
 		guard case .success(let cleartextData) = keychainResult else {
 			log.warning("launchBackgroundBiz(): readKeychainEntry(): failed")
 			return

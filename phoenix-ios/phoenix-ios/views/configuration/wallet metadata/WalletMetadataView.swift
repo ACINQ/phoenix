@@ -563,12 +563,16 @@ struct WalletMetadataView: View {
 				}
 				
 				updatedWallet = wallet.updated(name: newName, photo: newPhoto, isHidden: newIsHidden)
-				updatedV1 = v1.copyWithWallet(updatedWallet, id: walletId)
+				updatedV1 = v1.copyAddingWallet(updatedWallet, id: walletId)
 				
 			case .isDefault:
 				
 				updatedWallet = wallet
-				updatedV1 = v1.copyWithDefaultWalletId(self.isDefault ? walletId : nil)
+				if self.isDefault {
+					updatedV1 = v1.copySettingDefaultWalletId(walletId)
+				} else {
+					updatedV1 = v1.copyClearingDefaultWalletId(walletId.chain)
+				}
 			}
 			
 			self.metadata = WalletMetadata(

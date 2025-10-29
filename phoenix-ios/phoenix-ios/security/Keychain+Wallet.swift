@@ -96,7 +96,7 @@ class Keychain_Wallet {
 				}
 				
 			case .v1(let v1):
-				sealedBox = v1.wallets[self.id]?.keychain
+				sealedBox = v1.getWallet(self.id)?.keychain
 			}
 		}
 		
@@ -175,7 +175,7 @@ class Keychain_Wallet {
 		case .v0(let v0):
 			sealedBox = v0.keychain
 		case .v1(let v1):
-			sealedBox = v1.wallets[self.id]?.keychain
+			sealedBox = v1.getWallet(self.id)?.keychain
 		}
 		
 		guard let sealedBox else {
@@ -804,7 +804,7 @@ class Keychain_Wallet {
 				}
 				
 			case .v1(let v1):
-				if let keyInfo = v1.wallets[self.id]?.keychain {
+				if let keyInfo = v1.getWallet(self.id)?.keychain {
 					self.unlockWithSoftBiometrics(keyInfo, prompt, completion)
 				} else {
 					fail(genericError(404, "keyInfo not found"))

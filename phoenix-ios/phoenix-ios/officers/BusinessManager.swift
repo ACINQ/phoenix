@@ -39,19 +39,20 @@ class BusinessManager {
 
 	public static let phoenixGlobal = PhoenixGlobal(ctx: PlatformContext.default)
 	
-	/// There are some places in the code where we need to access the testnet state from a background thread.
-	/// This is problematic because calling into Kotlin via `business.chain.isTestnet()`
-	/// from a background thread will throw an exception.
-	///
-	/// So we're caching this value here for background access.
-	/// Also, this makes it easier to test mainnet UI & colors.
-	///
-	public let isTestnet: Bool
-	public let showTestnetBackground: Bool
-	
 	/// The associated business instance.
 	///
 	public let business: PhoenixBusiness
+	
+	/// There are some places in the code where we need to access the chain from a background thread.
+	/// This is problematic because calling into Kotlin via `business.chain`
+	/// from a background thread will throw an exception.
+	///
+	/// So we're caching these values here for potential background access.
+	/// Also, this makes it easier to test mainnet UI & colors.
+	///
+	public let chain: Bitcoin_kmpChain
+	public let isTestnet: Bool
+	public let showTestnetBackground: Bool
 	
 	/// The associated SyncManager instance.
 	///
@@ -100,6 +101,7 @@ class BusinessManager {
 		log.trace(#function)
 		
 		business = PhoenixBusiness(phoenixGlobal: BusinessManager.phoenixGlobal)
+		chain = business.chain
 		isTestnet = !business.chain.isMainnet()
 		showTestnetBackground = !business.chain.isMainnet()
 		

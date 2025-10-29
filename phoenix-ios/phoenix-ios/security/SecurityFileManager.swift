@@ -67,7 +67,7 @@ class SecurityFileManager {
 		guard case .v1(let v1) = self.currentSecurityFile() else {
 			return nil
 		}
-		guard let wallet = v1.defaultWallet(), let id = v1.defaultKey else {
+		guard let (id, wallet) = v1.defaultWallet(Biz.chain) else {
 			return nil
 		}
 		return WalletMetadata(wallet: wallet, nodeIdHash: id, isDefault: true)
@@ -78,24 +78,19 @@ class SecurityFileManager {
 		guard case .v1(let v1) = self.currentSecurityFile() else {
 			return true
 		}
-		return v1.wallets.isEmpty
-	}
-	
-	func allWallets() -> [WalletMetadata] {
-		
-		guard case .v1(let v1) = self.currentSecurityFile() else {
-			return []
-		}
-	
-		let defaultKey = v1.defaultKey
-		return v1.wallets.map { key, wallet in
-			WalletMetadata(wallet: wallet, nodeIdHash: key, isDefault: (key == defaultKey))
-		}
+		return v1.matchingWallets(Biz.chain).isEmpty
 	}
 	
 	func sortedWallets() -> [WalletMetadata] {
 	
-		return allWallets().sorted()
+		guard case .v1(let v1) = self.currentSecurityFile() else {
+			return []
+		}
+	
+		let defaultKey: String? = v1.defaultWallet(Biz.chain)?.0
+		return v1.matchingWallets(Biz.chain).map { key, wallet in
+			WalletMetadata(wallet: wallet, nodeIdHash: key, isDefault: (key == defaultKey))
+		}.sorted()
 	}
 	
 	// --------------------------------------------------

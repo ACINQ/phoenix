@@ -134,16 +134,16 @@ class AppSecurity {
 		// Thus, we only consider VISIBLE wallets in our calculation.
 		//
 		var makeDefaultWallet = false
-		if securityFile.defaultWallet() == nil {
-			let numVisibleWallets = securityFile.wallets.values.filter { !$0.isHidden }.count
-			if numVisibleWallets == 0 {
+		if securityFile.defaultWallet(Biz.chain) == nil {
+			let visibleWallets = securityFile.matchingWallets(Biz.chain).values.filter { !$0.isHidden }
+			if visibleWallets.isEmpty {
 				makeDefaultWallet = true
 			}
 		}
 		
-		var newSecurityFile = securityFile.copyWithWallet(newWallet, id: walletId)
+		var newSecurityFile = securityFile.copyAddingWallet(newWallet, id: walletId)
 		if makeDefaultWallet {
-			newSecurityFile = newSecurityFile.copyWithDefaultWalletId(walletId)
+			newSecurityFile = newSecurityFile.copySettingDefaultWalletId(walletId)
 		}
 		
 		switch SecurityFileManager.shared.writeToDisk(newSecurityFile) {
