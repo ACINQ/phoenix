@@ -16,19 +16,47 @@
 
 package fr.acinq.phoenix.db
 
-
 import app.cash.sqldelight.db.SqlDriver
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.phoenix.utils.runTest
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.setMain
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
 import kotlin.test.*
 
-@Ignore
-class SqliteChannelsDbTest {
-    private val db = createSqliteChannelsDb(testChannelsDriver())
+class SqliteChannelsDbTest : UsingContextTest() {
+
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @BeforeTest
+    fun setupDatabases() {
+        Dispatchers.setMain(mainThreadSurrogate)
+        val sampleDbs = "src/commonTest/resources/sampledbs/channelsdb"
+        val v1: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v1".toPath())
+        setUpDatabase(getPlatformContext(), v1)
+    }
 
     @Test
-    fun basic() = runTest {
+    fun `read v1 db`() = runTest {
+        val driver = createChannelsDbDriver(getPlatformContext(), fileName = "channels-testnet-fe646b99.sqlite")
+        val channelsDb = createSqliteChannelsDb(driver)
 
+        val channels = channelsDb.listLocalChannels()
 
+        // note: this test only checks that the app is able to read v1 of the channels database is readable.
+        // it does not test the channel data blob serialization ; that is already done in lightning-kmp.
+
+        assertEquals(1, channels.size)
+        assertEquals(ByteVector32.fromValidHex("b96f5cad6ecde09ca60c2aa4ad280cb9bb5e09f357306a65b349471fcc55a983"), channels[0].channelId)
+
+        driver.close()
     }
 }
 

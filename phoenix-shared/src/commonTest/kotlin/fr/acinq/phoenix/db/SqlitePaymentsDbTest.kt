@@ -81,7 +81,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
     @BeforeTest
     fun setupDatabases() {
         Dispatchers.setMain(mainThreadSurrogate)
-        val sampleDbs = "src/commonTest/resources/sampledbs"
+        val sampleDbs = "src/commonTest/resources/sampledbs/paymentsdb"
         val v1: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v1".toPath())
         val v6: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v6".toPath())
         val v10: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v10".toPath())
