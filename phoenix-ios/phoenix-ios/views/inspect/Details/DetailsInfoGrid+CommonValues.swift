@@ -76,102 +76,132 @@ extension DetailsInfoGrid {
 			// Note that if we detect truncation for either (original) or (now),
 			// then we keep the layout at 2 rows so it's not confusing when the user switches back and forth.
 			
-			let key = identifier
-			let isTruncated = detailsInfoGridState.truncatedText[key] ?? false
+			let key = "\(identifier)|\(dynamicTypeSize)"
+			let isTruncated = detailsInfoGridState.truncated[key] ?? false
 			
 			if isTruncated {
-				
-				// Two rows:
-				// 1,234 USD
-				//  (original) (clock)
-				
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-					if showingOriginalFiatValue {
-						
-						let display_fiatOriginal = displayAmounts.fiatOriginal ??
-							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-						
-						Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
-						Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
-						
-					} else {
-						
-						let display_fiatCurrent = displayAmounts.fiatCurrent ??
-							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-						
-						Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
-						Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
+				commonValue_amounts_fiat_twoLines(
+					displayAmounts: displayAmounts,
+					canShowOriginalFiatValue: canShowOriginalFiatValue,
+					showingOriginalFiatValue: showingOriginalFiatValue
+				)
+			} else {
+				ViewThatFits(in: .horizontal) {
+					commonValue_amounts_fiat_singleLine(
+						displayAmounts: displayAmounts,
+						canShowOriginalFiatValue: canShowOriginalFiatValue,
+						showingOriginalFiatValue: showingOriginalFiatValue
+					)
+					commonValue_amounts_fiat_twoLines(
+						displayAmounts: displayAmounts,
+						canShowOriginalFiatValue: canShowOriginalFiatValue,
+						showingOriginalFiatValue: showingOriginalFiatValue
+					).onAppear {
+						detailsInfoGridState.truncated[key] = true
 					}
-				} // </HStack>
+				}
+			}
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func commonValue_amounts_fiat_singleLine(
+		displayAmounts: DisplayAmounts,
+		canShowOriginalFiatValue: Bool,
+		showingOriginalFiatValue: Bool
+	) -> some View {
+		
+		// Single row:
+		// 1,234 USD (original) (clock)
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			
+			if showingOriginalFiatValue {
 				
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-					if showingOriginalFiatValue {
-						Text(" (original)", comment: "translate: original")
-							.foregroundColor(.secondary)
-					} else {
-						Text(" (now)", comment: "translate: now")
-							.foregroundColor(.secondary)
-					}
-					
-					if canShowOriginalFiatValue {
-						
-						AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
-							.padding(.leading, 4)
-							.offset(y: 1)
-					}
-				} // </HStack>
+				let display_fiatOriginal = displayAmounts.fiatOriginal ??
+					Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+				
+				Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
+					.layoutPriority(0)
+				Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
+					.layoutPriority(1)
+				Text(" (original)", comment: "translate: original")
+					.layoutPriority(1)
+					.foregroundColor(.secondary)
 				
 			} else {
 				
-				// Single row:
-				// 1,234 USD (original) (clock)
-				
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-					
-					if showingOriginalFiatValue {
-						
-						let display_fiatOriginal = displayAmounts.fiatOriginal ??
-							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-						
-						TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-							Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
-								.layoutPriority(0)
-						} wasTruncated: {
-							detailsInfoGridState.truncatedText[key] = true
-						}
-						Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
-							.layoutPriority(1)
-						Text(" (original)", comment: "translate: original")
-							.layoutPriority(1)
-							.foregroundColor(.secondary)
-						
-					} else {
-						
-						let display_fiatCurrent = displayAmounts.fiatCurrent ??
-							Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
-					
-						TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-							Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
-								.layoutPriority(0)
-						} wasTruncated: {
-							detailsInfoGridState.truncatedText[key] = true
-						}
-						Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
-							.layoutPriority(1)
-						Text(" (now)", comment: "translate: now")
-							.layoutPriority(1)
-							.foregroundColor(.secondary)
-					}
-					
-					if canShowOriginalFiatValue {
-						
-						AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
-							.padding(.leading, 4)
-							.offset(y: 1)
-					}
-					
-				} // </HStack>
+				let display_fiatCurrent = displayAmounts.fiatCurrent ??
+					Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			
+				Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
+					.layoutPriority(0)
+				Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
+					.layoutPriority(1)
+				Text(" (now)", comment: "translate: now")
+					.layoutPriority(1)
+					.foregroundColor(.secondary)
 			}
+			
+			if canShowOriginalFiatValue {
+				
+				AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
+					.padding(.leading, 4)
+					.offset(y: 1)
+			}
+			
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func commonValue_amounts_fiat_twoLines(
+		displayAmounts: DisplayAmounts,
+		canShowOriginalFiatValue: Bool,
+		showingOriginalFiatValue: Bool
+	) -> some View {
+		
+		// Two rows:
+		// 1,234 USD
+		//  (original) (clock)
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				if showingOriginalFiatValue {
+					
+					let display_fiatOriginal = displayAmounts.fiatOriginal ??
+						Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+					
+					Text(verbatim: "≈ \(display_fiatOriginal.digits) ")
+					Text_CurrencyName(currency: display_fiatOriginal.currency, fontTextStyle: .callout)
+					
+				} else {
+					
+					let display_fiatCurrent = displayAmounts.fiatCurrent ??
+						Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+					
+					Text(verbatim: "≈ \(display_fiatCurrent.digits) ")
+					Text_CurrencyName(currency: display_fiatCurrent.currency, fontTextStyle: .callout)
+				}
+			} // </HStack>
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				if showingOriginalFiatValue {
+					Text(" (original)", comment: "translate: original")
+						.foregroundColor(.secondary)
+				} else {
+					Text(" (now)", comment: "translate: now")
+						.foregroundColor(.secondary)
+				}
+				
+				if canShowOriginalFiatValue {
+					
+					AnimatedClock(state: clockStateBinding(), size: 14, animationDuration: 0.0)
+						.padding(.leading, 4)
+						.offset(y: 1)
+				}
+			} // </HStack>
 			
 		} // </VStack>
 	}

@@ -9,7 +9,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 class DetailsInfoGridState: ObservableObject {
-	@Published var truncatedText: [String: Bool] = [:]
+	@Published var truncated: [String: Bool] = [:]
 }
 
 protocol DetailsInfoGrid: InfoGridView {
@@ -19,6 +19,7 @@ protocol DetailsInfoGrid: InfoGridView {
 	var showOriginalFiatValue: Bool { get }
 	var showFiatValueExplanation: Bool { get }
 	var currencyPrefs: CurrencyPrefs { get }
+	var dynamicTypeSize: DynamicTypeSize { get }
 	
 	func clockStateBinding() -> Binding<AnimatedClock.ClockState>
 }

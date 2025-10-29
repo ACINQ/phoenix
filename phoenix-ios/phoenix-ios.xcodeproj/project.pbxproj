@@ -89,7 +89,6 @@
 		DC2ABAD92BED142900C11C9C /* ShakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */; };
 		DC2B74C32C121571001BA1FD /* Bolt12Sheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */; };
 		DC2CE3AF29AFEB0500BA0B00 /* Bundle+Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */; };
-		DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */; };
 		DC2CE55028A52AD90070A2E1 /* RecentPaymentsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */; };
 		DC2DC8682906AC0B0079E570 /* BitcoinUnitSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */; };
 		DC2DC86A2906AC620079E570 /* FiatCurrencySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2DC8692906AC620079E570 /* FiatCurrencySelector.swift */; };
@@ -318,6 +317,7 @@
 		DC9AD20D2C9C90A20019BEE9 /* ParseResultHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9AD20C2C9C90A20019BEE9 /* ParseResultHelper.swift */; };
 		DC9B15442B7D0DCB0023743B /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = DC9B15432B7D0DCB0023743B /* AsyncAlgorithms */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
+		DC9C96492EB018B400C675C2 /* RecoveryPhraseReveal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9C96482EB018AC00C675C2 /* RecoveryPhraseReveal.swift */; };
 		DC9CF83D2D2C6D37003F3B0F /* ScrollView_18.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF83C2D2C6D31003F3B0F /* ScrollView_18.swift */; };
 		DC9CF83F2D2DC3F3003F3B0F /* GeometryGroup_17.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF83E2D2DC3ED003F3B0F /* GeometryGroup_17.swift */; };
 		DC9CF8412D2ECF08003F3B0F /* IncomingBalancePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CF8402D2ECEF7003F3B0F /* IncomingBalancePopover.swift */; };
@@ -592,7 +592,6 @@
 		DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeEffect.swift; sourceTree = "<group>"; };
 		DC2B74C22C121571001BA1FD /* Bolt12Sheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bolt12Sheet.swift; sourceTree = "<group>"; };
 		DC2CE3AE29AFEB0500BA0B00 /* Bundle+Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Icon.swift"; sourceTree = "<group>"; };
-		DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncatableView.swift; sourceTree = "<group>"; };
 		DC2CE54F28A52AD90070A2E1 /* RecentPaymentsConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecentPaymentsConfig.swift; sourceTree = "<group>"; };
 		DC2DC8672906AC0B0079E570 /* BitcoinUnitSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinUnitSelector.swift; sourceTree = "<group>"; };
 		DC2DC8692906AC620079E570 /* FiatCurrencySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatCurrencySelector.swift; sourceTree = "<group>"; };
@@ -787,6 +786,7 @@
 		DC9AD1F02C9B81450019BEE9 /* PaymentRequestedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestedView.swift; sourceTree = "<group>"; };
 		DC9AD20C2C9C90A20019BEE9 /* ParseResultHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseResultHelper.swift; sourceTree = "<group>"; };
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
+		DC9C96482EB018AC00C675C2 /* RecoveryPhraseReveal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryPhraseReveal.swift; sourceTree = "<group>"; };
 		DC9CF83C2D2C6D31003F3B0F /* ScrollView_18.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollView_18.swift; sourceTree = "<group>"; };
 		DC9CF83E2D2DC3ED003F3B0F /* GeometryGroup_17.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryGroup_17.swift; sourceTree = "<group>"; };
 		DC9CF8402D2ECEF7003F3B0F /* IncomingBalancePopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingBalancePopover.swift; sourceTree = "<group>"; };
@@ -1213,6 +1213,7 @@
 			isa = PBXGroup;
 			children = (
 				DC27E4C92791D17A00C777CC /* RecoveryPhraseView.swift */,
+				DC9C96482EB018AC00C675C2 /* RecoveryPhraseReveal.swift */,
 				DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */,
 				DC0C52672BF4FF6100143831 /* AuthenticateWithPinSheet.swift */,
 			);
@@ -1308,7 +1309,6 @@
 				DCD5FF4226A0D34B009CC666 /* EqualSizes.swift */,
 				DCCC7FD426B0A006008ACD9B /* SquareSize.swift */,
 				DCAEF8F4276131A600015993 /* CheckboxToggleStyle.swift */,
-				DC2CE54C28A3D2F50070A2E1 /* TruncatableView.swift */,
 				DC2ABAD82BED142900C11C9C /* ShakeEffect.swift */,
 				DC5E28CD2C64108A0037B3D3 /* NavigationLinkStyle.swift */,
 				DCBA60D32C93544C00878895 /* InsetGroupBoxStyle.swift */,
@@ -2260,6 +2260,7 @@
 				DCD7E0AF28EC3C0D009C30E5 /* WatchTower.swift in Sources */,
 				DCB493CB269F3B06001B0F09 /* Result+Deugly.swift in Sources */,
 				DC71E7302723240E0063613D /* ObservableConnectionsMonitor.swift in Sources */,
+				DC9C96492EB018B400C675C2 /* RecoveryPhraseReveal.swift in Sources */,
 				DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
 				DC5E28CC2C63EF8E0037B3D3 /* NavigationLink_16.swift in Sources */,
@@ -2370,7 +2371,6 @@
 				DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */,
 				DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */,
 				DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */,
-				DC2CE54D28A3D2F50070A2E1 /* TruncatableView.swift in Sources */,
 				DC5F96B22E0360A10052CDE6 /* Prefs+Wallet.swift in Sources */,
 				DCDD9ED628637FD7001800A3 /* AppStatusButton.swift in Sources */,
 				DCCFE6A62B63028A002FFF11 /* UnfairLock.swift in Sources */,
