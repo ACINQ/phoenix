@@ -1673,12 +1673,12 @@
       }
     },
     "XCG" : {
-      "comment" : "Netherlands Antillean Guilder",
+      "comment" : "Caribbean Guilder",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Florín de las Antillas Neerlandesas"
+            "value" : "Florín caribeño"
           }
         }
       }
