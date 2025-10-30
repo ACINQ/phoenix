@@ -274,6 +274,12 @@
             "state" : "translated",
             "value" : " [más información](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [plus d'infos] (https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
         }
       }
     },
@@ -1421,6 +1427,12 @@
             "state" : "translated",
             "value" : "(Rayo11)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Éclair11)"
+          }
         }
       }
     },
@@ -1455,6 +1467,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Rayo12)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Éclair12)"
           }
         }
       }
@@ -1531,6 +1549,12 @@
             "state" : "translated",
             "value" : "(La única forma de acceder a un monedero oculto es tecleando el PIN de bloqueo)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Le seul moyen d'accéder à un portefeuille caché est de taper le code PIN de verrouillage)"
+          }
         }
       }
     },
@@ -1604,6 +1628,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Esto significa que funciona como PIN de coacción)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Cela signifie qu'il fonctionne comme un code PIN sous contrainte)"
           }
         }
       }
@@ -2123,6 +2153,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(espera unos segundos y vuelve a intentarlo)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(attendez quelques secondes et réessayez)"
           }
         }
       }
@@ -3666,6 +3702,12 @@
             "state" : "translated",
             "value" : ": %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
         }
       }
     },
@@ -4084,6 +4126,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Una cartera oculta requiere que se establezca un **PIN de bloqueo**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un portefeuille caché nécessite la définition d'un **PIN de verrouillage**."
           }
         }
       }
@@ -4602,6 +4650,12 @@
             "state" : "translated",
             "value" : "Acceder a la cartera oculta"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accéder au portefeuille caché"
+          }
         }
       }
     },
@@ -4675,6 +4729,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Añadir otra cartera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un autre portefeuille"
           }
         }
       }
@@ -4950,6 +5010,12 @@
             "state" : "translated",
             "value" : "Añadir a contactos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter aux contacts"
+          }
         }
       }
     },
@@ -4983,6 +5049,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Añadir a contacto existente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à un contact existant"
           }
         }
       }
@@ -5501,6 +5573,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importe requerido para el pago con tarjeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant requis pour le paiement par carte"
           }
         }
       }
@@ -7275,7 +7353,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Équilibre"
+            "value" : "Solde"
           }
         }
       }
@@ -8080,6 +8158,12 @@
             "state" : "translated",
             "value" : "Ofertas Bolt12:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 offre :"
+          }
         }
       }
     },
@@ -8234,6 +8318,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se puede acceder a la red Tor. Phoenix no funcionará correctamente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d\\'accéder au réseau Tor. Phoenix ne fonctionnera pas correctement."
           }
         }
       }
@@ -8470,6 +8560,12 @@
             "state" : "translated",
             "value" : "Cambiar Cartera Oculta"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer le portefeuille caché"
+          }
         }
       }
     },
@@ -8545,6 +8641,12 @@
             "state" : "translated",
             "value" : "Cambiar PIN de cerradura"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN de la serrure"
+          }
         }
       }
     },
@@ -8578,6 +8680,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cambiar el PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN des dépenses"
           }
         }
       }
@@ -10145,6 +10253,12 @@
             "state" : "translated",
             "value" : "Comunicando con el lector de tarjetas."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Communication avec le lecteur de cartes."
+          }
         }
       }
     },
@@ -10298,6 +10412,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Configurar PIN de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration du code PIN de verrouillage"
           }
         }
       }
@@ -11788,6 +11908,12 @@
             "state" : "translated",
             "value" : "Crear nuevo contacto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer un nouveau contact"
+          }
         }
       }
     },
@@ -11988,7 +12114,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Convertisseur"
+            "value" : "Convertisseur de devises"
           }
         }
       }
@@ -12103,6 +12229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cartera actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille actuel"
           }
         }
       }
@@ -12743,6 +12875,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cartera por defecto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille par défaut"
           }
         }
       }
@@ -13904,6 +14042,12 @@
             "state" : "translated",
             "value" : "Desactivar PIN de bloqueo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver le code PIN de verrouillage"
+          }
         }
       }
     },
@@ -13980,6 +14124,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Desactivar el PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver le code PIN de dépense"
           }
         }
       }
@@ -14856,6 +15006,12 @@
             "state" : "translated",
             "value" : "Duplicado en %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicata dans %@"
+          }
         }
       }
     },
@@ -14889,6 +15045,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Duplicado dentro de este contacto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicata dans ce contact"
           }
         }
       }
@@ -14963,6 +15125,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opción de PIN de coacción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Option PIN sous contrainte"
           }
         }
       }
@@ -15080,6 +15248,12 @@
             "state" : "translated",
             "value" : "Editar PIN de bloqueo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN de verrouillage"
+          }
         }
       }
     },
@@ -15156,6 +15330,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Editar PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN de dépense"
           }
         }
       }
@@ -15592,6 +15772,12 @@
             "state" : "translated",
             "value" : "Finaliza la comunicación con el lector de tarjetas."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de la communication avec le lecteur de cartes."
+          }
         }
       }
     },
@@ -15747,6 +15933,12 @@
             "state" : "translated",
             "value" : "Introduce un código PIN para poder gastar fondos."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un code PIN pour pouvoir dépenser des fonds."
+          }
         }
       }
     },
@@ -15862,6 +16054,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Introduce el PIN personalizado para abrir la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN personnalisé pour ouvrir l'application."
           }
         }
       }
@@ -16099,6 +16297,12 @@
             "state" : "translated",
             "value" : "Error al leer la etiqueta"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de lecture de l'étiquette"
+          }
         }
       }
     },
@@ -16252,6 +16456,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incluso cuando Phoenix te pide el PIN de otro monedero."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même lorsque Phoenix vous demande le code PIN d'un autre portefeuille."
           }
         }
       }
@@ -18834,6 +19044,12 @@
             "state" : "translated",
             "value" : "Volver a la lista de carteras visibles"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour à la liste des portefeuilles visibles"
+          }
         }
       }
     },
@@ -19029,6 +19245,12 @@
             "state" : "translated",
             "value" : "Cartera oculta"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille caché"
+          }
         }
       }
     },
@@ -19062,6 +19284,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Requisitos del monedero oculto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exigences relatives au portefeuille caché"
           }
         }
       }
@@ -19137,6 +19365,12 @@
             "state" : "translated",
             "value" : "Sujeta tu dispositivo cerca del lector."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tenez votre appareil à proximité du lecteur."
+          }
         }
       }
     },
@@ -19171,6 +19405,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inicio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accueil"
           }
         }
       }
@@ -19287,6 +19527,12 @@
             "state" : "translated",
             "value" : "No está disponible la emulación de tarjeta host.\nLimitado al Espacio Económico Europeo."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'émulation de la carte hôte n'est pas disponible.\nLimité à l'Espace économique européen."
+          }
         }
       }
     },
@@ -19321,6 +19567,12 @@
             "state" : "translated",
             "value" : "No está disponible la emulación de tarjeta host.\nRequiere iOS 17.4 o posterior."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'émulation de carte hôte n'est pas disponible.\nNécessite iOS 17.4 ou une version ultérieure."
+          }
         }
       }
     },
@@ -19354,6 +19606,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error de sesión de emulación de tarjeta host\n%@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de session d'émulation de carte hôte\n%@"
           }
         }
       }
@@ -19994,6 +20252,12 @@
             "state" : "translated",
             "value" : "Si Face ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Face ID échoue, vous pouvez entrer votre code d'accès iOS pour ouvrir l'application."
+          }
         }
       }
     },
@@ -20069,6 +20333,12 @@
             "state" : "translated",
             "value" : "Si Touch ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Touch ID échoue, vous pouvez saisir votre code d'accès iOS pour ouvrir l'application."
+          }
         }
       }
     },
@@ -20102,6 +20372,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si se selecciona un monedero predeterminado, se abrirá automáticamente al iniciar la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si un portefeuille par défaut est sélectionné, il sera automatiquement ouvert au lancement de l'application."
           }
         }
       }
@@ -20339,6 +20615,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Si no tienes una aplicación VPN Tor, instala una. Te recomendamos Orbot."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous n'avez pas d'application VPN Tor, installez-en une. Nous vous recommandons Orbot."
           }
         }
       }
@@ -20981,6 +21263,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Liquidez entrante"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidité entrante"
           }
         }
       }
@@ -21821,7 +22109,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Incorrect"
+            "value" : "Non valide"
           }
         }
       }
@@ -22221,6 +22509,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Formato no válido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format non valide"
           }
         }
       }
@@ -23063,6 +23357,12 @@
             "state" : "translated",
             "value" : "Rayo11"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'éclair11"
+          }
         }
       }
     },
@@ -23097,6 +23397,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rayo12"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'éclair12"
           }
         }
       }
@@ -23338,6 +23644,12 @@
             "state" : "translated",
             "value" : "Dirección del rayo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse de la foudre"
+          }
         }
       }
     },
@@ -23371,6 +23683,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Direcciones de rayos:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresses des foudres :"
           }
         }
       }
@@ -23820,6 +24138,12 @@
             "state" : "translated",
             "value" : "Liquidez"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidité"
+          }
         }
       }
     },
@@ -23853,6 +24177,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La liquidez no está disponible actualmente, inténtalo más tarde"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La liquidité n'est pas disponible actuellement, réessayez plus tard"
           }
         }
       }
@@ -24088,6 +24418,12 @@
             "state" : "translated",
             "value" : "Lock PIN"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock PIN"
+          }
         }
       }
     },
@@ -24121,6 +24457,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se requiere PIN de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code PIN de verrouillage requis"
           }
         }
       }
@@ -24440,6 +24782,12 @@
             "state" : "translated",
             "value" : "Asegúrate de que tu aplicación VPN Tor Proxy está en funcionamiento y conectada a Tor."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assurez-vous que votre application VPN Tor Proxy est opérationnelle et qu'elle est connectée à Tor."
+          }
         }
       }
     },
@@ -24633,6 +24981,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gestionar o cambiar de monedero"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer ou changer de portefeuille"
           }
         }
       }
@@ -25690,6 +26044,12 @@
             "state" : "translated",
             "value" : "Menos los honorarios de los mineros, estimados en:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moins les frais de minage, estimés à :"
+          }
         }
       }
     },
@@ -25925,6 +26285,12 @@
             "state" : "translated",
             "value" : "Las funciones NFC no están disponibles en este dispositivo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonctionnalités NFC ne sont pas disponibles sur cet appareil"
+          }
         }
       }
     },
@@ -25959,6 +26325,12 @@
             "state" : "translated",
             "value" : "Las funciones NFC no están disponibles en este dispositivo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonctions NFC ne sont pas disponibles sur cet appareil"
+          }
         }
       }
     },
@@ -25992,6 +26364,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El lector NFC ya está escaneando"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le lecteur NFC est déjà en train de scanner"
           }
         }
       }
@@ -26470,6 +26848,12 @@
             "state" : "translated",
             "value" : "No se detecta URI o texto en la etiqueta NFC"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas d'URI ou de texte détecté dans le tag NFC"
+          }
         }
       }
     },
@@ -26503,6 +26887,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sin acceso a la red Tor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas d\\'accès au réseau Tor"
           }
         }
       }
@@ -27182,6 +27572,12 @@
             "state" : "translated",
             "value" : "Nada escaneado"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien n'a été scanné"
+          }
         }
       }
     },
@@ -27418,6 +27814,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "On-chain saldo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solde on-chain"
           }
         }
       }
@@ -27822,6 +28224,12 @@
             "state" : "translated",
             "value" : "Abrir el sitio web de Orbot"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le site web d'Orbot"
+          }
         }
       }
     },
@@ -27855,6 +28263,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrir la configuración de Tor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres Tor"
           }
         }
       }
@@ -27929,6 +28343,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrir la app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l'application"
           }
         }
       }
@@ -28405,6 +28825,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pasa los datos biométricos de iOS para abrir la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passez la biométrie iOS pour ouvrir l'application."
           }
         }
       }
@@ -30172,6 +30598,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phoenix necesita acceso a Tor para funcionar correctamente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix a besoin d\\'accéder à Tor pour fonctionner correctement."
           }
         }
       }
@@ -32628,6 +33060,12 @@
             "state" : "translated",
             "value" : "Reutilizable"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réutilisable"
+          }
         }
       }
     },
@@ -33185,6 +33623,12 @@
             "state" : "translated",
             "value" : "Escanear código QR"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanner le code QR"
+          }
         }
       }
     },
@@ -33380,6 +33824,12 @@
             "state" : "translated",
             "value" : "Seleccionar emoji"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un emoji"
+          }
         }
       }
     },
@@ -33454,6 +33904,12 @@
             "state" : "translated",
             "value" : "Seleccionar foto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez une photo"
+          }
         }
       }
     },
@@ -33487,6 +33943,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Selecciona el emoji de la cartera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez l'emoji portefeuille"
           }
         }
       }
@@ -34495,6 +34957,12 @@
             "state" : "translated",
             "value" : "Establecer PIN de bloqueo"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir le code PIN de verrouillage"
+          }
         }
       }
     },
@@ -34571,6 +35039,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Establecer PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir le code PIN de dépense"
           }
         }
       }
@@ -36075,6 +36549,12 @@
             "state" : "translated",
             "value" : "Un solo uso"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usage unique"
+          }
         }
       }
     },
@@ -36271,6 +36751,12 @@
             "state" : "translated",
             "value" : "Gastar"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépenser"
+          }
         }
       }
     },
@@ -36425,6 +36911,12 @@
             "state" : "translated",
             "value" : "Control del gasto"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrôle des dépenses"
+          }
         }
       }
     },
@@ -36455,6 +36947,12 @@
           }
         },
         "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spending PIN"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spending PIN"
@@ -37339,6 +37837,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cambiar a otro monedero"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à un autre portefeuille"
           }
         }
       }
@@ -39881,6 +40385,12 @@
             "state" : "translated",
             "value" : "Esto parece ser un sitio web:"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il s'agit apparemment d'un site web :"
+          }
         }
       }
     },
@@ -40844,6 +41354,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Este monedero está **oculto**, y un monedero oculto requiere que se establezca un PIN de bloqueo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce portefeuille est **caché**, et un portefeuille caché nécessite la définition d'un code PIN de verrouillage."
           }
         }
       }
@@ -42252,6 +42768,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se pueden recuperar los datos de esta dirección. Es posible que esté experimentando un problema de conectividad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de récupérer les données relatives à cette adresse. Vous rencontrez peut-être un problème de connectivité."
           }
         }
       }
@@ -43699,6 +44221,12 @@
             "state" : "translated",
             "value" : "Carteras visibles"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuilles visibles"
+          }
         }
       }
     },
@@ -44254,6 +44782,12 @@
             "state" : "translated",
             "value" : "Cartera %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille %@"
+          }
         }
       }
     },
@@ -44368,6 +44902,12 @@
             "state" : "translated",
             "value" : "Imagen de la cartera"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image du portefeuille"
+          }
         }
       }
     },
@@ -44401,6 +44941,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saldo de la cartera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solde du portefeuille"
           }
         }
       }
@@ -44557,6 +45103,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El monedero no será visible en las pantallas de selección. Para acceder al monedero debes introducir su PIN de bloqueo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le portefeuille ne sera pas visible dans les écrans de sélection. Pour accéder au portefeuille, vous devez saisir son code PIN de verrouillage."
           }
         }
       }
@@ -45928,6 +46480,12 @@
             "state" : "translated",
             "value" : "Puedes introducir el PIN de este monedero en cualquier momento en la pantalla de bloqueo, y Phoenix **cambiará** a este monedero."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez saisir le code PIN de ce portefeuille à tout moment sur l'écran de verrouillage, et Phoenix passera **à ce portefeuille."
+          }
         }
       }
     },
@@ -47177,6 +47735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tu saldo de:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre solde de :"
           }
         }
       }
@@ -49841,6 +50405,12 @@
             "state" : "translated",
             "value" : "etiqueta (opcional)"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "étiquette (facultatif)"
+          }
         }
       }
     },
@@ -49956,6 +50526,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "lno1... (pega aquí la oferta)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (coller l'offre ici)"
           }
         }
       }
@@ -50314,6 +50890,12 @@
             "state" : "translated",
             "value" : "nfc"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
         }
       }
     },
@@ -50388,6 +50970,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ninguno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucun"
           }
         }
       }
