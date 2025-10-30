@@ -250,6 +250,12 @@
             "state" : "translated",
             "value" : " [المزيد من المعلومات] (https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [více informací](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
         }
       }
     },
@@ -1373,6 +1379,12 @@
             "state" : "translated",
             "value" : "(صاعقة البرق11)"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt11)"
+          }
         }
       }
     },
@@ -1383,6 +1395,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(صاعقة البرق12)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt12)"
           }
         }
       }
@@ -1435,6 +1453,12 @@
             "state" : "translated",
             "value" : "(الطريقة الوحيدة للوصول إلى المحفظة المخفية هي كتابة رقم التعريف الشخصي للقفل)"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Jediný způsob, jak získat přístup do skryté peněženky, je zadat kód PIN zámku.)"
+          }
         }
       }
     },
@@ -1484,6 +1508,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(وهذا يعني أنه يعمل كرقم تعريف شخصي بالإكراه)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(To znamená, že funguje jako PIN z donucení.)"
           }
         }
       }
@@ -1979,6 +2009,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(انتظر بضع ثوانٍ ثم أعد المحاولة)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(počkejte několik sekund a zkuste to znovu)"
           }
         }
       }
@@ -3498,6 +3534,12 @@
             "state" : "translated",
             "value" : ": %@"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
         }
       }
     },
@@ -3893,6 +3935,12 @@
             "state" : "translated",
             "value" : "تتطلب المحفظة المخفية تعيين **رقم تعريف شخصي للقفل**."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skrytá peněženka vyžaduje nastavení kódu **Lock PIN**."
+          }
         }
       }
     },
@@ -4229,7 +4277,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zrychlení transakcí v řetězci"
+            "value" : "Zrychlení on-chain transakcí"
           }
         },
         "de" : {
@@ -4386,6 +4434,12 @@
             "state" : "translated",
             "value" : "الوصول إلى المحفظة المخفية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přístup ke skryté peněžence"
+          }
         }
       }
     },
@@ -4435,6 +4489,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إضافة محفظة أخرى"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přidání další peněženky"
           }
         }
       }
@@ -4686,6 +4746,12 @@
             "state" : "translated",
             "value" : "إضافة إلى جهات الاتصال"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přidat ke kontaktům"
+          }
         }
       }
     },
@@ -4695,6 +4761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إضافة إلى جهة اتصال موجودة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přidat ke stávajícímu kontaktu"
           }
         }
       }
@@ -4953,7 +5025,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Částka připočtená k úvěru na poplatky"
+            "value" : "Částka přidána do poplatkového kreditu"
           }
         },
         "de" : {
@@ -5189,6 +5261,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "المبلغ المطلوب للدفع بالبطاقة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Částka požadovaná pro platbu kartou"
           }
         }
       }
@@ -5810,7 +5888,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jste si jisti, že chcete pokračovat?"
+            "value" : "Opravdu chcete pokračovat?"
           }
         },
         "de" : {
@@ -6939,7 +7017,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bilance"
+            "value" : "Zůstatek"
           }
         },
         "de" : {
@@ -7744,6 +7822,12 @@
             "state" : "translated",
             "value" : "عروض Bolt12:"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 nabízí:"
+          }
         }
       }
     },
@@ -7875,6 +7959,12 @@
             "state" : "translated",
             "value" : "لا يمكن الوصول إلى شبكة Tor. لن يعمل برنامج Phoenix بشكل صحيح."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nelze se připojit k síti Tor. Phoenix nebude fungovat správně."
+          }
         }
       }
     },
@@ -7889,7 +7979,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Po 4 měsících čekání již nelze vyměnit. Tyto prostředky je nutné utratit ručně."
+            "value" : "Po 4 měsících čekání není možné prostředky přehodit na Lightning. Tyto prostředky je nutné utratit ručně."
           }
         },
         "de" : {
@@ -8086,6 +8176,12 @@
             "state" : "translated",
             "value" : "تغيير المحفظة المخفية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna skryté peněženky"
+          }
         }
       }
     },
@@ -8137,6 +8233,12 @@
             "state" : "translated",
             "value" : "تغيير رقم التعريف الشخصي للقفل"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna kódu PIN zámku"
+          }
         }
       }
     },
@@ -8146,6 +8248,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تغيير رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna výdajového kódu PIN"
           }
         }
       }
@@ -8203,7 +8311,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uzavření kanálu"
+            "value" : "Platba uzavírající kanál"
           }
         },
         "de" : {
@@ -8365,7 +8473,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provoz kanálu (nový nebo spojovací)"
+            "value" : "Kanálová operace (nový nebo splice-in)"
           }
         },
         "de" : {
@@ -9330,7 +9438,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Typ uzavření"
+            "value" : "Uzavírací typ"
           }
         },
         "de" : {
@@ -9689,6 +9797,12 @@
             "state" : "translated",
             "value" : "التواصل مع قارئ البطاقات."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Komunikace se čtečkou karet."
+          }
         }
       }
     },
@@ -9818,6 +9932,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تكوين رقم التعريف الشخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfigurace kódu PIN zámku"
           }
         }
       }
@@ -10197,7 +10317,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Potvrzeno v řetězci"
+            "value" : "Potrvzeno on-chain"
           }
         },
         "de" : {
@@ -10401,7 +10521,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Připojování…"
+            "value" : "Připojuji…"
           }
         },
         "de" : {
@@ -11284,6 +11404,12 @@
             "state" : "translated",
             "value" : "إنشاء جهة اتصال جديدة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vytvořit nový kontakt"
+          }
         }
       }
     },
@@ -11419,7 +11545,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Převodník měn"
+            "value" : "Převodník Měn"
           }
         },
         "de" : {
@@ -11575,6 +11701,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "المحفظة الحالية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuální peněženka"
           }
         }
       }
@@ -12191,6 +12323,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "المحفظة الافتراضية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Výchozí peněženka"
           }
         }
       }
@@ -13328,6 +13466,12 @@
             "state" : "translated",
             "value" : "تعطيل رقم التعريف الشخصي للقفل"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakázat kód PIN zámku"
+          }
         }
       }
     },
@@ -13380,6 +13524,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تعطيل رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakázat kód PIN pro výdaje"
           }
         }
       }
@@ -13435,7 +13585,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vypnutí služby Tor"
+            "value" : "Vypnout Tor"
           }
         },
         "de" : {
@@ -13755,7 +13905,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zobrazit"
+            "value" : "Zobrazení"
           }
         },
         "de" : {
@@ -14232,6 +14382,12 @@
             "state" : "translated",
             "value" : "مكرر في %@"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikát v %@"
+          }
         }
       }
     },
@@ -14241,6 +14397,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تكرار داخل جهة الاتصال هذه"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikát v rámci tohoto kontaktu"
           }
         }
       }
@@ -14291,6 +14453,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خيار رقم التعريف الشخصي للإكراه"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Možnost PIN z donucení"
           }
         }
       }
@@ -14384,6 +14552,12 @@
             "state" : "translated",
             "value" : "تحرير رقم التعريف الشخصي للقفل"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upravit kód PIN zámku"
+          }
         }
       }
     },
@@ -14436,6 +14610,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تحرير رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upravit výdajový PIN"
           }
         }
       }
@@ -14812,7 +14992,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datum ukončení"
+            "value" : "Do data"
           }
         },
         "de" : {
@@ -14847,6 +15027,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إنهاء الاتصال بقارئ البطاقة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukončení komunikace se čtečkou karet."
           }
         }
       }
@@ -14979,6 +15165,12 @@
             "state" : "translated",
             "value" : "أدخل رمز PIN لتتمكن من إنفاق الأموال."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte kód PIN, abyste mohli utrácet peníze."
+          }
         }
       }
     },
@@ -15070,6 +15262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "أدخل رقم التعريف الشخصي المخصص لفتح التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadáním vlastního kódu PIN otevřete aplikaci."
           }
         }
       }
@@ -15283,6 +15481,12 @@
             "state" : "translated",
             "value" : "خطأ في قراءة العلامة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chyba při čtení značky"
+          }
         }
       }
     },
@@ -15412,6 +15616,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "حتى عندما يطالبك Phoenix برقم التعريف الشخصي لمحفظة مختلفة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I když vás Phoenix vyzve k zadání kódu PIN pro jinou peněženku."
           }
         }
       }
@@ -15549,7 +15759,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vypršela platnost"
+            "value" : "Platnost vypršela"
           }
         },
         "de" : {
@@ -15709,7 +15919,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Export"
+            "value" : "Exportovat"
           }
         },
         "de" : {
@@ -16232,7 +16442,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zápočet poplatků"
+            "value" : "Poplatkový kredit"
           }
         },
         "de" : {
@@ -17970,6 +18180,12 @@
             "state" : "translated",
             "value" : "العودة إلى قائمة المحافظ المرئية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zpět na seznam viditelných peněženek"
+          }
         }
       }
     },
@@ -18141,6 +18357,12 @@
             "state" : "translated",
             "value" : "المحفظة المخفية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skrytá peněženka"
+          }
         }
       }
     },
@@ -18150,6 +18372,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "متطلبات المحفظة المخفية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skryté požadavky na peněženku"
           }
         }
       }
@@ -18201,6 +18429,12 @@
             "state" : "translated",
             "value" : "أمسك جهازك بالقرب من القارئ."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Držte zařízení v blízkosti čtečky."
+          }
         }
       }
     },
@@ -18211,6 +18445,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "الصفحة الرئيسية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
           }
         }
       }
@@ -18303,6 +18543,12 @@
             "state" : "translated",
             "value" : "مضاهاة بطاقة المضيف غير متوفرة.\nيقتصر على المنطقة الاقتصادية الأوروبية."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emulace hostitelské karty není k dispozici.\nOmezeno na Evropský hospodářský prostor."
+          }
         }
       }
     },
@@ -18313,6 +18559,12 @@
             "state" : "translated",
             "value" : "مضاهاة بطاقة المضيف غير متوفرة.\nيتطلب نظام iOS 17.4 أو أحدث."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emulace hostitelské karty není k dispozici.\nVyžaduje iOS 17.4 nebo novější."
+          }
         }
       }
     },
@@ -18322,6 +18574,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "خطأ في جلسة مضاهاة بطاقة المضيف\n%@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chyba relace emulace hostitelské karty\n%@"
           }
         }
       }
@@ -18938,6 +19196,12 @@
             "state" : "translated",
             "value" : "في حالة فشل Face ID، يمكنك إدخال رمز مرور iOS لفتح التطبيق."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud Face ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
+          }
         }
       }
     },
@@ -18989,6 +19253,12 @@
             "state" : "translated",
             "value" : "إذا فشل معرّف اللمس، يمكنك إدخال رمز مرور iOS لفتح التطبيق."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud Touch ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
+          }
         }
       }
     },
@@ -18998,6 +19268,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إذا تم تحديد محفظة افتراضية، فسيتم فتحها تلقائيًا عند تشغيل التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud je vybrána výchozí peněženka, otevře se automaticky při spuštění aplikace."
           }
         }
       }
@@ -19211,6 +19487,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إذا لم يكن لديك تطبيق Tor VPN، فقم بتثبيت واحد. نوصي باستخدام Orbot."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud aplikaci Tor VPN nemáte, nainstalujte si ji. Doporučujeme Orbot."
           }
         }
       }
@@ -19830,6 +20112,12 @@
             "state" : "translated",
             "value" : "السيولة الواردة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příchozí likvidita"
+          }
         }
       }
     },
@@ -20004,7 +20292,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Včetně popisu"
+            "value" : "Zahrnout popis"
           }
         },
         "de" : {
@@ -20325,7 +20613,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Příchozí platba v řetězci (starší swap-in)"
+            "value" : "Příchozí on-chain platba (legacy swap-in)"
           }
         },
         "de" : {
@@ -20365,7 +20653,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Příchozí platba v řetězci (nový kanál)"
+            "value" : "Příchozí on-chain platba (nový kanál)"
           }
         },
         "de" : {
@@ -20525,7 +20813,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Příchozí platby někdy vyžadují On-Chain transakce. K tomu nedochází vždy, pouze v případě potřeby."
+            "value" : "Příchozí platby někdy vyžadují on-chain transakce. K tomu nedochází vždy, pouze v případě potřeby."
           }
         },
         "de" : {
@@ -20645,7 +20933,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nesprávné"
+            "value" : "Nesprávný PIN"
           }
         },
         "de" : {
@@ -21045,6 +21333,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تنسيق غير صالح"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nesprávný formát"
           }
         }
       }
@@ -21705,7 +21999,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deskriptor dědictví"
+            "value" : "Legacy deskriptor"
           }
         },
         "de" : {
@@ -21826,7 +22120,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Blesk"
+            "value" : "Lightning"
           }
         },
         "de" : {
@@ -21863,6 +22157,12 @@
             "state" : "translated",
             "value" : "صاعقة البرق11"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning Bolt11"
+          }
         }
       }
     },
@@ -21873,6 +22173,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "صاعقة البرق12"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning Bolt12"
           }
         }
       }
@@ -22090,6 +22396,12 @@
             "state" : "translated",
             "value" : "عنوان البرق"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightningová adresa"
+          }
         }
       }
     },
@@ -22099,6 +22411,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "عناوين البرق:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleskové adresy:"
           }
         }
       }
@@ -22524,6 +22842,12 @@
             "state" : "translated",
             "value" : "السيولة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likvidita"
+          }
         }
       }
     },
@@ -22533,6 +22857,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "السيولة غير متوفرة حالياً، حاول مرة أخرى لاحقاً"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likvidita není momentálně k dispozici, zkuste to později"
           }
         }
       }
@@ -22548,7 +22878,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Požadovaná likvidita"
+            "value" : "Likvidita vyžádána"
           }
         },
         "de" : {
@@ -22668,7 +22998,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Načítání.."
+            "value" : "Načítání…"
           }
         },
         "de" : {
@@ -22744,6 +23074,12 @@
             "state" : "translated",
             "value" : "قفل رقم التعريف الشخصي"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamykací PIN"
+          }
         }
       }
     },
@@ -22753,6 +23089,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "مطلوب رقم تعريف شخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Požadovaný kód PIN zámku"
           }
         }
       }
@@ -22851,7 +23193,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Logs"
+            "value" : "Logy"
           }
         },
         "de" : {
@@ -23048,6 +23390,12 @@
             "state" : "translated",
             "value" : "تأكد من أن تطبيق Tor Proxy VPN الخاص بك يعمل، وأنه متصل بـ Tor."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ujistěte se, že máte spuštěnou aplikaci Tor Proxy VPN a že je připojena k síti Tor."
+          }
         }
       }
     },
@@ -23062,7 +23410,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ujistěte se, že je Tor VPN aktivní a spuštěná."
+            "value" : "Ujistěte se, že vaše Tor VPN je aktivní a běží."
           }
         },
         "de" : {
@@ -23217,6 +23565,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "إدارة المحافظ أو تبديلها"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Správa nebo přepínání peněženek"
           }
         }
       }
@@ -24250,6 +24604,12 @@
             "state" : "translated",
             "value" : "ناقص رسوم عمال المناقصات المقدرة بـ"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po odečtení poplatků za těžbu se odhaduje, že:"
+          }
         }
       }
     },
@@ -24461,6 +24821,12 @@
             "state" : "translated",
             "value" : "إمكانات NFC غير متوفرة على هذا الجهاز"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkce NFC nejsou v tomto zařízení k dispozici"
+          }
         }
       }
     },
@@ -24471,6 +24837,12 @@
             "state" : "translated",
             "value" : "إمكانات NFC غير متوفرة على هذا الجهاز"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkce NFC nejsou v tomto zařízení k dispozici"
+          }
         }
       }
     },
@@ -24480,6 +24852,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يقوم قارئ NFC بالمسح الضوئي بالفعل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Čtečka NFC již skenuje"
           }
         }
       }
@@ -24934,6 +25312,12 @@
             "state" : "translated",
             "value" : "لم يتم اكتشاف أي URI أو نص في علامة NFC"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V tagu NFC nebyl zjištěn žádný URI ani text"
+          }
         }
       }
     },
@@ -24943,6 +25327,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لا يوجد وصول إلى شبكة Tor"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez přístupu k síti Tor"
           }
         }
       }
@@ -25598,6 +25988,12 @@
             "state" : "translated",
             "value" : "لم يتم مسح أي شيء"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nic se neskenuje"
+          }
         }
       }
     },
@@ -25811,6 +26207,12 @@
             "state" : "translated",
             "value" : "التوازن على السلسلة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zůstatek v řetězci"
+          }
         }
       }
     },
@@ -25826,7 +26228,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Záloha v řetězci"
+            "value" : "On-chain vklad"
           }
         },
         "de" : {
@@ -25866,7 +26268,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Očekávaný poplatek v řetězci"
+            "value" : "Očekává se poplatek"
           }
         },
         "de" : {
@@ -25906,7 +26308,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Čekající prostředky v řetězci (+%@)"
+            "value" : "On-chain finanční prostředky čekají na vyřízení (+%@)"
           }
         },
         "de" : {
@@ -26190,6 +26592,12 @@
             "state" : "translated",
             "value" : "افتح موقع أوربوت الإلكتروني"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otevřít webové stránky Orbot"
+          }
         }
       }
     },
@@ -26199,6 +26607,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فتح إعدادات Tor"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otevřít nastavení Toru"
           }
         }
       }
@@ -26249,6 +26663,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "فتح التطبيق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otevření aplikace"
           }
         }
       }
@@ -26424,7 +26844,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odchozí platba v řetězci"
+            "value" : "Odchozí on-chain platba (splice)"
           }
         },
         "de" : {
@@ -26464,7 +26884,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odchozí platba v řetězci (starší swap)"
+            "value" : "Outgoing on-chain payment (legacy swap)"
           }
         },
         "de" : {
@@ -26666,7 +27086,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neshoda PIN!"
+            "value" : "PIN se neshoduje!"
           }
         },
         "de" : {
@@ -26701,6 +27121,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اجتياز القياسات الحيوية لنظام iOS لفتح التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro otevření aplikace projděte biometrickými údaji systému iOS."
           }
         }
       }
@@ -26878,7 +27304,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platba v řetězci"
+            "value" : "Zaplatit on-chain"
           }
         },
         "de" : {
@@ -27726,7 +28152,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zamítnutí platby (+%@)"
+            "value" : "Platba zamítnuta (+%@)"
           }
         },
         "de" : {
@@ -28444,6 +28870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يحتاج Phoenix إلى الوصول إلى Tor ليعمل بشكل صحيح."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix potřebuje pro správné fungování přístup k síti Tor."
           }
         }
       }
@@ -30876,6 +31308,12 @@
             "state" : "translated",
             "value" : "قابلة لإعادة الاستخدام"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opakotavelná"
+          }
         }
       }
     },
@@ -30890,7 +31328,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zobrazit"
+            "value" : "Pokračovat"
           }
         },
         "de" : {
@@ -31409,6 +31847,12 @@
             "state" : "translated",
             "value" : "مسح رمز الاستجابة السريعة ضوئياً"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naskenovat QR kód"
+          }
         }
       }
     },
@@ -31580,6 +32024,12 @@
             "state" : "translated",
             "value" : "تحديد الرموز التعبيرية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vybrat emoji"
+          }
         }
       }
     },
@@ -31630,6 +32080,12 @@
             "state" : "translated",
             "value" : "اختر الصورة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vybrat fotografii"
+          }
         }
       }
     },
@@ -31639,6 +32095,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "اختر رمز تعبيري للمحفظة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyberte emoji peněženky"
           }
         }
       }
@@ -31654,7 +32116,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odeslat"
+            "value" : "Poslat"
           }
         },
         "de" : {
@@ -32623,6 +33085,12 @@
             "state" : "translated",
             "value" : "تعيين رقم التعريف الشخصي للقفل"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení kódu PIN zámku"
+          }
         }
       }
     },
@@ -32675,6 +33143,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تعيين رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení výdajového kódu PIN"
           }
         }
       }
@@ -34155,6 +34629,12 @@
             "state" : "translated",
             "value" : "استخدام واحد"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jednorázová"
+          }
         }
       }
     },
@@ -34327,6 +34807,12 @@
             "state" : "translated",
             "value" : "أنفق"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utratit"
+          }
         }
       }
     },
@@ -34457,6 +34943,12 @@
             "state" : "translated",
             "value" : "التحكم في الإنفاق"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrola výdajů"
+          }
         }
       }
     },
@@ -34466,6 +34958,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odesílací PIN"
           }
         }
       }
@@ -34722,7 +35220,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datum zahájení"
+            "value" : "Od data"
           }
         },
         "de" : {
@@ -35247,7 +35745,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Výměna adres"
+            "value" : "Swap-in adresa"
           }
         },
         "de" : {
@@ -35323,6 +35821,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "التحويل إلى محفظة أخرى"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přechod na jinou peněženku"
           }
         }
       }
@@ -37522,7 +38026,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tyto prostředky pocházejí z uzavřených kanálů Blesku. Je třeba je utratit ručně."
+            "value" : "Tyto prostředky pocházejí z uzavřených kanálů Lightning. Musí být utraceny ručně."
           }
         },
         "de" : {
@@ -37764,7 +38268,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tato adresa používá neplatnou nabídku Bolt12."
+            "value" : "Tato adresa používá neplatnou Bolt12 žádost."
           }
         },
         "de" : {
@@ -37840,6 +38344,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يبدو أن هذا موقع ويب:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdá se, že se jedná o webovou stránku:"
           }
         }
       }
@@ -38220,7 +38730,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12."
+            "value" : "Toto je lidsky čitelná adresa pro vaši Bolt12 fakturu."
           }
         },
         "de" : {
@@ -38584,7 +39094,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To vyžaduje instalaci aplikace Tor Proxy VPN třetí strany, například Orbot."
+            "value" : "Toto nastavení vyžaduje instalaci aplikace třetí strany Tor Proxy VPN (jakou je třeba Orbot)."
           }
         },
         "de" : {
@@ -38780,6 +39290,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "هذه المحفظة **مخفية**، والمحفظة المخفية تتطلب تعيين رقم تعريف شخصي للقفل."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato peněženka je **skrytá** a skrytá peněženka vyžaduje nastavení kódu PIN zámku."
           }
         }
       }
@@ -39482,7 +39998,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor je povolen"
+            "value" : "Je povolen Tor"
           }
         },
         "de" : {
@@ -39522,7 +40038,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor je povolen. Tento server by měl používat adresu onion."
+            "value" : "Tor je povolen. Tento server by měl používat onion adresu."
           }
         },
         "de" : {
@@ -40164,6 +40680,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يتعذر استرداد بيانات هذا العنوان. قد تكون تواجه مشكلة في الاتصال."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nelze načíst data pro tuto adresu. Možná máte problém s připojením."
           }
         }
       }
@@ -41270,7 +41792,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na této obrazovce můžete utrácet prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. To nemá vliv na vaše stávající kanály Lightning."
+            "value" : "Na této obrazovce můžete utratit prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. Toto neovlivní vaše stávající Lightning kanály."
           }
         },
         "de" : {
@@ -41587,6 +42109,12 @@
             "state" : "translated",
             "value" : "المحافظ المرئية"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viditelné peněženky"
+          }
         }
       }
     },
@@ -41681,7 +42209,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nejprve čekáme na potvrzení, než budou vyměněny za Lightning."
+            "value" : "Nejprve se čeká na potvrzení, než je bude možné přehodit na Lightning."
           }
         },
         "de" : {
@@ -42118,6 +42646,12 @@
             "state" : "translated",
             "value" : "المحفظة %@"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peněženka %@"
+          }
         }
       }
     },
@@ -42208,6 +42742,12 @@
             "state" : "translated",
             "value" : "صورة المحفظة"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obrázek peněženky"
+          }
         }
       }
     },
@@ -42217,6 +42757,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رصيد المحفظة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zůstatek peněženky"
           }
         }
       }
@@ -42350,6 +42896,12 @@
             "state" : "translated",
             "value" : "لن تكون المحفظة مرئية في شاشات التحديد. للوصول إلى المحفظة يجب إدخال رقم التعريف الشخصي للقفل الخاص بها."
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peněženka nebude na obrazovkách výběru viditelná. Pro přístup do peněženky musíte zadat její uzamčený kód PIN."
+          }
         }
       }
     },
@@ -42364,7 +42916,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chcete hezčí adresu? Použijte služby třetích stran, nebo si adresu hostujte sami!"
+            "value" : "Chcete hezčí adresu? Můžete použít služby třetích stran, nebo si adresu začít hostovat!"
           }
         },
         "de" : {
@@ -43131,7 +43683,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zůstane v řetězci, protože automatická správa kanálů je zakázána."
+            "value" : "Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá."
           }
         },
         "de" : {
@@ -43695,6 +44247,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "يمكنك إدخال رقم التعريف الشخصي لهذه المحفظة في أي وقت في شاشة القفل، وسيقوم Phoenix ** بالتبديل** إلى هذه المحفظة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN k této peněžence můžete kdykoli zadat na zamykací obrazovce a Phoenix se **přepne** na tuto peněženku."
           }
         }
       }
@@ -44921,6 +45479,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "رصيدك من:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váš zůstatek:"
           }
         }
       }
@@ -47561,6 +48125,12 @@
             "state" : "translated",
             "value" : "التسمية (اختياري)"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "štítek (nepovinné)"
+          }
         }
       }
     },
@@ -47652,6 +48222,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "lno1... (الصق العرض هنا)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (vložit nabídku sem)"
           }
         }
       }
@@ -47986,6 +48562,12 @@
             "state" : "translated",
             "value" : "إن إف سي"
           }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
         }
       }
     },
@@ -48036,6 +48618,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "لا شيء"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "žádné"
           }
         }
       }
