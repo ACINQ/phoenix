@@ -176,6 +176,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : " [více informací](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : " [mehr Infos](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -942,6 +946,9 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z"
+      },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
       }
@@ -953,6 +960,9 @@
       },
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -996,6 +1006,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "(Jediný způsob, jak získat přístup do skryté peněženky, je zadat kód PIN zámku.)"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "(Die einzige Möglichkeit, auf eine versteckte Brieftasche zuzugreifen, ist die Eingabe der Sperr-PIN)"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -1037,6 +1051,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "(To znamená, že funguje jako PIN z donucení.)"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "(Das bedeutet, dass sie als Nötigungs-PIN funktioniert.)"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -1386,6 +1404,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "(počkejte několik sekund a zkuste to znovu)"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "(warten Sie ein paar Sekunden und versuchen Sie es dann erneut)"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -2444,6 +2466,9 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -2718,6 +2743,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Skrytá peněženka vyžaduje nastavení kódu **Lock PIN**."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Für eine versteckte Brieftasche muss eine **Schließ-PIN** festgelegt werden."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -2964,8 +2993,8 @@
         "v" : "Zrychlení on-chain transakcí"
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Beschleunigung von On-Chain-Transaktionen"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Beschleunigte On-Chain Transaktion"
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -3079,6 +3108,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Přístup ke skryté peněžence"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Zugang zur versteckten Brieftasche"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -3120,6 +3153,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Přidání další peněženky"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Weitere Brieftasche hinzufügen"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -3308,6 +3345,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Přidat ke kontaktům"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Zu Kontakten hinzufügen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -3320,6 +3361,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Přidat ke stávajícímu kontaktu"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Zu bestehendem Kontakt hinzufügen"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -3681,6 +3726,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Částka požadovaná pro platbu kartou"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Erforderlicher Betrag für die Kartenzahlung"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -4131,8 +4180,8 @@
         "v" : "Opravdu chcete pokračovat?"
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Sind Sie sicher, dass Sie fortfahren wollen?"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Möchten Sie wirklich fortfahren?"
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -5509,6 +5558,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Bolt12 nabízí:"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Bolt12 bietet:"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -5609,6 +5662,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Nelze se připojit k síti Tor. Phoenix nebude fungovat správně."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Kein Zugriff auf das Tor-Netzwerk. Phoenix funktioniert nicht korrekt."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -5623,8 +5680,8 @@
         "v" : "Po 4 měsících čekání není možné prostředky přehodit na Lightning. Tyto prostředky je nutné utratit ručně."
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Kann nicht mehr getauscht werden, nach 4 Monaten Wartezeit. Diese Mittel müssen manuell ausgegeben werden."
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Kann nach 4 Monaten Wartezeit nicht mehr auf Lightning umgetauscht werden. Diese Gelder müssen manuell ausgegeben werden."
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -5767,6 +5824,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Změna skryté peněženky"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Versteckte Brieftasche ändern"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -5809,6 +5870,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Změna kódu PIN zámku"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Schloss-PIN ändern"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -5821,6 +5886,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Změna výdajového kódu PIN"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ausgaben-PIN ändern"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -5865,8 +5934,8 @@
         "v" : "Platba uzavírající kanál"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Kanal schließen"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Kanal-Schließung"
       },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
@@ -6936,6 +7005,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Komunikace se čtečkou karet."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Kommunikation mit dem Kartenleser."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -7034,6 +7107,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Konfigurace kódu PIN zámku"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Sperr-PIN konfigurieren"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -8090,6 +8167,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Vytvořit nový kontakt"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Neuen Kontakt erstellen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -8220,8 +8301,8 @@
         "v" : "Převodník měn"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Währungsumrechner"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Währungsrechner"
       },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
@@ -8305,6 +8386,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Aktuální peněženka"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Aktuelle Brieftasche"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -8753,6 +8838,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Výchozí peněženka"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Standard-Geldbörse"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -9572,6 +9661,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zakázat kód PIN zámku"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "PIN-Sperre deaktivieren"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -9613,6 +9706,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zakázat kód PIN pro výdaje"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ausgaben-PIN deaktivieren"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -10236,6 +10333,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Duplikát v %@"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Duplikat in %@"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -10248,6 +10349,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Duplikát v rámci tohoto kontaktu"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Duplizieren innerhalb dieses Kontakts"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -10290,6 +10395,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Možnost PIN z donucení"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Option Bedrohungs-PIN"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -10362,6 +10471,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Upravit kód PIN zámku"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Sperr-PIN bearbeiten"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -10403,6 +10516,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Upravit výdajový PIN"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ausgaben-PIN bearbeiten"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -10705,6 +10822,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Ukončení komunikace se čtečkou karet."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Beendet die Kommunikation mit dem Kartenleser."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -10805,6 +10926,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zadejte kód PIN, abyste mohli utrácet peníze."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Geben Sie einen PIN-Code ein, um Geld ausgeben zu können."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -10875,6 +11000,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zadáním vlastního kódu PIN otevřete aplikaci."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Geben Sie die benutzerdefinierte PIN ein, um die App zu öffnen."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -11032,6 +11161,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Chyba při čtení značky"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Fehler beim Lesen des Tags"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -11129,6 +11262,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "I když vás Phoenix vyzve k zadání kódu PIN pro jinou peněženku."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Auch dann, wenn Phoenix Sie zur Eingabe der PIN für eine andere Geldbörse auffordert."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -12264,8 +12401,7 @@
         "v" : "Konečná peněženka"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Finale Wallet"
+        "ts" : "2025-10-30T22:01:32Z"
       },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
@@ -12957,6 +13093,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zpět na seznam viditelných peněženek"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Zurück zur Liste der sichtbaren Geldbörsen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -13086,6 +13226,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Skrytá peněženka"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Versteckte Brieftasche"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -13098,6 +13242,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Skryté požadavky na peněženku"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Versteckte Anforderungen an die Brieftasche"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -13141,6 +13289,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Držte zařízení v blízkosti čtečky."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Halten Sie Ihr Gerät an das Lesegerät."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -13152,6 +13304,10 @@
       },
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Startseite"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -13224,6 +13380,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Emulace hostitelské karty není k dispozici.\nOmezeno na Evropský hospodářský prostor."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Hostkartenemulation nicht verfügbar.\nBeschränkt auf den Europäischen Wirtschaftsraum."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -13237,6 +13397,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Emulace hostitelské karty není k dispozici.\nVyžaduje iOS 17.4 nebo novější."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Hostkartenemulation nicht verfügbar.\nErfordert iOS 17.4 oder höher."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -13249,6 +13413,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Chyba relace emulace hostitelské karty\n%@"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Fehler in der Hostkartenemulationssitzung\n%@"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -13697,6 +13865,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Pokud Face ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Wenn Face ID fehlschlägt, können Sie Ihren iOS-Passcode eingeben, um die App zu öffnen."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -13739,6 +13911,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Pokud Touch ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Wenn Touch ID nicht funktioniert, können Sie Ihren iOS-Passcode eingeben, um die App zu öffnen."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -13751,6 +13927,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Pokud je vybrána výchozí peněženka, otevře se automaticky při spuštění aplikace."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Wenn eine Standard-Brieftasche ausgewählt ist, wird sie beim Start der App automatisch geöffnet."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -13909,6 +14089,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Pokud aplikaci Tor VPN nemáte, nainstalujte si ji. Doporučujeme Orbot."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Wenn Sie keine Tor-VPN-App haben, installieren Sie eine. Wir empfehlen Orbot."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -14356,6 +14540,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Příchozí likvidita"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Inbound-Liquidität"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -14951,8 +15139,8 @@
         "v" : "Nesprávný PIN"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Falsch"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ungültig"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -15234,6 +15422,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Nesprávný formát"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ungültiges Format"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -15422,8 +15614,8 @@
         "v" : "Popis faktury"
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Beschreibung der Rechnung"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Rechnungs-Beschreibung"
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -15815,6 +16007,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Blitzschlag11"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -15826,6 +16022,10 @@
       },
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Blitzschlag12"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -15983,6 +16183,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Lightningová adresa"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Adresse des Blitzes"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -15995,6 +16199,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Bleskové adresy:"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Blitzadressen:"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -16298,6 +16506,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Likvidita"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Liquidität"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -16310,6 +16522,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Likvidita není momentálně k dispozici, zkuste to později"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Liquidität derzeit nicht verfügbar, versuchen Sie es später noch einmal"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -16467,6 +16683,9 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zamykací PIN"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -16479,6 +16698,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Požadovaný kód PIN zámku"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Sperr-PIN erforderlich"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -16693,6 +16916,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Ujistěte se, že máte spuštěnou aplikaci Tor Proxy VPN a že je připojena k síti Tor."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Vergewissere dich, dass deine Tor Proxy VPN App läuft und mit Tor verbunden ist."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -16820,6 +17047,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Správa nebo přepínání peněženek"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Verwalten oder Wechseln von Geldbörsen"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -17549,6 +17780,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Po odečtení poplatků za těžbu se odhaduje, že:"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Abzüglich der geschätzten Bergwerksgebühren:"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -17704,6 +17939,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Funkce NFC nejsou v tomto zařízení k dispozici"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "NFC-Funktionen sind auf diesem Gerät nicht verfügbar"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -17717,6 +17956,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Funkce NFC nejsou v tomto zařízení k dispozici"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "NFC-Funktionen sind auf diesem Gerät nicht verfügbar"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -17729,6 +17972,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Čtečka NFC již skenuje"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Der NFC-Leser scannt bereits"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -18059,6 +18306,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "V tagu NFC nebyl zjištěn žádný URI ani text"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Kein URI oder Text im NFC-Tag erkannt"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -18071,6 +18322,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Bez přístupu k síti Tor"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Kein Zugriff auf das Tor-Netzwerk"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -18548,6 +18803,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Nic se neskenuje"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Nichts gescannt"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -18697,6 +18956,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zůstatek v řetězci"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "On-Chain-Guthaben"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -18973,6 +19236,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Otevřít webové stránky Orbot"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Orbot-Website öffnen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -18985,6 +19252,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Otevřít nastavení Toru"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Tor-Einstellungen öffnen"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -19027,6 +19298,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Otevření aplikace"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Öffnen der App"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -19157,8 +19432,8 @@
         "v" : "Odchozí on-chain platba (splice)"
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Ausgehende On-Chain-Zahlung"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ausgehender Splice"
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -19324,8 +19599,8 @@
         "v" : "PIN se neshoduje!"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Die PIN stimmt nicht überein!"
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "PIN stimmt nicht überein!"
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -19351,6 +19626,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Pro otevření aplikace projděte biometrickými údaji systému iOS."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Passieren Sie die iOS-Biometrie, um die App zu öffnen."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -20603,6 +20882,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Phoenix potřebuje pro správné fungování přístup k síti Tor."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Phoenix benötigt Zugriff auf Tor, um ordnungsgemäß zu funktionieren."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -22347,6 +22630,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Opakotavelná"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Wiederverwendbar"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -22735,6 +23022,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Naskenovat QR kód"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "QR-Code scannen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -22864,6 +23155,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Vybrat emoji"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Emoji auswählen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -22906,6 +23201,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Vybrat fotografii"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Foto auswählen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -22918,6 +23217,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Vyberte emoji peněženky"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Brieftaschen-Emoji auswählen"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -23624,6 +23927,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Nastavení kódu PIN zámku"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Sperr-PIN einstellen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -23665,6 +23972,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Nastavení výdajového kódu PIN"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ausgaben-PIN festlegen"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -24723,6 +25034,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Jednorázová"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Einmal verwendbar"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -24852,6 +25167,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Utratit"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ausgeben"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -24952,6 +25271,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Kontrola výdajů"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ausgabenkontrolle"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -24964,6 +25287,9 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Odesílací PIN"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -25573,6 +25899,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Přechod na jinou peněženku"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Zu einer anderen Geldbörse wechseln"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -27126,8 +27456,8 @@
         "v" : "Tyto prostředky pocházejí z uzavřených kanálů Lightning. Musí být utraceny ručně."
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Diese Mittel stammen aus geschlossenen Blitzkanälen. Sie müssen manuell ausgegeben werden."
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Diese Gelder stammen aus geschlossenen Lightning-Kanäle. Sie müssen manuell ausgegeben werden."
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -27356,6 +27686,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zdá se, že se jedná o webovou stránku:"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Dies scheint eine Website zu sein:"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -27893,8 +28227,8 @@
         "v" : "Toto nastavení vyžaduje instalaci aplikace třetí strany Tor Proxy VPN (jakou je třeba Orbot)."
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Dazu muss eine Tor-Proxy-VPN-App eines Drittanbieters wie Orbot installiert werden."
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Dazu ist die Installation einer Tor-Proxy-VPN-App eines Drittanbieters wie Orbot erforderlich."
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -28036,6 +28370,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Tato peněženka je **skrytá** a skrytá peněženka vyžaduje nastavení kódu PIN zámku."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Diese Brieftasche ist **versteckt**, und für eine versteckte Brieftasche muss eine Sperr-PIN festgelegt werden."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -29016,6 +29354,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Nelze načíst data pro tuto adresu. Možná máte problém s připojením."
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Daten für diese Adresse konnten nicht abgerufen werden. Möglicherweise liegt ein Verbindungsproblem vor."
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -29813,8 +30155,8 @@
         "v" : "Na této obrazovce můžete utratit prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. Toto neovlivní vaše stávající Lightning kanály."
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Auf diesem Bildschirm können Sie Guthaben aus Ihrer endgültigen Brieftasche ausgeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Verwenden Sie diesen Screen, um Guthaben aus Ihrer finalen Wallet auszugeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -30039,6 +30381,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Viditelné peněženky"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Sichtbare Geldbörsen"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -30111,8 +30457,8 @@
         "v" : "Nejprve se čeká na potvrzení, než je bude možné přehodit na Lightning."
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Wir warten auf eine Bestätigung, bevor wir sie in Lightning umwandeln können."
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Warten Sie zuerst auf die Bestätigung, bevor sie auf Lightning übertragen werden können."
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -30429,6 +30775,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Peněženka %@"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Brieftasche %@"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -30500,6 +30850,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Obrázek peněženky"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Bild der Brieftasche"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -30512,6 +30866,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Zůstatek peněženky"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Guthaben im Portemonnaie"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -30612,6 +30970,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Peněženka nebude na obrazovkách výběru viditelná. Pro přístup do peněženky musíte zadat její uzamčený kód PIN."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Die Brieftasche wird in den Auswahlbildschirmen nicht angezeigt. Um auf die Brieftasche zuzugreifen, müssen Sie die Sperr-PIN der Brieftasche eingeben."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -31179,8 +31541,8 @@
         "v" : "Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá."
       },
       "de" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Bleibt in der Kette, da die automatische Kanalverwaltung deaktiviert ist."
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist."
       },
       "en" : {
         "ts" : "2025-02-27T20:32:25Z"
@@ -31583,6 +31945,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "PIN k této peněžence můžete kdykoli zadat na zamykací obrazovce a Phoenix se **přepne** na tuto peněženku."
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Sie können die PIN für diese Brieftasche jederzeit auf dem Sperrbildschirm eingeben, und Phoenix wird zu dieser Brieftasche **wechseln**."
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -32467,6 +32833,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "Váš zůstatek:"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "Ihr Saldo aus:"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -34354,6 +34724,10 @@
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "štítek (nepovinné)"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "etikett (optional)"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -34424,6 +34798,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "lno1... (vložit nabídku sem)"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "lno1... (Angebot hier einfügen)"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
@@ -34659,6 +35037,9 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z"
       },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z"
+      },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
       }
@@ -34700,6 +35081,10 @@
       "cs" : {
         "ts" : "2025-10-30T22:00:25Z",
         "v" : "žádné"
+      },
+      "de" : {
+        "ts" : "2025-10-30T22:01:32Z",
+        "v" : "keine"
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
