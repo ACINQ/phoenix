@@ -167,6 +167,11 @@
         "v" : "(à l'époque)"
       }
     },
+    " [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "#%lld: %@" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -460,6 +465,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "%1$@ ∙ de %2$@"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "%1$@ ∙ de %2$@"
       }
     },
     "%@ ∙ to %@" : {
@@ -486,6 +495,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "%1$@ ∙ a %2$@"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "%1$@ ∙ to %2$@"
       }
     },
     "%@% (%@ minimum)" : {
@@ -914,45 +927,13 @@
       }
     },
     "(Lightning Bolt11)" : {
-      "cs" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(Lightning Bolt11)"
-      },
-      "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "(Lightning Bolt11)"
-      },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
-      },
-      "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(Lightning Bolt11)"
-      },
-      "es-419" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(Lightning Bolt11)"
-      },
-      "fr" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "(Lightning Bolt11)"
       }
     },
     "(Lightning Bolt12)" : {
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
-      },
-      "es" : {
-        "ts" : "2024-08-12T21:22:49Z",
-        "v" : "(Lightning Bolt12)"
-      },
-      "es-419" : {
-        "ts" : "2024-08-12T21:24:40Z",
-        "v" : "(Lightning Bolt12)"
-      },
-      "fr" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "(Lightning Bolt12)"
       }
     },
     "(Phoenix can be running in the background.)" : {
@@ -984,6 +965,11 @@
         "v" : "(Phoenix peut fonctionner en arrière plan)"
       }
     },
+    "(The only way to access a hidden wallet is by typing in the Lock PIN)" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -1011,6 +997,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "(Cette adresse vous appartient et est dérivée de votre clé. Vous seul en avez possession)"
+      }
+    },
+    "(This means it works as a duress PIN.)" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "(additional space in bucket)" : {
@@ -1347,6 +1338,11 @@
       },
       "fr" : {
         "ts" : "2025-02-27T20:32:25Z"
+      }
+    },
+    "(wait a few seconds and then retry)" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
@@ -2395,6 +2391,11 @@
         "v" : "7 jours"
       }
     },
+    ": %@" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "<decryption error>" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z"
@@ -2444,6 +2445,9 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "confirmaciones"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." : {
@@ -2651,6 +2655,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Des frais de %1$@ sont attendus pour recevoir ce montant, et ces frais représentent plus de %2$@ du montant.\n\nAugmentez cette limite dans les paramètres de gestion des canaux."
+      }
+    },
+    "A hidden wallet requires a **Lock PIN** to be set." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
@@ -2908,6 +2917,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Acelera las transacciones en la cadena"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Accélération de transactions on-chain"
       }
     },
     "Accelerate transaction" : {
@@ -2997,6 +3010,11 @@
         "v" : "Plage acceptable"
       }
     },
+    "Access hidden wallet" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Add Liquidity" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -3024,6 +3042,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Ajouter de la liquidité"
+      }
+    },
+    "Add another wallet" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Add contact" : {
@@ -3078,6 +3101,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Añade contactos para pagar fácil y rápidamente"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Ajoutez des contacts pour des paiements faciles et rapides"
       }
     },
     "Add liquidity" : {
@@ -3194,6 +3221,16 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Ajouter un commentaire"
+      }
+    },
+    "Add to contacts" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Add to existing contact" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Advanced" : {
@@ -3393,6 +3430,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Importe añadido al crédito de tasas"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Montant ajouté au crédit de redevance"
       }
     },
     "Amount exceeds your balance" : {
@@ -3505,6 +3546,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Importe recibido"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Montant reçu"
       }
     },
     "Amount requested" : {
@@ -3530,6 +3575,15 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Importe solicitado"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Montant demandé"
+      }
+    },
+    "Amount required for card payment" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Amount sent (fees included)" : {
@@ -3555,6 +3609,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Importe enviado (tasas incluidas)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Montant envoyé (frais inclus)"
       }
     },
     "An error occurred on a node in the payment route. The payment may succeed if you try again." : {
@@ -3986,6 +4044,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "¿Estás seguro de que quieres continuar?"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Êtes-vous sûr de vouloir continuer ?"
       }
     },
     "Are you sure you want to proceed?" : {
@@ -4098,6 +4160,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "¡Atención! Algunos fondos caducarán pronto y ya no se podrán canjear."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Attention ! Certains fonds expireront bientôt et ne pourront plus faire l'objet d'un échange."
       }
     },
     "Attention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive." : {
@@ -4819,8 +4885,8 @@
         "v" : "Ten cuidado con los mensajes de fuentes desconocidas"
       },
       "fr" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Prenez garde aux message venant d\\'inconnus"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Prenez garde aux messages de source inconnue"
       }
     },
     "Below the expected fee. Some payments may be rejected." : {
@@ -5270,6 +5336,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Factura Bolt12"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Facture Bolt12"
       }
     },
     "Bolt12 offer:" : {
@@ -5328,6 +5398,11 @@
       "fr" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Bolt12 propose"
+      }
+    },
+    "Bolt12 offers:" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Bump fees" : {
@@ -5417,6 +5492,11 @@
         "v" : "Annuler"
       }
     },
+    "Cannot access the Tor network. Phoenix will not function correctly." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually." : {
       "ar" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -5440,6 +5520,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Ya no se pueden canjear, tras 4 meses de espera. Estos fondos deben gastarse manualmente."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Ne peuvent plus être swappés sur Lightning, après 4 mois d\\'attente. Ces fonds doivent être dépensés manuellement."
       }
     },
     "Cannot create commit tx" : {
@@ -5523,6 +5607,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Causado por"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Causé par"
       }
     },
     "Chain mismatch" : {
@@ -5554,6 +5642,11 @@
         "v" : "Blockchain inadéquate"
       }
     },
+    "Change Hidden Wallet" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Change PIN" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -5581,6 +5674,16 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Modifier le code PIN"
+      }
+    },
+    "Change lock PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Change spending PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Channel Closing" : {
@@ -5637,8 +5740,8 @@
         "v" : "Cierre de canal"
       },
       "fr" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Clôture de canal"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Clôture de canal de paiement"
       }
     },
     "Channel creation has been temporarily disabled. You may not be able to receive some payments." : {
@@ -5693,6 +5796,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Id de canal"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Identifiant du canal"
       }
     },
     "Channel management" : {
@@ -5747,6 +5854,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Funcionamiento del canal (nuevo o empalmado)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Fonctionnement de la chaîne (nouvelle ou épissée)"
       }
     },
     "Channel size impacted" : {
@@ -6439,6 +6550,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tipo de cierre"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Type de clôture"
       }
     },
     "Cloud Backup" : {
@@ -6672,6 +6787,11 @@
         "v" : "Common Name :"
       }
     },
+    "Communicating with card reader." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Completed at" : {
       "ar" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -6695,6 +6815,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Completado en"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Terminé le"
       }
     },
     "Concurrent splice in progress" : {
@@ -6752,6 +6876,11 @@
       },
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z"
+      }
+    },
+    "Configure Lock PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Configure fee limit" : {
@@ -6841,33 +6970,33 @@
         "v" : "Confirmer"
       }
     },
-    "Confirm Drain" : {
+    "Confirm Closing" : {
       "ar" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "تأكيد الاستنزاف"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "تأكيد الإغلاق"
       },
       "cs" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Potvrzení odtoku"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Potvrdit uzavření"
       },
       "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Abfluss bestätigen"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Abschluss bestätigen"
       },
       "en" : {
-        "ts" : "2024-04-30T15:55:52Z"
+        "ts" : "2025-10-30T21:37:26Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Confirmar"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Confirmar cierre"
       },
       "es-419" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Confirmar vaciado"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Confirmar cierre"
       },
       "fr" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Confirmer la fermeture"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Confirmer la clôture"
       }
     },
     "Confirm Payment" : {
@@ -6982,8 +7111,8 @@
         "v" : "Confirmar nuevo PIN"
       },
       "fr" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Confirmez le nouveau code PIN"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Confirmer le nouveau PIN"
       }
     },
     "Confirmed Balance" : {
@@ -7038,6 +7167,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Confirmado en cadena"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Confirmé sur la chaîne"
       }
     },
     "Confirming: " : {
@@ -7063,6 +7196,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Confirmando: "
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Confirmation : "
       }
     },
     "Connected" : {
@@ -7724,6 +7861,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "No se ha podido conectar al servicio: %@"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Impossible de se connecter au service : %@"
       }
     },
     "Could not retrieve payment details within a reasonable time. The recipient may be offline or unreachable." : {
@@ -7784,6 +7925,11 @@
         "v" : "Impossible de récupérer les détails du paiement. Réception d'une réponse invalide du nœud."
       }
     },
+    "Create new contact" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Create new wallet" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -7836,6 +7982,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Creado en"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Créé le"
       }
     },
     "Creating record zone..." : {
@@ -7983,6 +8133,11 @@
         "v" : "Liquidité entrante courante :"
       }
     },
+    "Current wallet" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Custom PIN" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -8008,8 +8163,8 @@
         "v" : "PIN personalizado"
       },
       "fr" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "PIN personnalisé"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "PIN Personnalisé"
       }
     },
     "Custom electrum server: bad certificate !" : {
@@ -8418,6 +8573,11 @@
         "v" : "Description des paiements par défaut"
       }
     },
+    "Default wallet" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Delete" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -8615,6 +8775,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Eliminar el historial de pagos y los contactos de mi cuenta de iCloud."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Supprimer l'historique des paiements et les contacts de mon compte iCloud."
       }
     },
     "Delete payment?" : {
@@ -8756,6 +8920,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Borrar **historial de pagos** y **contactos** de iCloud"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Supprimer **l'historique de paiement** et **les contacts** d'iCloud"
       }
     },
     "Deleting **recovery phrase** from iCloud" : {
@@ -9013,6 +9181,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Dirección del depósito"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Adresse de dépôt on-chain"
       }
     },
     "Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." : {
@@ -9211,6 +9383,11 @@
         "v" : "Détails"
       }
     },
+    "Disable Lock PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Disable PIN" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -9238,6 +9415,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Désactiver le code PIN"
+      }
+    },
+    "Disable Spending PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Disabled" : {
@@ -9292,6 +9474,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Desactivar Tor"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Désactivation de Tor"
       }
     },
     "Disabling backup…" : {
@@ -9845,33 +10031,14 @@
         "v" : "Vider mon portefeuille"
       }
     },
-    "Drain wallet" : {
-      "ar" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "محفظة الصرف"
-      },
-      "cs" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Vyprázdnit peněženku"
-      },
-      "de" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Geldbeutel entleeren"
-      },
+    "Duplicate in %@" : {
       "en" : {
-        "ts" : "2024-04-30T15:55:52Z"
-      },
-      "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Vaciar billetera"
-      },
-      "es-419" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Vaciar billetera"
-      },
-      "fr" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Vider mon portefeuille"
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Duplicate within this contact" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Duration" : {
@@ -9901,6 +10068,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Durée"
+      }
+    },
+    "Duress PIN option" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Edit" : {
@@ -9961,6 +10133,11 @@
         "v" : "Éditer les informations"
       }
     },
+    "Edit Lock PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Edit PIN" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -9988,6 +10165,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Modifier le code PIN"
+      }
+    },
+    "Edit Spending PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Edit contact" : {
@@ -10243,6 +10425,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Para activar Tor ahora es necesario instalar una aplicación VPN Proxy Tor de terceros, como Orbot.\n\nEsto hace que los pagos en segundo plano sean mucho más fiables con Tor.\n\nAdemás, ahora Phoenix utiliza siempre direcciones cebolla para las conexiones Lightning y Electrum cuando Tor está activado."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "L'activation de Tor nécessite maintenant l'installation d'une application VPN Proxy Tor tierce telle qu'Orbot.\n\nCela rend les paiements en arrière-plan beaucoup plus fiables avec Tor.\n\nDe plus, Phoenix utilise désormais toujours des adresses en oignon pour les connexions Lightning et Electrum lorsque Tor est activé."
       }
     },
     "End date" : {
@@ -10272,6 +10458,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Date de fin"
+      }
+    },
+    "Ending communication with card reader." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Enter PIN to authenticate" : {
@@ -10361,6 +10552,11 @@
         "v" : "Saisissez le code PIN de Phoenix"
       }
     },
+    "Enter a PIN code to be able to spend funds." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Enter a valid amount" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -10419,6 +10615,11 @@
         "v" : "Saisissez un montant"
       }
     },
+    "Enter custom PIN to open the app." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Enter keywords from your seed" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -10473,8 +10674,8 @@
         "v" : "Introducir nuevo PIN"
       },
       "fr" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Saisissez un nouveau code PIN"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Saisir un nouveau PIN"
       }
     },
     "Error" : {
@@ -10562,6 +10763,11 @@
         "v" : "Échec de la récupération des sauvegardes sur iCloud"
       }
     },
+    "Error reading tag" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Error: %@" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -10645,6 +10851,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Estimation du coût de la liquidité"
+      }
+    },
+    "Even when Phoenix is prompting you for the PIN for a different wallet." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Expect to receive %d separate payments." : {
@@ -10784,6 +10995,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Caducado: "
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Expiré : "
       }
     },
     "Explore" : {
@@ -11061,6 +11276,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Fallido"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Échoué"
       }
     },
     "Failed payment" : {
@@ -11231,6 +11450,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Crédito de tasas"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Crédit d'impôt"
       }
     },
     "Fee for on-the-fly channel creation:" : {
@@ -11750,8 +11973,8 @@
         "v" : "Divisa fíat"
       },
       "fr" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Monnaie fiduciare"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Monnaie fiduciaire"
       }
     },
     "Final wallet" : {
@@ -11806,6 +12029,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Cartera final: "
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Portefeuille final : "
       }
     },
     "Fix It" : {
@@ -12444,6 +12671,11 @@
         "v" : "Commencer"
       }
     },
+    "Go back to visible wallets list" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Good news! Your transaction has been mined!" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -12560,6 +12792,16 @@
         "v" : "Montant caché"
       }
     },
+    "Hidden wallet" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Hidden wallet requirements" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "High Priority" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -12587,6 +12829,16 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Priorité élevée"
+      }
+    },
+    "Hold your device near the reader." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Home" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Home Screen" : {
@@ -12645,6 +12897,21 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Écran d'accueil"
+      }
+    },
+    "Host card emulation not available.\nLimited to European Economic Area." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Host card emulation not available.\nRequires iOS 17.4 or later." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Host card emulation session error\n%@" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Host returned error response." : {
@@ -12814,6 +13081,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Cómo funciona"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Comment cela fonctionne-t-il ?"
       }
     },
     "How to use" : {
@@ -13077,6 +13348,11 @@
         "v" : "Si Face ID échoue, vous pourrez saisir votre code d'accès iOS pour accéder à Phoenix."
       }
     },
+    "If Face ID fails, you can enter your iOS passcode to open the app." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "If Touch ID fails, you can enter your iOS passcode to access Phoenix." : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -13104,6 +13380,16 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Si TouchID échoue, vous pourrez saisir votre code d'accès iOS pour accéder à Phoenix."
+      }
+    },
+    "If Touch ID fails, you can enter your iOS passcode to open the app." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "If a default wallet is selected, it will automatically be opened on app launch." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "If done correctly, self-backup is the most secure option." : {
@@ -13216,6 +13502,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Si desactivas Tor, tu dirección IP puede ser revelada a varios proveedores de servicios."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Si vous désactivez Tor, votre adresse IP peut être révélée à divers fournisseurs de services."
       }
     },
     "If you do not back it up and you lose access to Phoenix you will **lose your funds**!" : {
@@ -13245,6 +13535,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Si vous ne la sauvegardez pas et que vous perdez accès à Phoenix, **vous perdrez vos fonds**!"
+      }
+    },
+    "If you don't have a Tor VPN app, install one. We recommend Orbot." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it." : {
@@ -13328,6 +13623,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Si cambias de dispositivo (o reinstalas la aplicación), perderás esta información."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Si vous changez d'appareil (ou réinstallez l'application), vous perdrez ces informations."
       }
     },
     "If you're planning on deleting your wallet data, we recommend waiting until after the closing transactions have been confirmed on the blockchain." : {
@@ -13677,6 +13976,11 @@
         "v" : "Liquidité entrante"
       }
     },
+    "Inbound liquidity" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Inbound liquidity is insufficient for this amount, and you have disabled automated channel management." : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -13729,6 +14033,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Solicitud de liquidez entrante (auto)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Demande de liquidité entrante (auto)"
       }
     },
     "Inbound liquidity request (manual)" : {
@@ -13754,6 +14062,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Solicitud de liquidez entrante (manual)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Demande de liquidité entrante (manual)"
       }
     },
     "Include amount received" : {
@@ -13953,6 +14265,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago relámpago entrante (bolt11)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement Lightning entrant (bolt11)"
       }
     },
     "Incoming Lightning payment (bolt12)" : {
@@ -13978,6 +14294,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago relámpago entrante (bolt12)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement Lightning entrant (bolt12)"
       }
     },
     "Incoming on-chain payment (legacy pay-to-open)" : {
@@ -14003,6 +14323,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago entrante en la cadena (pago por apertura heredado)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement entrant sur la chaîne (anciennement \"pay-to-open\")"
       }
     },
     "Incoming on-chain payment (legacy swap-in)" : {
@@ -14028,6 +14352,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago entrante en la cadena (swap-in heredado)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement entrant dans la chaîne (legacy swap-in)"
       }
     },
     "Incoming on-chain payment (new channel)" : {
@@ -14053,6 +14381,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago entrante en la cadena (nuevo canal)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement entrant sur la chaîne (nouveau canal)"
       }
     },
     "Incoming on-chain payment (splice)" : {
@@ -14078,6 +14410,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago entrante en la cadena (splice)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement entrant sur la chaîne (splice)"
       }
     },
     "Incoming payment expiry" : {
@@ -14416,6 +14752,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Dirección no válida"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Adresse invalide"
       }
     },
     "Invalid bitcoin address" : {
@@ -14470,6 +14810,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Parámetros de canal no válidos"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paramètres de canal non valides"
       }
     },
     "Invalid date range" : {
@@ -14499,6 +14843,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Intervalle invalide"
+      }
+    },
+    "Invalid format" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Invalid liquidity ads" : {
@@ -14698,6 +15047,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Descripción de la factura"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Description de la requête de paiement"
       }
     },
     "Invoice expiration" : {
@@ -15067,6 +15420,16 @@
         "ts" : "2024-04-30T15:55:52Z"
       }
     },
+    "Lightning Bolt11" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Lightning Bolt12" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Lightning Fees" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -15210,6 +15573,16 @@
         "v" : "Code QR Lightning"
       }
     },
+    "Lightning address" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Lightning addresses:" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Lightning fee" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -15262,6 +15635,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tasas relámpago para encaminar el pago. El pago requiere %lld saltos."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Frais de foudre pour l'acheminement du paiement. Le paiement nécessite %lld hops."
       }
     },
     "Lightning fees for routing the payment. Payment required 1 hop." : {
@@ -15317,6 +15694,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tasas de relámpago por enrutar el pago. El pago se dividió en %1$lld partes, utilizando %2$lld saltos."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Frais de foudre pour l'acheminement du paiement. Le paiement a été divisé en %1$lld parties, utilisant %2$lld sauts."
       }
     },
     "Lightning invoice" : {
@@ -15371,6 +15752,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago relámpago"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement lightning"
       }
     },
     "Lightning payments are fast and best suited for smaller payments." : {
@@ -15487,6 +15872,16 @@
         "v" : "Relié"
       }
     },
+    "Liquidity" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Liquidity not currently available, try again later" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Liquidity requested" : {
       "ar" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -15510,6 +15905,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Liquidez solicitada"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Liquidité demandée"
       }
     },
     "Liquidity successfully added!" : {
@@ -15620,6 +16019,20 @@
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Locale"
+      }
+    },
+    "Lock PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Lock PIN Required" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Logged In" : {
@@ -15821,6 +16234,11 @@
         "v" : "Frais faibles!"
       }
     },
+    "Make sure your Tor Proxy VPN app is up and running, and that it's connected to Tor." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Make sure your Tor VPN is active and running." : {
       "ar" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -15844,6 +16262,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Asegúrate de que tu VPN Tor está activa y funcionando."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Assurez-vous que votre VPN Tor est actif et fonctionne."
       }
     },
     "Malformed JPG image data" : {
@@ -15932,6 +16354,11 @@
         "v" : "Malformé : %@"
       }
     },
+    "Manage or switch wallets" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Manual Backup" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -15984,6 +16411,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Liquidez manual"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Liquidité manuelle"
       }
     },
     "Manual restore" : {
@@ -16578,6 +17009,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tasas mineras"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Frais de minage"
       }
     },
     "Minimum amount is %@, ≈%@" : {
@@ -16639,6 +17074,11 @@
         "v" : "Contribution aux frais de minage pour la transaction sous-jacente."
       }
     },
+    "Minus miner fees estimated to:" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Missing off-chain amount too low." : {
       "ar" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -16662,6 +17102,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Cantidad fuera de cadena demasiado baja."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Montant manquant hors chaîne trop faible."
       }
     },
     "Modify" : {
@@ -16716,6 +17160,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Mutua"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Mutuelle"
       }
     },
     "N/A" : {
@@ -16739,6 +17187,9 @@
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "NEW" : {
@@ -16768,6 +17219,21 @@
       "fr" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "NOUVEAU"
+      }
+    },
+    "NFC cababilities not available on this device" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "NFC capabilities not available on this device" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "NFC reader is already scanning" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "NO FUNDS HAVE BEEN SENT" : {
@@ -17051,6 +17517,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Sin contactos"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Aucun contact"
       }
     },
     "No Priority" : {
@@ -17080,6 +17550,16 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Aucune priorité"
+      }
+    },
+    "No URI or text detected in NFC tag" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "No access to the Tor network" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "No address yet..." : {
@@ -17366,6 +17846,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "No, no quiero utilizar una dirección cebolla"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Non, je ne veux pas utiliser une adresse en oignon"
       }
     },
     "Node id" : {
@@ -17541,6 +18025,11 @@
         "v" : "Notes :"
       }
     },
+    "Nothing scanned" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Notifications" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -17616,6 +18105,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Oferta"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Offre"
       }
     },
     "Offline" : {
@@ -17672,6 +18165,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Paiement on-chain"
+      }
+    },
+    "On-chain balance" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "On-chain deposit" : {
@@ -17936,6 +18434,16 @@
         "v" : "Ouvrir"
       }
     },
+    "Open Orbot website" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Open Tor settings" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Open iOS Settings for Phoenix" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -17963,6 +18471,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Ouvrir les paramètres iOS pour Phoenix"
+      }
+    },
+    "Opening the app" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Options" : {
@@ -18045,6 +18558,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago relámpago saliente (bolt11)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement sortant Lightning (bolt11)"
       }
     },
     "Outgoing Lightning payment (bolt12)" : {
@@ -18070,6 +18587,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago relámpago saliente (bolt12)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement sortant Lightning (bolt12)"
       }
     },
     "Outgoing on-chain payment" : {
@@ -18095,6 +18616,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago en cadena saliente"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Splice sortant"
       }
     },
     "Outgoing on-chain payment (legacy swap)" : {
@@ -18120,6 +18645,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pago saliente en cadena (canje heredado)"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Paiement sortant de la chaîne (legacy swap)"
       }
     },
     "Outgoing payments" : {
@@ -18257,8 +18786,13 @@
         "v" : "¡PIN incorrecto!"
       },
       "fr" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Erreur de code PIN !"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "PIN non correspondant !"
+      }
+    },
+    "Pass iOS biometrics to open the app." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Paste encrypted data blob here" : {
@@ -18458,6 +18992,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Clave del pagador"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Clé du payeur"
       }
     },
     "Payment" : {
@@ -18570,6 +19108,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Hash de pago"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Hash du paiement"
       }
     },
     "Payment History" : {
@@ -18804,35 +19346,6 @@
         "v" : "Des canaux de paiements sont automatiquement créés lorsque vous recevez des paiements. Utilisez l’écran **Recevoir** pour créer des requêtes de paiement Lightning."
       }
     },
-    "Payment code" : {
-      "ar" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "رمز الدفع"
-      },
-      "cs" : {
-        "ts" : "2024-08-12T21:18:59Z",
-        "v" : "Kód platby"
-      },
-      "de" : {
-        "ts" : "2024-08-12T21:21:28Z",
-        "v" : "Zahlungscode"
-      },
-      "en" : {
-        "ts" : "2024-08-12T21:16:31Z"
-      },
-      "es" : {
-        "ts" : "2024-08-12T21:22:49Z",
-        "v" : "Código de pago"
-      },
-      "es-419" : {
-        "ts" : "2024-08-12T21:24:40Z",
-        "v" : "Código de pago"
-      },
-      "fr" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Code de paiement"
-      }
-    },
     "Payment from %@" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -18914,6 +19427,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "El historial de pagos y los contactos no se almacenan en iCloud."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "L'historique des paiements et les contacts ne sont pas stockés dans iCloud."
       }
     },
     "Payment options" : {
@@ -19141,6 +19658,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Estado del pago"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Statut du paiement"
       }
     },
     "Payment to %@" : {
@@ -19311,6 +19832,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Pendiente"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "En attente"
       }
     },
     "Pending payment" : {
@@ -19507,6 +20032,11 @@
       "fr" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Vous seul avez le contrôle de votre fonds."
+      }
+    },
+    "Phoenix needs access to Tor to function properly." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
@@ -19993,6 +20523,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Preimagen"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Préimage"
       }
     },
     "Prepare Transaction" : {
@@ -20163,6 +20697,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tipo de compra"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Type d'achat"
       }
     },
     "QR code" : {
@@ -20592,6 +21130,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Recibido a través de"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Reçu via"
       }
     },
     "Receiving in background…" : {
@@ -20903,6 +21445,9 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Remoto"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Remove" : {
@@ -21102,6 +21647,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Resolución de la dirección del rayo"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Résolution de l'adresse éclair"
       }
     },
     "Restart required" : {
@@ -21127,6 +21676,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Reinicio necesario"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Redémarrage nécessaire"
       }
     },
     "Restore my wallet" : {
@@ -21154,8 +21707,8 @@
         "v" : "Restaurar mi billetera"
       },
       "fr" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Restaurer mon portefeuille"
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Restaurer mon wallet"
       }
     },
     "Retry" : {
@@ -21214,6 +21767,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Réessai dans %@"
+      }
+    },
+    "Reusable" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Review" : {
@@ -21296,6 +21854,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Revocada"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Revocation"
       }
     },
     "Revoked commits found on %lld channel(s)!" : {
@@ -21581,6 +22143,15 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Escanear código QR"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Scannez le code QR"
+      }
+    },
+    "Scan QR code" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Search" : {
@@ -21699,6 +22270,11 @@
         "v" : "Sélectionner les frais pour voir le montant final."
       }
     },
+    "Select emoji" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Select image" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -21726,6 +22302,16 @@
       "fr" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Sélectionner l'image"
+      }
+    },
+    "Select photo" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Select wallet emoji" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Send" : {
@@ -22385,6 +22971,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tasas de servicio"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Frais de service"
       }
     },
     "Service returned unreadable response" : {
@@ -22416,6 +23006,11 @@
         "v" : "Le service retourne une réponse invalide"
       }
     },
+    "Set Lock PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Set PIN" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -22443,6 +23038,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Définir le code PIN"
+      }
+    },
+    "Set Spending PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Settings" : {
@@ -23483,6 +24083,15 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Como has activado Tor, deberías utilizar una dirección onion para este servidor."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Puisque vous avez activé Tor, vous devez utiliser une adresse en oignon pour ce serveur."
+      }
+    },
+    "Single use" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Skip" : {
@@ -23601,6 +24210,11 @@
         "v" : "Cette requête ne semble pas correcte…"
       }
     },
+    "Spend" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Spend expired swap-ins" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -23653,6 +24267,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Gastar del monedero final"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Dépenser à partir du portefeuille final"
       }
     },
     "Spending = pouring water out\nReceiving = adding more water" : {
@@ -23682,6 +24300,16 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Dépenser = verser de l'eau\nRecevoir = ajouter de l'eau"
+      }
+    },
+    "Spending Control" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Spending PIN" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Splice already in progress" : {
@@ -23848,6 +24476,9 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Estándar"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Start date" : {
@@ -24017,6 +24648,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Éxito"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Succès"
       }
     },
     "Suggestions" : {
@@ -24042,6 +24677,9 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Sugerencias"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Summary" : {
@@ -24270,6 +24908,11 @@
         "ts" : "2025-02-27T20:32:25Z"
       }
     },
+    "Switch to another wallet" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "System" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -24432,6 +25075,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Clave pública objetivo"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Clé publique du destinataire"
       }
     },
     "Terminate App" : {
@@ -24486,6 +25133,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "El **historial de pagos** y los **contactos** de este monedero se eliminarán de tu cuenta de iCloud."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "L'**historique des paiements** et les **contacts** de ce portefeuille seront supprimés de votre compte iCloud."
       }
     },
     "The **seed backup** for this wallet will be deleted from your iCloud account." : {
@@ -25328,6 +25979,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "La factura recibida ya está en curso."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "La facture reçue est déjà en cours."
       }
     },
     "The recipient is offline." : {
@@ -25469,6 +26124,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "El servicio (%@) parece estar desconectado, o tienen un servidor caído"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Le service (%@) semble être hors ligne ou son serveur est en panne"
       }
     },
     "The service (%@) doesn't support Lightning addresses, or doesn't know this user" : {
@@ -25494,6 +26153,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "El servicio (%@) no admite direcciones Lightning, o no conoce a este usuario"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Le service (%@) ne supporte pas les adresses Lightning, ou ne connaît pas cet utilisateur"
       }
     },
     "The service (%@) returned error code: %d" : {
@@ -25520,6 +26183,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "El servicio (%1$@) ha devuelto el código de error: %2$d"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Le service (%1$@) a renvoyé un code d'erreur : %2$d"
       }
     },
     "The service (%@) returned error message: %@" : {
@@ -25546,6 +26213,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "El servicio (%1$@) ha devuelto un mensaje de error: %2$@"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Le service (%1$@) a renvoyé un message d'erreur : %2$@"
       }
     },
     "The simulator cannot access the camera. Please use the clipboard." : {
@@ -25803,6 +26474,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Estos fondos proceden de canales cerrados de Rayo. Deben gastarse manualmente."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Ces fonds proviennent de canaux Lightning fermés. Ils doivent être dépensés manuellement."
       }
     },
     "These funds were not swapped in time. Tap to spend." : {
@@ -26006,6 +26681,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Il semble que ce lien soit pour un site web (et non une requête de paiement)"
+      }
+    },
+    "This appears to be a website:" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "This doesn't appear to be a Lightning invoice" : {
@@ -26408,6 +27088,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Esta liquidez era necesaria para recibir un pago"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Cette liquidité était nécessaire pour recevoir un paiement"
       }
     },
     "This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." : {
@@ -26522,8 +27206,8 @@
         "v" : "Este pago ya se está procesando. Por favor, espere a que se complete."
       },
       "fr" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Ce paiement est déjà en cours de traitement. Veuillez attendre qu'il soit terminé."
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Ce paiement est déjà en cours de traitement. Veuillez attendre qu\\'il soit terminé."
       }
     },
     "This requires installing a third-party Tor Proxy VPN app such as Orbot." : {
@@ -26549,6 +27233,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Para ello es necesario instalar una aplicación VPN Tor Proxy de terceros, como Orbot."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Cela nécessite l\\'installation d\\'une application VPN Tor Proxy tierce telle que Orbot."
       }
     },
     "This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution." : {
@@ -26665,6 +27353,11 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Ce swap expirera dans 1 jour"
+      }
+    },
+    "This wallet is **hidden**, and a hidden wallet requires a Lock PIN to be set." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "This will reset the app, as if you had just installed it." : {
@@ -27066,6 +27759,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Para asegurar tus canales de pago, Phoenix monitoriza la blockchain de Bitcoin a través de los servidores de Electrum.\n\nPor defecto, se utilizan servidores aleatorios. También puedes configurar Phoenix para que se conecte sólo a tu propio servidor."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Pour sécuriser vos canaux de paiement, Phoenix surveille la blockchain Bitcoin par l'intermédiaire des serveurs Electrum.\n\nPar défaut, des serveurs aléatoires sont utilisés. Vous pouvez également configurer Phoenix pour qu'il se connecte uniquement à votre propre serveur."
       }
     },
     "Tools" : {
@@ -27201,6 +27898,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tor está activado. Este servidor debe utilizar una dirección cebolla."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Tor est activé. Ce serveur doit utiliser une adresse en oignon."
       }
     },
     "Total" : {
@@ -27334,6 +28035,9 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Transacción"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Transactions" : {
@@ -27587,6 +28291,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tipo de pago"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Type de paiement"
       }
     },
     "Unable to extract public key!" : {
@@ -27616,6 +28324,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Impossible d'extraire la clé publique !"
+      }
+    },
+    "Unable to retrieve data for this address. You may be experiencing a connectivity issue." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Unconfirmed Balance" : {
@@ -27699,6 +28412,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Mensaje inesperado"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Message inattendu"
       }
     },
     "Unknown" : {
@@ -27985,6 +28702,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Respuesta ilegible del servicio: %@"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Réponse illisible du service : %@"
       }
     },
     "Updating cloud" : {
@@ -28271,6 +28992,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Utiliza Tor"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Utiliser Tor"
       }
     },
     "Use a custom server" : {
@@ -28412,6 +29137,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Utiliza esta pantalla para gastar fondos de tu monedero final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a tus canales Lightning existentes."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Utilisez cet écran pour dépenser les fonds de votre portefeuille final. Ces fonds proviennent de canaux qui ont été fermés par le passé. Cela n\\'affecte pas les canaux Lightning existants."
       }
     },
     "Use this screen to spend your on-chain funds that were not swapped in time. The swap-in request has now expired." : {
@@ -28437,6 +29166,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Utiliza esta pantalla para gastar tus fondos en la cadena que no fueron canjeados a tiempo. La solicitud de canje ha caducado."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Utilisez cet écran pour dépenser vos fonds sur la chaîne qui n'ont pas été échangés à temps. La demande de swap-in a maintenant expiré."
       }
     },
     "Using Tor" : {
@@ -28462,6 +29195,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Usar Tor"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Utiliser Tor"
       }
     },
     "Version %@" : {
@@ -28543,6 +29280,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Versión 2.5.0: Cambios en Tor"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Version 2.5.0 : Changements de Tor"
       }
     },
     "View source" : {
@@ -28598,6 +29339,11 @@
       },
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z"
+      }
+    },
+    "Visible wallets" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "WAITING FOR CONFIRMATIONS" : {
@@ -28681,6 +29427,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Esperando confirmación primero para poder cambiarlos a Rayo."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "En attente de confirmation avant de pouvoir les échanger contre Lightning."
       }
     },
     "Waiting for confirmations" : {
@@ -28880,6 +29630,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Esperando el intercambio: "
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "En attendant l'échange : "
       }
     },
     "Waiting to start…" : {
@@ -28969,6 +29723,11 @@
         "v" : "Portefeuille"
       }
     },
+    "Wallet %@" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Wallet Balance" : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -29025,6 +29784,16 @@
       "fr" : {
         "ts" : "2024-08-12T21:16:31Z",
         "v" : "Création de portefeuilles"
+      }
+    },
+    "Wallet Image" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
+    "Wallet balance" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Wallet creation options" : {
@@ -29112,6 +29881,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Nom du portefeuille (optionnel)"
+      }
+    },
+    "Wallet will not be visible in selector screens. To access the wallet you must enter it's lock PIN." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "Want a prettier address? Use third-party services, or self-host the address!" : {
@@ -29544,6 +30318,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Se cambiará automáticamente a Rayo si la comisión es **inferior al %1$@** (%2$@) del importe."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Il sera automatiquement remplacé par Lightning si les frais sont **inférieurs à %1$@** (%2$@) du montant."
       }
     },
     "Will automatically be swapped to Lightning if the fee is **less than %@**." : {
@@ -29569,6 +30347,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Se cambiará automáticamente a Rayo si la cuota es **menor que %@**."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Sera automatiquement remplacé par Lightning si les frais sont **moins élevés que %@**."
       }
     },
     "Will connect to:" : {
@@ -29681,6 +30463,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Permanecerá en la cadena porque la gestión automatizada de canales está desactivada."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Vont rester on-chain car la gestion automatisée des canaux est désactivée."
       }
     },
     "With Phoenix, receiving and sending bitcoin is safe, easy, and fast." : {
@@ -30058,6 +30844,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Vous pouvez également utiliser l’écran **Mes canaux de paiement** pour consulter l’état de vos canaux."
+      }
+    },
+    "You can enter the PIN for this wallet anytime in the lock screen, and Phoenix will **switch** to this wallet." : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
@@ -30663,6 +31454,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Debes reiniciar Phoenix para que los cambios surtan efecto."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "Vous devez redémarrer Phoenix pour que les modifications soient prises en compte."
       }
     },
     "You need at least one channel to claim your address. Try adding funds to your wallet and try again." : {
@@ -30927,6 +31722,11 @@
         "v" : "Votre adresse pour les dépôts sur la chaîne va changer"
       }
     },
+    "Your balance of:" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
       "ar" : {
         "ts" : "2024-08-12T21:16:31Z",
@@ -31066,6 +31866,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tu historial de pagos y tus contactos sólo se almacenan en este dispositivo."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "L'historique de vos paiements et vos contacts ne sont stockés que sur cet appareil."
       }
     },
     "Your payment history and contacts will be stored in iCloud." : {
@@ -31091,6 +31895,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "Tu historial de pagos y tus contactos se almacenarán en iCloud."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "L'historique de vos paiements et vos contacts seront stockés dans iCloud."
       }
     },
     "Your recovery phrase is 12 words, generated using the BIP39 standard.\n\nEnglish is recommended. If you prefer another language, we provide recovery instructions on our website.\n\nYour selection here does **not** affect your ability to send or receive bitcoin within Phoenix." : {
@@ -31811,6 +32619,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "elegir imagen"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "choisir l'image"
       }
     },
     "claimed amount" : {
@@ -32788,6 +33600,11 @@
         "v" : "vous saurez quand des frais induits sont à prévoir"
       }
     },
+    "label (optional)" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "layer 1 -> 2" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -32844,6 +33661,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "couche 2 -> 1"
+      }
+    },
+    "lno1... (paste offer here)" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "lnurl-auth" : {
@@ -33033,6 +33855,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "nombre, dirección del rayo, oferta..."
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "nom, adresse éclair, offre..."
       }
     },
     "never" : {
@@ -33064,6 +33890,11 @@
         "v" : "jamais"
       }
     },
+    "nfc" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
+      }
+    },
     "no description" : {
       "ar" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -33091,6 +33922,11 @@
       "fr" : {
         "ts" : "2024-04-30T15:55:52Z",
         "v" : "Sans description"
+      }
+    },
+    "none" : {
+      "en" : {
+        "ts" : "2025-10-30T21:37:26Z"
       }
     },
     "now" : {
@@ -33261,6 +34097,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "pegar"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "coller"
       }
     },
     "payment hash" : {
@@ -33541,6 +34381,10 @@
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
         "v" : "escanear código qr"
+      },
+      "fr" : {
+        "ts" : "2025-10-30T21:37:26Z",
+        "v" : "scanner un code qr"
       }
     },
     "select miner fee when sending on-chain" : {
