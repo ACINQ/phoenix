@@ -256,6 +256,12 @@
             "state" : "translated",
             "value" : " [více informací](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [mehr Infos](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
         }
       }
     },
@@ -1385,6 +1391,12 @@
             "state" : "translated",
             "value" : "(Lightning Bolt11)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt11)"
+          }
         }
       }
     },
@@ -1398,6 +1410,12 @@
           }
         },
         "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt12)"
+          }
+        },
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "(Lightning Bolt12)"
@@ -1459,6 +1477,12 @@
             "state" : "translated",
             "value" : "(Jediný způsob, jak získat přístup do skryté peněženky, je zadat kód PIN zámku.)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Die einzige Möglichkeit, auf eine versteckte Brieftasche zuzugreifen, ist die Eingabe der Sperr-PIN)"
+          }
         }
       }
     },
@@ -1514,6 +1538,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(To znamená, že funguje jako PIN z donucení.)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Das bedeutet, dass sie als Nötigungs-PIN funktioniert.)"
           }
         }
       }
@@ -2015,6 +2045,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(počkejte několik sekund a zkuste to znovu)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(warten Sie ein paar Sekunden und versuchen Sie es dann erneut)"
           }
         }
       }
@@ -3540,6 +3576,12 @@
             "state" : "translated",
             "value" : ": %@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
         }
       }
     },
@@ -3941,6 +3983,12 @@
             "state" : "translated",
             "value" : "Skrytá peněženka vyžaduje nastavení kódu **Lock PIN**."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für eine versteckte Brieftasche muss eine **Schließ-PIN** festgelegt werden."
+          }
         }
       }
     },
@@ -4283,7 +4331,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschleunigung von On-Chain-Transaktionen"
+            "value" : "Beschleunigte On-Chain Transaktion"
           }
         },
         "es" : {
@@ -4440,6 +4488,12 @@
             "state" : "translated",
             "value" : "Přístup ke skryté peněžence"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugang zur versteckten Brieftasche"
+          }
         }
       }
     },
@@ -4495,6 +4549,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Přidání další peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Brieftasche hinzufügen"
           }
         }
       }
@@ -4752,6 +4812,12 @@
             "state" : "translated",
             "value" : "Přidat ke kontaktům"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Kontakten hinzufügen"
+          }
         }
       }
     },
@@ -4767,6 +4833,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Přidat ke stávajícímu kontaktu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu bestehendem Kontakt hinzufügen"
           }
         }
       }
@@ -5267,6 +5339,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Částka požadovaná pro platbu kartou"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erforderlicher Betrag für die Kartenzahlung"
           }
         }
       }
@@ -5894,7 +5972,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sind Sie sicher, dass Sie fortfahren wollen?"
+            "value" : "Möchten Sie wirklich fortfahren?"
           }
         },
         "es" : {
@@ -7828,6 +7906,12 @@
             "state" : "translated",
             "value" : "Bolt12 nabízí:"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 bietet:"
+          }
         }
       }
     },
@@ -7965,6 +8049,12 @@
             "state" : "translated",
             "value" : "Nelze se připojit k síti Tor. Phoenix nebude fungovat správně."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Zugriff auf das Tor-Netzwerk. Phoenix funktioniert nicht korrekt."
+          }
         }
       }
     },
@@ -7985,7 +8075,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kann nicht mehr getauscht werden, nach 4 Monaten Wartezeit. Diese Mittel müssen manuell ausgegeben werden."
+            "value" : "Kann nach 4 Monaten Wartezeit nicht mehr auf Lightning umgetauscht werden. Diese Gelder müssen manuell ausgegeben werden."
           }
         },
         "es" : {
@@ -8182,6 +8272,12 @@
             "state" : "translated",
             "value" : "Změna skryté peněženky"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versteckte Brieftasche ändern"
+          }
         }
       }
     },
@@ -8239,6 +8335,12 @@
             "state" : "translated",
             "value" : "Změna kódu PIN zámku"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schloss-PIN ändern"
+          }
         }
       }
     },
@@ -8254,6 +8356,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Změna výdajového kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN ändern"
           }
         }
       }
@@ -8317,7 +8425,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kanal schließen"
+            "value" : "Kanal-Schließung"
           }
         },
         "es" : {
@@ -9803,6 +9911,12 @@
             "state" : "translated",
             "value" : "Komunikace se čtečkou karet."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommunikation mit dem Kartenleser."
+          }
         }
       }
     },
@@ -9938,6 +10052,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Konfigurace kódu PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN konfigurieren"
           }
         }
       }
@@ -11410,6 +11530,12 @@
             "state" : "translated",
             "value" : "Vytvořit nový kontakt"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuen Kontakt erstellen"
+          }
         }
       }
     },
@@ -11592,7 +11718,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Währungsumrechner"
+            "value" : "Währungsrechner"
           }
         },
         "es" : {
@@ -11707,6 +11833,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktuální peněženka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Brieftasche"
           }
         }
       }
@@ -12329,6 +12461,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Výchozí peněženka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard-Geldbörse"
           }
         }
       }
@@ -13472,6 +13610,12 @@
             "state" : "translated",
             "value" : "Zakázat kód PIN zámku"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN-Sperre deaktivieren"
+          }
         }
       }
     },
@@ -13530,6 +13674,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zakázat kód PIN pro výdaje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN deaktivieren"
           }
         }
       }
@@ -14388,6 +14538,12 @@
             "state" : "translated",
             "value" : "Duplikát v %@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikat in %@"
+          }
         }
       }
     },
@@ -14403,6 +14559,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Duplikát v rámci tohoto kontaktu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplizieren innerhalb dieses Kontakts"
           }
         }
       }
@@ -14459,6 +14621,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Možnost PIN z donucení"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Option Bedrohungs-PIN"
           }
         }
       }
@@ -14558,6 +14726,12 @@
             "state" : "translated",
             "value" : "Upravit kód PIN zámku"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN bearbeiten"
+          }
         }
       }
     },
@@ -14616,6 +14790,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Upravit výdajový PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN bearbeiten"
           }
         }
       }
@@ -15034,6 +15214,12 @@
             "state" : "translated",
             "value" : "Ukončení komunikace se čtečkou karet."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beendet die Kommunikation mit dem Kartenleser."
+          }
         }
       }
     },
@@ -15171,6 +15357,12 @@
             "state" : "translated",
             "value" : "Zadejte kód PIN, abyste mohli utrácet peníze."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie einen PIN-Code ein, um Geld ausgeben zu können."
+          }
         }
       }
     },
@@ -15268,6 +15460,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zadáním vlastního kódu PIN otevřete aplikaci."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie die benutzerdefinierte PIN ein, um die App zu öffnen."
           }
         }
       }
@@ -15487,6 +15685,12 @@
             "state" : "translated",
             "value" : "Chyba při čtení značky"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler beim Lesen des Tags"
+          }
         }
       }
     },
@@ -15622,6 +15826,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "I když vás Phoenix vyzve k zadání kódu PIN pro jinou peněženku."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auch dann, wenn Phoenix Sie zur Eingabe der PIN für eine andere Geldbörse auffordert."
           }
         }
       }
@@ -17223,7 +17433,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finale Wallet"
+            "value" : "Final wallet"
           }
         },
         "es" : {
@@ -18186,6 +18396,12 @@
             "state" : "translated",
             "value" : "Zpět na seznam viditelných peněženek"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zur Liste der sichtbaren Geldbörsen"
+          }
         }
       }
     },
@@ -18363,6 +18579,12 @@
             "state" : "translated",
             "value" : "Skrytá peněženka"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versteckte Brieftasche"
+          }
         }
       }
     },
@@ -18378,6 +18600,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skryté požadavky na peněženku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versteckte Anforderungen an die Brieftasche"
           }
         }
       }
@@ -18435,6 +18663,12 @@
             "state" : "translated",
             "value" : "Držte zařízení v blízkosti čtečky."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halten Sie Ihr Gerät an das Lesegerät."
+          }
         }
       }
     },
@@ -18451,6 +18685,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Home"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startseite"
           }
         }
       }
@@ -18549,6 +18789,12 @@
             "state" : "translated",
             "value" : "Emulace hostitelské karty není k dispozici.\nOmezeno na Evropský hospodářský prostor."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hostkartenemulation nicht verfügbar.\nBeschränkt auf den Europäischen Wirtschaftsraum."
+          }
         }
       }
     },
@@ -18565,6 +18811,12 @@
             "state" : "translated",
             "value" : "Emulace hostitelské karty není k dispozici.\nVyžaduje iOS 17.4 nebo novější."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hostkartenemulation nicht verfügbar.\nErfordert iOS 17.4 oder höher."
+          }
         }
       }
     },
@@ -18580,6 +18832,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chyba relace emulace hostitelské karty\n%@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler in der Hostkartenemulationssitzung\n%@"
           }
         }
       }
@@ -19202,6 +19460,12 @@
             "state" : "translated",
             "value" : "Pokud Face ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Face ID fehlschlägt, können Sie Ihren iOS-Passcode eingeben, um die App zu öffnen."
+          }
         }
       }
     },
@@ -19259,6 +19523,12 @@
             "state" : "translated",
             "value" : "Pokud Touch ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Touch ID nicht funktioniert, können Sie Ihren iOS-Passcode eingeben, um die App zu öffnen."
+          }
         }
       }
     },
@@ -19274,6 +19544,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pokud je vybrána výchozí peněženka, otevře se automaticky při spuštění aplikace."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn eine Standard-Brieftasche ausgewählt ist, wird sie beim Start der App automatisch geöffnet."
           }
         }
       }
@@ -19493,6 +19769,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pokud aplikaci Tor VPN nemáte, nainstalujte si ji. Doporučujeme Orbot."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie keine Tor-VPN-App haben, installieren Sie eine. Wir empfehlen Orbot."
           }
         }
       }
@@ -20117,6 +20399,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Příchozí likvidita"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inbound-Liquidität"
           }
         }
       }
@@ -20939,7 +21227,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Falsch"
+            "value" : "Ungültig"
           }
         },
         "es" : {
@@ -21340,6 +21628,12 @@
             "state" : "translated",
             "value" : "Nesprávný formát"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungültiges Format"
+          }
         }
       }
     },
@@ -21602,7 +21896,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschreibung der Rechnung"
+            "value" : "Rechnungs-Beschreibung"
           }
         },
         "es" : {
@@ -22163,6 +22457,12 @@
             "state" : "translated",
             "value" : "Lightning Bolt11"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzschlag11"
+          }
         }
       }
     },
@@ -22179,6 +22479,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lightning Bolt12"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzschlag12"
           }
         }
       }
@@ -22402,6 +22708,12 @@
             "state" : "translated",
             "value" : "Lightningová adresa"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse des Blitzes"
+          }
         }
       }
     },
@@ -22417,6 +22729,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bleskové adresy:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzadressen:"
           }
         }
       }
@@ -22848,6 +23166,12 @@
             "state" : "translated",
             "value" : "Likvidita"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidität"
+          }
         }
       }
     },
@@ -22863,6 +23187,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Likvidita není momentálně k dispozici, zkuste to později"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidität derzeit nicht verfügbar, versuchen Sie es später noch einmal"
           }
         }
       }
@@ -23080,6 +23410,12 @@
             "state" : "translated",
             "value" : "Zamykací PIN"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock PIN"
+          }
         }
       }
     },
@@ -23095,6 +23431,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Požadovaný kód PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN erforderlich"
           }
         }
       }
@@ -23396,6 +23738,12 @@
             "state" : "translated",
             "value" : "Ujistěte se, že máte spuštěnou aplikaci Tor Proxy VPN a že je připojena k síti Tor."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergewissere dich, dass deine Tor Proxy VPN App läuft und mit Tor verbunden ist."
+          }
         }
       }
     },
@@ -23571,6 +23919,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Správa nebo přepínání peněženek"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwalten oder Wechseln von Geldbörsen"
           }
         }
       }
@@ -24610,6 +24964,12 @@
             "state" : "translated",
             "value" : "Po odečtení poplatků za těžbu se odhaduje, že:"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abzüglich der geschätzten Bergwerksgebühren:"
+          }
         }
       }
     },
@@ -24827,6 +25187,12 @@
             "state" : "translated",
             "value" : "Funkce NFC nejsou v tomto zařízení k dispozici"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC-Funktionen sind auf diesem Gerät nicht verfügbar"
+          }
         }
       }
     },
@@ -24843,6 +25209,12 @@
             "state" : "translated",
             "value" : "Funkce NFC nejsou v tomto zařízení k dispozici"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC-Funktionen sind auf diesem Gerät nicht verfügbar"
+          }
         }
       }
     },
@@ -24858,6 +25230,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Čtečka NFC již skenuje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der NFC-Leser scannt bereits"
           }
         }
       }
@@ -25318,6 +25696,12 @@
             "state" : "translated",
             "value" : "V tagu NFC nebyl zjištěn žádný URI ani text"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein URI oder Text im NFC-Tag erkannt"
+          }
         }
       }
     },
@@ -25333,6 +25717,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bez přístupu k síti Tor"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Zugriff auf das Tor-Netzwerk"
           }
         }
       }
@@ -25994,6 +26384,12 @@
             "state" : "translated",
             "value" : "Nic se neskenuje"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts gescannt"
+          }
         }
       }
     },
@@ -26212,6 +26608,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zůstatek v řetězci"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On-Chain-Guthaben"
           }
         }
       }
@@ -26598,6 +27000,12 @@
             "state" : "translated",
             "value" : "Otevřít webové stránky Orbot"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orbot-Website öffnen"
+          }
         }
       }
     },
@@ -26613,6 +27021,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otevřít nastavení Toru"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor-Einstellungen öffnen"
           }
         }
       }
@@ -26669,6 +27083,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otevření aplikace"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen der App"
           }
         }
       }
@@ -26850,7 +27270,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausgehende On-Chain-Zahlung"
+            "value" : "Ausgehender Splice"
           }
         },
         "es" : {
@@ -27092,7 +27512,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die PIN stimmt nicht überein!"
+            "value" : "PIN stimmt nicht überein!"
           }
         },
         "es" : {
@@ -27127,6 +27547,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pro otevření aplikace projděte biometrickými údaji systému iOS."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passieren Sie die iOS-Biometrie, um die App zu öffnen."
           }
         }
       }
@@ -28876,6 +29302,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phoenix potřebuje pro správné fungování přístup k síti Tor."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix benötigt Zugriff auf Tor, um ordnungsgemäß zu funktionieren."
           }
         }
       }
@@ -31314,6 +31746,12 @@
             "state" : "translated",
             "value" : "Opakotavelná"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederverwendbar"
+          }
         }
       }
     },
@@ -31853,6 +32291,12 @@
             "state" : "translated",
             "value" : "Naskenovat QR kód"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code scannen"
+          }
         }
       }
     },
@@ -32030,6 +32474,12 @@
             "state" : "translated",
             "value" : "Vybrat emoji"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji auswählen"
+          }
         }
       }
     },
@@ -32086,6 +32536,12 @@
             "state" : "translated",
             "value" : "Vybrat fotografii"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto auswählen"
+          }
         }
       }
     },
@@ -32101,6 +32557,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vyberte emoji peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brieftaschen-Emoji auswählen"
           }
         }
       }
@@ -33091,6 +33553,12 @@
             "state" : "translated",
             "value" : "Nastavení kódu PIN zámku"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN einstellen"
+          }
         }
       }
     },
@@ -33149,6 +33617,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nastavení výdajového kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN festlegen"
           }
         }
       }
@@ -34635,6 +35109,12 @@
             "state" : "translated",
             "value" : "Jednorázová"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal verwendbar"
+          }
         }
       }
     },
@@ -34813,6 +35293,12 @@
             "state" : "translated",
             "value" : "Utratit"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeben"
+          }
         }
       }
     },
@@ -34949,6 +35435,12 @@
             "state" : "translated",
             "value" : "Kontrola výdajů"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgabenkontrolle"
+          }
         }
       }
     },
@@ -34964,6 +35456,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odesílací PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spending PIN"
           }
         }
       }
@@ -35827,6 +36325,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Přechod na jinou peněženku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu einer anderen Geldbörse wechseln"
           }
         }
       }
@@ -38032,7 +38536,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Mittel stammen aus geschlossenen Blitzkanälen. Sie müssen manuell ausgegeben werden."
+            "value" : "Diese Gelder stammen aus geschlossenen Lightning-Kanäle. Sie müssen manuell ausgegeben werden."
           }
         },
         "es" : {
@@ -38350,6 +38854,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zdá se, že se jedná o webovou stránku:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies scheint eine Website zu sein:"
           }
         }
       }
@@ -39100,7 +39610,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dazu muss eine Tor-Proxy-VPN-App eines Drittanbieters wie Orbot installiert werden."
+            "value" : "Dazu ist die Installation einer Tor-Proxy-VPN-App eines Drittanbieters wie Orbot erforderlich."
           }
         },
         "es" : {
@@ -39296,6 +39806,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tato peněženka je **skrytá** a skrytá peněženka vyžaduje nastavení kódu PIN zámku."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Brieftasche ist **versteckt**, und für eine versteckte Brieftasche muss eine Sperr-PIN festgelegt werden."
           }
         }
       }
@@ -40687,6 +41203,12 @@
             "state" : "translated",
             "value" : "Nelze načíst data pro tuto adresu. Možná máte problém s připojením."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten für diese Adresse konnten nicht abgerufen werden. Möglicherweise liegt ein Verbindungsproblem vor."
+          }
         }
       }
     },
@@ -41798,7 +42320,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auf diesem Bildschirm können Sie Guthaben aus Ihrer endgültigen Brieftasche ausgeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
+            "value" : "Verwenden Sie diesen Screen, um Guthaben aus Ihrer finalen Wallet auszugeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
           }
         },
         "es" : {
@@ -42115,6 +42637,12 @@
             "state" : "translated",
             "value" : "Viditelné peněženky"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichtbare Geldbörsen"
+          }
         }
       }
     },
@@ -42215,7 +42743,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wir warten auf eine Bestätigung, bevor wir sie in Lightning umwandeln können."
+            "value" : "Warten Sie zuerst auf die Bestätigung, bevor sie auf Lightning übertragen werden können."
           }
         },
         "es" : {
@@ -42652,6 +43180,12 @@
             "state" : "translated",
             "value" : "Peněženka %@"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brieftasche %@"
+          }
         }
       }
     },
@@ -42748,6 +43282,12 @@
             "state" : "translated",
             "value" : "Obrázek peněženky"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild der Brieftasche"
+          }
         }
       }
     },
@@ -42763,6 +43303,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zůstatek peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guthaben im Portemonnaie"
           }
         }
       }
@@ -42901,6 +43447,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Peněženka nebude na obrazovkách výběru viditelná. Pro přístup do peněženky musíte zadat její uzamčený kód PIN."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Brieftasche wird in den Auswahlbildschirmen nicht angezeigt. Um auf die Brieftasche zuzugreifen, müssen Sie die Sperr-PIN der Brieftasche eingeben."
           }
         }
       }
@@ -43689,7 +44241,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bleibt in der Kette, da die automatische Kanalverwaltung deaktiviert ist."
+            "value" : "Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist."
           }
         },
         "es" : {
@@ -44253,6 +44805,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN k této peněžence můžete kdykoli zadat na zamykací obrazovce a Phoenix se **přepne** na tuto peněženku."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können die PIN für diese Brieftasche jederzeit auf dem Sperrbildschirm eingeben, und Phoenix wird zu dieser Brieftasche **wechseln**."
           }
         }
       }
@@ -45485,6 +46043,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Váš zůstatek:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Saldo aus:"
           }
         }
       }
@@ -48131,6 +48695,12 @@
             "state" : "translated",
             "value" : "štítek (nepovinné)"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "etikett (optional)"
+          }
         }
       }
     },
@@ -48228,6 +48798,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "lno1... (vložit nabídku sem)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (Angebot hier einfügen)"
           }
         }
       }
@@ -48568,6 +49144,12 @@
             "state" : "translated",
             "value" : "nfc"
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
         }
       }
     },
@@ -48624,6 +49206,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "žádné"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keine"
           }
         }
       }
