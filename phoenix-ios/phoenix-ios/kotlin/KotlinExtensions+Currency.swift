@@ -13,27 +13,6 @@ extension FiatCurrency {
 		return FiatCurrency.shortNameComponents(displayCode)
 	}
 	
-	var shortPreciseName: String {
-		let (code, mkt) = splitShortPreciseName
-		return code + mkt
-	}
-	
-	var splitShortPreciseName: (String, String) { // e.g. ("ARM", "bm")
-		
-		let precise: String
-		switch self {
-			case .ars   : precise = "ARS_OFF"
-			case .arsBm : precise = "ARS_BM"
-			case .cup   : precise = "CUP_OFF"
-			case .cupFm : precise = "CUP_FM"
-			case .lbp   : precise = "LBP_OFF"
-			case .lbpBm : precise = "LBP_BM"
-			default     : precise = self.displayCode
-		}
-		
-		return FiatCurrency.shortNameComponents(precise)
-	}
-	
 	private static func shortNameComponents(_ input: String) -> (String, String) {
 		
 		if input.count <= 3 {
@@ -55,7 +34,7 @@ extension FiatCurrency {
 		case .afn   : return "Afghan Afghani"
 		case .all   : return "Albanian Lek"
 		case .amd   : return "Armenian Dram"
-		case .ang   : return "Netherlands Antillean Guilder"
+		case .ang   : return "Caribbean Guilder"
 		case .aoa   : return "Angolan Kwanza"
 		case .ars   : fallthrough
 		case .arsBm : return "Argentine Peso"
@@ -212,7 +191,7 @@ extension FiatCurrency {
 		case .afn   : return NSLocalizedString("AFN", tableName: "Currencies", comment: "Afghan Afghani")
 		case .all   : return NSLocalizedString("ALL", tableName: "Currencies", comment: "Albanian Lek")
 		case .amd   : return NSLocalizedString("AMD", tableName: "Currencies", comment: "Armenian Dram")
-		case .ang   : return NSLocalizedString("XCG", tableName: "Currencies", comment: "Netherlands Antillean Guilder")
+		case .ang   : return NSLocalizedString("XCG", tableName: "Currencies", comment: "Caribbean Guilder")
 		case .aoa   : return NSLocalizedString("AOA", tableName: "Currencies", comment: "Angolan Kwanza")
 		case .ars   : fallthrough
 		case .arsBm : return NSLocalizedString("ARS", tableName: "Currencies", comment: "Argentine Peso")
@@ -396,11 +375,8 @@ extension FiatCurrency {
 		var autoTranslation: String? = nil
 
 		let currentLocale = Locale.current
-        if currentLocale.language.languageCode?.identifier != "en" {
-			let (code, mkt) = splitShortPreciseName
-			if mkt.isEmpty {
-				autoTranslation = currentLocale.localizedString(forCurrencyCode: code)
-			}
+		if currentLocale.language.languageCode?.identifier != "en" {
+			autoTranslation = currentLocale.localizedString(forCurrencyCode: code)
 		}
 
 		if let autoTranslation {
