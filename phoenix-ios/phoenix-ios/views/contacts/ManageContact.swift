@@ -98,15 +98,6 @@ struct ManageContact: View {
 	@State private var editAddress_text: String = ""
 	@State private var editAddress_invalidReason: InvalidReason? = nil
 	
-	enum FooterType: Int {
-		case expanded_standard = 1
-		case expanded_squeezed = 2
-		case compact_standard = 3
-		case compact_squeezed = 4
-		case accessible = 5
-	}
-	@State var footerType: [DynamicTypeSize: FooterType] = [:]
-	
 	@State var didAppear: Bool = false
 	
 	enum ActiveSheet {
@@ -1001,21 +992,13 @@ struct ManageContact: View {
 	func footer_navStack() -> some View {
 		
 		if !isNewContact {
-			Group {
-				let type = footerType[dynamicTypeSize] ?? FooterType.expanded_standard
-				switch type {
-				case .expanded_standard:
-					footer_navStack_standard(compact: false)
-				case .expanded_squeezed:
-					footer_navStack_squeezed(compact: false)
-				case .compact_standard:
-					footer_navStack_standard(compact: true)
-				case .compact_squeezed:
-					footer_navStack_squeezed(compact: true)
-				case .accessible:
-					footer_navStack_accessible()
-				}
-			} // </Group>
+			ViewThatFits() {
+				footer_navStack_standard(compact: false)
+				footer_navStack_squeezed(compact: false)
+				footer_navStack_standard(compact: true)
+				footer_navStack_squeezed(compact: true)
+				footer_navStack_accessible()
+			}
 			.frame(maxWidth: .infinity)
 			.background(
 				Color(
@@ -1038,32 +1021,22 @@ struct ManageContact: View {
 		// ---------------------------------
 		//        ^                ^        < same size
 		
-		let type: FooterType = compact ? FooterType.compact_standard : FooterType.expanded_standard
-		
 		HStack(alignment: VerticalAlignment.centerTopLine, spacing: 10) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				footer_button_deleteContact(compact: compact, lineLimit: 1)
-			} wasTruncated: {
-				footerTruncationDetected(type, "delete")
-			}
-			.frame(minWidth: footerButtonWidth, alignment: Alignment.trailing)
-			.read(footerButtonWidthReader)
-			.read(footerButtonHeightReader)
+			footer_button_deleteContact(compact: compact, lineLimit: 1)
+				.frame(minWidth: footerButtonWidth, alignment: Alignment.trailing)
+				.read(footerButtonWidthReader)
+				.read(footerButtonHeightReader)
 			
 			if globalSendButtonVisible {
 				if let footerButtonHeight {
 					Divider().frame(height: footerButtonHeight)
 				}
 				
-				TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-					footer_button_sendPayment(compact: compact, lineLimit: 1)
-				} wasTruncated: {
-					footerTruncationDetected(type, "pay")
-				}
-				.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
-				.read(footerButtonWidthReader)
-				.read(footerButtonHeightReader)
+				footer_button_sendPayment(compact: compact, lineLimit: 1)
+					.frame(minWidth: footerButtonWidth, alignment: Alignment.leading)
+					.read(footerButtonWidthReader)
+					.read(footerButtonHeightReader)
 			}
 			
 		} // </HStack>
@@ -1083,28 +1056,18 @@ struct ManageContact: View {
 		// -------------------------------
 		//        ^                ^      < NOT the same size
 		
-		let type: FooterType = compact ? FooterType.compact_squeezed : FooterType.expanded_squeezed
-		
 		HStack(alignment: VerticalAlignment.centerTopLine, spacing: 10) {
 			
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				footer_button_deleteContact(compact: compact, lineLimit: 1)
-			} wasTruncated: {
-				footerTruncationDetected(type, "delete")
-			}
-			.read(footerButtonHeightReader)
+			footer_button_deleteContact(compact: compact, lineLimit: 1)
+				.read(footerButtonHeightReader)
 			
 			if globalSendButtonVisible {
 				if let footerButtonHeight {
 					Divider().frame(height: footerButtonHeight)
 				}
 				
-				TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-					footer_button_sendPayment(compact: compact, lineLimit: 1)
-				} wasTruncated: {
-					footerTruncationDetected(type, "pay")
-				}
-				.read(footerButtonHeightReader)
+				footer_button_sendPayment(compact: compact, lineLimit: 1)
+					.read(footerButtonHeightReader)
 			}
 		} // </HStack>
 		.padding(.all)
@@ -1338,7 +1301,7 @@ struct ManageContact: View {
 		// Which may affect the footer, because the sendButton might appear/disappear.
 		// So we reset any measurements/calculations we've done for the footer.
 		
-		footerType = [:]
+	//	footerType = [:]
 		footerButtonWidth = nil
 		footerButtonHeight = nil
 	}
@@ -1346,31 +1309,6 @@ struct ManageContact: View {
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
-	
-	func footerTruncationDetected(_ type: FooterType, _ identifier: String) {
-		
-		switch type {
-		case .expanded_standard:
-			log.debug("footerTruncationDetected: expanded_standard (\(identifier))")
-			footerType[dynamicTypeSize] = .expanded_squeezed
-		
-		case .expanded_squeezed:
-			log.debug("footerTruncationDetected: expanded_squeezed (\(identifier))")
-			footerType[dynamicTypeSize] = .compact_standard
-			
-		case .compact_standard:
-			log.debug("footerTruncationDetected: compact_standard (\(identifier))")
-			footerType[dynamicTypeSize] = .compact_squeezed
-			
-		case .compact_squeezed:
-			log.debug("footerTruncationDetected: compact_squeezed (\(identifier))")
-			footerType[dynamicTypeSize] = .accessible
-			
-		case .accessible:
-			log.debug("footerTruncationDetected: accessible (\(identifier))")
-			break
-		}
-	}
 	
 	func selectImageOptionSelected() {
 		log.trace("selectImageOptionSelected()")
