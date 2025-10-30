@@ -31,6 +31,7 @@ import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -136,6 +137,7 @@ private fun FiatCurrencyPreference(business: PhoenixBusiness, walletId: WalletId
 
 @Composable
 private fun UserThemePreference(userPrefs: UserPrefs, scope: CoroutineScope) {
+    val globalPrefs = application.globalPrefs
     var prefEnabled by remember { mutableStateOf(true) }
     val preferences = UserTheme.entries.map {
         PreferenceItem(it, title = it.label())
@@ -151,6 +153,7 @@ private fun UserThemePreference(userPrefs: UserPrefs, scope: CoroutineScope) {
             prefEnabled = false
             scope.launch {
                 userPrefs.saveUserTheme(it.item)
+                globalPrefs.saveFallbackTheme(it.item)
                 prefEnabled = true
             }
         }

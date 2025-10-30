@@ -57,6 +57,7 @@ import fr.acinq.phoenix.android.navigation.navigateToPaymentDetails
 import fr.acinq.phoenix.android.navigation.paymentsNavGraph
 import fr.acinq.phoenix.android.navigation.settingsNavGraph
 import fr.acinq.phoenix.android.navigation.walletInfoNavGraph
+import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.getBitcoinUnits
 import fr.acinq.phoenix.android.utils.datastore.getFiatCurrencies
@@ -95,46 +96,48 @@ fun AppRoot(
         LocalFiatCurrencies provides fiatCurrencies.value,
         LocalShowInFiat provides isAmountInFiat.value,
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .background(appBackground())
-                    .fillMaxSize()
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
-                NavHost(
-                    navController = navController,
-                    startDestination = "${Screen.Startup.route}?next={next}",
-                    enterTransition = { EnterTransition.None },
-                    exitTransition = { ExitTransition.None },
+        PhoenixAndroidTheme {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .background(appBackground())
+                        .fillMaxSize()
+                        .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
                 ) {
-                    baseNavGraph(navController, appViewModel)
-                    // nav graphs below depends on the business, and will redirect to /startup if no wallet is active
-                    navigation(startDestination = Screen.BusinessNavGraph.Home.route, route = Screen.BusinessNavGraph.route) {
-                        settingsNavGraph(navController, appViewModel)
-                        homeNavGraph(navController, appViewModel)
-                        paymentsNavGraph(navController, appViewModel)
-                        walletInfoNavGraph(navController, appViewModel)
-                        channelsNavGraph(navController, appViewModel)
+                    NavHost(
+                        navController = navController,
+                        startDestination = "${Screen.Startup.route}?next={next}",
+                        enterTransition = { EnterTransition.None },
+                        exitTransition = { ExitTransition.None },
+                    ) {
+                        baseNavGraph(navController, appViewModel)
+                        // nav graphs below depends on the business, and will redirect to /startup if no wallet is active
+                        navigation(startDestination = Screen.BusinessNavGraph.Home.route, route = Screen.BusinessNavGraph.route) {
+                            settingsNavGraph(navController, appViewModel)
+                            homeNavGraph(navController, appViewModel)
+                            paymentsNavGraph(navController, appViewModel)
+                            walletInfoNavGraph(navController, appViewModel)
+                            channelsNavGraph(navController, appViewModel)
+                        }
                     }
                 }
-            }
 
-            val lastCompletedPayment = business?.paymentsManager?.lastCompletedPayment?.collectAsState()
-            lastCompletedPayment?.value?.let { payment ->
-                LaunchedEffect(key1 = payment.id) {
-                    val completedAt = payment.completedAt
-                    val showPaymentOnCurrentRoute = navController.currentDestination?.route == Screen.BusinessNavGraph.Home.route
-                            || navController.currentDestination?.route == Screen.BusinessNavGraph.Receive.route
-                    if (showPaymentOnCurrentRoute && (completedAt != null && (currentTimestampMillis() - completedAt) < 5.seconds.inWholeMilliseconds)) {
-                        navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
+                val lastCompletedPayment = business?.paymentsManager?.lastCompletedPayment?.collectAsState()
+                lastCompletedPayment?.value?.let { payment ->
+                    LaunchedEffect(key1 = payment.id) {
+                        val completedAt = payment.completedAt
+                        val showPaymentOnCurrentRoute = navController.currentDestination?.route == Screen.BusinessNavGraph.Home.route
+                                || navController.currentDestination?.route == Screen.BusinessNavGraph.Receive.route
+                        if (showPaymentOnCurrentRoute && (completedAt != null && (currentTimestampMillis() - completedAt) < 5.seconds.inWholeMilliseconds)) {
+                            navigateToPaymentDetails(navController, id = payment.id, isFromEvent = true)
+                        }
                     }
                 }
-            }
 
-            val isUpgradeRequired = business?.peerManager?.upgradeRequired?.collectAsState(false)
-            if (isUpgradeRequired?.value == true) {
-                UpgradeRequiredBlockingDialog()
+                val isUpgradeRequired = business?.peerManager?.upgradeRequired?.collectAsState(false)
+                if (isUpgradeRequired?.value == true) {
+                    UpgradeRequiredBlockingDialog()
+                }
             }
         }
     }

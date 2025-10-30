@@ -38,7 +38,6 @@ import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.services.HceService
 import fr.acinq.phoenix.android.services.PaymentsForegroundService
-import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.android.utils.nfc.NfcReaderCallback
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
 import kotlinx.coroutines.CoroutineScope
@@ -88,9 +87,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             navController = rememberNavController()
             navController?.let {
-                PhoenixAndroidTheme {
-                    AppRoot(it, appViewModel)
-                }
+                AppRoot(it, appViewModel)
             }
         }
     }
