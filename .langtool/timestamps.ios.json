@@ -182,6 +182,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : " [más información](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
       }
     },
     "#%lld: %@" : {
@@ -951,6 +955,10 @@
       },
       "en" : {
         "ts" : "2024-04-30T15:55:52Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "(Rayo11)"
       }
     },
     "(Lightning Bolt12)" : {
@@ -966,6 +974,10 @@
       },
       "en" : {
         "ts" : "2024-08-12T21:16:31Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "(Rayo12)"
       }
     },
     "(Phoenix can be running in the background.)" : {
@@ -1012,6 +1024,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "(La única forma de acceder a un monedero oculto es tecleando el PIN de bloqueo)"
       }
     },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
@@ -1058,6 +1074,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "(Esto significa que funciona como PIN de coacción)"
       }
     },
     "(additional space in bucket)" : {
@@ -1411,6 +1431,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "(espera unos segundos y vuelve a intentarlo)"
       }
     },
     "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." : {
@@ -2471,6 +2495,9 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z"
       }
     },
     "<decryption error>" : {
@@ -2749,6 +2776,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Una cartera oculta requiere que se establezca un **PIN de bloqueo**."
       }
     },
     "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
@@ -3114,6 +3145,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Acceder a la cartera oculta"
       }
     },
     "Add Liquidity" : {
@@ -3160,6 +3195,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Añadir otra cartera"
       }
     },
     "Add contact" : {
@@ -3351,6 +3390,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Añadir a contactos"
       }
     },
     "Add to existing contact" : {
@@ -3368,6 +3411,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Añadir a contacto existente"
       }
     },
     "Advanced" : {
@@ -3733,6 +3780,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Importe requerido para el pago con tarjeta"
       }
     },
     "Amount sent (fees included)" : {
@@ -4187,8 +4238,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "¿Estás seguro de que quieres continuar?"
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "¿Está seguro de que desea continuar?"
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -5564,6 +5615,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Ofertas de Bolt12:"
       }
     },
     "Bump fees" : {
@@ -5668,6 +5723,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "No se puede acceder a la red Tor. Phoenix no funcionará correctamente."
       }
     },
     "Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually." : {
@@ -5687,8 +5746,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Ya no se pueden canjear, tras 4 meses de espera. Estos fondos deben gastarse manualmente."
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Ya no se pueden intercambiar, después de 4 meses de espera. Estos fondos deben gastarse manualmente."
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -5830,6 +5889,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cambiar Cartera Oculta"
       }
     },
     "Change PIN" : {
@@ -5876,6 +5939,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cambiar PIN de cerradura"
       }
     },
     "Change spending PIN" : {
@@ -5893,6 +5960,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cambiar el PIN de gastos"
       }
     },
     "Channel Closing" : {
@@ -7011,6 +7082,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Comunicando con el lector de tarjetas."
       }
     },
     "Completed at" : {
@@ -7114,6 +7189,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Configurar PIN de bloqueo"
       }
     },
     "Configure fee limit" : {
@@ -8173,6 +8252,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Crear nuevo contacto"
       }
     },
     "Create new wallet" : {
@@ -8308,8 +8391,8 @@
         "ts" : "2024-04-30T15:55:52Z"
       },
       "es" : {
-        "ts" : "2024-04-30T15:55:52Z",
-        "v" : "Convertidor de moneda"
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Conversor de divisas"
       },
       "es-419" : {
         "ts" : "2024-04-30T15:55:52Z",
@@ -8393,6 +8476,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cartera actual"
       }
     },
     "Custom PIN" : {
@@ -8845,6 +8932,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cartera por defecto"
       }
     },
     "Delete" : {
@@ -9667,6 +9758,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Desactivar PIN de bloqueo"
       }
     },
     "Disable PIN" : {
@@ -9713,6 +9808,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Desactivar el PIN de gastos"
       }
     },
     "Disabled" : {
@@ -9761,8 +9860,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Desactivar Tor"
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Deshabilitar Tor"
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -10339,6 +10438,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Duplicado en %@"
       }
     },
     "Duplicate within this contact" : {
@@ -10356,6 +10459,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Duplicado dentro de este contacto"
       }
     },
     "Duration" : {
@@ -10402,6 +10509,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Opción de PIN de coacción"
       }
     },
     "Edit" : {
@@ -10477,6 +10588,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Editar PIN de bloqueo"
       }
     },
     "Edit PIN" : {
@@ -10523,6 +10638,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Editar PIN de gastos"
       }
     },
     "Edit contact" : {
@@ -10828,6 +10947,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Finaliza la comunicación con el lector de tarjetas."
       }
     },
     "Enter PIN to authenticate" : {
@@ -10932,6 +11055,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Introduce un código PIN para poder gastar fondos."
       }
     },
     "Enter a valid amount" : {
@@ -11007,6 +11134,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Introduce el PIN personalizado para abrir la aplicación."
       }
     },
     "Enter keywords from your seed" : {
@@ -11167,6 +11298,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Error al leer la etiqueta"
       }
     },
     "Error: %@" : {
@@ -11269,6 +11404,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Incluso cuando Phoenix te pide el PIN de otro monedero."
       }
     },
     "Expect to receive %d separate payments." : {
@@ -11373,8 +11512,8 @@
         "ts" : "2024-08-12T21:16:31Z"
       },
       "es" : {
-        "ts" : "2024-08-12T21:16:31Z",
-        "v" : "Caducado"
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Vencido"
       },
       "es-419" : {
         "ts" : "2024-08-12T21:24:40Z",
@@ -13099,6 +13238,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Volver a la lista de carteras visibles"
       }
     },
     "Good news! Your transaction has been mined!" : {
@@ -13232,6 +13375,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cartera oculta"
       }
     },
     "Hidden wallet requirements" : {
@@ -13249,6 +13396,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Requisitos del monedero oculto"
       }
     },
     "High Priority" : {
@@ -13295,6 +13446,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Sujeta tu dispositivo cerca del lector."
       }
     },
     "Home" : {
@@ -13311,6 +13466,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Inicio"
       }
     },
     "Home Screen" : {
@@ -13386,6 +13545,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "No está disponible la emulación de tarjeta host.\nLimitado al Espacio Económico Europeo."
       }
     },
     "Host card emulation not available.\nRequires iOS 17.4 or later." : {
@@ -13403,6 +13566,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "No está disponible la emulación de tarjeta host.\nRequiere iOS 17.4 o posterior."
       }
     },
     "Host card emulation session error\n%@" : {
@@ -13420,6 +13587,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Error de sesión de emulación de tarjeta host\n%@"
       }
     },
     "Host returned error response." : {
@@ -13871,6 +14042,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Si Face ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
       }
     },
     "If Touch ID fails, you can enter your iOS passcode to access Phoenix." : {
@@ -13917,6 +14092,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Si Touch ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
       }
     },
     "If a default wallet is selected, it will automatically be opened on app launch." : {
@@ -13934,6 +14113,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Si se selecciona un monedero predeterminado, se abrirá automáticamente al iniciar la aplicación."
       }
     },
     "If done correctly, self-backup is the most secure option." : {
@@ -14096,6 +14279,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Si no tienes una aplicación VPN Tor, instala una. Te recomendamos Orbot."
       }
     },
     "If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it." : {
@@ -14547,6 +14734,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Liquidez entrante"
       }
     },
     "Inbound liquidity is insufficient for this amount, and you have disabled automated channel management." : {
@@ -15428,6 +15619,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Formato no válido"
       }
     },
     "Invalid liquidity ads" : {
@@ -16013,6 +16208,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Rayo11"
       }
     },
     "Lightning Bolt12" : {
@@ -16029,6 +16228,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Rayo12"
       }
     },
     "Lightning Fees" : {
@@ -16189,6 +16392,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Dirección del rayo"
       }
     },
     "Lightning addresses:" : {
@@ -16206,6 +16413,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Direcciones de rayos:"
       }
     },
     "Lightning fee" : {
@@ -16512,6 +16723,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Liquidez"
       }
     },
     "Liquidity not currently available, try again later" : {
@@ -16529,6 +16744,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "La liquidez no está disponible actualmente, inténtalo más tarde"
       }
     },
     "Liquidity requested" : {
@@ -16688,6 +16907,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "PIN de bloqueo"
       }
     },
     "Lock PIN Required" : {
@@ -16705,6 +16928,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Se requiere PIN de bloqueo"
       }
     },
     "Logged In" : {
@@ -16922,6 +17149,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Asegúrate de que tu aplicación VPN Tor Proxy está en funcionamiento y conectada a Tor."
       }
     },
     "Make sure your Tor VPN is active and running." : {
@@ -17054,6 +17285,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Gestionar o cambiar de monedero"
       }
     },
     "Manual Backup" : {
@@ -17786,6 +18021,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Menos los honorarios de los mineros, estimados en:"
       }
     },
     "Missing off-chain amount too low." : {
@@ -17945,6 +18184,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Las funciones NFC no están disponibles en este dispositivo"
       }
     },
     "NFC capabilities not available on this device" : {
@@ -17962,6 +18205,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Las funciones NFC no están disponibles en este dispositivo"
       }
     },
     "NFC reader is already scanning" : {
@@ -17979,6 +18226,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "El lector NFC ya está escaneando"
       }
     },
     "NO FUNDS HAVE BEEN SENT" : {
@@ -18312,6 +18563,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "No se detecta URI o texto en la etiqueta NFC"
       }
     },
     "No access to the Tor network" : {
@@ -18329,6 +18584,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Sin acceso a la red Tor"
       }
     },
     "No address yet..." : {
@@ -18809,6 +19068,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Nada escaneado"
       }
     },
     "Notifications" : {
@@ -18963,6 +19226,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "On-chain saldo"
       }
     },
     "On-chain deposit" : {
@@ -19242,6 +19509,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Abrir el sitio web de Orbot"
       }
     },
     "Open Tor settings" : {
@@ -19259,6 +19530,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Abrir la configuración de Tor"
       }
     },
     "Open iOS Settings for Phoenix" : {
@@ -19305,6 +19580,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Abrir la app"
       }
     },
     "Options" : {
@@ -19633,6 +19912,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Pasa los datos biométricos de iOS para abrir la aplicación."
       }
     },
     "Paste encrypted data blob here" : {
@@ -20889,6 +21172,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Phoenix necesita acceso a Tor para funcionar correctamente."
       }
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
@@ -22636,6 +22923,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Reutilizable"
       }
     },
     "Review" : {
@@ -23028,6 +23319,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Escanear código QR"
       }
     },
     "Search" : {
@@ -23161,6 +23456,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Seleccionar emoji"
       }
     },
     "Select image" : {
@@ -23207,6 +23506,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Seleccionar foto"
       }
     },
     "Select wallet emoji" : {
@@ -23224,6 +23527,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Selecciona el emoji de la cartera"
       }
     },
     "Send" : {
@@ -23933,6 +24240,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Establecer PIN de bloqueo"
       }
     },
     "Set PIN" : {
@@ -23979,6 +24290,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Establecer PIN de gastos"
       }
     },
     "Settings" : {
@@ -25040,6 +25355,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Un solo uso"
       }
     },
     "Skip" : {
@@ -25173,6 +25492,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Gasta"
       }
     },
     "Spend expired swap-ins" : {
@@ -25277,6 +25600,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Control del gasto"
       }
     },
     "Spending PIN" : {
@@ -25293,6 +25620,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "PIN de gasto"
       }
     },
     "Splice already in progress" : {
@@ -25906,6 +26237,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cambiar a otro monedero"
       }
     },
     "System" : {
@@ -27463,8 +27798,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Estos fondos proceden de canales cerrados de Rayo. Deben gastarse manualmente."
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Estos fondos provienen de canales Lightning cerrados. Deben gastarse manualmente."
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -27693,6 +28028,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Esto parece ser un sitio web:"
       }
     },
     "This doesn't appear to be a Lightning invoice" : {
@@ -28234,8 +28573,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Para ello es necesario instalar una aplicación VPN Tor Proxy de terceros, como Orbot."
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Esto requiere instalar una aplicación Tor Proxy VPN de terceros, como Orbot."
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -28377,6 +28716,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Este monedero está **oculto**, y un monedero oculto requiere que se establezca un PIN de bloqueo."
       }
     },
     "This will reset the app, as if you had just installed it." : {
@@ -29360,6 +29703,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "No se pueden recuperar los datos de esta dirección. Es posible que esté experimentando un problema de conectividad."
       }
     },
     "Unconfirmed Balance" : {
@@ -30162,8 +30509,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Utiliza esta pantalla para gastar fondos de tu monedero final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a tus canales Lightning existentes."
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Utilice esta pantalla para gastar fondos de su billetera final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a sus canales Lightning existentes."
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -30387,6 +30734,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Carteras visibles"
       }
     },
     "WAITING FOR CONFIRMATIONS" : {
@@ -30464,8 +30815,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Esperando confirmación primero para poder cambiarlos a Rayo."
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Esperando confirmación primero antes de poder intercambiarlos a Lightning."
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -30781,6 +31132,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Cartera %@"
       }
     },
     "Wallet Balance" : {
@@ -30856,6 +31211,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Imagen de la cartera"
       }
     },
     "Wallet balance" : {
@@ -30873,6 +31232,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Saldo de la cartera"
       }
     },
     "Wallet creation options" : {
@@ -30977,6 +31340,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "El monedero no será visible en las pantallas de selección. Para acceder al monedero debes introducir su PIN de bloqueo."
       }
     },
     "Want a prettier address? Use third-party services, or self-host the address!" : {
@@ -31548,8 +31915,8 @@
         "ts" : "2025-02-27T20:32:25Z"
       },
       "es" : {
-        "ts" : "2025-02-27T20:32:25Z",
-        "v" : "Permanecerá en la cadena porque la gestión automatizada de canales está desactivada."
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Los depósitos permanecerán en la cadena porque la gestión automatizada de canales está desactivada."
       },
       "es-419" : {
         "ts" : "2025-02-27T20:32:25Z",
@@ -31952,6 +32319,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Puedes introducir el PIN de este monedero en cualquier momento en la pantalla de bloqueo, y Phoenix **cambiará** a este monedero."
       }
     },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
@@ -32840,6 +33211,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "Tu saldo de:"
       }
     },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
@@ -34730,6 +35105,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "etiqueta (opcional)"
       }
     },
     "layer 1 -> 2" : {
@@ -34805,6 +35184,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "lno1... (pega aquí la oferta)"
       }
     },
     "lnurl-auth" : {
@@ -35042,6 +35425,9 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z"
       }
     },
     "no description" : {
@@ -35088,6 +35474,10 @@
       },
       "en" : {
         "ts" : "2025-10-30T21:37:26Z"
+      },
+      "es" : {
+        "ts" : "2025-10-30T22:02:41Z",
+        "v" : "ninguno"
       }
     },
     "now" : {
