@@ -98,6 +98,9 @@ struct ManageContact: View {
 	@State private var editAddress_text: String = ""
 	@State private var editAddress_invalidReason: InvalidReason? = nil
 	
+	@State private var secrets: [ContactSecret]
+	@State private var secrets_hasChanges: Bool
+	
 	enum FooterType: Int {
 		case expanded_standard = 1
 		case expanded_squeezed = 2
@@ -184,7 +187,6 @@ struct ManageContact: View {
 					hasNewOffer = true
 				}
 			}
-
 			
 			self._offers = State(initialValue: rows)
 			self._offers_hasChanges = State(initialValue: (contact != nil && hasNewOffer))
@@ -214,10 +216,33 @@ struct ManageContact: View {
 					hasNewAddress = true
 				}
 			}
-
 			
 			self._addresses = State(initialValue: rows)
 			self._addresses_hasChanges = State(initialValue: (contact != nil && hasNewAddress))
+		}
+		do {
+			var set = Set<Bitcoin_kmpByteVector32>()
+			var secrets = Array<ContactSecret>()
+			
+			if let contact {
+				for secret in contact.secrets {
+					if !set.contains(secret.id) {
+						set.insert(secret.id)
+						secrets.append(secret)
+					}
+				}
+			}
+			var hasNewSecret = false
+			if let newSecret = info?.secret {
+				if !set.contains(newSecret.id) {
+					set.insert(newSecret.id)
+					secrets.append(newSecret)
+					hasNewSecret = true
+				}
+			}
+			
+			self._secrets = State(initialValue: secrets)
+			self._secrets_hasChanges = State(initialValue: (contact != nil && hasNewSecret))
 		}
 	}
 	
@@ -397,6 +422,9 @@ struct ManageContact: View {
 				content_trusted()
 				content_offers()
 				content_addresses()
+			#if DEBUG
+				content_secrets()
+			#endif
 			} // </VStack>
 			.padding()
 		} // </ScrollView>
@@ -935,6 +963,67 @@ struct ManageContact: View {
 	}
 	
 	@ViewBuilder
+	func content_secrets() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Secrets: (DEBUG build only)")
+				Spacer(minLength: 0)
+			} // </HStack>
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(0 ..< secrets.count, id: \.self) { idx in
+					content_secret_row(idx)
+				} // </ForEach>
+			} // </VStack>
+			
+			if secrets.isEmpty {
+				content_secret_emptyRow()
+			}
+			
+		} // </VStack>
+		.padding(.bottom, 30)
+	}
+	
+	@ViewBuilder
+	func content_secret_row(_ index: Int) -> some View {
+		
+		let row: ContactSecret = secrets[index]
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			
+			bullet()
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				Text(row.id.toHex())
+					.foregroundStyle(Color.primary)
+				Text(verbatim: "incomingPaymentId: \( row.incomingPaymentId?.description() ?? "<nil>" )")
+					.foregroundStyle(Color.secondary)
+			}
+			.lineLimit(1)
+			.truncationMode(.middle)
+			.font(.callout)
+			
+		}
+		.padding(.top, ROW_VERTICAL_SPACING)
+	}
+	
+	@ViewBuilder
+	func content_secret_emptyRow() -> some View {
+		
+		HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			bullet()
+			Text("none")
+				.lineLimit(1)
+				.foregroundStyle(Color.secondary)
+				.layoutPriority(-1)
+				.font(.callout)
+		}
+		.padding(.top, ROW_VERTICAL_SPACING)
+	}
+	
+	@ViewBuilder
 	func bullet() -> some View {
 		
 		Image(systemName: "circlebadge.fill")
@@ -1290,7 +1379,7 @@ struct ManageContact: View {
 		if doNotUseDiskImage {
 			return true
 		}
-		if offers_hasChanges || addresses_hasChanges {
+		if offers_hasChanges || addresses_hasChanges || secrets_hasChanges {
 			return true
 		}
 		
@@ -1487,8 +1576,11 @@ struct ManageContact: View {
 					photoUri: newPhotoName,
 					useOfferKey: updatedUseOfferKey,
 					offers: offers.map { $0.raw },
-					addresses: addresses.map { $0.raw }
+					addresses: addresses.map { $0.raw },
+					secrets: secrets
 				)
+				
+				log.debug("updatedContact.secrets.count: \(updatedContact.secrets.count)")
 				
 				let contactsDb = try await Biz.business.databaseManager.contactsDb()
 				
