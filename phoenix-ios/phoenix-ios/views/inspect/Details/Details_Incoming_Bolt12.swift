@@ -21,6 +21,8 @@ struct Details_Incoming_Bolt12: DetailsInfoGrid {
 	
 	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
+	
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------

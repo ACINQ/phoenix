@@ -29,12 +29,6 @@ struct MergeChannelsView: View {
 	@State var connections: Connections = Biz.business.connectionsManager.currentValue
 	@State var channels = Biz.business.peerManager.channelsValue()
 	
-	@State var initialButtonsRow_truncated_title3 = false
-	@State var initialButtonsRow_truncated_headline = false
-	
-	@State var subsequentButtonsRow_truncated_title3 = false
-	@State var subsequentButtonsRow_truncated_headline = false
-	
 	@State var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
 	@ObservedObject var currencyPrefs = CurrencyPrefs.current
@@ -313,25 +307,10 @@ struct MergeChannelsView: View {
 	@ViewBuilder
 	func page1_footer_initialButtonsRow() -> some View {
 		
-		if initialButtonsRow_truncated_headline {
-
+		ViewThatFits {
+			page1_footer_initialButtonsRow(buttonFont: .title3, lineLimit: 1)
+			page1_footer_initialButtonsRow(buttonFont: .headline, lineLimit: 1)
 			page1_footer_initialButtonsRow(buttonFont: .callout, lineLimit: nil)
-
-		} else if initialButtonsRow_truncated_title3 {
-
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				page1_footer_initialButtonsRow(buttonFont: .headline, lineLimit: 1)
-			} wasTruncated: {
-				initialButtonsRow_truncated_headline = true
-			}
-
-		} else {
-
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				page1_footer_initialButtonsRow(buttonFont: .title3, lineLimit: 1)
-			} wasTruncated: {
-				initialButtonsRow_truncated_title3 = true
-			}
 		}
 	}
 	
@@ -375,25 +354,10 @@ struct MergeChannelsView: View {
 	@ViewBuilder
 	func page1_footer_subsequentButtonsRow() -> some View {
 		
-		if subsequentButtonsRow_truncated_headline {
-
+		ViewThatFits {
+			page1_footer_subsequentButtonsRow(buttonFont: .title3, lineLimit: 1)
+			page1_footer_subsequentButtonsRow(buttonFont: .headline, lineLimit: 1)
 			page1_footer_subsequentButtonsRow(buttonFont: .callout, lineLimit: nil)
-
-		} else if subsequentButtonsRow_truncated_title3 {
-
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				page1_footer_subsequentButtonsRow(buttonFont: .headline, lineLimit: 1)
-			} wasTruncated: {
-				subsequentButtonsRow_truncated_headline = true
-			}
-
-		} else {
-
-			TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-				page1_footer_subsequentButtonsRow(buttonFont: .title3, lineLimit: 1)
-			} wasTruncated: {
-				subsequentButtonsRow_truncated_title3 = true
-			}
 		}
 	}
 	

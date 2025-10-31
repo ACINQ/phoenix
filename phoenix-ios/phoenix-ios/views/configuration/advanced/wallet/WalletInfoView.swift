@@ -24,8 +24,6 @@ struct WalletInfoView: View {
 	@State var popoverPresent_swapInWallet = false
 	@State var popoverPresent_finalWallet = false
 	
-	@State var final_mpk_truncationDetected = false
-	
 	@State var swapInWallet = Biz.business.balanceManager.swapInWalletValue()
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	
@@ -351,46 +349,10 @@ struct WalletInfoView: View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
 			
-			if !final_mpk_truncationDetected {
-				
-				// All on one line:
-				// Master public key (Path m/x/y/z)  <img>
-				
-				TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-					
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text("Master public key")
-							.font(.headline.bold())
-						Text(" (Path \(keyPath))")
-							.font(.subheadline)
-							.foregroundColor(.secondary)
-						Spacer()
-						copyButton(xpub)
-					} // </HStack>
-					
-				} wasTruncated: {
-					final_mpk_truncationDetected = true
-					
-				} // </TruncatableView>
-				
-			} else /* if truncationDetected */ {
-				
-				// Too big to fit on one line => switch to two lines:
-				// Master public key   <img>
-				// Path: m/x/y/z
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					Text("Master public key")
-						.font(.headline.bold())
-					Spacer()
-					copyButton(xpub)
-				}
-				
-				Text("Path: \(keyPath)")
-					.font(.callout)
-					.foregroundColor(.secondary)
-				
-			} // </else>
+			ViewThatFits {
+				subsection_finalWallet_masterPublicKey_oneLine(keyPath: keyPath, xpub: xpub)
+				subsection_finalWallet_masterPublicKey_twoLines(keyPath: keyPath, xpub: xpub)
+			}
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Text(xpub)
@@ -402,6 +364,45 @@ struct WalletInfoView: View {
 			}
 			
 		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func subsection_finalWallet_masterPublicKey_oneLine(keyPath: String, xpub: String) -> some View {
+		
+		// All on one line:
+		// Master public key (Path m/x/y/z)  <img>
+			
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Text("Master public key")
+				.font(.headline.bold())
+			Text(" (Path \(keyPath))")
+				.font(.subheadline)
+				.foregroundColor(.secondary)
+			Spacer()
+			copyButton(xpub)
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func subsection_finalWallet_masterPublicKey_twoLines(keyPath: String, xpub: String) -> some View {
+		
+		// Too big to fit on one line => switch to two lines:
+		// Master public key   <img>
+		// Path: m/x/y/z
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Master public key")
+					.font(.headline.bold())
+				Spacer()
+				copyButton(xpub)
+			}
+			
+			Text("Path: \(keyPath)")
+				.font(.callout)
+				.foregroundColor(.secondary)
+		}
 	}
 	
 	// --------------------------------------------------
