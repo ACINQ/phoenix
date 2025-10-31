@@ -47,7 +47,7 @@ class Prefs_Global {
 			defaults.data(forKey: Key.theme.value(id))?.jsonDecode() ?? Theme.system
 		}
 		set {
-			defaults.set(newValue, forKey: Key.theme.value(id))
+			defaults.set(newValue.jsonEncode(), forKey: Key.theme.value(id))
 			runOnMainThread {
 				self.themePublisher.send(newValue)
 			}
