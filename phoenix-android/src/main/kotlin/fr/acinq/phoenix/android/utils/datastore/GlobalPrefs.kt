@@ -129,7 +129,7 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         if (code == null) it.remove(SHOW_RELEASE_NOTES_SINCE) else it[SHOW_RELEASE_NOTES_SINCE] = code
     }
 
-    /** Fallback theme used by the app when no specific is used and no user prefs is available. It should be set to the theme used by last active user. */
+    /** Fallback theme used when no wallet theme is available yet. Set to the theme used by last active wallet. */
     val getFallbackTheme: Flow<UserTheme> = safeData.map { UserTheme.safeValueOf(it[APP_THEME_FALLBACK]) }
     suspend fun saveFallbackTheme(theme: UserTheme) = data.edit { it[APP_THEME_FALLBACK] = theme.name }
 }
