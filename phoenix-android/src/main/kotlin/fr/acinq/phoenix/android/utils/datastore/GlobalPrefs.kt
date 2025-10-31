@@ -30,6 +30,7 @@ import fr.acinq.phoenix.android.BaseWalletId
 import fr.acinq.phoenix.android.EmptyWalletId
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.utils.UserTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -66,6 +67,8 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
         private val SHOW_INTRO = booleanPreferencesKey("SHOW_INTRO")
         private val LAST_USED_APP_CODE = intPreferencesKey("LAST_USED_APP_CODE")
         private val SHOW_RELEASE_NOTES_SINCE = intPreferencesKey("SHOW_RELEASE_NOTES_SINCE")
+
+        private val APP_THEME_FALLBACK = stringPreferencesKey("APP_THEME_FALLBACK")
     }
 
     /**
@@ -125,6 +128,10 @@ class GlobalPrefs(private val data: DataStore<Preferences>) {
     suspend fun saveShowReleaseNoteSinceCode(code: Int?) = data.edit {
         if (code == null) it.remove(SHOW_RELEASE_NOTES_SINCE) else it[SHOW_RELEASE_NOTES_SINCE] = code
     }
+
+    /** Fallback theme used when no wallet theme is available yet. Set to the theme used by last active wallet. */
+    val getFallbackTheme: Flow<UserTheme> = safeData.map { UserTheme.safeValueOf(it[APP_THEME_FALLBACK]) }
+    suspend fun saveFallbackTheme(theme: UserTheme) = data.edit { it[APP_THEME_FALLBACK] = theme.name }
 }
 
 @Serializable

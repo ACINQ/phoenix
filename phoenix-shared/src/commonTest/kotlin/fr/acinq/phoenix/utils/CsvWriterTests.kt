@@ -8,8 +8,12 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.CltvExpiryDelta
+import fr.acinq.lightning.Feature
+import fr.acinq.lightning.FeatureSupport
+import fr.acinq.lightning.Features
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.db.Bolt11IncomingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment
 import fr.acinq.lightning.db.ChannelCloseOutgoingPayment.ChannelClosingType
@@ -24,7 +28,6 @@ import fr.acinq.lightning.utils.currentTimestampSeconds
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.csv.WalletPaymentCsvWriter
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
@@ -334,7 +337,15 @@ class CsvWriterTests {
             privateKey = PrivateKey(value = ByteVector32.fromValidHex("8aca84879c0d7517445ecaf399b427d1e79ecc55e9bfe2421e227679993c461e")),
             description = Either.Left("fake invoice"),
             minFinalCltvExpiryDelta = CltvExpiryDelta(128),
-            features = TestConstants.Bob.nodeParams.features,
+            features = Features(
+                Feature.OptionDataLossProtect to FeatureSupport.Optional,
+                Feature.VariableLengthOnion to FeatureSupport.Mandatory,
+                Feature.PaymentSecret to FeatureSupport.Mandatory,
+                Feature.BasicMultiPartPayment to FeatureSupport.Optional,
+                Feature.Wumbo to FeatureSupport.Optional,
+                Feature.StaticRemoteKey to FeatureSupport.Mandatory,
+                Feature.AnchorOutputs to FeatureSupport.Optional,
+            ),
             paymentSecret = randomBytes32(),
             paymentMetadata = null,
             expirySeconds = null,

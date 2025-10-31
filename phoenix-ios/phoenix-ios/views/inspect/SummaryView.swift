@@ -43,14 +43,6 @@ struct SummaryView: View {
 	
 	@State var didAppear = false
 	
-	enum ButtonListType: Int {
-		case standard = 1
-		case squeezed = 2
-		case compact = 3
-		case accessible = 4
-	}
-	@State var buttonListType: [DynamicTypeSize: ButtonListType] = [:]
-	
 	// <iOS_16_workarounds>
 	@State var navLinkTag: NavLinkTag? = nil
 	@State var popToDestination: PopToDestination? = nil
@@ -519,15 +511,12 @@ struct SummaryView: View {
 	@ViewBuilder
 	func buttonList() -> some View {
 		
-		Group {
-			let type = buttonListType[dynamicTypeSize] ?? ButtonListType.standard
-			switch type {
-				case .standard   : buttonList_standard()
-				case .squeezed   : buttonList_squeezed()
-				case .compact    : buttonList_compact()
-				case .accessible : buttonList_accessibility()
-			}
-		} // </Group>
+		ViewThatFits(in: .horizontal) {
+			buttonList_standard()
+			buttonList_squeezed()
+			buttonList_compact()
+			buttonList_accessibility()
+		}
 		.confirmationDialog("Delete payment?",
 			isPresented: $showDeletePaymentConfirmationDialog,
 			titleVisibility: Visibility.hidden
@@ -548,57 +537,43 @@ struct SummaryView: View {
 		// ---------------------------
 		//   ^          ^         ^    < same size
 		
-		let type = ButtonListType.standard
-		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			TruncatableView(identifier: "standard-details", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					navigateTo(.DetailsView)
-				} label: {
-					buttonLabel_details()
-						.lineLimit(1)
-				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-				.read(buttonWidthReader)
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "details")
+			Button {
+				navigateTo(.DetailsView)
+			} label: {
+				buttonLabel_details()
+					.lineLimit(1)
 			}
+			.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+			.read(buttonWidthReader)
+			.read(buttonHeightReader)
 			
 			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(identifier: "standard-edit", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					navigateTo(.EditInfoView)
-				} label: {
-					buttonLabel_edit()
-				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.center)
-				.read(buttonWidthReader)
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "edit")
+			Button {
+				navigateTo(.EditInfoView)
+			} label: {
+				buttonLabel_edit()
 			}
+			.frame(minWidth: buttonWidth, alignment: Alignment.center)
+			.read(buttonWidthReader)
+			.read(buttonHeightReader)
 			
 			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(identifier: "standard-delete", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					showDeletePaymentConfirmationDialog = true
-				} label: {
-					buttonLabel_delete()
-				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-				.read(buttonWidthReader)
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "delete")
+			Button {
+				showDeletePaymentConfirmationDialog = true
+			} label: {
+				buttonLabel_delete()
 			}
+			.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+			.read(buttonWidthReader)
+			.read(buttonHeightReader)
 		}
 		.padding(.all)
 		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
@@ -617,57 +592,43 @@ struct SummaryView: View {
 		// ---------------------------
 		//   ^                    ^    < same size
 		
-		let type = ButtonListType.squeezed
-		
 		HStack(alignment: VerticalAlignment.center, spacing: 16) {
 			
-			TruncatableView(identifier: "squeezed-details", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					navigateTo(.DetailsView)
-				} label: {
-					buttonLabel_details()
-						.lineLimit(1)
-				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-				.read(buttonWidthReader)
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "edit")
+			Button {
+				navigateTo(.DetailsView)
+			} label: {
+				buttonLabel_details()
+					.lineLimit(1)
 			}
+			.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+			.read(buttonWidthReader)
+			.read(buttonHeightReader)
 			
 			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(identifier: "squeezed-edit", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					navigateTo(.EditInfoView)
-				} label: {
-					buttonLabel_edit()
-						.lineLimit(1)
-				}
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "edit")
+			Button {
+				navigateTo(.EditInfoView)
+			} label: {
+				buttonLabel_edit()
+					.lineLimit(1)
 			}
+			.read(buttonHeightReader)
 			
 			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(identifier: "squeezed-delete", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					showDeletePaymentConfirmationDialog = true
-				} label: {
-					buttonLabel_delete()
-						.lineLimit(1)
-				}
-				.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-				.read(buttonWidthReader)
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "delete")
+			Button {
+				showDeletePaymentConfirmationDialog = true
+			} label: {
+				buttonLabel_delete()
+					.lineLimit(1)
 			}
+			.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+			.read(buttonWidthReader)
+			.read(buttonHeightReader)
 		}
 		.padding(.horizontal, 10) // allow content to be closer to edges
 		.padding(.vertical)
@@ -688,53 +649,39 @@ struct SummaryView: View {
 		// -----------------------
 		//             ^ might not be centered, but at least the buttons fit on 1 line
 		
-		let type = ButtonListType.compact
-		
 		HStack(alignment: VerticalAlignment.center, spacing: 8) {
 			
-			TruncatableView(identifier: "compatct-details", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					navigateTo(.DetailsView)
-				} label: {
-					buttonLabel_details()
-						.lineLimit(1)
-				}
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "details")
+			Button {
+				navigateTo(.DetailsView)
+			} label: {
+				buttonLabel_details()
+					.lineLimit(1)
 			}
+			.read(buttonHeightReader)
 			
 			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(identifier: "compact-edit", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					navigateTo(.EditInfoView)
-				} label: {
-					buttonLabel_edit()
-						.lineLimit(1)
-				}
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "edit")
+			Button {
+				navigateTo(.EditInfoView)
+			} label: {
+				buttonLabel_edit()
+					.lineLimit(1)
 			}
+			.read(buttonHeightReader)
 			
 			if let buttonHeight {
 				Divider().frame(height: buttonHeight)
 			}
 			
-			TruncatableView(identifier: "compact-delete", fixedHorizontal: true, fixedVertical: true) {
-				Button {
-					showDeletePaymentConfirmationDialog = true
-				} label: {
-					buttonLabel_delete()
-						.lineLimit(1)
-				}
-				.read(buttonHeightReader)
-			} wasTruncated: {
-				buttonListTruncationDetected(type, "delete")
+			Button {
+				showDeletePaymentConfirmationDialog = true
+			} label: {
+				buttonLabel_delete()
+					.lineLimit(1)
 			}
+			.read(buttonHeightReader)
 		}
 		.padding(.horizontal, 4) // allow content to be closer to edges
 		.padding(.vertical)
@@ -1234,27 +1181,6 @@ struct SummaryView: View {
 			if case .embedded(let popTo) = location {
 				popTo(destination)
 			}
-		}
-	}
-	
-	func buttonListTruncationDetected(_ type: ButtonListType, _ identifier: String) {
-		
-		switch type {
-		case .standard:
-			log.debug("buttonListTruncationDetected: standard (\(identifier))")
-			buttonListType[dynamicTypeSize] = .squeezed
-		
-		case .squeezed:
-			log.debug("buttonListTruncationDetected: squeezed (\(identifier))")
-			buttonListType[dynamicTypeSize] = .compact
-			
-		case .compact:
-			log.debug("buttonListTruncationDetected: compact (\(identifier))")
-			buttonListType[dynamicTypeSize] = .accessible
-			
-		case .accessible:
-			log.debug("buttonListTruncationDetected: accessible (\(identifier))")
-			break
 		}
 	}
 	

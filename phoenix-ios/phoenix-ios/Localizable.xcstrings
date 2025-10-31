@@ -244,7 +244,44 @@
       }
     },
     " [more info](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [المزيد من المعلومات] (https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [více informací](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [mehr Infos](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [más información](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [más información](https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " [plus d'infos] (https://phoenix.acinq.co/faq#what-is-inbound-liquidity)"
+          }
+        }
+      }
     },
     "-" : {
       "extractionState" : "manual",
@@ -288,7 +325,44 @@
       }
     },
     ": %@" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ": %@"
+          }
+        }
+      }
     },
     "? confirmations" : {
       "localizations" : {
@@ -406,7 +480,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(espace supplémentaire dans le seau)"
+            "value" : "(espace disponible dans le contenant)"
           }
         }
       }
@@ -696,10 +770,86 @@
       }
     },
     "(Lightning Bolt11)" : {
-      "comment" : "Type of text being copied"
+      "comment" : "Type of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(صاعقة البرق11)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt11)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt11)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Rayo11)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Rayo11)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Éclair11)"
+          }
+        }
+      }
     },
     "(Lightning Bolt12)" : {
-      "comment" : "Type of text being copied"
+      "comment" : "Type of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(صاعقة البرق12)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt12)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Lightning Bolt12)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Rayo12)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Rayo12)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Éclair12)"
+          }
+        }
+      }
     },
     "(Phoenix can be running in the background.)" : {
       "extractionState" : "manual",
@@ -904,7 +1054,44 @@
       }
     },
     "(The only way to access a hidden wallet is by typing in the Lock PIN)" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(الطريقة الوحيدة للوصول إلى المحفظة المخفية هي كتابة رقم التعريف الشخصي للقفل)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Jediný způsob, jak získat přístup do skryté peněženky, je zadat kód PIN zámku.)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Die einzige Möglichkeit, auf eine versteckte Brieftasche zuzugreifen, ist die Eingabe der Sperr-PIN)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(La única forma de acceder a un monedero oculto es tecleando el PIN de bloqueo)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(La única forma de acceder a un monedero oculto es tecleando el PIN de bloqueo)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Le seul moyen d'accéder à un portefeuille caché est de saisir le code PIN de verrouillage)"
+          }
+        }
+      }
     },
     "(This is your address - derived from your seed. You alone possess your seed.)" : {
       "localizations" : {
@@ -947,10 +1134,84 @@
       }
     },
     "(This means it works as a duress PIN.)" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(وهذا يعني أنه يعمل كرقم تعريف شخصي بالإكراه)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(To znamená, že funguje jako PIN z donucení.)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Das bedeutet, dass sie als Nötigungs-PIN funktioniert.)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Esto significa que funciona como PIN de coacción)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Esto significa que funciona como PIN de coacción)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Cela signifie que le code PIN peut fonctionner comme un leurre)"
+          }
+        }
+      }
     },
     "(wait a few seconds and then retry)" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(انتظر بضع ثوانٍ ثم أعد المحاولة)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(počkejte několik sekund a zkuste to znovu)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(warten Sie ein paar Sekunden und versuchen Sie es dann erneut)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(espera unos segundos y vuelve a intentarlo)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(espera unos segundos y vuelve a intentarlo)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(attendez quelques secondes et réessayez)"
+          }
+        }
+      }
     },
     "**disabled**: sent payments will be anonymous" : {
       "localizations" : {
@@ -1189,7 +1450,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Ce code de paiement Bolt12 est l'équivalent Lightning d'une adresse Bitcoin\n\nContrairement aux requêtes Lightning traditionnelles, elle n'expire pas et peut être réutilisée.\n\nPartagez-la largement : pour des dons, des pourboires, ou pour vous faire payer par vos amis.\n\n🛟 **Qui accepte Bolt12?**\n\nPour l'instant, peu de services supportent Bolt12. Si un service rejette ce code, faites-leur savoir qu'il passe à côté de quelque chose de génial !\n\n🪫 **Restrictions**\n\nVotre téléphone doit être allumé et connecté à internet pour recevoir un paiement. L'activation de TOR dans Phoenix peut également causer des problèmes."
+            "value" : "**Ce code de paiement Bolt12 est l'équivalent Lightning d'une adresse Bitcoin\n\nContrairement aux requêtes Lightning traditionnelles, celui-ci n'expire pas et peut être réutilisé.\n\nPartagez-le largement : pour des dons, des pourboires, ou pour vous faire payer par vos amis.\n\n🛟 **Qui accepte Bolt12?**\n\nPour l'instant, peu de services supportent Bolt12. Si un service rejette ce code, faites-leur savoir qu'il passe à côté de quelque chose de génial !\n\n🪫 **Restrictions**\n\nVotre téléphone doit être allumé et connecté à internet pour recevoir un paiement. L'activation de TOR dans Phoenix peut également causer des problèmes."
           }
         }
       }
@@ -3726,7 +3987,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une clé de sauvegarde a été générée, contenant toutes les informations nécessaires pour restaurer vos fonds Bitcoin."
+            "value" : "Une clé de sauvegarde a été générée, contenant toutes les informations nécessaires pour restaurer vos bitcoins."
           }
         }
       }
@@ -3766,7 +4027,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un bitcoin peut être divisé en de plus petites unités, appelées Satoshi. Il y a 100 millions de satoshis dans un seul bitcoin."
+            "value" : "Un bitcoin peut être divisé en de plus petites unités, appelées satoshi. Il y a 100 millions de satoshis dans un seul bitcoin."
           }
         }
       }
@@ -3898,7 +4159,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, et ces frais sont supérieurs à ta limite de %2$@.\n\nAugmente cette limite dans les paramètres de gestion des canaux."
+            "value" : "Des frais de %1$@ sont attendus pour recevoir ce montant, et ces frais sont supérieurs à votre limite de %2$@.\n\nAugmentez cette limite dans les paramètres de gestion des canaux."
           }
         }
       }
@@ -3996,7 +4257,44 @@
       }
     },
     "A hidden wallet requires a **Lock PIN** to be set." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تتطلب المحفظة المخفية تعيين **رقم تعريف شخصي للقفل**."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skrytá peněženka vyžaduje nastavení kódu **Lock PIN**."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für eine versteckte Brieftasche muss eine **Schließ-PIN** festgelegt werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una cartera oculta requiere que se establezca un **PIN de bloqueo**."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una cartera oculta requiere que se establezca un **PIN de bloqueo**."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un portefeuille caché requiert un **PIN de verrouillage**."
+          }
+        }
+      }
     },
     "A less efficient and less private format that does not rotate addresses. However, it is compatible with almost every service and wallet." : {
       "localizations" : {
@@ -4290,13 +4588,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zrychlení transakcí v řetězci"
+            "value" : "Zrychlení on-chain transakcí"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschleunigung von On-Chain-Transaktionen"
+            "value" : "Beschleunigte On-Chain Transaktion"
           }
         },
         "es" : {
@@ -4308,7 +4606,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acelera las transacciones en la cadena"
+            "value" : "Acelerar transacciones en la cadena"
           }
         },
         "fr" : {
@@ -4482,7 +4780,44 @@
       }
     },
     "Access hidden wallet" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوصول إلى المحفظة المخفية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přístup ke skryté peněžence"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugang zur versteckten Brieftasche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceder a la cartera oculta"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceder a la cartera oculta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accéder au portefeuille caché"
+          }
+        }
+      }
     },
     "active commitments" : {
       "localizations" : {
@@ -4525,7 +4860,44 @@
       }
     },
     "Add another wallet" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة محفظة أخرى"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přidání další peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Brieftasche hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir otra cartera"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir otra cartera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un autre portefeuille"
+          }
+        }
+      }
     },
     "Add contact" : {
       "localizations" : {
@@ -4848,10 +5220,84 @@
       }
     },
     "Add to contacts" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة إلى جهات الاتصال"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přidat ke kontaktům"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Kontakten hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a contactos"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a contactos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter aux contacts"
+          }
+        }
+      }
     },
     "Add to existing contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة إلى جهة اتصال موجودة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přidat ke stávajícímu kontaktu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu bestehendem Kontakt hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a contacto existente"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a contacto existente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à un contact existant"
+          }
+        }
+      }
     },
     "adding to existing channel" : {
       "comment" : "Transaction Info: Explanation",
@@ -5188,7 +5634,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Částka připočtená k úvěru na poplatky"
+            "value" : "Částka přidána do poplatkového kreditu"
           }
         },
         "de" : {
@@ -5212,7 +5658,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Montant ajouté au crédit de redevance"
+            "value" : "Montant ajouté au crédit"
           }
         }
       }
@@ -5621,7 +6067,44 @@
       }
     },
     "Amount required for card payment" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المبلغ المطلوب للدفع بالبطاقة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Částka požadovaná pro platbu kartou"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erforderlicher Betrag für die Kartenzahlung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe requerido para el pago con tarjeta"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe requerido para el pago con tarjeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Montant requis pour le paiement par carte"
+          }
+        }
+      }
     },
     "Amount sent (fees included)" : {
       "localizations" : {
@@ -6322,25 +6805,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jste si jisti, že chcete pokračovat?"
+            "value" : "Opravdu chcete pokračovat?"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sind Sie sicher, dass Sie fortfahren wollen?"
+            "value" : "Möchten Sie wirklich fortfahren?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Estás seguro de que quieres continuar?"
+            "value" : "¿Está seguro de que desea continuar?"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Estás seguro de que quieres continuar?"
+            "value" : "¿Está seguro de que desea continuar?"
           }
         },
         "fr" : {
@@ -6546,7 +7029,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Attention ! Certains fonds expireront bientôt et ne pourront plus faire l'objet d'un échange."
+            "value" : "Attention ! Certains fonds expireront bientôt et ne pourront plus faire l'objet d'un swap."
           }
         }
       }
@@ -6912,7 +7395,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Évite la corrélation de vos paiement via l’horodatage"
+            "value" : "Évite la corrélation de vos paiement par horodatage"
           }
         }
       }
@@ -7371,7 +7854,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bilance"
+            "value" : "Zůstatek"
           }
         },
         "de" : {
@@ -7395,7 +7878,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Équilibre"
+            "value" : "Solde"
           }
         }
       }
@@ -8325,13 +8808,50 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bolt12 propose"
+            "value" : "Offre Bolt12"
           }
         }
       }
     },
     "Bolt12 offers:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عروض Bolt12:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 nabízí:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 bietet:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ofertas de Bolt12:"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ofertas Bolt12:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offres Bolt12 :"
+          }
+        }
+      }
     },
     "broadcast" : {
       "localizations" : {
@@ -8368,7 +8888,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "émis"
+            "value" : "envoyé"
           }
         }
       }
@@ -8575,7 +9095,44 @@
       }
     },
     "Cannot access the Tor network. Phoenix will not function correctly." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يمكن الوصول إلى شبكة Tor. لن يعمل برنامج Phoenix بشكل صحيح."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nelze se připojit k síti Tor. Phoenix nebude fungovat správně."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Zugriff auf das Tor-Netzwerk. Phoenix funktioniert nicht korrekt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede acceder a la red Tor. Phoenix no funcionará correctamente."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se puede acceder a la red Tor. Phoenix no funcionará correctamente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d\\'accéder au réseau Tor. Phoenix ne fonctionnera pas correctement."
+          }
+        }
+      }
     },
     "Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually." : {
       "localizations" : {
@@ -8588,31 +9145,31 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Po 4 měsících čekání již nelze vyměnit. Tyto prostředky je nutné utratit ručně."
+            "value" : "Po 4 měsících čekání není možné prostředky přehodit na Lightning. Tyto prostředky je nutné utratit ručně."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kann nicht mehr getauscht werden, nach 4 Monaten Wartezeit. Diese Mittel müssen manuell ausgegeben werden."
+            "value" : "Kann nach 4 Monaten Wartezeit nicht mehr auf Lightning umgetauscht werden. Diese Gelder müssen manuell ausgegeben werden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ya no se pueden canjear, tras 4 meses de espera. Estos fondos deben gastarse manualmente."
+            "value" : "Ya no se pueden intercambiar, después de 4 meses de espera. Estos fondos deben gastarse manualmente."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ya no se pueden canjear, tras 4 meses de espera. Estos fondos deben gastarse manualmente."
+            "value" : "Ya no se pueden intercambiar, después de 4 meses de espera. Estos fondos deben gastarse manualmente."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ne peuvent plus être swappés sur Lightning, après 4 mois d\\'attente. Ces fonds doivent être dépensés manuellement."
+            "value" : "Ces fonds ne peuvent plus être swappés vers Lightning après 4 mois d\\'attente. Ils doivent être dépensés manuellement."
           }
         }
       }
@@ -8819,10 +9376,84 @@
       }
     },
     "Change Hidden Wallet" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير المحفظة المخفية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna skryté peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versteckte Brieftasche ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar Cartera Oculta"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar Cartera Oculta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer le portefeuille caché"
+          }
+        }
+      }
     },
     "Change lock PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير رقم التعريف الشخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna kódu PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schloss-PIN ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar PIN de cerradura"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar PIN de cerradura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN de verrouillage"
+          }
+        }
+      }
     },
     "Change PIN" : {
       "extractionState" : "stale",
@@ -8866,7 +9497,44 @@
       }
     },
     "Change spending PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Změna výdajového kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar el PIN de gastos"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar el PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN de dépense"
+          }
+        }
+      }
     },
     "Channel closing" : {
       "comment" : "Payment description for channel closing",
@@ -8880,13 +9548,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uzavření kanálu"
+            "value" : "Platba uzavírající kanál"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kanal schließen"
+            "value" : "Kanal-Schließung"
           }
         },
         "es" : {
@@ -8898,7 +9566,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cierre de canal"
+            "value" : "Pago por cierre de canal"
           }
         },
         "fr" : {
@@ -9124,7 +9792,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provoz kanálu (nový nebo spojovací)"
+            "value" : "Kanálová operace (nový nebo splice-in)"
           }
         },
         "de" : {
@@ -9148,7 +9816,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fonctionnement de la chaîne (nouvelle ou épissée)"
+            "value" : "Opération on-chain (nouveau canal ou splice)"
           }
         }
       }
@@ -9589,7 +10257,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vérification de la sauvegarde du portefeuille sur iCloud…"
+            "value" : "Vérification des sauvegardes iCloud…"
           }
         }
       }
@@ -10172,7 +10840,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Typ uzavření"
+            "value" : "Uzavírací typ"
           }
         },
         "de" : {
@@ -10566,7 +11234,44 @@
       }
     },
     "Communicating with card reader." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التواصل مع قارئ البطاقات."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Komunikace se čtečkou karet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommunikation mit dem Kartenleser."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comunicando con el lector de tarjetas."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comunicando con el lector de tarjetas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Communication avec le lecteur de cartes."
+          }
+        }
+      }
     },
     "completed at" : {
       "comment" : "Label in DetailsView_IncomingPayment",
@@ -10811,7 +11516,44 @@
       }
     },
     "Configure Lock PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تكوين رقم التعريف الشخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfigurace kódu PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN konfigurieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar PIN de bloqueo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar PIN de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration du code PIN de verrouillage"
+          }
+        }
+      }
     },
     "Confirm" : {
       "localizations" : {
@@ -11148,7 +11890,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Potvrzeno v řetězci"
+            "value" : "Potrvzeno on-chain"
           }
         },
         "de" : {
@@ -11434,7 +12176,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Připojování…"
+            "value" : "Připojuji…"
           }
         },
         "de" : {
@@ -12393,7 +13135,44 @@
       }
     },
     "Create new contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء جهة اتصال جديدة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vytvořit nový kontakt"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuen Kontakt erstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear nuevo contacto"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear nuevo contacto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer un nouveau contact"
+          }
+        }
+      }
     },
     "Create new wallet" : {
       "localizations" : {
@@ -12573,25 +13352,25 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Währungsumrechner"
+            "value" : "Währungsrechner"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Convertidor de moneda"
+            "value" : "Conversor de divisas"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conversión de divisa"
+            "value" : "Conversor de divisas"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Convertisseur"
+            "value" : "Convertisseur de devises"
           }
         }
       }
@@ -12608,7 +13387,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Převodník měn"
+            "value" : "Převodník Měn"
           }
         },
         "de" : {
@@ -12718,7 +13497,44 @@
       }
     },
     "Current wallet" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحفظة الحالية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuální peněženka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Brieftasche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera actual"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille actuel"
+          }
+        }
+      }
     },
     "Custom electrum server: bad certificate !" : {
       "localizations" : {
@@ -13161,7 +13977,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les données sont mal formées. Un blob hexagonal crypté est attendu."
+            "value" : "Les données sont mal formées. Un blob hexadécimal chiffré est attendu."
           }
         }
       }
@@ -13241,7 +14057,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Format par défaut, avec une meilleure confidentialité, des frais moins élevés et une rotation des adresses. Certains services ou portefeuilles plus anciens peuvent ne pas comprendre ce format d'adresse moderne."
+            "value" : "Format par défaut, moderne, avec une confidentialité améliorée, des frais moins élevés et la rotation d’adresse. Certains services ne comprendront pas ce type d’addresses et renverront une erreur."
           }
         }
       }
@@ -13287,7 +14103,44 @@
       }
     },
     "Default wallet" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحفظة الافتراضية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Výchozí peněženka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard-Geldbörse"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera por defecto"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera por defecto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille par défaut"
+          }
+        }
+      }
     },
     "Delete" : {
       "localizations" : {
@@ -14415,7 +15268,45 @@
       }
     },
     "Disable Lock PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعطيل رقم التعريف الشخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakázat kód PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN-Sperre deaktivieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar PIN de bloqueo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar PIN de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver le code PIN de verrouillage"
+          }
+        }
+      }
     },
     "Disable PIN" : {
       "comment" : "Navigation bar title",
@@ -14460,7 +15351,45 @@
       }
     },
     "Disable Spending PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعطيل رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakázat kód PIN pro výdaje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN deaktivieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar el PIN de gastos"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivar el PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactiver le code PIN de dépense"
+          }
+        }
+      }
     },
     "Disabled" : {
       "localizations" : {
@@ -14553,7 +15482,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vypnutí služby Tor"
+            "value" : "Vypnout Tor"
           }
         },
         "de" : {
@@ -14565,13 +15494,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desactivar Tor"
+            "value" : "Deshabilitar Tor"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desactivar Tor"
+            "value" : "Deshabilitar Tor"
           }
         },
         "fr" : {
@@ -14833,7 +15762,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zobrazit"
+            "value" : "Zobrazení"
           }
         },
         "de" : {
@@ -15344,10 +16273,84 @@
       }
     },
     "Duplicate in %@" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مكرر في %@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikát v %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikat in %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicado en %@"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicado en %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicata dans %@"
+          }
+        }
+      }
     },
     "Duplicate within this contact" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تكرار داخل جهة الاتصال هذه"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikát v rámci tohoto kontaktu"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplizieren innerhalb dieses Kontakts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicado dentro de este contacto"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicado dentro de este contacto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En doublon dans ce contact"
+          }
+        }
+      }
     },
     "Duration" : {
       "localizations" : {
@@ -15390,7 +16393,44 @@
       }
     },
     "Duress PIN option" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خيار رقم التعريف الشخصي للإكراه"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Možnost PIN z donucení"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Option Bedrohungs-PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opción de PIN de coacción"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opción de PIN de coacción"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Option PIN sous contrainte"
+          }
+        }
+      }
     },
     "edit" : {
       "comment" : "button label - try to make it short",
@@ -15555,7 +16595,45 @@
       }
     },
     "Edit Lock PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير رقم التعريف الشخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upravit kód PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN bearbeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar PIN de bloqueo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar PIN de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN de verrouillage"
+          }
+        }
+      }
     },
     "Edit payment request" : {
       "localizations" : {
@@ -15640,7 +16718,45 @@
       }
     },
     "Edit Spending PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحرير رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upravit výdajový PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN bearbeiten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar PIN de gastos"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code PIN de dépense"
+          }
+        }
+      }
     },
     "elapsed" : {
       "comment" : "Label in SummaryInfoGrid",
@@ -16015,7 +17131,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datum ukončení"
+            "value" : "Do data"
           }
         },
         "de" : {
@@ -16045,10 +17161,84 @@
       }
     },
     "Ending communication with card reader." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنهاء الاتصال بقارئ البطاقة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukončení komunikace se čtečkou karet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beendet die Kommunikation mit dem Kartenleser."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finaliza la comunicación con el lector de tarjetas."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finaliza la comunicación con el lector de tarjetas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de la communication avec le lecteur de cartes."
+          }
+        }
+      }
     },
     "Enter a PIN code to be able to spend funds." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رمز PIN لتتمكن من إنفاق الأموال."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadejte kód PIN, abyste mohli utrácet peníze."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie einen PIN-Code ein, um Geld ausgeben zu können."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce un código PIN para poder gastar fondos."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce un código PIN para poder gastar fondos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un code PIN pour pouvoir dépenser des fonds."
+          }
+        }
+      }
     },
     "Enter a valid amount" : {
       "comment" : "error message",
@@ -16133,7 +17323,44 @@
       }
     },
     "Enter custom PIN to open the app." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل رقم التعريف الشخصي المخصص لفتح التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadáním vlastního kódu PIN otevřete aplikaci."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie die benutzerdefinierte PIN ein, um die App zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN personalizado para abrir la aplicación."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduce el PIN personalizado para abrir la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code PIN personnalisé pour ouvrir l'application."
+          }
+        }
+      }
     },
     "Enter keywords from your seed" : {
       "comment" : "TextField placeholder",
@@ -16459,7 +17686,44 @@
       }
     },
     "Error reading tag" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خطأ في قراءة العلامة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chyba při čtení značky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler beim Lesen des Tags"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al leer la etiqueta"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al leer la etiqueta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de lecture de l'étiquette"
+          }
+        }
+      }
     },
     "Error: %@" : {
       "localizations" : {
@@ -16582,7 +17846,44 @@
       }
     },
     "Even when Phoenix is prompting you for the PIN for a different wallet." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حتى عندما يطالبك Phoenix برقم التعريف الشخصي لمحفظة مختلفة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I když vás Phoenix vyzve k zadání kódu PIN pro jinou peněženku."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auch dann, wenn Phoenix Sie zur Eingabe der PIN für eine andere Geldbörse auffordert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluso cuando Phoenix te pide el PIN de otro monedero."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluso cuando Phoenix te pide el PIN de otro monedero."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même lorsque Phoenix vous demande le code PIN d'un autre portefeuille."
+          }
+        }
+      }
     },
     "example payment" : {
       "localizations" : {
@@ -16838,7 +18139,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vypršela platnost"
+            "value" : "Platnost vypršela"
           }
         },
         "de" : {
@@ -16850,13 +18151,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Caducado"
+            "value" : "Vencido"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Caducado"
+            "value" : "Vencido"
           }
         },
         "fr" : {
@@ -16998,7 +18299,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Export"
+            "value" : "Exportovat"
           }
         },
         "de" : {
@@ -17344,7 +18645,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erreur: vous avez des canaux de paiement en cours création"
+            "value" : "Erreur: des canaux de paiement sont en cours de création"
           }
         }
       }
@@ -17521,7 +18822,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zápočet poplatků"
+            "value" : "Poplatkový kredit"
           }
         },
         "de" : {
@@ -17821,7 +19122,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comisiones"
+            "value" : "Tarifas"
           }
         },
         "fr" : {
@@ -17955,7 +19256,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ élément trouvé"
+            "value" : "%@ élément récupéré"
           }
         }
       }
@@ -17996,7 +19297,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ éléments trouvés"
+            "value" : "%@ éléments récupérés"
           }
         }
       }
@@ -18319,7 +19620,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Monnaie fiduciare"
+            "value" : "Monnaie fiduciaire"
           }
         }
       }
@@ -18342,7 +19643,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finale Wallet"
+            "value" : "Final wallet"
           }
         },
         "es" : {
@@ -19373,7 +20674,44 @@
       }
     },
     "Go back to visible wallets list" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العودة إلى قائمة المحافظ المرئية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zpět na seznam viditelných peněženek"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück zur Liste der sichtbaren Geldbörsen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a la lista de carteras visibles"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a la lista de carteras visibles"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour à la liste des portefeuilles visibles"
+          }
+        }
+      }
     },
     "Good news! Your transaction has been mined!" : {
       "localizations" : {
@@ -19577,10 +20915,84 @@
       }
     },
     "Hidden wallet" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحفظة المخفية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skrytá peněženka"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versteckte Brieftasche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera oculta"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera oculta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille caché"
+          }
+        }
+      }
     },
     "Hidden wallet requirements" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متطلبات المحفظة المخفية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skryté požadavky na peněženku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versteckte Anforderungen an die Brieftasche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requisitos del monedero oculto"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requisitos del monedero oculto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exigences relatives au portefeuille caché"
+          }
+        }
+      }
     },
     "High Priority" : {
       "localizations" : {
@@ -19623,11 +21035,85 @@
       }
     },
     "Hold your device near the reader." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أمسك جهازك بالقرب من القارئ."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Držte zařízení v blízkosti čtečky."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halten Sie Ihr Gerät an das Lesegerät."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sujeta tu dispositivo cerca del lector."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sujeta tu dispositivo cerca del lector."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tenez votre appareil à proximité du lecteur."
+          }
+        }
+      }
     },
     "Home" : {
       "comment" : "The title of the main view.",
-      "isCommentAutoGenerated" : true
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الصفحة الرئيسية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startseite"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicio"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accueil"
+          }
+        }
+      }
     },
     "Home screen" : {
       "comment" : "Navigation bar title",
@@ -19711,13 +21197,124 @@
       }
     },
     "Host card emulation not available.\nLimited to European Economic Area." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مضاهاة بطاقة المضيف غير متوفرة.\nيقتصر على المنطقة الاقتصادية الأوروبية."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emulace hostitelské karty není k dispozici.\nOmezeno na Evropský hospodářský prostor."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hostkartenemulation nicht verfügbar.\nBeschränkt auf den Europäischen Wirtschaftsraum."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No está disponible la emulación de tarjeta host.\nLimitado al Espacio Económico Europeo."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No está disponible la emulación de tarjeta host.\nLimitado al Espacio Económico Europeo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'émulation de la carte hôte n'est pas disponible.\nLimité à l'Espace économique européen."
+          }
+        }
+      }
     },
     "Host card emulation not available.\nRequires iOS 17.4 or later." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مضاهاة بطاقة المضيف غير متوفرة.\nيتطلب نظام iOS 17.4 أو أحدث."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emulace hostitelské karty není k dispozici.\nVyžaduje iOS 17.4 nebo novější."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hostkartenemulation nicht verfügbar.\nErfordert iOS 17.4 oder höher."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No está disponible la emulación de tarjeta host.\nRequiere iOS 17.4 o posterior."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No está disponible la emulación de tarjeta host.\nRequiere iOS 17.4 o posterior."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'émulation de carte hôte n'est pas disponible.\nNécessite iOS 17.4 ou une version ultérieure."
+          }
+        }
+      }
     },
     "Host card emulation session error\n%@" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خطأ في جلسة مضاهاة بطاقة المضيف\n%@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chyba relace emulace hostitelské karty\n%@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler in der Hostkartenemulationssitzung\n%@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de sesión de emulación de tarjeta host\n%@"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de sesión de emulación de tarjeta host\n%@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de session d'émulation de carte hôte\n%@"
+          }
+        }
+      }
     },
     "Host returned error response." : {
       "localizations" : {
@@ -20608,7 +22205,44 @@
       }
     },
     "If a default wallet is selected, it will automatically be opened on app launch." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا تم تحديد محفظة افتراضية، فسيتم فتحها تلقائيًا عند تشغيل التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud je vybrána výchozí peněženka, otevře se automaticky při spuštění aplikace."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn eine Standard-Brieftasche ausgewählt ist, wird sie beim Start der App automatisch geöffnet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si se selecciona un monedero predeterminado, se abrirá automáticamente al iniciar la aplicación."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si se selecciona un monedero predeterminado, se abrirá automáticamente al iniciar la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si un portefeuille par défaut est sélectionné, il sera automatiquement ouvert au lancement de l'application."
+          }
+        }
+      }
     },
     "If done correctly, self-backup is the most secure option." : {
       "extractionState" : "manual",
@@ -20693,7 +22327,44 @@
       }
     },
     "If Face ID fails, you can enter your iOS passcode to open the app." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في حالة فشل Face ID، يمكنك إدخال رمز مرور iOS لفتح التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud Face ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Face ID fehlschlägt, können Sie Ihren iOS-Passcode eingeben, um die App zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Face ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Face ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Face ID échoue, vous pouvez entrer votre code d'accès iOS pour ouvrir l'application."
+          }
+        }
+      }
     },
     "If the bucket needs to be resized to allow for more water, that will require an on-chain operation with a mining fee." : {
       "localizations" : {
@@ -20818,7 +22489,44 @@
       }
     },
     "If Touch ID fails, you can enter your iOS passcode to open the app." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا فشل معرّف اللمس، يمكنك إدخال رمز مرور iOS لفتح التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud Touch ID selže, můžete aplikaci otevřít zadáním přístupového kódu iOS."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Touch ID nicht funktioniert, können Sie Ihren iOS-Passcode eingeben, um die App zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Touch ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Touch ID falla, puedes introducir tu código de acceso de iOS para abrir la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Touch ID échoue, vous pouvez saisir votre code d'accès iOS pour ouvrir l'application."
+          }
+        }
+      }
     },
     "If you disable Tor, your IP address may be revealed to various service providers." : {
       "localizations" : {
@@ -20902,7 +22610,44 @@
       }
     },
     "If you don't have a Tor VPN app, install one. We recommend Orbot." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا لم يكن لديك تطبيق Tor VPN، فقم بتثبيت واحد. نوصي باستخدام Orbot."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokud aplikaci Tor VPN nemáte, nainstalujte si ji. Doporučujeme Orbot."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie keine Tor-VPN-App haben, installieren Sie eine. Wir empfehlen Orbot."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si no tienes una aplicación VPN Tor, instala una. Te recomendamos Orbot."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si no tienes una aplicación VPN Tor, instala una. Te recomendamos Orbot."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous n'avez pas d'application VPN Tor, installez-en une. Nous vous recommandons Orbot."
+          }
+        }
+      }
     },
     "If you enable [Advanced Data Protection](https://support.apple.com/en-us/108756) for iCloud, your recovery phrase will be encrypted end-to-end, and Apple cannot access it." : {
       "localizations" : {
@@ -20921,7 +22666,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn du [Advanced Data Protection] (https://support.apple.com/en-us/108756) für iCloud aktivierst, wird deine Wiederherstellungsphrase Ende-zu-Ende verschlüsselt und Apple hat keinen Zugriff darauf."
+            "value" : "Wenn du [Advanced Data Protection](https://support.apple.com/en-us/108756) für iCloud aktivierst, wird deine Wiederherstellungsphrase Ende-zu-Ende verschlüsselt und Apple hat keinen Zugriff darauf."
           }
         },
         "es" : {
@@ -21553,7 +23298,44 @@
       }
     },
     "Inbound liquidity" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السيولة الواردة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Příchozí likvidita"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inbound-Liquidität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez entrante"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez entrante"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidité entrante"
+          }
+        }
+      }
     },
     "Inbound Liquidity" : {
       "localizations" : {
@@ -21766,7 +23548,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Včetně popisu"
+            "value" : "Zahrnout popis"
           }
         },
         "de" : {
@@ -22087,7 +23869,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Příchozí platba v řetězci (starší swap-in)"
+            "value" : "Příchozí on-chain platba (legacy swap-in)"
           }
         },
         "de" : {
@@ -22127,7 +23909,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Příchozí platba v řetězci (nový kanál)"
+            "value" : "Příchozí on-chain platba (nový kanál)"
           }
         },
         "de" : {
@@ -22287,7 +24069,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Příchozí platby někdy vyžadují On-Chain transakce. K tomu nedochází vždy, pouze v případě potřeby."
+            "value" : "Příchozí platby někdy vyžadují on-chain transakce. K tomu nedochází vždy, pouze v případě potřeby."
           }
         },
         "de" : {
@@ -22407,13 +24189,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nesprávné"
+            "value" : "Nesprávný PIN"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Falsch"
+            "value" : "Ungültig"
           }
         },
         "es" : {
@@ -22425,13 +24207,13 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Incorrecto"
+            "value" : "Inválido"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Incorrect"
+            "value" : "Non valide"
           }
         }
       }
@@ -22801,7 +24583,44 @@
       }
     },
     "Invalid format" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تنسيق غير صالح"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nesprávný formát"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungültiges Format"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato no válido"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato no válido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format non valide"
+          }
+        }
+      }
     },
     "Invalid Lightning Request" : {
       "comment" : "toast warning",
@@ -23184,7 +25003,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschreibung der Rechnung"
+            "value" : "Rechnungs-Beschreibung"
           }
         },
         "es" : {
@@ -23492,7 +25311,45 @@
       }
     },
     "label (optional)" : {
-
+      "comment" : "TextField placeholder; translate: optional",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التسمية (اختياري)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "štítek (nepovinné)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "etikett (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "etiqueta (opcional)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "etiqueta (opcional)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nom (facultatif)"
+          }
+        }
+      }
     },
     "Last attempt failed" : {
       "localizations" : {
@@ -23691,7 +25548,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En savoir plus sur [notre article de blog](https://acinq.co/blog/phoenix-splicing-update)."
+            "value" : "En apprendre plus sur [notre article de blog](https://acinq.co/blog/phoenix-splicing-update)."
           }
         }
       }
@@ -23747,7 +25604,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deskriptor dědictví"
+            "value" : "Legacy deskriptor"
           }
         },
         "de" : {
@@ -23868,7 +25725,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Blesk"
+            "value" : "Lightning"
           }
         },
         "de" : {
@@ -23898,16 +25755,167 @@
       }
     },
     "Lightning address" : {
-      "comment" : "Type of text being copied"
+      "comment" : "Type of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عنوان البرق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightningová adresa"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse des Blitzes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del rayo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección del rayo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse Lightning"
+          }
+        }
+      }
     },
     "Lightning addresses:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عناوين البرق:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleskové adresy:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzadressen:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direcciones de rayos:"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direcciones de rayos:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresses Lightning :"
+          }
+        }
+      }
     },
     "Lightning Bolt11" : {
-      "comment" : "Secondary title\nType of text being copied"
+      "comment" : "Secondary title\nType of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صاعقة البرق11"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning Bolt11"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzschlag11"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rayo11"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rayo11"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning Bolt11"
+          }
+        }
+      }
     },
     "Lightning Bolt12" : {
-      "comment" : "Secondary title\nType of text being copied"
+      "comment" : "Secondary title\nType of text being copied",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صاعقة البرق12"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning Bolt12"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitzschlag12"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rayo12"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rayo12"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lightning Bolt12"
+          }
+        }
+      }
     },
     "Lightning fee" : {
       "localizations" : {
@@ -24026,7 +26034,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frais de foudre pour l'acheminement du paiement. Le paiement nécessite %lld hops."
+            "value" : "Frais de routage sur Lightning. Le paiement nécessite %lld sauts."
           }
         }
       }
@@ -24067,7 +26075,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frais de routage Lightning. Le paiement a nécessité 1 saut."
+            "value" : "Frais de routage sur Lightning. Le paiement a nécessité 1 saut."
           }
         }
       }
@@ -24114,7 +26122,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Frais de foudre pour l'acheminement du paiement. Le paiement a été divisé en %1$lld parties, utilisant %2$lld sauts."
+            "value" : "Frais de routage sur Lightning. Le paiement a été divisé en %1$lld parties, et fait %2$lld sauts."
           }
         }
       }
@@ -24320,7 +26328,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paiement lightning"
+            "value" : "Paiement Lightning"
           }
         }
       }
@@ -24529,10 +26537,84 @@
       }
     },
     "Liquidity" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السيولة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likvidita"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidez"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidité"
+          }
+        }
+      }
     },
     "Liquidity not currently available, try again later" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السيولة غير متوفرة حالياً، حاول مرة أخرى لاحقاً"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likvidita není momentálně k dispozici, zkuste to později"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liquidität derzeit nicht verfügbar, versuchen Sie es später noch einmal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La liquidez no está disponible actualmente, inténtalo más tarde"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La liquidez no está disponible actualmente, inténtalo más tarde"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service de liquidité n'est pas disponible actuellement, réessayez plus tard"
+          }
+        }
+      }
     },
     "Liquidity requested" : {
       "localizations" : {
@@ -24545,7 +26627,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Požadovaná likvidita"
+            "value" : "Likvidita vyžádána"
           }
         },
         "de" : {
@@ -24615,7 +26697,44 @@
       }
     },
     "lno1... (paste offer here)" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (الصق العرض هنا)"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (vložit nabídku sem)"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (Angebot hier einfügen)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (pega aquí la oferta)"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (pega aquí la oferta)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lno1... (coller l'offre ici)"
+          }
+        }
+      }
     },
     "lnurl-auth" : {
       "localizations" : {
@@ -24708,7 +26827,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Načítání.."
+            "value" : "Načítání…"
           }
         },
         "de" : {
@@ -24778,10 +26897,84 @@
       }
     },
     "Lock PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قفل رقم التعريف الشخصي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamykací PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN de bloqueo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock PIN"
+          }
+        }
+      }
     },
     "Lock PIN Required" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مطلوب رقم تعريف شخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Požadovaný kód PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN erforderlich"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se requiere PIN de bloqueo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se requiere PIN de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code PIN de verrouillage requis"
+          }
+        }
+      }
     },
     "Logged In" : {
       "comment" : "lnurl-auth: success text",
@@ -24877,7 +27070,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Logs"
+            "value" : "Logy"
           }
         },
         "de" : {
@@ -25068,7 +27261,44 @@
       }
     },
     "Make sure your Tor Proxy VPN app is up and running, and that it's connected to Tor." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكد من أن تطبيق Tor Proxy VPN الخاص بك يعمل، وأنه متصل بـ Tor."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ujistěte se, že máte spuštěnou aplikaci Tor Proxy VPN a že je připojena k síti Tor."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergewissere dich, dass deine Tor Proxy VPN App läuft und mit Tor verbunden ist."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegúrate de que tu aplicación VPN Tor Proxy está en funcionamiento y conectada a Tor."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegúrate de que tu aplicación VPN Tor Proxy está en funcionamiento y conectada a Tor."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assurez-vous que votre application de proxy VPN Tor est opérationnelle, et qu'elle est connectée à Tor."
+          }
+        }
+      }
     },
     "Make sure your Tor VPN is active and running." : {
       "localizations" : {
@@ -25081,7 +27311,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ujistěte se, že je Tor VPN aktivní a spuštěná."
+            "value" : "Ujistěte se, že vaše Tor VPN je aktivní a běží."
           }
         },
         "de" : {
@@ -25231,7 +27461,44 @@
       }
     },
     "Manage or switch wallets" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إدارة المحافظ أو تبديلها"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Správa nebo přepínání peněženek"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwalten oder Wechseln von Geldbörsen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar o cambiar de monedero"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar o cambiar de monedero"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gérer ou changer de portefeuille"
+          }
+        }
+      }
     },
     "Manual Backup" : {
       "comment" : "Navigation bar title",
@@ -26458,7 +28725,44 @@
       }
     },
     "Minus miner fees estimated to:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ناقص رسوم عمال المناقصات المقدرة بـ"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po odečtení poplatků za těžbu se odhaduje, že:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abzüglich der geschätzten Bergwerksgebühren:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menos los honorarios de los mineros, estimados en:"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menos los honorarios de los mineros, estimados en:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moins les frais de minage, estimés à :"
+          }
+        }
+      }
     },
     "Missing off-chain amount too low." : {
       "localizations" : {
@@ -26695,7 +28999,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "nom, adresse éclair, offre..."
+            "value" : "nom, adresse lightning, offre..."
           }
         }
       }
@@ -26735,7 +29039,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nommer ce portefeuille vous permettra de gérer de multiples portefeuilles facilement."
+            "value" : "Nommer ce portefeuille vous facilitera la gestion."
           }
         }
       }
@@ -27024,16 +29328,165 @@
       }
     },
     "nfc" : {
-      "comment" : "button label - try to make it short"
+      "comment" : "button label - try to make it short",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إن إف سي"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nfc"
+          }
+        }
+      }
     },
     "NFC cababilities not available on this device" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إمكانات NFC غير متوفرة على هذا الجهاز"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkce NFC nejsou v tomto zařízení k dispozici"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC-Funktionen sind auf diesem Gerät nicht verfügbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las funciones NFC no están disponibles en este dispositivo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las funciones NFC no están disponibles en este dispositivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonctionnalités NFC ne sont pas disponibles sur cet appareil"
+          }
+        }
+      }
     },
     "NFC capabilities not available on this device" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إمكانات NFC غير متوفرة على هذا الجهاز"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funkce NFC nejsou v tomto zařízení k dispozici"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC-Funktionen sind auf diesem Gerät nicht verfügbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las funciones NFC no están disponibles en este dispositivo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las funciones NFC no están disponibles en este dispositivo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les fonctions NFC ne sont pas disponibles sur cet appareil"
+          }
+        }
+      }
     },
     "NFC reader is already scanning" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يقوم قارئ NFC بالمسح الضوئي بالفعل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Čtečka NFC již skenuje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der NFC-Leser scannt bereits"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El lector NFC ya está escaneando"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El lector NFC ya está escaneando"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le lecteur NFC est déjà en train de scanner"
+          }
+        }
+      }
     },
     "No" : {
       "extractionState" : "manual",
@@ -27077,7 +29530,44 @@
       }
     },
     "No access to the Tor network" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يوجد وصول إلى شبكة Tor"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez přístupu k síti Tor"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Zugriff auf das Tor-Netzwerk"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin acceso a la red Tor"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin acceso a la red Tor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas d\\'accès au réseau Tor"
+          }
+        }
+      }
     },
     "No address yet..." : {
       "localizations" : {
@@ -27602,7 +30092,44 @@
       }
     },
     "No URI or text detected in NFC tag" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يتم اكتشاف أي URI أو نص في علامة NFC"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V tagu NFC nebyl zjištěn žádný URI ani text"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein URI oder Text im NFC-Tag erkannt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se detecta URI o texto en la etiqueta NFC"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se detecta URI o texto en la etiqueta NFC"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas d'URI ou de texte détecté dans le tag NFC"
+          }
+        }
+      }
     },
     "No, I don't want to use an onion address" : {
       "localizations" : {
@@ -27685,7 +30212,44 @@
       }
     },
     "none" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا شيء"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "žádné"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keine"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ninguno"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ninguno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucun"
+          }
+        }
+      }
     },
     "None" : {
       "comment" : "TextField placeholder",
@@ -27891,7 +30455,44 @@
       }
     },
     "Nothing scanned" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يتم مسح أي شيء"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nic se neskenuje"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts gescannt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada escaneado"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nada escaneado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien n'a été scanné"
+          }
+        }
+      }
     },
     "Notifications" : {
       "localizations" : {
@@ -28136,7 +30737,44 @@
     },
     "On-chain balance" : {
       "comment" : "A label displayed next to the on-chain balance amount in the user's home view.",
-      "isCommentAutoGenerated" : true
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التوازن على السلسلة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zůstatek v řetězci"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On-Chain-Guthaben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On-chain saldo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On-chain saldo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solde on-chain"
+          }
+        }
+      }
     },
     "On-chain deposit" : {
       "comment" : "Payment description for received deposit",
@@ -28150,7 +30788,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Záloha v řetězci"
+            "value" : "On-chain vklad"
           }
         },
         "de" : {
@@ -28190,7 +30828,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Očekávaný poplatek v řetězci"
+            "value" : "Očekává se poplatek"
           }
         },
         "de" : {
@@ -28230,7 +30868,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Čekající prostředky v řetězci (+%@)"
+            "value" : "On-chain finanční prostředky čekají na vyřízení (+%@)"
           }
         },
         "de" : {
@@ -28629,13 +31267,124 @@
       }
     },
     "Open Orbot website" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح موقع أوربوت الإلكتروني"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otevřít webové stránky Orbot"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orbot-Website öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir el sitio web de Orbot"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir el sitio web de Orbot"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le site web d'Orbot"
+          }
+        }
+      }
     },
     "Open Tor settings" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح إعدادات Tor"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otevřít nastavení Toru"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor-Einstellungen öffnen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la configuración de Tor"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la configuración de Tor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres Tor"
+          }
+        }
+      }
     },
     "Opening the app" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح التطبيق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otevření aplikace"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen der App"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la app"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir l'application"
+          }
+        }
+      }
     },
     "opens browser" : {
       "localizations" : {
@@ -28889,13 +31638,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odchozí platba v řetězci"
+            "value" : "Odchozí on-chain platba (splice)"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ausgehende On-Chain-Zahlung"
+            "value" : "Ausgehender Splice"
           }
         },
         "es" : {
@@ -28907,7 +31656,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pago en cadena saliente"
+            "value" : "Pago por empalme saliente"
           }
         },
         "fr" : {
@@ -28929,7 +31678,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odchozí platba v řetězci (starší swap)"
+            "value" : "Outgoing on-chain payment (legacy swap)"
           }
         },
         "de" : {
@@ -29040,7 +31789,44 @@
       }
     },
     "Pass iOS biometrics to open the app." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اجتياز القياسات الحيوية لنظام iOS لفتح التطبيق."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro otevření aplikace projděte biometrickými údaji systému iOS."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passieren Sie die iOS-Biometrie, um die App zu öffnen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasa los datos biométricos de iOS para abrir la aplicación."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasa los datos biométricos de iOS para abrir la aplicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passez la biométrie iOS pour ouvrir l'application."
+          }
+        }
+      }
     },
     "paste" : {
       "comment" : "button label - try to make it short",
@@ -29119,7 +31905,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Colle le bloc de données cryptées ici"
+            "value" : "Collez le bloc de données chiffrées ici"
           }
         }
       }
@@ -29256,7 +32042,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platba v řetězci"
+            "value" : "Zaplatit on-chain"
           }
         },
         "de" : {
@@ -30144,7 +32930,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zamítnutí platby (+%@)"
+            "value" : "Platba zamítnuta (+%@)"
           }
         },
         "de" : {
@@ -30979,7 +33765,44 @@
       }
     },
     "Phoenix needs access to Tor to function properly." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يحتاج Phoenix إلى الوصول إلى Tor ليعمل بشكل صحيح."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix potřebuje pro správné fungování přístup k síti Tor."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix benötigt Zugriff auf Tor, um ordnungsgemäß zu funktionieren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix necesita acceso a Tor para funcionar correctamente."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix necesita acceso a Tor para funcionar correctamente."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix a besoin d\\'accéder à Tor pour fonctionner correctement."
+          }
+        }
+      }
     },
     "Phoenix uses payment channels to make Bitcoin fast and private." : {
       "localizations" : {
@@ -31194,13 +34017,13 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neshoda PIN!"
+            "value" : "PIN se neshoduje!"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die PIN stimmt nicht überein!"
+            "value" : "PIN stimmt nicht überein!"
           }
         },
         "es" : {
@@ -31212,13 +34035,13 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡PIN incorrecto!"
+            "value" : "¡El PIN no coincide!"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PIN non correspondant !"
+            "value" : "Le PIN ne correspond pas !"
           }
         }
       }
@@ -31500,7 +34323,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veuillez effectuer une sauvegarde avant d'activer l'une ou l'autre des options proposées ici. Si vous vous enfermez hors de Phoenix sans avoir sauvegardé votre phrase de récupération, vous **perdrez vos fonds** !"
+            "value" : "Veuillez effectuer une sauvegarde avant d'activer l'une ou l'autre des options proposées ici. Si vous vous enfermez dehors sans avoir sauvegardé votre phrase de récupération, vous **perdrez vos fonds** !"
           }
         }
       }
@@ -32428,7 +35251,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prêt à basculer sur Lightning"
+            "value" : "Prêt à swap sur Lightning"
           }
         }
       }
@@ -33479,7 +36302,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Résolution de l'adresse éclair"
+            "value" : "Résolution de l'adresse Lightning"
           }
         }
       }
@@ -33686,7 +36509,44 @@
       }
     },
     "Reusable" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قابلة لإعادة الاستخدام"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opakotavelná"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederverwendbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reutilizable"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reutilizable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réutilisable"
+          }
+        }
+      }
     },
     "Review" : {
       "localizations" : {
@@ -33699,7 +36559,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zobrazit"
+            "value" : "Pokračovat"
           }
         },
         "de" : {
@@ -34132,7 +36992,44 @@
       }
     },
     "Scan QR code" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مسح رمز الاستجابة السريعة ضوئياً"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naskenovat QR kód"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code scannen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escanear código QR"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escanear código QR"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanner le code QR"
+          }
+        }
+      }
     },
     "Scan QR Code" : {
       "localizations" : {
@@ -34336,7 +37233,44 @@
       }
     },
     "Select emoji" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديد الرموز التعبيرية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vybrat emoji"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji auswählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar emoji"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar emoji"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez un emoji"
+          }
+        }
+      }
     },
     "Select image" : {
       "localizations" : {
@@ -34419,10 +37353,84 @@
       }
     },
     "Select photo" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر الصورة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vybrat fotografii"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto auswählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar foto"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar foto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez une photo"
+          }
+        }
+      }
     },
     "Select wallet emoji" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر رمز تعبيري للمحفظة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyberte emoji peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brieftaschen-Emoji auswählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona el emoji de la cartera"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona el emoji de la cartera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez l'emoji portefeuille"
+          }
+        }
+      }
     },
     "Send" : {
       "localizations" : {
@@ -34435,7 +37443,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Odeslat"
+            "value" : "Poslat"
           }
         },
         "de" : {
@@ -35438,7 +38446,45 @@
       }
     },
     "Set Lock PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين رقم التعريف الشخصي للقفل"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení kódu PIN zámku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperr-PIN einstellen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer PIN de bloqueo"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer PIN de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir le code PIN de verrouillage"
+          }
+        }
+      }
     },
     "Set PIN" : {
       "comment" : "Navigation bar title",
@@ -35483,7 +38529,45 @@
       }
     },
     "Set Spending PIN" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعيين رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavení výdajového kódu PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgaben-PIN festlegen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer PIN de gastos"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer PIN de gastos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir le code PIN de dépense"
+          }
+        }
+      }
     },
     "Settings" : {
       "comment" : "Navigation bar title",
@@ -37076,7 +40160,44 @@
       }
     },
     "Single use" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استخدام واحد"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jednorázová"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal verwendbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un solo uso"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un solo uso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usage unique"
+          }
+        }
+      }
     },
     "Skip" : {
       "localizations" : {
@@ -37241,7 +40362,44 @@
     },
     "Spend" : {
       "comment" : "A button label that says \"Spend\".",
-      "isCommentAutoGenerated" : true
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنفق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utratit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gasta"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gastar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépenser"
+          }
+        }
+      }
     },
     "Spend expired swap-ins" : {
       "localizations" : {
@@ -37364,10 +40522,84 @@
       }
     },
     "Spending Control" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التحكم في الإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrola výdajů"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgabenkontrolle"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control del gasto"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control del gasto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrôle des dépenses"
+          }
+        }
+      }
     },
     "Spending PIN" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم التعريف الشخصي للإنفاق"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odesílací PIN"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spending PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN de gasto"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spending PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spending PIN"
+          }
+        }
+      }
     },
     "Splice already in progress" : {
       "localizations" : {
@@ -37444,7 +40676,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'épissage a été interrompu"
+            "value" : "Le splice a été interrompu"
           }
         }
       }
@@ -37621,7 +40853,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datum zahájení"
+            "value" : "Od data"
           }
         },
         "de" : {
@@ -38145,7 +41377,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Výměna adres"
+            "value" : "Swap-in adresa"
           }
         },
         "de" : {
@@ -38257,7 +41489,44 @@
       }
     },
     "Switch to another wallet" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التحويل إلى محفظة أخرى"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přechod na jinou peněženku"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu einer anderen Geldbörse wechseln"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar a otro monedero"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar a otro monedero"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à un autre portefeuille"
+          }
+        }
+      }
     },
     "System" : {
       "comment" : "App theme option",
@@ -40454,25 +43723,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tyto prostředky pocházejí z uzavřených kanálů Blesku. Je třeba je utratit ručně."
+            "value" : "Tyto prostředky pocházejí z uzavřených kanálů Lightning. Musí být utraceny ručně."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Mittel stammen aus geschlossenen Blitzkanälen. Sie müssen manuell ausgegeben werden."
+            "value" : "Diese Gelder stammen aus geschlossenen Lightning-Kanäle. Sie müssen manuell ausgegeben werden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estos fondos proceden de canales cerrados de Rayo. Deben gastarse manualmente."
+            "value" : "Estos fondos provienen de canales Lightning cerrados. Deben gastarse manualmente."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estos fondos proceden de canales cerrados de Rayo. Deben gastarse manualmente."
+            "value" : "Estos fondos provienen de canales Lightning cerrados. Deben gastarse manualmente."
           }
         },
         "fr" : {
@@ -40696,7 +43965,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tato adresa používá neplatnou nabídku Bolt12."
+            "value" : "Tato adresa používá neplatnou Bolt12 žádost."
           }
         },
         "de" : {
@@ -40767,7 +44036,44 @@
       }
     },
     "This appears to be a website:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يبدو أن هذا موقع ويب:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdá se, že se jedná o webovou stránku:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies scheint eine Website zu sein:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto parece ser un sitio web:"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esto parece ser un sitio web:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il s'agit apparemment d'un site web :"
+          }
+        }
+      }
     },
     "This doesn't appear to be a Lightning invoice" : {
       "comment" : "Error message - scanning lightning invoice",
@@ -41145,7 +44451,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toto je lidsky čitelná adresa pro vaši žádost o platbu Bolt12."
+            "value" : "Toto je lidsky čitelná adresa pro vaši Bolt12 fakturu."
           }
         },
         "de" : {
@@ -41509,25 +44815,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To vyžaduje instalaci aplikace Tor Proxy VPN třetí strany, například Orbot."
+            "value" : "Toto nastavení vyžaduje instalaci aplikace třetí strany Tor Proxy VPN (jakou je třeba Orbot)."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dazu muss eine Tor-Proxy-VPN-App eines Drittanbieters wie Orbot installiert werden."
+            "value" : "Dazu ist die Installation einer Tor-Proxy-VPN-App eines Drittanbieters wie Orbot erforderlich."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para ello es necesario instalar una aplicación VPN Tor Proxy de terceros, como Orbot."
+            "value" : "Esto requiere instalar una aplicación Tor Proxy VPN de terceros, como Orbot."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para ello es necesario instalar una aplicación VPN Tor Proxy de terceros, como Orbot."
+            "value" : "Esto requiere instalar una aplicación Tor Proxy VPN de terceros, como Orbot."
           }
         },
         "fr" : {
@@ -41700,7 +45006,44 @@
       }
     },
     "This wallet is **hidden**, and a hidden wallet requires a Lock PIN to be set." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذه المحفظة **مخفية**، والمحفظة المخفية تتطلب تعيين رقم تعريف شخصي للقفل."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tato peněženka je **skrytá** a skrytá peněženka vyžaduje nastavení kódu PIN zámku."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Brieftasche ist **versteckt**, und für eine versteckte Brieftasche muss eine Sperr-PIN festgelegt werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este monedero está **oculto**, y un monedero oculto requiere que se establezca un PIN de bloqueo."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este monedero está **oculto**, y un monedero oculto requiere que se establezca un PIN de bloqueo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce portefeuille est **caché**, et un portefeuille caché nécessite la définition d'un code PIN de verrouillage."
+          }
+        }
+      }
     },
     "This will reset the app, as if you had just installed it." : {
       "localizations" : {
@@ -42439,7 +45782,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor je povolen"
+            "value" : "Je povolen Tor"
           }
         },
         "de" : {
@@ -42479,7 +45822,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor je povolen. Tento server by měl používat adresu onion."
+            "value" : "Tor je povolen. Tento server by měl používat onion adresu."
           }
         },
         "de" : {
@@ -43281,7 +46624,45 @@
       }
     },
     "Unable to retrieve data for this address. You may be experiencing a connectivity issue." : {
-      "comment" : "Error message - could not retrieve dns records for that address"
+      "comment" : "Error message - could not retrieve dns records for that address",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يتعذر استرداد بيانات هذا العنوان. قد تكون تواجه مشكلة في الاتصال."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nelze načíst data pro tuto adresu. Možná máte problém s připojením."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten für diese Adresse konnten nicht abgerufen werden. Möglicherweise liegt ein Verbindungsproblem vor."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pueden recuperar los datos de esta dirección. Es posible que esté experimentando un problema de conectividad."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pueden recuperar los datos de esta dirección. Es posible que esté experimentando un problema de conectividad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de récupérer les données relatives à cette adresse. Vous rencontrez peut-être un problème de connectivité."
+          }
+        }
+      }
     },
     "Unconfirmed Balance" : {
       "localizations" : {
@@ -44345,25 +47726,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na této obrazovce můžete utrácet prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. To nemá vliv na vaše stávající kanály Lightning."
+            "value" : "Na této obrazovce můžete utratit prostředky z konečné peněženky. Tyto prostředky pocházejí z kanálů, které byly v minulosti uzavřeny. Toto neovlivní vaše stávající Lightning kanály."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auf diesem Bildschirm können Sie Guthaben aus Ihrer endgültigen Brieftasche ausgeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
+            "value" : "Verwenden Sie diesen Screen, um Guthaben aus Ihrer finalen Wallet auszugeben. Diese Gelder stammen aus Kanälen, die in der Vergangenheit geschlossen wurden. Dies hat keine Auswirkungen auf Ihre bestehenden Lightning-Kanäle."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utiliza esta pantalla para gastar fondos de tu monedero final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a tus canales Lightning existentes."
+            "value" : "Utilice esta pantalla para gastar fondos de su billetera final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a sus canales Lightning existentes."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utiliza esta pantalla para gastar fondos de tu monedero final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a tus canales Lightning existentes."
+            "value" : "Utilice esta pantalla para gastar fondos de su billetera final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a sus canales Lightning existentes."
           }
         },
         "fr" : {
@@ -44736,7 +48117,44 @@
       }
     },
     "Visible wallets" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحافظ المرئية"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viditelné peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichtbare Geldbörsen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carteras visibles"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carteras visibles"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuilles visibles"
+          }
+        }
+      }
     },
     "Waiting For 3 Confirmations" : {
       "localizations" : {
@@ -44789,25 +48207,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nejprve čekáme na potvrzení, než budou vyměněny za Lightning."
+            "value" : "Nejprve se čeká na potvrzení, než je bude možné přehodit na Lightning."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wir warten auf eine Bestätigung, bevor wir sie in Lightning umwandeln können."
+            "value" : "Warten Sie zuerst auf die Bestätigung, bevor sie auf Lightning übertragen werden können."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esperando confirmación primero para poder cambiarlos a Rayo."
+            "value" : "Esperando confirmación primero antes de poder intercambiarlos a Lightning."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esperando confirmación primero para poder cambiarlos a Rayo."
+            "value" : "Esperando confirmación primero antes de poder intercambiarlos a Lightning."
           }
         },
         "fr" : {
@@ -45341,10 +48759,85 @@
       }
     },
     "Wallet %@" : {
-      "comment" : "Default wallet name"
+      "comment" : "Default wallet name",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحفظة %@"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peněženka %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brieftasche %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera %@"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartera %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portefeuille %@"
+          }
+        }
+      }
     },
     "Wallet balance" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رصيد المحفظة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zůstatek peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guthaben im Portemonnaie"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saldo de la cartera"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saldo de la cartera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solde du portefeuille"
+          }
+        }
+      }
     },
     "Wallet Balance" : {
       "localizations" : {
@@ -45467,7 +48960,44 @@
       }
     },
     "Wallet Image" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صورة المحفظة"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obrázek peněženky"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild der Brieftasche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen de la cartera"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen de la cartera"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image du portefeuille"
+          }
+        }
+      }
     },
     "Wallet info" : {
       "comment" : "Navigation Bar Title",
@@ -45552,7 +49082,44 @@
       }
     },
     "Wallet will not be visible in selector screens. To access the wallet you must enter it's lock PIN." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لن تكون المحفظة مرئية في شاشات التحديد. للوصول إلى المحفظة يجب إدخال رقم التعريف الشخصي للقفل الخاص بها."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peněženka nebude na obrazovkách výběru viditelná. Pro přístup do peněženky musíte zadat její uzamčený kód PIN."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Brieftasche wird in den Auswahlbildschirmen nicht angezeigt. Um auf die Brieftasche zuzugreifen, müssen Sie die Sperr-PIN der Brieftasche eingeben."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El monedero no será visible en las pantallas de selección. Para acceder al monedero debes introducir su PIN de bloqueo."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El monedero no será visible en las pantallas de selección. Para acceder al monedero debes introducir su PIN de bloqueo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le portefeuille ne sera pas visible dans les écrans de sélection. Pour accéder au portefeuille, vous devez saisir son code PIN de verrouillage."
+          }
+        }
+      }
     },
     "wallet: %@" : {
       "localizations" : {
@@ -45605,7 +49172,7 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chcete hezčí adresu? Použijte služby třetích stran, nebo si adresu hostujte sami!"
+            "value" : "Chcete hezčí adresu? Můžete použít služby třetích stran, nebo si adresu začít hostovat!"
           }
         },
         "de" : {
@@ -46412,25 +49979,25 @@
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zůstane v řetězci, protože automatická správa kanálů je zakázána."
+            "value" : "Vklady zůstanou on-chain, protože automatická správa kanálů je vypnutá."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bleibt in der Kette, da die automatische Kanalverwaltung deaktiviert ist."
+            "value" : "Einlagen bleiben auf der Chain, da die automatische Kanalverwaltung deaktiviert ist."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permanecerá en la cadena porque la gestión automatizada de canales está desactivada."
+            "value" : "Los depósitos permanecerán en la cadena porque la gestión automatizada de canales está desactivada."
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permanecerá en la cadena porque la gestión automatizada de canales está desactivada."
+            "value" : "Los depósitos permanecerán en la cadena porque la gestión automatizada de canales está desactivada."
           }
         },
         "fr" : {
@@ -46971,7 +50538,44 @@
       }
     },
     "You can enter the PIN for this wallet anytime in the lock screen, and Phoenix will **switch** to this wallet." : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكنك إدخال رقم التعريف الشخصي لهذه المحفظة في أي وقت في شاشة القفل، وسيقوم Phoenix ** بالتبديل** إلى هذه المحفظة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN k této peněžence můžete kdykoli zadat na zamykací obrazovce a Phoenix se **přepne** na tuto peněženku."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können die PIN für diese Brieftasche jederzeit auf dem Sperrbildschirm eingeben, und Phoenix wird zu dieser Brieftasche **wechseln**."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes introducir el PIN de este monedero en cualquier momento en la pantalla de bloqueo, y Phoenix **cambiará** a este monedero."
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes introducir el PIN de este monedero en cualquier momento en la pantalla de bloqueo, y Phoenix **cambiará** a este monedero."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez saisir le code PIN de ce portefeuille à tout moment sur l'écran de verrouillage, et Phoenix passera sur ce portefeuille."
+          }
+        }
+      }
     },
     "You can make all your unconfirmed transactions use a higher effective feerate to encourage miners to favour your payments." : {
       "localizations" : {
@@ -48149,7 +51753,44 @@
       }
     },
     "Your balance of:" : {
-
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رصيدك من:"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váš zůstatek:"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Saldo aus:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu saldo de:"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu saldo de:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre solde de :"
+          }
+        }
+      }
     },
     "Your channel are not connected yet. Wait for a stable connection and try again." : {
       "localizations" : {

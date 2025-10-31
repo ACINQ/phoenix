@@ -66,9 +66,6 @@ struct MainView_Small: View {
 	)
 	@State var footerButtonHeight: CGFloat? = nil
 	
-	@State var footerTruncationDetection_standard: [DynamicTypeSize: Bool] = [:]
-	@State var footerTruncationDetection_condensed: [DynamicTypeSize: Bool] = [:]
-	
 	@State var isParsing: Bool = false
 	@State var parseIndex: Int = 0
 	@State var parseProgress: SendManager.ParseProgress? = nil
@@ -273,20 +270,12 @@ struct MainView_Small: View {
 	@ViewBuilder
 	func footer() -> some View {
 		
-		let dts = dynamicTypeSize
-		let footerTruncationDetected_condensed = footerTruncationDetection_condensed[dts] ?? false
-		let footerTruncationDetected_standard = footerTruncationDetection_standard[dts] ?? false
-		
 		let buttonTextColor = canMergeChannelsForSplicing ? Color.appNegative : Color.primaryForeground
 		
-		Group {
-			if footerTruncationDetected_condensed {
-				footer_accessibility(buttonTextColor: buttonTextColor)
-			} else if footerTruncationDetected_standard {
-				footer_condensed(buttonTextColor: buttonTextColor, dts: dts)
-			} else {
-				footer_standard(buttonTextColor: buttonTextColor, dts: dts)
-			}
+		ViewThatFits(in: .horizontal) {
+			footer_standard(buttonTextColor)
+			footer_condensed(buttonTextColor)
+			footer_accessibility(buttonTextColor)
 		}
 		.padding(.top, 20)
 		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
@@ -300,7 +289,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_standard(buttonTextColor: Color, dts: DynamicTypeSize) -> some View {
+	func footer_standard(_ buttonTextColor: Color) -> some View {
 		
 		// We're trying to center the divider:
 		//
@@ -319,14 +308,10 @@ struct MainView_Small: View {
 				didTapReceiveButton()
 			} label: {
 				Label {
-					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-						Text("Receive")
-							.lineLimit(1)
-							.foregroundColor(buttonTextColor)
-					} wasTruncated: {
-						log.debug("footerTruncationDetected_standard(receive): \(dts)")
-						self.footerTruncationDetection_standard[dts] = true
-					}
+					Text("Receive")
+						.lineLimit(1)
+						.foregroundColor(buttonTextColor)
+					
 				} icon: {
 					Image("ic_receive_resized")
 						.resizable()
@@ -350,14 +335,9 @@ struct MainView_Small: View {
 				didTapSendButton()
 			} label: {
 				Label {
-					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-						Text("Send")
-							.lineLimit(1)
-							.foregroundColor(buttonTextColor)
-					} wasTruncated: {
-						log.debug("footerTruncationDetected_standard(send): \(dts)")
-						self.footerTruncationDetection_standard[dts] = true
-					}
+					Text("Send")
+						.lineLimit(1)
+						.foregroundColor(buttonTextColor)
 				} icon: {
 					Image("ic_scan_resized")
 						.resizable()
@@ -377,7 +357,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_condensed(buttonTextColor: Color, dts: DynamicTypeSize) -> some View {
+	func footer_condensed(_ buttonTextColor: Color) -> some View {
 		
 		// There's a large font being used, and possibly a small screen too.
 		// Thus horizontal space is tight.
@@ -397,14 +377,9 @@ struct MainView_Small: View {
 				didTapReceiveButton()
 			} label: {
 				Label {
-					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-						Text("Receive")
-							.lineLimit(1)
-							.foregroundColor(buttonTextColor)
-					} wasTruncated: {
-						log.debug("footerTruncationDetected_condensed(receive): \(dts)")
-						self.footerTruncationDetection_condensed[dts] = true
-					}
+					Text("Receive")
+						.lineLimit(1)
+						.foregroundColor(buttonTextColor)
 				} icon: {
 					Image("ic_receive_resized")
 						.resizable()
@@ -426,14 +401,9 @@ struct MainView_Small: View {
 				didTapSendButton()
 			} label: {
 				Label {
-					TruncatableView(fixedHorizontal: true, fixedVertical: true) {
-						Text("Send")
-							.lineLimit(1)
-							.foregroundColor(buttonTextColor)
-					} wasTruncated: {
-						log.debug("footerTruncationDetected_condensed(send): \(dts)")
-						self.footerTruncationDetection_condensed[dts] = true
-					}
+					Text("Send")
+						.lineLimit(1)
+						.foregroundColor(buttonTextColor)
 				} icon: {
 					Image("ic_scan_resized")
 						.resizable()
@@ -451,7 +421,7 @@ struct MainView_Small: View {
 	}
 	
 	@ViewBuilder
-	func footer_accessibility(buttonTextColor: Color) -> some View {
+	func footer_accessibility(_ buttonTextColor: Color) -> some View {
 		
 		// There's a large font being used, and possibly a small screen too.
 		// Horizontal space is so tight that we can't get the 2 buttons on a single line.

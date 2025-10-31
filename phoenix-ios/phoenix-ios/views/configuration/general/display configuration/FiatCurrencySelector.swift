@@ -12,7 +12,9 @@ struct FiatCurrencySelector: View {
 	
 	@State var selectedFiatCurrency: FiatCurrency
 	
-	@State var visibleFiatCurrencies: [FiatCurrency] = FiatCurrency.companion.values
+	@State var sortedFiatCurrencies: [FiatCurrency] = []
+	@State var visibleFiatCurrencies: [FiatCurrency] = []
+	
 	@State var searchText: String = ""
 	
 	enum TextWidth: Preference {}
@@ -31,60 +33,76 @@ struct FiatCurrencySelector: View {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	// --------------------------------------------------
+	// MARK: View Builders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
+		layers()
+			.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
+			.navigationBarTitleDisplayMode(.inline)
+	}
+	
+	@ViewBuilder
+	func layers() -> some View {
+		
 		ZStack {
-			
-			// We want to vertically align the text:
-			//
-			// AUD (flag) Australian Dollar
-			// BRL (flag) Brazilian Real
-			//            ^ The fiatCurrency.longName should be
-			//              vertically aligned on leading edge.
-			//
-			// To accomplish this we need to measure the shortName & flag.
-			// But we need to measure ALL of them.
-			// And we can't do that with a List because it's lazy.
-			//
-			// So we have to use this hack,
-			// which force-renders all the Text items using a hidden VStack.
-			//
-			ScrollView {
-				VStack {
-					ForEach(FiatCurrency.companion.values) { fiatCurrency in
-						
-						Text_CurrencyName(fiatCurrency: fiatCurrency, fontTextStyle: .body)
-							.foregroundColor(.clear)
-							.read(textWidthReader)
-							.frame(width: textWidth, alignment: .leading)
-						
-						Text(fiatCurrency.flag)
-							.foregroundColor(Color.clear)
-							.read(flagWidthReader)
-							.frame(width: flagWidth, alignment: .leading)
-					}
-				}
-				.assignMaxPreference(for: textWidthReader.key, to: $textWidth)
-				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
-			}
-			
-			content
+			invisibleContent()
+			content()
 				.searchable(text: $searchText)
 				.onChange(of: searchText) { _ in
 					searchTextDidChange()
 				}
 		}
-		.navigationTitle(NSLocalizedString("Fiat currency", comment: "Navigation bar title"))
-		.navigationBarTitleDisplayMode(.inline)
+		.onAppear {
+			onAppear()
+		}
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func invisibleContent() -> some View {
+		
+		// We want to vertically align the text:
+		//
+		// AUD (flag) Australian Dollar
+		// BRL (flag) Brazilian Real
+		//            ^ The fiatCurrency.longName should be
+		//              vertically aligned on leading edge.
+		//
+		// To accomplish this we need to measure the shortName & flag.
+		// But we need to measure ALL of them.
+		// And we can't do that with a List because it's lazy.
+		//
+		// So we have to use this hack,
+		// which force-renders all the Text items using a hidden VStack.
+		//
+		ScrollView {
+			VStack {
+				ForEach(FiatCurrency.companion.values) { fiatCurrency in
+					
+					Text_CurrencyName(fiatCurrency: fiatCurrency, fontTextStyle: .body)
+						.foregroundColor(.clear)
+						.read(textWidthReader)
+						.frame(width: textWidth, alignment: .leading)
+					
+					Text(fiatCurrency.flag)
+						.foregroundColor(Color.clear)
+						.read(flagWidthReader)
+						.frame(width: flagWidth, alignment: .leading)
+				}
+			}
+			.assignMaxPreference(for: textWidthReader.key, to: $textWidth)
+			.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
+		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
 		
 		List {
 			ForEach(visibleFiatCurrencies) { fiatCurrency in
-				
 				Button {
 					didSelect(fiatCurrency)
 				} label: {
@@ -121,6 +139,23 @@ struct FiatCurrencySelector: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Notifications
+	// --------------------------------------------------
+	
+	func onAppear() {
+		log.trace(#function)
+		
+		sortedFiatCurrencies = FiatCurrency.companion.values.sorted(by: { currencyA, currencyB in
+			return currencyA.shortName < currencyB.shortName
+		})
+		visibleFiatCurrencies = sortedFiatCurrencies
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
 	func didSelect(_ fiatCurrency: FiatCurrency) {
 		log.trace("didSelect(fiatCurrency = \(fiatCurrency.shortName)")
 		
@@ -135,17 +170,15 @@ struct FiatCurrencySelector: View {
 	func searchTextDidChange() {
 		log.trace("searchTextDidChange(): \(searchText)")
 		
-		let allFiatCurrencies: [FiatCurrency] = FiatCurrency.companion.values
-		
 		let components = searchText
 			.components(separatedBy: .whitespacesAndNewlines)
 			.filter { !$0.isEmpty }
 		
 		if components.isEmpty {
-			visibleFiatCurrencies = allFiatCurrencies
+			visibleFiatCurrencies = sortedFiatCurrencies
 			
 		} else {
-			visibleFiatCurrencies = allFiatCurrencies.filter { fiatCurrency in
+			visibleFiatCurrencies = sortedFiatCurrencies.filter { fiatCurrency in
 				components.allSatisfy { component in
 					fiatCurrency.shortName.localizedCaseInsensitiveContains(component) ||
 					fiatCurrency.longName.localizedCaseInsensitiveContains(component)
