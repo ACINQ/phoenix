@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import fr.acinq.phoenix.android.LocalTheme
 import fr.acinq.phoenix.android.LocalUserPrefs
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.utils.extensions.findActivitySafe
 
@@ -213,7 +215,9 @@ private val shapes = Shapes(
 
 @Composable
 fun PhoenixAndroidTheme(content: @Composable () -> Unit) {
-    val userTheme = LocalUserPrefs.current?.getUserTheme?.collectAsState(initial = UserTheme.SYSTEM)?.value ?: UserTheme.SYSTEM
+    val fallbackUserTheme by application.globalPrefs.getFallbackTheme.collectAsState(UserTheme.SYSTEM)
+    val userTheme = LocalUserPrefs.current?.getUserTheme?.collectAsState(initial = fallbackUserTheme)?.value ?: fallbackUserTheme
+
     val systemUiController = rememberSystemUiController()
 
     CompositionLocalProvider(

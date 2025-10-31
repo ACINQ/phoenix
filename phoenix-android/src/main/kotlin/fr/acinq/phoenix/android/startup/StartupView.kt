@@ -147,9 +147,9 @@ fun StartupView(
                                     mutableStateOf(
                                         when {
                                             forceWalletId != null -> availableWallets[forceWalletId]
+                                            desiredWalletId != null -> availableWallets[desiredWalletId]
                                             !startWalletImmediately -> null
                                             availableWallets.size == 1 -> availableWallets.entries.firstOrNull()?.value
-                                            desiredWalletId != null -> availableWallets[desiredWalletId]
                                             startWalletImmediately -> availableWallets[defaultWallet.value]
                                             else -> null
                                         }
@@ -334,6 +334,12 @@ private fun BoxScope.LoadWallet(
     goToWalletSelector: (() -> Unit)?
 ) {
     val context = LocalContext.current
+    val globalPrefs = application.globalPrefs
+
+    LaunchedEffect(userWallet.walletId) {
+        val userPrefs = DataStoreManager.loadUserPrefsForWallet(context, userWallet.walletId)
+        globalPrefs.saveFallbackTheme(userPrefs.getUserTheme.first())
+    }
 
     val isScreenLockRequired = produceState<Boolean?>(initialValue = null, key1 = userWallet) {
         val userPrefs = DataStoreManager.loadUserPrefsForWallet(context, userWallet.walletId)
