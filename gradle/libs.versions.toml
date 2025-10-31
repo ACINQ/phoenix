@@ -1,5 +1,5 @@
 [versions]
-lightningkmp = "1.11.0"
+lightningkmp = "1.11.1"
 secp256k1 = "0.21.0" # keep in check with lightning-kmp secp version
 
 kotlin = "2.2.10"
