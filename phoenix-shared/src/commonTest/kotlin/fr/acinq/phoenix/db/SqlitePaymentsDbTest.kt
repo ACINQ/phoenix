@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.db
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.TxHash
 import fr.acinq.bitcoin.TxId
@@ -40,7 +39,7 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.LiquidityAds
-import fr.acinq.phoenix.runTest
+import fr.acinq.phoenix.utils.runTest
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.state
@@ -82,7 +81,7 @@ class SqlitePaymentsDbTest : UsingContextTest() {
     @BeforeTest
     fun setupDatabases() {
         Dispatchers.setMain(mainThreadSurrogate)
-        val sampleDbs = "src/commonTest/resources/sampledbs"
+        val sampleDbs = "src/commonTest/resources/sampledbs/paymentsdb"
         val v1: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v1".toPath())
         val v6: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v6".toPath())
         val v10: List<Path> = FileSystem.SYSTEM.list("$sampleDbs/v10".toPath())

@@ -27,7 +27,7 @@
   ~
   ~ Most technical resource strings should stay in the default `strings.xml` file.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- system notifications -->
 
@@ -410,7 +410,7 @@
     <string name="liquidityads_estimate_details_duration">Thời hạn</string>
     <string name="liquidityads_estimate_details_duration_value">1 năm</string>
     <string name="liquidityads_estimate_details_duration_help">Dung lượng bổ sung sẽ được duy trì trong thời hạn này.</string>
-    <string name="liquidityads_estimate_above_25">Tổng phí cao hơn 25% so với khoản thanh khoản đã yêu cầu.</string>
+    <string name="liquidityads_estimate_above_25" tools:ignore="StringFormatInvalid">Tổng phí cao hơn 25% so với khoản thanh khoản đã yêu cầu.</string>
     <string name="liquidityads_over_balance">Tổng phí vượt quá số dư của bạn.</string>
 
     <string name="liquidityads_review_button">Xem lại yêu cầu</string>
