@@ -13,7 +13,7 @@ extension Lightning_kmpFinalFailure {
 		}
 		if let _ = self.asChannelNotConnected() {
 			return String(localized:
-				"Your channel are not connected yet. Wait for a stable connection and try again.")
+				"Your channels are not connected yet. Wait for a stable connection and try again.")
 		}
 		if let _ = self.asChannelOpening() {
 			return String(localized:

@@ -53,4 +53,14 @@ enum Currency: Hashable, Identifiable, CustomStringConvertible {
 			return "fiat(\(currency.shortName))"
 		}
 	}
+	
+	static func fromKotlin(_ value: CurrencyUnit) -> Currency {
+		if let btcUnit = value as? BitcoinUnit {
+			return .bitcoin(btcUnit)
+		}
+		if let fiatCurrency = value as? FiatCurrency {
+			return .fiat(fiatCurrency)
+		}
+		fatalError("Unknown CurrencyUnit: \(value)")
+	}
 }

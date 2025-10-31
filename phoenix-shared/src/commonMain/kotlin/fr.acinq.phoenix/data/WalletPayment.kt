@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 
 /**
@@ -23,6 +24,7 @@ data class WalletPaymentMetadata(
     val userDescription: String? = null,
     val userNotes: String? = null,
     val lightningAddress: String? = null,
+    val cardId: UUID? = null,
     val modifiedAt: Long? = null
 )
 

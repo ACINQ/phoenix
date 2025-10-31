@@ -37,13 +37,13 @@ class CloudKitContactsDb(
         // The fetched rowid values from the `cloudkit_contacts_queue` table
         val rowids: List<Long>,
 
-        // Maps `cloudkit_contacts_queue.rowid` to the corresponding ContactId.
+        // Maps `cloudkit_contacts_queue.rowid` to the corresponding contactId.
         // If missing from the map, then the `cloudkit_contacts_queue` row was
         // malformed or unrecognized.
         val rowidMap: Map<Long, UUID>,
 
         // Maps to the contact information in the database.
-        // If missing from the map, then the contacts has been deleted from the database.
+        // If missing from the map, then the contact has been deleted from the database.
         val rowMap: Map<UUID, ContactInfo>,
 
         // Maps to `cloudkit_contacts_metadata.ckrecord_info`.
@@ -278,7 +278,7 @@ class CloudKitContactsDb(
                 // We will choose to upload the OLDEST item first.
                 // This matches how they normally would have been uploaded.
                 // Also, when a user restores their wallet (e.g. on a new phone),
-                // we always want to download the newest contacts first.
+                // we always want to download the newest items first.
                 // And this assumes the newest items in the cloud are the newest contacts.
                 //
                 // Since items are uploaded in FIFO order,

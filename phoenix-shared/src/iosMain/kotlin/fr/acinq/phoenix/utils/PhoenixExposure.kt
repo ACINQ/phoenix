@@ -1,8 +1,6 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.utils.UUID
-import fr.acinq.phoenix.data.ContactInfo
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.availableForReceive
 import fr.acinq.phoenix.data.canRequestLiquidity

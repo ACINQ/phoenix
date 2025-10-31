@@ -199,6 +199,19 @@ extension WalletPaymentMetadata {
 			userDescription: nil,
 			userNotes: nil,
 			lightningAddress: nil,
+			cardId: nil,
+			modifiedAt: nil
+		)
+	}
+	
+	static func withCard(_ cardID: Lightning_kmpUUID) -> WalletPaymentMetadata {
+		return WalletPaymentMetadata(
+			lnurl: nil,
+			originalFiat: nil,
+			userDescription: nil,
+			userNotes: nil,
+			lightningAddress: nil,
+			cardId: cardID,
 			modifiedAt: nil
 		)
 	}

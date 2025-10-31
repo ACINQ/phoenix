@@ -74,8 +74,8 @@ extension SyncBackupManager {
 			
 			// Step 1 of 4:
 			//
-			// We are downloading payments from newest to oldest.
-			// So first we fetch the oldest payment date in the table (if there is one)
+			// We are downloading items from newest to oldest.
+			// So first we fetch the oldest item date in the table (if there is one)
 			
 			if await isShutdown() { return }
 			let millis: KotlinLong? = try await self.cloudKitDb.contacts.fetchOldestCreation()
@@ -119,7 +119,7 @@ extension SyncBackupManager {
 					
 					// Step 2 of 4:
 					//
-					// Execute a CKQuery to download a batch of payments from the cloud.
+					// Execute a CKQuery to download a batch of items from the cloud.
 					// There may be multiple batches available for download.
 					
 					let predicate: NSPredicate
@@ -254,7 +254,7 @@ extension SyncBackupManager {
 				
 				// Step 4 of 4:
 				//
-				// There may be payments that we've added to the database since we started the download process.
+				// There may be items that we've added to the database since we started the download process.
 				// So we enqueue these for upload now.
 				
 				if await isShutdown() { return }
@@ -686,8 +686,7 @@ extension SyncBackupManager {
 	// ----------------------------------------
 	
 	/// Performs all of the following:
-	/// - serializes incoming/outgoing payment into JSON
-	/// - adds randomized padding to obfuscate payment type
+	/// - serializes item (CBOR)
 	/// - encrypts the blob using the cloudKey
 	///
 	private func serializeAndEncryptContact(

@@ -97,3 +97,12 @@ listSuccessfulIds:
 SELECT id, completed_at
 FROM payments_outgoing
 WHERE completed_at IS NOT NULL;
+
+listRecentCardPayments:
+SELECT p.data, pm.*
+FROM payments_outgoing AS p
+LEFT OUTER JOIN payments_metadata AS pm ON pm.payment_id = p.id
+WHERE
+    card_id = :card_id AND created_at >= :min_ts
+ORDER BY created_at DESC
+LIMIT :limit OFFSET :offset;

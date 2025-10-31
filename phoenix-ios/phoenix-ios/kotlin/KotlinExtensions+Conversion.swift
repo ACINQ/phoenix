@@ -74,6 +74,11 @@ extension Data {
 		return result
 	*/
 	}
+	
+	func toKotlinByteVector() -> Bitcoin_kmpByteVector {
+		
+		return Bitcoin_kmpByteVector(bytes: self.toKotlinByteArray())
+	}
 }
 
 extension Array {
@@ -85,5 +90,21 @@ extension Array {
 			shutUpCompiler = (self[i.intValue] as! Item)
 			return shutUpCompiler
 		}
+	}
+}
+
+extension KotlinInstant {
+	
+	func toDate() -> Date {
+		let milliseconds: Int64 = self.toEpochMilliseconds()
+		return Date(timeIntervalSince1970: TimeInterval(milliseconds) / TimeInterval(1_000))
+	}
+}
+
+extension Date {
+	
+	func toKotlinInstant() -> KotlinInstant {
+		let milliseconds = Int64(self.timeIntervalSince1970 * 1_000)
+		return KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: milliseconds)
 	}
 }

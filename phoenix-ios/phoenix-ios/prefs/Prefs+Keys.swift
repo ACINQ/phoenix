@@ -18,6 +18,8 @@ enum PrefsKey: CaseIterable {
 	case doNotShowChannelImpactWarning
 	case watchTower_lastAttemptDate
 	case watchTower_lastAttemptFailed
+	case pushTokenRegistration
+	case lnurlWithdrawRegistration
 //	BackupSeed:
 	case backupSeed_enabled
 	case backupSeed_hasUploadedSeed
@@ -30,6 +32,7 @@ enum PrefsKey: CaseIterable {
 	case recordZoneCreated
 	case hasDownloadedPayments
 	case hasDownloadedContacts
+	case hasDownloadedCards
 	case hasReUploadedPayments
 //	Global:
 	case theme
@@ -54,6 +57,8 @@ enum PrefsKey: CaseIterable {
 		case .doNotShowChannelImpactWarning : return "doNotShowChannelImpactWarning"
 		case .watchTower_lastAttemptDate    : return "watchTower_lastAttemptDate"
 		case .watchTower_lastAttemptFailed  : return "watchTower_lastAttemptFailed"
+		case .pushTokenRegistration         : return "pushTokenRegistration"
+		case .lnurlWithdrawRegistration     : return "lnurlWithdrawRegistration"
 	// BackupSeed:
 		case .backupSeed_enabled            : return "backupSeed_enabled"
 		case .backupSeed_hasUploadedSeed    : return "backupSeed_hasUploadedSeed"
@@ -66,6 +71,7 @@ enum PrefsKey: CaseIterable {
 		case .recordZoneCreated             : return "hasCKRecordZone_v2"
 		case .hasDownloadedPayments         : return "hasDownloadedCKRecords"
 		case .hasDownloadedContacts         : return "hasDownloadedContacts_v2"
+		case .hasDownloadedCards            : return "hasDownloadedCards"
 		case .hasReUploadedPayments         : return "hasReUploadedPayments"
 	//	Global:
 		case .theme                         : return "theme"
@@ -94,6 +100,8 @@ enum PrefsKey: CaseIterable {
 		case .doNotShowChannelImpactWarning : return .wallet
 		case .watchTower_lastAttemptDate    : return .wallet
 		case .watchTower_lastAttemptFailed  : return .wallet
+		case .pushTokenRegistration         : return .wallet
+		case .lnurlWithdrawRegistration     : return .wallet
 	// BackupSeed:
 		case .backupSeed_enabled            : return .backupSeed
 		case .backupSeed_hasUploadedSeed    : return .backupSeed
@@ -106,6 +114,7 @@ enum PrefsKey: CaseIterable {
 		case .recordZoneCreated             : return .backupTransactions
 		case .hasDownloadedPayments         : return .backupTransactions
 		case .hasDownloadedContacts         : return .backupTransactions
+		case .hasDownloadedCards            : return .backupTransactions
 		case .hasReUploadedPayments         : return .backupTransactions
 		//	Global:
 		case .theme                         : return .global

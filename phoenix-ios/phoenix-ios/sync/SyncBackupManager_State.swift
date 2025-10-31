@@ -191,6 +191,7 @@ class SyncBackupManager_State_Downloading: ObservableObject, Equatable, @uncheck
 	
 	let needsDownloadPayments: Bool
 	let needsDownloadContacts: Bool
+	let needsDownloadCards: Bool
 	
 	@Published private(set) var payments_completedCount: Int = 0
 	@Published private(set) var payments_oldestCompletedDownload: Date? = nil
@@ -198,13 +199,17 @@ class SyncBackupManager_State_Downloading: ObservableObject, Equatable, @uncheck
 	@Published private(set) var contacts_completedCount: Int = 0
 	@Published private(set) var contacts_oldestCompletedDownload: Date? = nil
 	
-	init(needsDownloadPayments: Bool, needsDownloadContacts: Bool) {
+	@Published private(set) var cards_completedCount: Int = 0
+	@Published private(set) var cards_oldestCompletedDownload: Date? = nil
+	
+	init(needsDownloadPayments: Bool, needsDownloadContacts: Bool, needsDownloadCards: Bool) {
 		self.needsDownloadPayments = needsDownloadPayments
 		self.needsDownloadContacts = needsDownloadContacts
+		self.needsDownloadCards = needsDownloadCards
 	}
 	
 	var completedCount: Int {
-		return payments_completedCount + contacts_completedCount
+		return payments_completedCount + contacts_completedCount + cards_completedCount
 	}
 	
 	func setPayments_oldestCompletedDownload(_ date: Date?) {
@@ -216,6 +221,12 @@ class SyncBackupManager_State_Downloading: ObservableObject, Equatable, @uncheck
 	func setContacts_oldestCompletedDownload(_ date: Date?) {
 		runOnMainThread {
 			self.contacts_oldestCompletedDownload = date
+		}
+	}
+	
+	func setCards_oldestCompletedDownload(_ date: Date?) {
+		runOnMainThread {
+			self.cards_oldestCompletedDownload = date
 		}
 	}
 	
@@ -251,6 +262,22 @@ class SyncBackupManager_State_Downloading: ObservableObject, Equatable, @uncheck
 		}
 	}
 	
+	func cards_finishBatch(completed: Int, oldest: Date?) {
+		runOnMainThread {
+			self.cards_completedCount += completed
+			
+			if let oldest = oldest {
+				if let prv = self.cards_oldestCompletedDownload {
+					if oldest < prv {
+						self.cards_oldestCompletedDownload = oldest
+					}
+				} else {
+					self.cards_oldestCompletedDownload = oldest
+				}
+			}
+		}
+	}
+	
 	static func == (lhs: SyncBackupManager_State_Downloading,
 	                rhs: SyncBackupManager_State_Downloading
 	) -> Bool {
@@ -274,37 +301,47 @@ class SyncBackupManager_State_Uploading: ObservableObject, Equatable {
 	@Published private(set) var contacts_inFlightCount: Int = 0
 	@Published private(set) var contacts_inFlightProgress: Progress? = nil
 	
+	@Published private(set) var cards_totalCount: Int
+	@Published private(set) var cards_completedCount: Int = 0
+	@Published private(set) var cards_inFlightCount: Int = 0
+	@Published private(set) var cards_inFlightProgress: Progress? = nil
+	
 	private(set) var isCancelled = false
 	private(set) var operation: CKOperation? = nil
 	
 	var totalCount: Int {
-		return payments_totalCount + contacts_totalCount
+		return payments_totalCount + contacts_totalCount + cards_totalCount
 	}
 	
 	var completedCount: Int {
-		return payments_completedCount + contacts_completedCount
+		return payments_completedCount + contacts_completedCount + cards_completedCount
 	}
 	
 	var inFlightCount: Int {
-		return payments_inFlightCount + contacts_inFlightCount
+		return payments_inFlightCount + contacts_inFlightCount + cards_inFlightCount
 	}
 	
 	var inFlightProgress: Progress? {
 		// Note: we only perform one upload at a time (either payments or contacts)
-		return payments_inFlightProgress ?? contacts_inFlightProgress
+		return payments_inFlightProgress ?? contacts_inFlightProgress ?? cards_inFlightProgress
 	}
 	
 	var payments_pendingCount: Int {
-		return payments_totalCount - payments_completedCount
+		return max(0, payments_totalCount - payments_completedCount)
 	}
 	
 	var contacts_pendingCount: Int {
-		return contacts_totalCount - contacts_completedCount
+		return max(0, contacts_totalCount - contacts_completedCount)
 	}
 	
-	init(payments_totalCount: Int, contacts_totalCount: Int) {
+	var cards_pendingCount: Int {
+		return max(0, cards_totalCount - cards_completedCount)
+	}
+	
+	init(payments_totalCount: Int, contacts_totalCount: Int, cards_totalCount: Int) {
 		self.payments_totalCount = payments_totalCount
 		self.contacts_totalCount = contacts_totalCount
+		self.cards_totalCount = cards_totalCount
 	}
 	
 	func setPayments_totalCount(_ value: Int) {
@@ -316,6 +353,12 @@ class SyncBackupManager_State_Uploading: ObservableObject, Equatable {
 	func setContacts_totalCount(_ value: Int) {
 		runOnMainThread {
 			self.contacts_totalCount = value
+		}
+	}
+	
+	func setCards_totalCount(_ value: Int) {
+		runOnMainThread {
+			self.cards_totalCount = value
 		}
 	}
 	
@@ -339,6 +382,14 @@ class SyncBackupManager_State_Uploading: ObservableObject, Equatable {
 			self.contacts_completedCount += completed
 			self.contacts_inFlightCount = 0
 			self.contacts_inFlightProgress = nil
+		}
+	}
+	
+	func completeCards_inFlight(_ completed: Int) {
+		runOnMainThread {
+			self.cards_completedCount += completed
+			self.cards_inFlightCount = 0
+			self.cards_inFlightProgress = nil
 		}
 	}
 	

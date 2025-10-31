@@ -10,6 +10,7 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 enum PushNotification {
 	case fcm(notification: FcmPushNotification)
+	case lnurlWithdraw(notification: LnurlWithdrawNotification)
 	
 	static func parse(_ userInfo: [AnyHashable: Any]) -> PushNotification? {
 		log.trace(#function)
@@ -129,6 +130,65 @@ enum PushNotification {
 		// Function reserved for other debugging uses.
 		// We sometimes trigger custom push notifications from AWS during debug sessions.
 		
-		return nil
+		return parse_aws_lnurlWithdraw(userInfo: userInfo)
+	}
+	
+	private static func parse_aws_lnurlWithdraw(userInfo: [AnyHashable : Any]) -> PushNotification? {
+		log.trace(#function)
+		
+		// It should look like this:
+		//
+		// acinq: {
+		//   t    : "withdraw",
+		//   n    : "<node_id>",
+		//   picc : "<picc_data_hex_string>",
+		//   cmac : "<cmac_hex_string>",
+		//   invc : "<bolt_11_invoice>",
+		//   ts   : <timestamp_in_milliseconds>
+		// }
+		
+		guard
+			let acinq = userInfo["acinq"] as? [String: Any],
+			let t     = acinq["t"]    as? String,
+			let n     = acinq["n"]    as? String,
+			let picc  = acinq["picc"] as? String,
+			let cmac  = acinq["cmac"] as? String,
+			let invc  = acinq["invc"] as? String,
+			let ts    = acinq["ts"]   as? Int64
+		else {
+			log.debug("\(#function): missing one or more parameters")
+			return nil
+		}
+		
+		guard t == "withdraw" else {
+			log.debug("\(#function): t != withdraw")
+			return nil
+		}
+		guard let piccData = Data(fromHex: picc) else {
+			log.debug("\(#function): picc is not hexadecimal")
+			return nil
+		}
+		guard let cmacData = Data(fromHex: cmac) else {
+			log.debug("\(#function): cmac is not hexadecimal")
+			return nil
+		}
+		guard let invoice = Parser.shared.readBolt11Invoice(input: invc) else {
+			log.debug("\(#function): invc is not Bolt11Invoice")
+			return nil
+		}
+		guard let invoiceAmount = invoice.amount else {
+			log.debug("\(#function): invoice.amount is nil")
+			return nil
+		}
+		
+		return PushNotification.lnurlWithdraw(notification: LnurlWithdrawNotification(
+			nodeId        : n,
+			piccData      : piccData,
+			cmac          : cmacData,
+			invoice       : invoice,
+			invoiceAmount : invoiceAmount,
+			invoiceString : invc,
+			timestamp     : ts.toDate(from: .milliseconds)
+		))
 	}
 }

@@ -78,6 +78,10 @@ class BusinessManager {
 	/// 
 	public let mnemonicLanguagePublisher = CurrentValueSubject<MnemonicLanguage, Never>(MnemonicLanguage.english)
 	
+	/// Reports incoming CardResponse messages.
+	///
+	public let cardResponsePublisher = PassthroughSubject<CardResponse, Never>()
+	
 	/// General wallet info (e.g. nodeId)
 	///
 	public var walletInfo: WalletManager.WalletInfo? = nil
@@ -171,6 +175,30 @@ class BusinessManager {
 				} else if let paymentNotSent = event as? Lightning_kmpPaymentNotSent {
 					let paymentId = paymentNotSent.request.paymentId.description()
 					self.endLongLivedTask(id: paymentId)
+				}
+			}
+		}.store(in: &cancellables)
+		
+		// Card payment requests
+		Task { @MainActor [self] in
+			let peer = try await self.business.peerManager.getPeer()
+			for await event in peer.eventsFlow {
+				if let msg = event as? Lightning_kmp_coreCardPaymentRequestReceived {
+					log.debug("found event: CardPaymentRequestReceived")
+					
+					if let cardRequest = CardRequest.fromOnionMessage(msg) {
+						Task { @MainActor in
+							await self.handleCardRequest(cardRequest)
+						}
+					} else {
+						log.debug("CardRequest.fromOnionMessage() failed")
+					}
+					
+				} else if let msg = event as? Lightning_kmp_coreCardPaymentResponseReceived {
+					log.debug("found event: CardPaymentResponseReceived")
+					
+					let response = CardResponse.fromOnionMessage(msg)
+					cardResponsePublisher.send(response)
 				}
 			}
 		}.store(in: &cancellables)
@@ -472,6 +500,7 @@ class BusinessManager {
 		
 		self.walletInfo = _walletInfo
 		maybeRegisterFcmToken()
+		maybeRegisterPushToken()
 		
 		let walletId = WalletIdentifier(chain: business.chain, walletInfo: _walletInfo)
 		
@@ -549,14 +578,15 @@ class BusinessManager {
 	// --------------------------------------------------
 	
 	private func pushTokenChanged() {
-		log.trace("pushTokenChanged()")
+		log.trace(#function)
 
-		// Reserved for debugging use (AWS)
+		// For debugging use (AWS)
+		maybeRegisterPushToken()
 	}
 
 	private func fcmTokenChanged() {
-		log.trace("fcmTokenChanged()")
-
+		log.trace(#function)
+		
 		maybeRegisterFcmToken()
 	}
 	
@@ -569,6 +599,7 @@ class BusinessManager {
 		
 		if !oldPeerConnectionState.isEstablished() && newPeerConnectionState.isEstablished() {
 			maybeRegisterFcmToken()
+			maybeRegisterPushToken()
 		}
 	}
 	
@@ -615,6 +646,108 @@ class BusinessManager {
 		// registration. Which we could then use to trigger a storage in UserDefaults.
 	}
 	
+	func maybeRegisterPushToken() -> Void {
+		log.trace(#function)
+		assertMainThread()
+		
+		guard let walletInfo else {
+			log.debug("maybeRegisterPushToken: walletInfo is nil")
+			return
+		}
+		guard let pushToken = AppDelegate.get().pushTokenPublisher.value else {
+			log.debug("maybeRegisterPushToken: pushToken is nil")
+			return
+		}
+		guard peerConnectionState is Lightning_kmpConnection.ESTABLISHED else {
+			log.debug("maybeRegisterPushToken: peerConnection not established")
+			return
+		}
+		
+		let walletId = WalletIdentifier(chain: business.chain, walletInfo: walletInfo)
+		let prefs = Prefs.wallet(walletId)
+			
+		let nodeIdHash = walletInfo.nodeId.hash160().toSwiftData().toHex()
+		assert(nodeIdHash == walletInfo.nodeIdHash)
+		
+		if let prvRegistration = prefs.pushTokenRegistration {
+
+			if prvRegistration.pushToken == pushToken &&
+			   prvRegistration.nodeIdHash == nodeIdHash
+			{
+				// We've already registered our {pushToken, nodeId} tuple.
+
+				if abs(prvRegistration.registrationDate.timeIntervalSinceNow) < 30.days() {
+					// The last registration was recent, so we can skip registration.
+					log.debug("Push token already registered")
+					return
+
+				} else {
+					// It's been awhile since we last registered, so let's re-register.
+					// This is a self-healing mechanism, in case of server problems.
+				}
+			}
+		}
+		
+		let registration = PushTokenRegistration(
+			pushToken: pushToken,
+			nodeIdHash: nodeIdHash,
+			registrationDate: Date()
+		)
+		
+		let url = URL(string: "https://s7r6lsmzk7.execute-api.us-west-2.amazonaws.com/v1/pub/push/register")
+		guard let requestUrl = url else { return }
+		
+		#if DEBUG
+		let platform = "iOS-development"
+		#else
+		// Note: This is actually wrong if you build-and-run using RELEASE mode.
+		let platform = "iOS-production"
+		#endif
+		
+		let body = [
+			"app_id"     : "co.acinq.phoenix",
+			"platform"   : platform,
+			"push_token" : pushToken,
+			"node_id"    : walletInfo.nodeId.value.toHex()
+		]
+		let bodyData = try? JSONSerialization.data(
+			withJSONObject: body,
+			options: []
+		)
+		
+		var request = URLRequest(url: requestUrl)
+		request.httpMethod = "POST"
+		request.httpBody = bodyData
+			
+		let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+			
+			var statusCode = 418
+			var success = false
+			if let httpResponse = response as? HTTPURLResponse {
+				statusCode = httpResponse.statusCode
+				if statusCode >= 200 && statusCode < 300 {
+					success = true
+				}
+			}
+			
+			if success {
+				log.debug("/push/register: success")
+				prefs.pushTokenRegistration = registration
+			}
+			else if let error = error {
+				log.debug("/push/register: error: \(String(describing: error))")
+			} else {
+				log.debug("/push/register: statusCode: \(statusCode)")
+				if let data = data, let dataString = String(data: data, encoding: .utf8) {
+					log.debug("/push/register: response:\n\(dataString)")
+				}
+			}
+		}
+		
+		log.debug("/push/register ...")
+		task.resume()
+	}
+	
 	// --------------------------------------------------
 	// MARK: Long-Lived Tasks
 	// --------------------------------------------------
@@ -659,6 +792,56 @@ class BusinessManager {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Card Payments
+	// --------------------------------------------------
+	
+	@MainActor
+	func handleCardRequest(
+		_ cardRequest: CardRequest
+	) async {
+		log.trace(#function)
+		
+		let result: Result<WithdrawRequestStatus, WithdrawRequestError> =
+			await business.checkWithdrawRequest(cardRequest.toWithdrawRequest())
+		
+		switch result {
+		case .failure(let error):
+			log.error("handleCardRequest: error: \(error.description)")
+			
+			// Send error message to merchant
+			do {
+				let peer = try await business.peerManager.getPeer()
+				try await peer.sendCardResponse(
+					request : cardRequest.invoice,
+					msg     : error.cardResponseMessage,
+					code    : error.cardResponseCode.rawValue
+				)
+			} catch {
+				log.error("peer.sendCardResponse(): error: \(error)")
+			}
+			
+		case .success(let status):
+			switch status {
+			case .abortHandledElsewhere(_):
+				log.warning("handleCardReqeust: abort: handled elsewhere")
+				
+			case .continueAndSendPayment(let card, _, _):
+				log.debug("handleCardReqeust: continue: send payment")
+				
+				// Send payment to merchant
+				do {
+					try await business.sendManager.payUnsolicitedInvoice(
+						invoice: cardRequest.invoice,
+						metadata: WalletPaymentMetadata.withCard(card.id)
+					)
+				} catch {
+					log.error("peer.payUnsolicitedInvoice(): error: \(error)")
+				}
+			}
 		}
 	}
 	

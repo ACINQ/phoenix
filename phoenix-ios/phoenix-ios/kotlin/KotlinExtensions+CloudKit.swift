@@ -1,6 +1,47 @@
 import Foundation
 import PhoenixShared
 
+struct FetchCardsQueueBatchResult {
+	let rowids: [Int64]
+	let rowidMap: [Int64: Lightning_kmpUUID]
+	let rowMap: [Lightning_kmpUUID : BoltCardInfo]
+	let metadataMap: [Lightning_kmpUUID : KotlinByteArray]
+	
+	func uniqueCardIds() -> Set<Lightning_kmpUUID> {
+		return Set<Lightning_kmpUUID>(rowidMap.values)
+	}
+	
+	func rowidsMatching(_ query: Lightning_kmpUUID) -> [Int64] {
+		var results = [Int64]()
+		for (rowid, cardId) in rowidMap {
+			if cardId == query {
+				results.append(rowid)
+			}
+		}
+		return results
+	}
+	
+	func rowidsMatching(_ query: String) -> [Int64] {
+		var results = [Int64]()
+		for (rowid, cardId) in rowidMap {
+			if cardId.id == query {
+				results.append(rowid)
+			}
+		}
+		return results
+	}
+	
+	static func empty() -> FetchCardsQueueBatchResult {
+		
+		return FetchCardsQueueBatchResult(
+			rowids: [],
+			rowidMap: [:],
+			rowMap: [:],
+			metadataMap: [:]
+		)
+	}
+}
+
 struct FetchContactsQueueBatchResult {
 	let rowids: [Int64]
 	let rowidMap: [Int64: Lightning_kmpUUID]
@@ -79,6 +120,43 @@ struct FetchPaymentsQueueBatchResult {
 			rowidMap: [:],
 			rowMap: [:],
 			metadataMap: [:]
+		)
+	}
+}
+
+extension CloudKitCardsDb.FetchQueueBatchResult {
+	
+	func convertToSwift() -> FetchCardsQueueBatchResult {
+		
+		// We are experiencing crashes like this:
+		//
+		// for (rowid, paymentRowId) in batch.rowidMap {
+		//      ^^^^^
+		// Crash: Could not cast value of type '__NSCFNumber' to 'PhoenixSharedLong'.
+		//
+		// This appears to be some kind of bug in Kotlin.
+		// So we're going to make a clean migration.
+		// And we need to do so without swift-style enumeration in order to avoid crashing.
+		
+		var _rowids = [Int64]()
+		var _rowidMap = [Int64: Lightning_kmpUUID]()
+		
+		for i in 0 ..< self.rowids.count { // cannot enumerate self.rowidMap
+			
+			let value_kotlin = rowids[i]
+			let value_swift = value_kotlin.int64Value
+			
+			_rowids.append(value_swift)
+			if let cardId = self.rowidMap[value_kotlin] {
+				_rowidMap[value_swift] = cardId
+			}
+		}
+		
+		return FetchCardsQueueBatchResult(
+			rowids: _rowids,
+			rowidMap: _rowidMap,
+			rowMap: self.rowMap,
+			metadataMap: self.metadataMap
 		)
 	}
 }

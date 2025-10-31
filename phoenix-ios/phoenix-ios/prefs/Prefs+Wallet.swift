@@ -190,6 +190,27 @@ class Prefs_Wallet {
 		}
 	}
 	
+	var pushTokenRegistration: PushTokenRegistration? {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.data(forKey: Key.pushTokenRegistration.value(id))?.jsonDecode()
+		}
+		set {
+			defaults.set(newValue?.jsonEncode(), forKey: Key.pushTokenRegistration.value(id))
+		}
+	}
+	
+	var lnurlWithdrawRegistration: LnurlWithdrawRegistration? {
+		get {
+			maybeLogDefaultAccess(#function)
+			return defaults.data(forKey: Key.lnurlWithdrawRegistration.value(id))?.jsonDecode()
+		}
+		set {
+			defaults.set(newValue?.jsonEncode(), forKey: Key.lnurlWithdrawRegistration.value(id))
+		}
+	}
+
+	
 	// --------------------------------------------------
 	// MARK: Wallet State
 	// --------------------------------------------------

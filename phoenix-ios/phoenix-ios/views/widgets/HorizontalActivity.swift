@@ -15,6 +15,17 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 
 struct HorizontalActivity: View {
 	
+	let color: Color
+	let diameter: CGFloat
+	let speed: TimeInterval
+	
+	@State private var timer: Publishers.Autoconnect<Timer.TimerPublisher>
+	
+	@State private var viewWidth: CGFloat? = nil
+	@State private var offsetA: CGFloat = 0
+	@State private var offsetB: CGFloat = 0
+	@State private var showCircles = false
+	
 	init(color: Color, diameter: CGFloat, speed: TimeInterval = 1.6) {
 		self.color = color
 		self.diameter = diameter
@@ -22,17 +33,6 @@ struct HorizontalActivity: View {
 		
 		self.timer = Timer.publish(every: speed, on: .main, in: .common).autoconnect()
 	}
-	
-	let color: Color
-	let diameter: CGFloat
-	let speed: TimeInterval
-	
-	let timer: Publishers.Autoconnect<Timer.TimerPublisher>
-	
-	@State private var viewWidth: CGFloat? = nil
-	@State private var offsetA: CGFloat = 0
-	@State private var offsetB: CGFloat = 0
-	@State private var showCircles = false
 	
 	struct HorizontalActivityWidth: PreferenceKey {
 		typealias Value = [CGFloat]
