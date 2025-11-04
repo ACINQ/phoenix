@@ -22,8 +22,12 @@ CREATE TABLE htlc_infos (
 CREATE INDEX htlc_infos_idx ON htlc_infos(channel_id, commitment_number);
 
 -- channels queries
+
+-- we ignore legacy channels using version 2/3
 getChannel:
-SELECT * FROM local_channels WHERE channel_id=?;
+SELECT * FROM local_channels
+WHERE channel_id=?
+AND hex(substr(data, 1, 4)) NOT IN ('00000002', '00000003');
 
 updateChannel:
 UPDATE local_channels SET data=? WHERE channel_id=?;
@@ -34,8 +38,11 @@ INSERT INTO local_channels VALUES (?, ?, 0);
 closeLocalChannel:
 UPDATE local_channels SET is_closed=1 WHERE channel_id=?;
 
+-- we ignore legacy channels using version 2/3
 listLocalChannels:
-SELECT data FROM local_channels WHERE is_closed=0;
+SELECT data FROM local_channels
+WHERE is_closed=0
+AND hex(substr(data, 1, 4)) NOT IN ('00000002', '00000003');
 
 -- htlcs info queries
 insertHtlcInfo:
