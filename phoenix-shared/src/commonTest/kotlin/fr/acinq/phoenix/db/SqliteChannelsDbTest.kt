@@ -19,6 +19,7 @@ package fr.acinq.phoenix.db
 import app.cash.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.phoenix.utils.runTest
+import fr.acinq.phoenix.utils.testLoggerFactory
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,7 +47,7 @@ class SqliteChannelsDbTest : UsingContextTest() {
     @Test
     fun `read v1 db`() = runTest {
         val driver = createChannelsDbDriver(getPlatformContext(), fileName = "channels-testnet-fe646b99.sqlite")
-        val channelsDb = createSqliteChannelsDb(driver)
+        val channelsDb = createSqliteChannelsDb(driver, testLoggerFactory)
 
         val channels = channelsDb.listLocalChannels()
 

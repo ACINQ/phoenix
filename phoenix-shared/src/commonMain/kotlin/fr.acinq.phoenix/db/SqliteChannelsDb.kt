@@ -21,22 +21,24 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.CltvExpiry
 import fr.acinq.lightning.channel.states.PersistedChannelState
 import fr.acinq.lightning.db.ChannelsDb
+import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.phoenix.db.sqldelight.ChannelsDatabase
 import kotlin.collections.List
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SqliteChannelsDb(val driver: SqlDriver, database: ChannelsDatabase) : ChannelsDb {
+class SqliteChannelsDb(val driver: SqlDriver, database: ChannelsDatabase, loggerFactory: LoggerFactory) : ChannelsDb {
 
+    val log = loggerFactory.newLogger(this::class)
     private val queries = database.channelsDatabaseQueries
 
     override suspend fun addOrUpdateChannel(state: PersistedChannelState) {
         withContext(Dispatchers.Default) {
             queries.transaction {
                 queries.getChannel(state.channelId).executeAsOneOrNull()?.run {
-                    queries.updateChannel(channel_id = state.channelId, data_ = state)
+                    queries.updateChannel(channel_id = state.channelId, data_ = PersistedChannelStateAdapter.encode(state))
                 } ?: run {
-                    queries.insertChannel(channel_id = state.channelId, data_ = state)
+                    queries.insertChannel(channel_id = state.channelId, data_ = PersistedChannelStateAdapter.encode(state))
                 }
             }
         }
@@ -44,9 +46,11 @@ class SqliteChannelsDb(val driver: SqlDriver, database: ChannelsDatabase) : Chan
 
     suspend fun getChannel(channelId: ByteVector32): Triple<ByteVector32, PersistedChannelState, Boolean>? {
         return withContext(Dispatchers.Default) {
-            queries.getChannel(channelId, mapper = { channelId, data, isClosed ->
-                Triple(channelId, data, isClosed)
-            }).executeAsOneOrNull()
+            queries.getChannel(channelId).executeAsOneOrNull()?.let { (channelId, data, isClosed) ->
+                mapChannelData(channelId, data)?.let {
+                    Triple(channelId, it, isClosed)
+                }
+            }
         }
     }
 
@@ -58,7 +62,7 @@ class SqliteChannelsDb(val driver: SqlDriver, database: ChannelsDatabase) : Chan
     }
 
     override suspend fun listLocalChannels(): List<PersistedChannelState> = withContext(Dispatchers.Default) {
-        queries.listLocalChannels().executeAsList()
+        queries.listLocalChannels().executeAsList().mapNotNull { (channelId, data) -> mapChannelData(channelId, data) }
     }
 
     override suspend fun addHtlcInfo(channelId: ByteVector32, commitmentNumber: Long, paymentHash: ByteVector32, cltvExpiry: CltvExpiry) {
@@ -77,6 +81,15 @@ class SqliteChannelsDb(val driver: SqlDriver, database: ChannelsDatabase) : Chan
             queries.listHtlcInfos(channel_id = channelId, commitment_number = commitmentNumber, mapper = { payment_hash, cltv_expiry ->
                 payment_hash to CltvExpiry(cltv_expiry)
             }).executeAsList()
+        }
+    }
+
+    private fun mapChannelData(channelId: ByteVector32, data: ByteArray): PersistedChannelState? {
+        return try {
+            PersistedChannelStateAdapter.decode(data)
+        } catch (e: Exception) {
+            log.e(e) { "failed to read channel data for channel=$channelId :" }
+            null
         }
     }
 

@@ -72,7 +72,7 @@ class DatabaseManager(
                 log.debug { "nodeParams available: building databases..." }
 
                 val channelsDbDriver = createChannelsDbDriver(ctx, channelsDbName(chain, nodeParams.nodeId))
-                val channelsDb = createSqliteChannelsDb(channelsDbDriver)
+                val channelsDb = createSqliteChannelsDb(channelsDbDriver, loggerFactory)
                 val paymentsDbDriver = createPaymentsDbDriver(ctx, paymentsDbName(chain, nodeParams.nodeId)) { log.e { "payments-db migration error: $it" } }
                 val paymentsDb = createSqlitePaymentsDb(paymentsDbDriver, paymentMetadataQueue, loggerFactory)
                 val cloudKitDb = makeCloudKitDb(appDb, paymentsDb)

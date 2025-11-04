@@ -36,14 +36,15 @@ import fr.acinq.phoenix.db.sqldelight.*
 import fr.acinq.phoenix.managers.PaymentMetadataQueue
 import fr.acinq.phoenix.utils.extensions.toByteArray
 
-fun createSqliteChannelsDb(driver: SqlDriver): SqliteChannelsDb {
+fun createSqliteChannelsDb(driver: SqlDriver, loggerFactory: LoggerFactory): SqliteChannelsDb {
     return SqliteChannelsDb(
         driver = driver,
         database = ChannelsDatabase(
             driver = driver,
             htlc_infosAdapter = Htlc_infos.Adapter(ByteVector32Adapter, ByteVector32Adapter),
-            local_channelsAdapter = Local_channels.Adapter(ByteVector32Adapter, PersistedChannelStateAdapter)
-        )
+            local_channelsAdapter = Local_channels.Adapter(ByteVector32Adapter),
+        ),
+        loggerFactory = loggerFactory
     )
 }
 

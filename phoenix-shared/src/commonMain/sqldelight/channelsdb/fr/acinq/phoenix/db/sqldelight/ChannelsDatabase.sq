@@ -6,7 +6,7 @@ import kotlin.Boolean;
 -- note: boolean are stored as INTEGER, with 0=false
 CREATE TABLE local_channels (
     channel_id BLOB AS ByteVector32 NOT NULL PRIMARY KEY,
-    data BLOB AS PersistedChannelState NOT NULL,
+    data BLOB NOT NULL,
     is_closed INTEGER AS Boolean DEFAULT 0 NOT NULL
 );
 
@@ -35,7 +35,7 @@ closeLocalChannel:
 UPDATE local_channels SET is_closed=1 WHERE channel_id=?;
 
 listLocalChannels:
-SELECT data FROM local_channels WHERE is_closed=0;
+SELECT channel_id, data FROM local_channels WHERE is_closed=0;
 
 -- htlcs info queries
 insertHtlcInfo:
