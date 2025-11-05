@@ -180,6 +180,9 @@ final class GroupPrefs_Wallet: Sendable {
 		}
 	}
 	
+	/// Reminder: This value is updated by the notifySrvExt,
+	/// and the mainApp needs to be properly notified when this change occurs.
+	///
 	func srvExtConnectionPublisher() -> AnyAsyncSequence<Date> {
 		maybeLogDefaultAccess(#function)
 		return defaults.observeKey(Key.srvExtConnection.value(id), valueType: NSNumber.self)
