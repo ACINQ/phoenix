@@ -17,7 +17,6 @@ struct IncomingBalancePopover: View {
 	@State var finalWallet = Biz.business.peerManager.finalWalletValue()
 	
 	@State var liquidityPolicy: LiquidityPolicy = GroupPrefs.current.liquidityPolicy
-	let liquidityPolicyPublisher = GroupPrefs.current.liquidityPolicyPublisher
 	
 	@ObservedObject var currencyPrefs = CurrencyPrefs.current
 	
@@ -34,8 +33,10 @@ struct IncomingBalancePopover: View {
 		}
 		.padding(.vertical, 10)
 		.background(Color.primaryBackground)
-		.onReceive(liquidityPolicyPublisher) {
-			liquidityPolicyChanged($0)
+		.task {
+			for await value in GroupPrefs.current.altLiquidityPolicyPublisher() {
+				liquidityPolicyChanged(value)
+			}
 		}
 		.task {
 			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {
