@@ -6,7 +6,7 @@ fileprivate let filename = "XPC"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+fileprivate var log = LoggerFactory.shared.logger(filename, .info)
 #endif
 
 enum XpcActor: CustomStringConvertible {
@@ -102,7 +102,7 @@ class XPC {
 	}
 	
 	deinit {
-		log.trace("deinit()")
+		log.trace(#function)
 		
 		if notify_is_valid_token(notifyToken) {
 			notify_cancel(notifyToken)
@@ -163,7 +163,7 @@ class XPC {
 	// --------------------------------------------------
 	
 	private func readChannelID() {
-		log.trace("readChannelID()")
+		log.trace(#function)
 		
 		let fm = FileManager.default
 		guard let groupDir = fm.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier) else {
@@ -226,10 +226,10 @@ class XPC {
 	}
 	
 	private func registerChannel(_ channelID: String) {
-		log.trace("register()")
+		log.trace(#function)
 		
 		guard !notify_is_valid_token(notifyToken) else {
-			log.debug("ignoring: channel is already registered")
+			log.warning("registerChannel(): ignoring: channel is already registered")
 			return
 		}
 		
@@ -259,7 +259,7 @@ class XPC {
 		if notify_is_valid_token(notifyToken) {
 			
 			if suspendCount > 0 {
-				log.debug("notify_suspend()")
+				log.info("notify_suspend()")
 				notify_suspend(notifyToken)
 				
 			} else {
@@ -277,24 +277,23 @@ class XPC {
 			switch msg {
 			case msgPing_mainApp : fallthrough
 			case msgPong_mainApp : fallthrough
-			case msgUnavailable_mainApp:
-				log.debug("ignorning own message: \(msgStr)")
+			case msgUnavailable_mainApp: break
 				
 			case msgPing_notifySrvExt:
-				log.debug("received message: \(msgStr)")
+				log.info("received message: \(msgStr)")
 				notifyReceivedMessage(.available)
 				sendPongMessage()
 				
 			case msgPong_notifySrvExt:
-				log.debug("received message: \(msgStr)")
+				log.info("received message: \(msgStr)")
 				notifyReceivedMessage(.available)
 				
 			case msgUnavailable_notifySrvExt:
-				log.debug("received message: \(msgStr)")
+				log.info("received message: \(msgStr)")
 				notifyReceivedMessage(.unavailable)
 				
 			default:
-				log.debug("received unknown message: \(msg)")
+				log.warning("received unknown message: \(msg)")
 				
 			} // </switch msg>
 			
@@ -303,24 +302,23 @@ class XPC {
 			switch msg {
 			case msgPing_notifySrvExt: fallthrough
 			case msgPong_notifySrvExt: fallthrough
-			case msgUnavailable_notifySrvExt:
-				log.debug("ignorning own message: \(msgStr)")
+			case msgUnavailable_notifySrvExt: break
 				
 			case msgPing_mainApp:
-				log.debug("received message: \(msgStr)")
+				log.info("received message: \(msgStr)")
 				notifyReceivedMessage(.available)
 				sendPongMessage()
 				
 			case msgPong_mainApp:
-				log.debug("received message: \(msgStr)")
+				log.info("received message: \(msgStr)")
 				notifyReceivedMessage(.available)
 				
 			case msgUnavailable_mainApp:
-				log.debug("received message: \(msgStr)")
+				log.info("received message: \(msgStr)")
 				notifyReceivedMessage(.unavailable)
 				
 			default:
-				log.debug("received unknown message: \(msg)")
+				log.warning("received unknown message: \(msg)")
 				
 			} // </switch msg>
 		} // </switch actor>
@@ -348,10 +346,10 @@ class XPC {
 	}
 	
 	private func sendMessage(_ msg: UInt64) {
-		log.trace("sendMessage(\(messageToString(msg)))")
+		log.info("sendMessage(\(messageToString(msg)))")
 		
 		guard notify_is_valid_token(notifyToken), let channel = channel else {
-			log.debug("sendMessage(\(messageToString(msg))): ignoring: channel not setup yet")
+			log.warning("sendMessage(\(messageToString(msg))): ignoring: channel not setup yet")
 			return
 		}
 		
@@ -377,7 +375,7 @@ class XPC {
 	}
 	
 	private func notifyReceivedMessage(_ msg: XpcMessage) {
-		log.trace("notifyReceivedMessage()")
+		log.trace(#function)
 		
 		DispatchQueue.main.async {
 			self.receivedMessagePublisher.send(msg)
