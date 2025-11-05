@@ -3,6 +3,7 @@ import SwiftUI
 import PhoenixShared
 import BackgroundTasks
 import Combine
+import AsyncAlgorithms
 
 fileprivate let filename = "BusinessManager"
 #if DEBUG && true
@@ -176,21 +177,21 @@ class BusinessManager {
 		}.store(in: &cancellables)
 		
 		// Tor configuration observer
-		groupPrefs.isTorEnabledPublisher
-			.sink { (isTorEnabled: Bool) in
-				
+		Task { @MainActor [self] in
+			for await isTorEnabled in groupPrefs.isTorEnabledPubliser() {
 				self.business.appConfigurationManager.updateTorUsage(enabled: isTorEnabled)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// PreferredFiatCurrenies observers
-		Publishers.CombineLatest(
-				groupPrefs.fiatCurrencyPublisher,
-				groupPrefs.currencyConverterListPublisher
-			).sink { _ in
-			
+		Task { @MainActor [self] in
+			let sequence = combineLatest(
+				groupPrefs.fiatCurrencyPublisher(),
+				groupPrefs.currrencyConverterListPublisher()
+			)
+			for await (fiatCurrency, _) in sequence {
 				let current = PreferredFiatCurrencies(
-					primary: groupPrefs.fiatCurrency,
+					primary: fiatCurrency,
 					others: groupPrefs.preferredFiatCurrencies
 				)
 				BizGlobal.currencyManager.startMonitoringCurrencies(
@@ -199,27 +200,24 @@ class BusinessManager {
 				)
 				self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// Liquidity policy
-		groupPrefs.liquidityPolicyPublisher.dropFirst()
-			.sink { (policy: LiquidityPolicy) in
-			
-				Task { @MainActor in
-					do {
-						log.debug("invoking peerManager.updatePeerLiquidityPolicy()...")
-						try await self.business.peerManager.updatePeerLiquidityPolicy(newPolicy: policy.toKotlin())
-						
-						if self.swapInRejectedPublisher.value != nil {
-							log.debug("Received updated liquidityPolicy: clearing swapInRejectedPublisher")
-							self.swapInRejectedPublisher.value = nil
-						}
-					} catch {
-						log.error("Error: biz.peerManager.updatePeerLiquidityPolicy: \(error)")
+		Task { @MainActor [self] in
+			for await policy in groupPrefs.altLiquidityPolicyPublisher().dropFirst() {
+				do {
+					log.debug("invoking peerManager.updatePeerLiquidityPolicy()...")
+					try await self.business.peerManager.updatePeerLiquidityPolicy(newPolicy: policy.toKotlin())
+					
+					if self.swapInRejectedPublisher.value != nil {
+						log.debug("Received updated liquidityPolicy: clearing swapInRejectedPublisher")
+						self.swapInRejectedPublisher.value = nil
 					}
+				} catch {
+					log.error("Error: biz.peerManager.updatePeerLiquidityPolicy: \(error)")
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		// NodeEvents
 		Task { @MainActor [self] in
@@ -281,9 +279,9 @@ class BusinessManager {
 		
 		// Monitor for notifySrvExt being active & connected to Peer
 		//
-		groupPrefs.srvExtConnectionPublisher
-			.sink { (date: Date) in
-			
+		Task { @MainActor [self] in
+			for await date in groupPrefs.srvExtConnectionPublisher() {
+				
 				log.debug("srvExtConnectionPublisher.fire()")
 				
 				let elapsed = date.timeIntervalSinceNow * -1.0
@@ -304,7 +302,7 @@ class BusinessManager {
 					}
 				}
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		var srvExtWasConnectedToPeer = false
 		self.srvExtConnectedToPeer

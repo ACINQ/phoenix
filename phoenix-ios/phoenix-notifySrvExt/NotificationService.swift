@@ -7,7 +7,7 @@ fileprivate let filename = "NotificationService"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+fileprivate var log = LoggerFactory.shared.logger(filename, .info)
 #endif
 
 /**
@@ -58,8 +58,7 @@ class NotificationService: UNNotificationServiceExtension {
 	) {
 		let selfPtr: String = Unmanaged.passUnretained(self).toOpaque().debugDescription
 		
-		log.trace("instance => \(selfPtr)")
-		log.trace("didReceive(request:withContentHandler:)")
+		log.info("didReceive(request:withContentHandler:): instance => \(selfPtr)")
 		log.trace("request.content.userInfo: \(request.content.userInfo)")
 		
 		self.contentHandler = contentHandler
@@ -79,7 +78,7 @@ class NotificationService: UNNotificationServiceExtension {
 	}
 	
 	override func serviceExtensionTimeWillExpire() {
-		log.trace("serviceExtensionTimeWillExpire()")
+		log.trace(#function)
 		
 		// iOS calls this function just before the extension will be terminated by the system.
 		// Use this as an opportunity to deliver your "best attempt" at modified content,
@@ -96,7 +95,7 @@ class NotificationService: UNNotificationServiceExtension {
 	// --------------------------------------------------
 	
 	private func processNotification(_ userInfo: [AnyHashable : Any]) {
-		log.trace("processNotification()")
+		log.trace(#function)
 		assertMainThread()
 		
 		// This could be a push notification coming from either:
@@ -129,15 +128,15 @@ class NotificationService: UNNotificationServiceExtension {
 	// --------------------------------------------------
 	
 	private func startTotalTimer() {
-		log.trace("startTotalTimer()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard !srvExtDone else {
-			log.debug("startTotalTimer(): ignoring: srvExtDone")
+			log.info("startTotalTimer(): ignoring: srvExtDone")
 			return
 		}
 		guard totalTimer == nil else {
-			log.debug("startTotalTimer(): ignoring: already started")
+			log.info("startTotalTimer(): ignoring: already started")
 			return
 		}
 		
@@ -150,30 +149,30 @@ class NotificationService: UNNotificationServiceExtension {
 		) {[weak self](_: Timer) -> Void in
 			
 			if let self {
-				log.debug("totalTimer.fire()")
+				log.info("totalTimer.fire()")
 				self.finish()
 			}
 		}
 	}
 	
 	private func startConnectionTimer() {
-		log.trace("startConnectionTimer()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard !srvExtDone else {
-			log.debug("startConnectionTimer(): ignoring: srvExtDone")
+			log.info("startConnectionTimer(): ignoring: srvExtDone")
 			return
 		}
 		guard connectionTimer == nil else {
-			log.debug("startConnectionTimer(): ignoring: already started")
+			log.info("startConnectionTimer(): ignoring: already started")
 			return
 		}
 		guard let groupPrefs = PhoenixManager.shared.groupPrefs() else {
-			log.debug("startConnectionTimer(): ignoring: groupPrefs is nil")
+			log.info("startConnectionTimer(): ignoring: groupPrefs is nil")
 			return
 		}
 		
-		log.debug("GroupPrefs.current.srvExtConnection = now")
+		log.info("GroupPrefs.current.srvExtConnection = now")
 		groupPrefs.srvExtConnection = Date.now
 		
 		connectionTimer = Timer.scheduledTimer(
@@ -183,14 +182,14 @@ class NotificationService: UNNotificationServiceExtension {
 		
 			if let _ = self {
 				log.debug("connectionsTimer.fire()")
-				log.debug("GroupPrefs.current.srvExtConnection = now")
+				log.info("GroupPrefs.current.srvExtConnection = now")
 				groupPrefs.srvExtConnection = Date.now
 			}
 		}
 	}
 	
 	private func startPostReceivedPaymentTimer() {
-		log.trace("startPostReceivedPaymentTimer()")
+		log.trace(#function)
 		assertMainThread()
 		
 		// This method is called everytime we receive a payment,
@@ -210,7 +209,7 @@ class NotificationService: UNNotificationServiceExtension {
 		) {[weak self](_: Timer) -> Void in
 			
 			if let self {
-				log.debug("postReceivedPaymentTimer.fire()")
+				log.info("postReceivedPaymentTimer.fire()")
 				self.finish()
 			}
 		}
@@ -221,15 +220,15 @@ class NotificationService: UNNotificationServiceExtension {
 	// --------------------------------------------------
 	
 	private func startXpc() {
-		log.trace("startXpc()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard !srvExtDone else {
-			log.debug("startXpc(): ignoring: srvExtDone")
+			log.info("startXpc(): ignoring: srvExtDone")
 			return
 		}
 		guard !xpcStarted else {
-			log.debug("startXpc(): ignoring: already started")
+			log.warning("startXpc(): ignoring: already started")
 			return
 		}
 		xpcStarted = true
@@ -242,11 +241,11 @@ class NotificationService: UNNotificationServiceExtension {
 	}
 	
 	private func stopXpc() {
-		log.trace("stopXpc()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard xpcStarted else {
-			log.debug("stopXpc(): ignoring: already stopped")
+			log.info("stopXpc(): ignoring: already stopped")
 			return
 		}
 		xpcStarted = false
@@ -255,12 +254,13 @@ class NotificationService: UNNotificationServiceExtension {
 	}
 	
 	private func didReceiveXpcMessage(_ msg: XpcMessage) {
-		log.trace("didReceiveXpcMessage()")
+		log.trace(#function)
 		assertMainThread()
 		
 		if msg == .available {
 			
 			// The main phoenix app is running.
+			log.info("didReceiveXpcMessage: available (main phoenix app is running)")
 			
 			if isConnectedToPeer {
 				
@@ -268,7 +268,7 @@ class NotificationService: UNNotificationServiceExtension {
 				// So we're going to continue working on the payment,
 				// and the main app will have to wait for us to finish before connecting to the peer itself.
 				
-				log.debug("isConnectedToPeer is true => continue processing incoming payment")
+				log.info("isConnectedToPeer is true => continue processing incoming payment")
 				
 			} else {
 				
@@ -288,15 +288,15 @@ class NotificationService: UNNotificationServiceExtension {
 	// --------------------------------------------------
 	
 	private func startPhoenix() {
-		log.trace("startPhoenix()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard !srvExtDone else {
-			log.debug("startPhoenix(): ignoring: srvExtDone")
+			log.info("startPhoenix(): ignoring: srvExtDone")
 			return
 		}
 		guard !phoenixStarted else {
-			log.debug("startPhoenix(): ignoring: already started")
+			log.warning("startPhoenix(): ignoring: already started")
 			return
 		}
 		phoenixStarted = true
@@ -328,11 +328,11 @@ class NotificationService: UNNotificationServiceExtension {
 	}
 	
 	private func stopPhoenix() {
-		log.trace("stopPhoenix()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard phoenixStarted else {
-			log.debug("stopPhoenix(): ignoring: already stopped")
+			log.info("stopPhoenix(): ignoring: already stopped")
 			return
 		}
 		phoenixStarted = false
@@ -342,20 +342,24 @@ class NotificationService: UNNotificationServiceExtension {
 	}
 	
 	private func connectionsChanged(_ connections: Connections) {
-		log.trace("connectionsChanged(): isConnectedToPeer = \(connections.peer.isEstablished())")
+		log.trace(#function)
 		assertMainThread()
 		
 		isConnectedToPeer = connections.peer.isEstablished()
+		log.info("isConnectedToPeer = \(isConnectedToPeer)")
+		
 		if isConnectedToPeer && !srvExtDone {
 			startConnectionTimer()
 		}
 	}
 	
 	private func didReceivePayment(_ payment: Lightning_kmpIncomingPayment) {
-		log.trace("didReceivePayment()")
+		log.trace(#function)
 		assertMainThread()
 		
 		receivedPayments.append(payment)
+		log.info("total received payments = \(receivedPayments.count)")
+		
 		if !srvExtDone {
 			startPostReceivedPaymentTimer()
 		}
@@ -366,7 +370,7 @@ class NotificationService: UNNotificationServiceExtension {
 	// --------------------------------------------------
 	
 	private func finish() {
-		log.trace("finish()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard !srvExtDone else {
@@ -378,6 +382,8 @@ class NotificationService: UNNotificationServiceExtension {
 			log.error("finish(): invalid state")
 			return
 		}
+		
+		log.info("finish(): shutting down notify-srv-ext")
 		
 		totalTimer?.invalidate()
 		totalTimer = nil
@@ -451,10 +457,10 @@ class NotificationService: UNNotificationServiceExtension {
 	}
 	
 	private func displayLocalNotificationsForAdditionalPayments() {
-		log.trace("displayLocalNotificationsForAdditionalPayments()")
+		log.trace(#function)
 		
 		for additionalPayment in receivedPayments {
-			log.debug("processing additional payment...")
+			log.info("processing additional payment...")
 			
 			let identifier = UUID().uuidString
 			let content = UNMutableNotificationContent()

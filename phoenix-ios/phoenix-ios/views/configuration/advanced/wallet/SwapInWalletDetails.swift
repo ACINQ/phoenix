@@ -67,11 +67,13 @@ struct SwapInWalletDetails: View {
 		.onAppear {
 			onAppear()
 		}
-		.onReceive(GroupPrefs.current.liquidityPolicyPublisher) {
-			liquidityPolicyChanged($0)
-		}
 		.onReceive(swapInRejectedPublisher) {
 			swapInRejectedStateChange($0)
+		}
+		.task {
+			for await value in GroupPrefs.current.altLiquidityPolicyPublisher() {
+				liquidityPolicyChanged(value)
+			}
 		}
 		.task {
 			for await wallet in Biz.business.balanceManager.swapInWalletSequence() {

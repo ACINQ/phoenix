@@ -18,7 +18,7 @@ fileprivate typealias Key = GroupPrefsKey
 /// The values here are SHARED with other extensions bundled in the app,
 /// such as the notification-service-extension.
 ///
-class GroupPrefs_Global {
+final class GroupPrefs_Global: Sendable {
 	
 	private static var defaults: UserDefaults {
 		return GroupPrefs.defaults
@@ -38,9 +38,14 @@ class GroupPrefs_Global {
 	// MARK: Push Notifications
 	// --------------------------------------------------
 	
-	lazy private(set) var badgeCountPublisher = {
-		CurrentValueSubject<Int, Never>(self.badgeCount)
-	}()
+	/// Reminder: This value is updated by the notifySrvExt,
+	/// and the mainApp needs to be properly notified when this change occurs.
+	///
+	func badgeCountPublisher() -> AnyAsyncSequence<Int> {
+		return defaults.observeKey(Key.badgeCount.value(id), valueType: NSNumber.self)
+			.map { $0?.intValue ?? 0 }
+			.eraseToAnyAsyncSequence()
+	}
 	
 	var badgeCount: Int {
 		get {
@@ -48,9 +53,6 @@ class GroupPrefs_Global {
 		}
 		set {
 			defaults.set(newValue, forKey: Key.badgeCount.value(id))
-			runOnMainThread {
-				self.badgeCountPublisher.send(newValue)
-			}
 		}
 	}
 	

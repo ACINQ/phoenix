@@ -68,11 +68,15 @@ fileprivate struct DisplayConfigurationList: View {
 		}
 		.listStyle(.insetGrouped)
 		.listBackgroundColor(.primaryBackground)
-		.onReceive(GroupPrefs.current.fiatCurrencyPublisher) {
-			fiatCurrency = $0
+		.task {
+			for await value in GroupPrefs.current.fiatCurrencyPublisher() {
+				fiatCurrency = value
+			}
 		}
-		.onReceive(GroupPrefs.current.bitcoinUnitPublisher) {
-			bitcoinUnit = $0
+		.task {
+			for await value in GroupPrefs.current.bitcoinUnitPublisher() {
+				bitcoinUnit = value
+			}
 		}
 		.onReceive(Prefs.global.themePublisher) {
 			theme = $0

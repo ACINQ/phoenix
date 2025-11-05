@@ -121,11 +121,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	func _applicationDidBecomeActive(_ application: UIApplication) {
 		log.trace("### applicationDidBecomeActive(_:)")
 		
-		GroupPrefs.global.badgeCountPublisher.sink {[self](count: Int) in
-			if count > 0 {
-				self.didReceivePaymentViaAppExtension()
-				GroupPrefs.global.badgeCount = 0
-				UIApplication.shared.applicationIconBadgeNumber = 0
+		Task { @MainActor [self] in
+			for await count in GroupPrefs.global.badgeCountPublisher() {
+				if count > 0 {
+					self.didReceivePaymentViaAppExtension()
+					GroupPrefs.global.badgeCount = 0
+					UIApplication.shared.applicationIconBadgeNumber = 0
+				}
 			}
 		}.store(in: &groupPrefsCancellables)
 		

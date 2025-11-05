@@ -17,7 +17,7 @@ fileprivate typealias Key = GroupPrefsKey
 /// Note that the values here are SHARED with other extensions bundled in the app,
 /// such as the notification-service-extension.
 ///
-class GroupPrefs_Wallet {
+final class GroupPrefs_Wallet: Sendable {
 	
 	private static var defaults: UserDefaults {
 		return GroupPrefs.defaults
@@ -51,45 +51,59 @@ class GroupPrefs_Wallet {
 		}
 	}
 	
-	lazy private(set) var fiatCurrencyPublisher = {
-		CurrentValueSubject<FiatCurrency, Never>(self.fiatCurrency)
-	}()
+	func fiatCurrencyPublisher() -> AnyAsyncSequence<FiatCurrency> {
+		maybeLogDefaultAccess(#function)
+		return defaults.observeKey(Key.fiatCurrency.value(id), valueType: String.self)
+			.map { Self.deserializeFiatCurrency($0) }
+			.eraseToAnyAsyncSequence()
+	}
+	
+	private static func deserializeFiatCurrency(_ str: String?) -> FiatCurrency {
+		return FiatCurrency.deserialize(str)
+			?? FiatCurrency.localeDefault()
+			?? FiatCurrency.usd
+	}
 
 	var fiatCurrency: FiatCurrency {
 		get {
 			maybeLogDefaultAccess(#function)
-			return FiatCurrency.deserialize(defaults.string(forKey: Key.fiatCurrency.value(id))) ??
-			FiatCurrency.localeDefault() ?? FiatCurrency.usd
+			let str = defaults.string(forKey: Key.fiatCurrency.value(id))
+			return Self.deserializeFiatCurrency(str)
 		}
 		set {
 			defaults.set(newValue.serialize(), forKey: Key.fiatCurrency.value(id))
-			runOnMainThread {
-				self.fiatCurrencyPublisher.send(newValue)
-			}
 		}
 	}
 	
-	lazy private(set) var bitcoinUnitPublisher = {
-		CurrentValueSubject<BitcoinUnit, Never>(self.bitcoinUnit)
-	}()
+	func bitcoinUnitPublisher() -> AnyAsyncSequence<BitcoinUnit> {
+		maybeLogDefaultAccess(#function)
+		return defaults.observeKey(Key.bitcoinUnit.value(id), valueType: String.self)
+			.map { Self.deserializeBitcoinUnit($0) }
+			.eraseToAnyAsyncSequence()
+	}
 
+	private static func deserializeBitcoinUnit(_ str: String?) -> BitcoinUnit {
+		return BitcoinUnit.deserialize(str)
+			?? BitcoinUnit.sat
+	}
+	
 	var bitcoinUnit: BitcoinUnit {
 		get {
 			maybeLogDefaultAccess(#function)
-			return BitcoinUnit.deserialize(defaults.string(forKey: Key.bitcoinUnit.value(id))) ??
-			BitcoinUnit.sat
+			let str = defaults.string(forKey: Key.bitcoinUnit.value(id))
+			return Self.deserializeBitcoinUnit(str)
 		}
 		set {
 			defaults.set(newValue.serialize(), forKey: Key.bitcoinUnit.value(id))
-			runOnMainThread {
-				self.bitcoinUnitPublisher.send(newValue)
-			}
 		}
 	}
 	
-	lazy private(set) var currencyConverterListPublisher = {
-		CurrentValueSubject<[Currency], Never>(self.currencyConverterList)
-	}()
+	func currrencyConverterListPublisher() -> AnyAsyncSequence<[Currency]> {
+		maybeLogDefaultAccess(#function)
+		return defaults.observeKey(Key.currencyConverterList.value(id), valueType: String.self)
+			.map { Currency.deserializeList($0) }
+			.eraseToAnyAsyncSequence()
+	}
 	
 	var currencyConverterList: [Currency] {
 		get {
@@ -98,9 +112,6 @@ class GroupPrefs_Wallet {
 		}
 		set {
 			defaults.set(Currency.serializeList(newValue), forKey: Key.currencyConverterList.value(id))
-			runOnMainThread {
-				self.currencyConverterListPublisher.send(newValue)
-			}
 		}
 	}
 	
@@ -125,10 +136,6 @@ class GroupPrefs_Wallet {
 	// --------------------------------------------------
 	// MARK: User Config
 	// --------------------------------------------------
-	
-	lazy private(set) var electrumConfigPublisher = {
-		CurrentValueSubject<ElectrumConfigPrefs?, Never>(self.electrumConfig)
-	}()
 
 	var electrumConfig: ElectrumConfigPrefs? {
 		get {
@@ -137,15 +144,14 @@ class GroupPrefs_Wallet {
 		}
 		set {
 			defaults.set(newValue?.jsonEncode(), forKey: Key.electrumConfig.value(id))
-			runOnMainThread {
-				self.electrumConfigPublisher.send(newValue)
-			}
 		}
 	}
-
-	lazy private(set) var isTorEnabledPublisher = {
-		CurrentValueSubject<Bool, Never>(self.isTorEnabled)
-	}()
+	
+	func isTorEnabledPubliser() -> AnyAsyncSequence<Bool> {
+		return defaults.observeKey(Key.isTorEnabled.value(id), valueType: NSNumber.self)
+			.map { $0?.boolValue ?? false }
+			.eraseToAnyAsyncSequence()
+	}
 
 	var isTorEnabled: Bool {
 		get {
@@ -154,15 +160,14 @@ class GroupPrefs_Wallet {
 		}
 		set {
 			defaults.set(newValue, forKey: Key.isTorEnabled.value(id))
-			runOnMainThread {
-				self.isTorEnabledPublisher.send(newValue)
-			}
 		}
 	}
 	
-	lazy private(set) var liquidityPolicyPublisher = {
-		CurrentValueSubject<LiquidityPolicy, Never>(self.liquidityPolicy)
-	}()
+	func altLiquidityPolicyPublisher() -> AnyAsyncSequence<LiquidityPolicy> {
+		return defaults.observeKey(Key.liquidityPolicy.value(id), valueType: Data.self)
+			.map { $0?.jsonDecode() ?? LiquidityPolicy.defaultPolicy() }
+			.eraseToAnyAsyncSequence()
+	}
 	
 	var liquidityPolicy: LiquidityPolicy {
 		get {
@@ -172,15 +177,19 @@ class GroupPrefs_Wallet {
 		}
 		set {
 			defaults.set(newValue.jsonEncode(), forKey: Key.liquidityPolicy.value(id))
-			runOnMainThread {
-				self.liquidityPolicyPublisher.send(newValue)
-			}
 		}
 	}
 	
-	lazy private(set) var srvExtConnectionPublisher = {
-		CurrentValueSubject<Date, Never>(self.srvExtConnection)
-	}()
+	/// Reminder: This value is updated by the notifySrvExt,
+	/// and the mainApp needs to be properly notified when this change occurs.
+	///
+	func srvExtConnectionPublisher() -> AnyAsyncSequence<Date> {
+		maybeLogDefaultAccess(#function)
+		return defaults.observeKey(Key.srvExtConnection.value(id), valueType: NSNumber.self)
+			.map { $0 ?? NSNumber(value: 0.0) }
+			.map { Date(timeIntervalSince1970: $0.doubleValue) }
+			.eraseToAnyAsyncSequence()
+	}
 	
 	var srvExtConnection: Date {
 		get {
@@ -189,9 +198,6 @@ class GroupPrefs_Wallet {
 		}
 		set {
 			defaults.set(newValue.timeIntervalSince1970, forKey: Key.srvExtConnection.value(id))
-			runOnMainThread {
-				self.srvExtConnectionPublisher.send(newValue)
-			}
 		}
 	}
 	
