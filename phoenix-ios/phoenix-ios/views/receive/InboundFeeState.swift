@@ -35,11 +35,11 @@ class InboundFeeState: ObservableObject {
 			}
 		}.store(in: &cancellables)
 		
-		GroupPrefs.current.liquidityPolicyPublisher
-			.sink {[weak self](newValue: LiquidityPolicy) in
+		Task { @MainActor [weak self] in
+			for await newValue in GroupPrefs.current.altLiquidityPolicyPublisher() {
 				self?.liquidityPolicyChanged(newValue)
 			}
-			.store(in: &cancellables)
+		}.store(in: &cancellables)
 		
 		mempoolTask = Task { @MainActor in
 			await fetchMempoolRecommendedFees()

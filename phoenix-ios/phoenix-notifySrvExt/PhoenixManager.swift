@@ -6,7 +6,7 @@ fileprivate let filename = "PhoenixManager"
 #if DEBUG && true
 fileprivate var log = LoggerFactory.shared.logger(filename, .trace)
 #else
-fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
+fileprivate var log = LoggerFactory.shared.logger(filename, .info)
 #endif
 
 typealias ConnectionsListener = (Connections) -> Void
@@ -49,7 +49,7 @@ class PhoenixManager {
 	// --------------------------------------------------
 	
 	public func setupBusiness(_ target: String?) -> PhoenixBusiness {
-		log.trace("setupBusiness()")
+		log.trace(#function)
 		assertMainThread()
 		
 		if let currentBusiness = business {
@@ -70,7 +70,7 @@ class PhoenixManager {
 	}
 
 	public func teardownBusiness() {
-		log.trace("teardownBusiness()")
+		log.trace(#function)
 		assertMainThread()
 
 		guard let currentBusiness = business else {
@@ -124,7 +124,7 @@ class PhoenixManager {
 	// --------------------------------------------------
 
 	private func startAsyncUnlock(_ target: String?) {
-		log.trace("startAsyncUnlock()")
+		log.trace(#function)
 		
 		let unlockWithRecoveryPhrase = {(recoveryPhrase: RecoveryPhrase?) in
 			DispatchQueue.main.async {
@@ -189,7 +189,7 @@ class PhoenixManager {
 	}
 	
 	private func unlock(_ recoveryPhrase: RecoveryPhrase?, _ targetNodeIdHash: String?) {
-		log.trace("unlock()")
+		log.trace(#function)
 		assertMainThread()
 		
 		guard let recoveryPhrase else {
@@ -259,7 +259,7 @@ class PhoenixManager {
 	// --------------------------------------------------
 
 	private func oldConnectionsChanged(_ connections: Connections) {
-		log.trace("oldConnectionsChanged(_)")
+		log.trace(#function)
 
 		switch connections.peer {
 			case is Lightning_kmpConnection.ESTABLISHED  : log.debug("oldConnections.peer = ESTABLISHED")

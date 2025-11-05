@@ -276,6 +276,8 @@
 		DC6F04272C3895E300627B4F /* ContactPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F04262C3895E300627B4F /* ContactPhoto.swift */; };
 		DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */; };
 		DC6F19C12C470F70004EC469 /* PickerResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6F19C02C470F70004EC469 /* PickerResult.swift */; };
+		DC6FCC0E2EBA979200A5A498 /* UserDefaults+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6FCC0D2EBA978200A5A498 /* UserDefaults+Stream.swift */; };
+		DC6FCC0F2EBA979200A5A498 /* UserDefaults+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6FCC0D2EBA978200A5A498 /* UserDefaults+Stream.swift */; };
 		DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */; };
 		DC71E7302723240E0063613D /* ObservableConnectionsMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */; };
 		DC71E7332728645B0063613D /* CurrencyConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC71E7322728645B0063613D /* CurrencyConverterView.swift */; };
@@ -747,6 +749,7 @@
 		DC6F04262C3895E300627B4F /* ContactPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPhoto.swift; sourceTree = "<group>"; };
 		DC6F19BE2C46FB0F004EC469 /* NSItemProvider+Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+Async.swift"; sourceTree = "<group>"; };
 		DC6F19C02C470F70004EC469 /* PickerResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerResult.swift; sourceTree = "<group>"; };
+		DC6FCC0D2EBA978200A5A498 /* UserDefaults+Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Stream.swift"; sourceTree = "<group>"; };
 		DC70A99B2BBB6093002DBFF8 /* InboundFeeWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboundFeeWarning.swift; sourceTree = "<group>"; };
 		DC71E72F2723240E0063613D /* ObservableConnectionsMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableConnectionsMonitor.swift; sourceTree = "<group>"; };
 		DC71E7322728645B0063613D /* CurrencyConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyConverterView.swift; sourceTree = "<group>"; };
@@ -1437,6 +1440,7 @@
 				DC78A6002DF8C181003A7DD8 /* UserDefaults+DefaultValue.swift */,
 				DC5F96AD2E032C4B0052CDE6 /* UserDefaults+Dump.swift */,
 				DCB8762F2735AA7300657570 /* UserDefaults+Serialization.swift */,
+				DC6FCC0D2EBA978200A5A498 /* UserDefaults+Stream.swift */,
 			);
 			path = prefs;
 			sourceTree = "<group>";
@@ -2264,6 +2268,7 @@
 				DC0C52682BF4FF6100143831 /* AuthenticateWithPinSheet.swift in Sources */,
 				DC0D2EA52939269800284608 /* KotlinExtensions+CloudKit.swift in Sources */,
 				DC5E28CC2C63EF8E0037B3D3 /* NavigationLink_16.swift in Sources */,
+				DC6FCC0E2EBA979200A5A498 /* UserDefaults+Stream.swift in Sources */,
 				DCA02BA02BD1A5FC0080520F /* ChannelSizeImpactWarning.swift in Sources */,
 				DC355E232A45FAF2008E8A8E /* NestedObservableObject.swift in Sources */,
 				DC5F1C4A28DDAA49007A55ED /* ResetWalletView_Confirm.swift in Sources */,
@@ -2525,6 +2530,7 @@
 				DCEB2795282D7A9F0096B87E /* KotlinPublishers+Phoenix.swift in Sources */,
 				DC5F96CF2E0AFE630052CDE6 /* GroupPrefs+Debug.swift in Sources */,
 				DC5F96EB2E1314FD0052CDE6 /* SecurityErrors.swift in Sources */,
+				DC6FCC0F2EBA979200A5A498 /* UserDefaults+Stream.swift in Sources */,
 				DC641C6B2820803100862DCD /* PhoenixManager.swift in Sources */,
 				DC641C7B2821726F00862DCD /* FormattedAmount.swift in Sources */,
 				DC5F96A52E00A6B30052CDE6 /* WalletIdentifier.swift in Sources */,

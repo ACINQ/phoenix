@@ -59,12 +59,16 @@ class CurrencyPrefs: ObservableObject {
 		hideAmounts = prefs.hideAmounts
 		showOriginalFiatValue = prefs.showOriginalFiatAmount
 		
-		groupPrefs.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
-			self?.fiatCurrency = newValue
+		Task { @MainActor [weak self] in
+			for await value in groupPrefs.fiatCurrencyPublisher()	{
+				self?.fiatCurrency = value
+			}
 		}.store(in: &cancellables)
 		
-		groupPrefs.bitcoinUnitPublisher.sink {[weak self](newValue: BitcoinUnit) in
-			self?.bitcoinUnit = newValue
+		Task { @MainActor [weak self] in
+			for await value in groupPrefs.bitcoinUnitPublisher() {
+				self?.bitcoinUnit = value
+			}
 		}.store(in: &cancellables)
 		
 		prefs.showOriginalFiatAmountPublisher.sink {[weak self](newValue: Bool) in
@@ -72,8 +76,8 @@ class CurrencyPrefs: ObservableObject {
 		}.store(in: &cancellables)
 		
 		Task { @MainActor [weak self] in
-			for await rates in BizGlobal.currencyManager.ratesSequence() {
-				self?.fiatExchangeRates = rates
+			for await value in BizGlobal.currencyManager.ratesSequence() {
+				self?.fiatExchangeRates = value
 			}
 		}.store(in: &cancellables)
 	}
