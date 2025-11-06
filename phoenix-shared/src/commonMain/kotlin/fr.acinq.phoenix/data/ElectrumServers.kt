@@ -15,31 +15,31 @@ private fun electrumServerOnion(host: String, port: Int = 50002): ServerAddress 
 
 val mainnetElectrumServers = listOf(
     electrumServer(host = "electrum.acinq.co"),
-    electrumServer(
-        host = "btc.cihar.com", publicKey =
-                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs0gd2ZsghxUZNwjY6cAD" +
-                "eZRRvk4sGUvkp5SEENNotiwCFPWXdNxCWxh1aiXpLc/h1+1NmwDHDhFXZDZNGFEW" +
-                "GPjW92uZWlcGVZffJWqc8XAvVmTKXUgCDv5daEtyTxk/69NDmmDWSeltV8020ykD" +
-                "FcU5cE/xEmBCfFRoR6yIGwIsCQAIX7XnfbDg1+JdN2N3ZSOOlY4B9r7n3Pm0Q0MW" +
-                "kRykSFk8EEQYmtk383aFZVDuvUkgLLFsBb0zmkWEVrm6Jy1hXyfWqdsrLaipqhy7" +
-                "2n62mHT9vfKhTGIoOXR989v6FA+EIYAklIL2ptX3vLqqvOnRjB122b9eT5ZpZhNi" +
-                "uwIDAQAB"
-    ),
-    electrumServer(
-        host = "tardis.bauerj.eu", publicKey =
-                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxLHijYCSNS9SDOgcMPo3" +
-                "ldVzRTo3LYwozUOUI2P5P8ip7sLFmXPjLbRdzSaKi6YA1J56muie5MJgAimqPo8F" +
-                "vclOGQrArpU/mQEHbWBZJyPQiftldILRLGAN5OpZnAilLtNuPOtbqbEn5KtX7hyz" +
-                "K4Xq+RZd32PMpehVVpG9LZTL/QCB5m99iffUl5uR3BX36siOJIWpahPMizzJKdP0" +
-                "RNZcAKrx5YdWStUYtfprjfBDKXQN6SB5tOVHxVLPpQz3+Iv1mab2nBbQxqiuPTyW" +
-                "8KC1ZsaLfvnQdBgnWxSPcSuLmlc4hsjloC0oinUnH3j4MvqkaTrTsokUMF4ROHiX" +
-                "ks9UcbvzdTXHh9c+8Ia/fVLLAIZitKrc9glFKI1hkjFRAQeGlc3m4TFcsT8ue8a6" +
-                "C6btxW1XZ/BPhznpk9FdUtU0BjZKtwg12cuqSfBcqdFgIwN60jM5N16n1hQDrMHN" +
-                "eZuW5DcVBIR4gq8eZUZ15460Ck4qufliWFD/M6G7rO+hLOIxu9MEe6r5CF1bGaNw" +
-                "mNJhIZeg3JGN9fn1h7kX4VW5H+9v7YVpYGB/vGXCDEsOLjHlZVjgbtungBVJ1UML" +
-                "uOixmccwKWZecT5jXCypj671lzOxF6edUbRsD2xXFjkG5RoifqyNY6zM08bNTyVo" +
-                "BbQJhHwGCCFBV/e5RgVATIUCAwEAAQ=="
-    ),
+//    electrumServer(
+//        host = "btc.cihar.com", publicKey =
+//                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs0gd2ZsghxUZNwjY6cAD" +
+//                "eZRRvk4sGUvkp5SEENNotiwCFPWXdNxCWxh1aiXpLc/h1+1NmwDHDhFXZDZNGFEW" +
+//                "GPjW92uZWlcGVZffJWqc8XAvVmTKXUgCDv5daEtyTxk/69NDmmDWSeltV8020ykD" +
+//                "FcU5cE/xEmBCfFRoR6yIGwIsCQAIX7XnfbDg1+JdN2N3ZSOOlY4B9r7n3Pm0Q0MW" +
+//                "kRykSFk8EEQYmtk383aFZVDuvUkgLLFsBb0zmkWEVrm6Jy1hXyfWqdsrLaipqhy7" +
+//                "2n62mHT9vfKhTGIoOXR989v6FA+EIYAklIL2ptX3vLqqvOnRjB122b9eT5ZpZhNi" +
+//                "uwIDAQAB"
+//    ),
+//    electrumServer(
+//        host = "tardis.bauerj.eu", publicKey =
+//                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxLHijYCSNS9SDOgcMPo3" +
+//                "ldVzRTo3LYwozUOUI2P5P8ip7sLFmXPjLbRdzSaKi6YA1J56muie5MJgAimqPo8F" +
+//                "vclOGQrArpU/mQEHbWBZJyPQiftldILRLGAN5OpZnAilLtNuPOtbqbEn5KtX7hyz" +
+//                "K4Xq+RZd32PMpehVVpG9LZTL/QCB5m99iffUl5uR3BX36siOJIWpahPMizzJKdP0" +
+//                "RNZcAKrx5YdWStUYtfprjfBDKXQN6SB5tOVHxVLPpQz3+Iv1mab2nBbQxqiuPTyW" +
+//                "8KC1ZsaLfvnQdBgnWxSPcSuLmlc4hsjloC0oinUnH3j4MvqkaTrTsokUMF4ROHiX" +
+//                "ks9UcbvzdTXHh9c+8Ia/fVLLAIZitKrc9glFKI1hkjFRAQeGlc3m4TFcsT8ue8a6" +
+//                "C6btxW1XZ/BPhznpk9FdUtU0BjZKtwg12cuqSfBcqdFgIwN60jM5N16n1hQDrMHN" +
+//                "eZuW5DcVBIR4gq8eZUZ15460Ck4qufliWFD/M6G7rO+hLOIxu9MEe6r5CF1bGaNw" +
+//                "mNJhIZeg3JGN9fn1h7kX4VW5H+9v7YVpYGB/vGXCDEsOLjHlZVjgbtungBVJ1UML" +
+//                "uOixmccwKWZecT5jXCypj671lzOxF6edUbRsD2xXFjkG5RoifqyNY6zM08bNTyVo" +
+//                "BbQJhHwGCCFBV/e5RgVATIUCAwEAAQ=="
+//    ),
     electrumServer(
         host = "VPS.hsmiths.com", publicKey =
                 "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwaNR7gST8KEAwc7tGTZP" +
@@ -55,21 +55,21 @@ val mainnetElectrumServers = listOf(
                 "585YChjthLYR8fdfHR2sAvMf0pfqBQgV8sNQ3qIZdpaVZIr0wXucsKDGhsZO3Zym" +
                 "FlzYsP0snim4LMNIlQ+W8N8CAwEAAQ=="
     ),
-    electrumServer(
-        host = "electrum.qtornado.com", publicKey =
-                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAm78Y1pLds3BzsHpo9Bz2" +
-                "2lzu9tS/7loMcdL6AVJ3zVgGycI5whOWuaQntG0aYSiHammZNgGzjv44oU/PluzX" +
-                "PhMxzPlNgSEHnVi2K9mzG7HuGMQh5tEJfvt1zoMmnV4qTaZSLgKKcvrG9112LGQF" +
-                "UZBhV2J3gN21c8rqj/b6NfEqtItKVU173nqYchYu1GBGrHK1nDWWwTVrtHzY4Qos" +
-                "etyCPPnj/JWkO6I8kW2CIevpbXh5PROb+YvdbIsqvRODFgo1oLHmwf09Y7ZxE/nS" +
-                "LZ8yI67U1O39EcRQnoob6pbaqbaoNr0KZSR3xXcJTz2RkhlErMVNH850QGxlXMOr" +
-                "wNKgVrHhUFEBklbsk11Mx+mYWoeHrvZn55xwpTYGaZmZmAVwwUvherz/Tg490XD2" +
-                "2+2T78Zu3mmfmHKfD9uhC+ewyn+REHiz9vrvmMeh+YMBOEwf8lp1Jqte7/8xgdfq" +
-                "kDguOkN6azG64+LyzgWrB79Dfql858Rwn+ezpBZKcSyIL7o1r0T/WeCuR6vLiQ8q" +
-                "YbwAm61pUM9aVshda2WGRRUkhpy7Uj5OHpEQsnXqtoeEzTuiCr1y19VJgwabcUQH" +
-                "MVN1HGHiBl5eU4xBhDUG0l/268Ulk2lcRSI0udRtu7jjQzhSnKQL6HUhCm7PCdXg" +
-                "SqOSwa1yPuHtg/rNBXcqK8cCAwEAAQ=="
-    ),
+//    electrumServer(
+//        host = "electrum.qtornado.com", publicKey =
+//                "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAm78Y1pLds3BzsHpo9Bz2" +
+//                "2lzu9tS/7loMcdL6AVJ3zVgGycI5whOWuaQntG0aYSiHammZNgGzjv44oU/PluzX" +
+//                "PhMxzPlNgSEHnVi2K9mzG7HuGMQh5tEJfvt1zoMmnV4qTaZSLgKKcvrG9112LGQF" +
+//                "UZBhV2J3gN21c8rqj/b6NfEqtItKVU173nqYchYu1GBGrHK1nDWWwTVrtHzY4Qos" +
+//                "etyCPPnj/JWkO6I8kW2CIevpbXh5PROb+YvdbIsqvRODFgo1oLHmwf09Y7ZxE/nS" +
+//                "LZ8yI67U1O39EcRQnoob6pbaqbaoNr0KZSR3xXcJTz2RkhlErMVNH850QGxlXMOr" +
+//                "wNKgVrHhUFEBklbsk11Mx+mYWoeHrvZn55xwpTYGaZmZmAVwwUvherz/Tg490XD2" +
+//                "2+2T78Zu3mmfmHKfD9uhC+ewyn+REHiz9vrvmMeh+YMBOEwf8lp1Jqte7/8xgdfq" +
+//                "kDguOkN6azG64+LyzgWrB79Dfql858Rwn+ezpBZKcSyIL7o1r0T/WeCuR6vLiQ8q" +
+//                "YbwAm61pUM9aVshda2WGRRUkhpy7Uj5OHpEQsnXqtoeEzTuiCr1y19VJgwabcUQH" +
+//                "MVN1HGHiBl5eU4xBhDUG0l/268Ulk2lcRSI0udRtu7jjQzhSnKQL6HUhCm7PCdXg" +
+//                "SqOSwa1yPuHtg/rNBXcqK8cCAwEAAQ=="
+//    ),
     electrumServer(
         host = "electrum.emzy.de", publicKey =
                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAufqDv0nJICJPoP86wOPY" +
