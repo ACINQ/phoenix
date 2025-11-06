@@ -20,13 +20,13 @@ import fr.acinq.bitcoin.*
 import fr.acinq.lightning.crypto.Bip84OnChainKeys
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.crypto.div
+import fr.acinq.phoenix.defaultScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 
 class WalletManager(
     private val chain: Chain
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     private val _localKeyManager = MutableStateFlow<LocalKeyManager?>(null)
     val keyManager: StateFlow<LocalKeyManager?> = _localKeyManager

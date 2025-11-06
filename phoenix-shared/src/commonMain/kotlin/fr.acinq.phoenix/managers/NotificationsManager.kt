@@ -25,8 +25,8 @@ import fr.acinq.phoenix.data.Notification
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.lightning.logging.debug
+import fr.acinq.phoenix.defaultScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -37,7 +37,7 @@ class NotificationsManager(
     private val loggerFactory: LoggerFactory,
     private val appDb: SqliteAppDb,
     private val walletManager: WalletManager
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,

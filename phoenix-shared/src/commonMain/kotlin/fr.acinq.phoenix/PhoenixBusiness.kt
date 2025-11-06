@@ -33,8 +33,10 @@ import fr.acinq.phoenix.controllers.payments.AppReceiveController
 import fr.acinq.phoenix.data.StartupParams
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.*
-import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,8 +53,8 @@ class PhoenixBusiness(
 
     val chain: Chain = NodeParamsManager.chain
 
-    val electrumClient by lazy { ElectrumClient(scope = MainScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds) }
-    val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope(), loggerFactory) }
+    val electrumClient = ElectrumClient(scope = defaultScope(), loggerFactory = loggerFactory, pingInterval = 30.seconds, rpcTimeout = 10.seconds)
+    val electrumWatcher = ElectrumWatcher(client = electrumClient, scope = defaultScope(), loggerFactory = loggerFactory)
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
@@ -139,3 +141,7 @@ class PhoenixBusiness(
             AppCloseChannelsConfigurationController(_this, isForceClose = true)
     }
 }
+
+
+fun defaultScope() = CoroutineScope(Dispatchers.Default + SupervisorJob())
+fun ioScope() = CoroutineScope(Dispatchers.IO + SupervisorJob())
