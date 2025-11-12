@@ -35,6 +35,7 @@ import fr.acinq.phoenix.utils.extensions.nextTimeout
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
+import fr.acinq.phoenix.defaultScope
 import fr.acinq.phoenix.managers.global.FeerateManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -49,7 +50,7 @@ class PeerManager(
     private val notificationsManager: NotificationsManager,
     private val electrumClient: ElectrumClient,
     private val electrumWatcher: ElectrumWatcher,
-) : CoroutineScope by CoroutineScope(CoroutineName("peer") + SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, e ->
+) : CoroutineScope by CoroutineScope(CoroutineName("peer") + SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, e ->
     println("error in Peer coroutine scope: ${e.message}")
     val logger = loggerFactory.newLogger("PeerManager")
     logger.error(e) { "error in Peer scope: " }
@@ -203,7 +204,7 @@ class PeerManager(
                 watcher = electrumWatcher,
                 db = databaseManager.databases.filterNotNull().first(),
                 socketBuilder = null,
-                scope = MainScope()
+                scope = defaultScope()
             )
             _peer.value = peer
 

@@ -2,24 +2,22 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.*
-import fr.acinq.lightning.blockchain.electrum.SwapInManager
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.lightning.blockchain.electrum.balance
 import fr.acinq.lightning.channel.states.ChannelState
 import fr.acinq.lightning.io.Peer
-import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.defaultScope
 import fr.acinq.phoenix.utils.extensions.localBalance
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class BalanceManager(
     private val peerManager: PeerManager,
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     constructor(business: PhoenixBusiness): this(
         peerManager = business.peerManager,

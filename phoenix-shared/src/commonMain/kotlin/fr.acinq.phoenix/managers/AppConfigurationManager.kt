@@ -13,8 +13,8 @@ import fr.acinq.phoenix.data.mainnetElectrumServersOnion
 import fr.acinq.phoenix.data.platformElectrumRegtestConf
 import fr.acinq.phoenix.data.testnetElectrumServers
 import fr.acinq.phoenix.data.testnetElectrumServersOnion
+import fr.acinq.phoenix.defaultScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 class AppConfigurationManager(
     private val chain: Chain,
     private val electrumWatcher: ElectrumWatcher,
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     constructor(business: PhoenixBusiness) : this(
         chain = business.chain,

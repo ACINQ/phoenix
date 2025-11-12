@@ -22,6 +22,7 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.lnurl.*
 import fr.acinq.lightning.logging.error
+import fr.acinq.phoenix.defaultScope
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -30,7 +31,6 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -41,7 +41,7 @@ import kotlinx.serialization.json.JsonObject
 class LnurlManager(
     loggerFactory: LoggerFactory,
     private val walletManager: WalletManager
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     // use special client for lnurl since we dont want ktor to break when receiving non-2xx response
     private val httpClient: HttpClient by lazy {

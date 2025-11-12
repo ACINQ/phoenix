@@ -14,12 +14,12 @@ import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.db.migrations.appDb.v7.AfterVersion7Result
 import fr.acinq.phoenix.db.sqldelight.PaymentsDatabase
+import fr.acinq.phoenix.ioScope
 import fr.acinq.phoenix.utils.extensions.incomingOfferMetadata
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +35,7 @@ class SqliteContactsDb(
     val driver: SqlDriver,
     val database: PaymentsDatabase,
     val loggerFactory: LoggerFactory
-): CoroutineScope by MainScope() {
+): CoroutineScope by ioScope() {
 
     private val log = loggerFactory.newLogger(this::class)
 

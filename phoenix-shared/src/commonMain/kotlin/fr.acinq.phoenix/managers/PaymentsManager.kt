@@ -13,9 +13,8 @@ import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
-import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.phoenix.defaultScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -31,7 +30,7 @@ class PaymentsManager(
     private val databaseManager: DatabaseManager,
     private val electrumClient: ElectrumClient,
     private val nodeParamsManager: NodeParamsManager,
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
