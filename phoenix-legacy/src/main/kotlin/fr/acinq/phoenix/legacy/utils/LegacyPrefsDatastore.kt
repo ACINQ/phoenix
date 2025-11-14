@@ -49,7 +49,7 @@ object LegacyPrefsDatastore {
       LegacyAppStatus.Required.Running.name() -> LegacyAppStatus.Required.Running
       LegacyAppStatus.Required.Interrupted.name() -> LegacyAppStatus.Required.Interrupted
       LegacyAppStatus.NotRequired.name() -> LegacyAppStatus.NotRequired
-      else -> LegacyAppStatus.Unknown
+      else -> LegacyAppStatus.NotRequired // LegacyAppStatus.Unknown
     }
   }
   suspend fun saveStartLegacyApp(context: Context, value: LegacyAppStatus) {

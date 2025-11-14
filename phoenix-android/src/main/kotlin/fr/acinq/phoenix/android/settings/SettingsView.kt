@@ -63,7 +63,6 @@ fun SettingsView(
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var debugClickCount by remember { mutableIntStateOf(0) }
     val notices = noticesViewModel.notices
     val notifications = business.notificationsManager.notifications.collectAsState()
 
@@ -71,31 +70,20 @@ fun SettingsView(
         DefaultScreenHeader(onBackClick = { nc.navigate(Screen.Home.route) }) {
             Text(
                 text = stringResource(id = R.string.menu_settings),
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { debugClickCount += 1 }
-                    )
+                modifier = Modifier.padding(vertical = 12.dp)
             )
         }
 
-        if (debugClickCount > 10) {
-            LaunchedEffect(key1 = Unit) {
-                Toast.makeText(context, "Debug mode enabled", Toast.LENGTH_SHORT).show()
-            }
-            // -- debug
-            CardHeader(text = "DEBUG")
-            Card {
-                MenuButton(
-                    text = "Switch to legacy app (DEBUG)",
-                    icon = R.drawable.ic_settings,
-                    onClick = {
-                        scope.launch { LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected) }
-                    },
-                )
-            }
+        // -- debug
+        CardHeader(text = "DEBUG")
+        Card {
+            MenuButton(
+                text = "Switch to legacy app (DEBUG)",
+                icon = R.drawable.ic_settings,
+                onClick = {
+                    scope.launch { LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected) }
+                },
+            )
         }
 
         // -- general

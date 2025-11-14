@@ -127,7 +127,7 @@ class InitViewModel(controller: InitializationController) : MVIControllerViewMod
                     val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
                     SeedManager.writeSeedToDisk(context, encrypted)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
-                    LegacyPrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
+                    LegacyPrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
                     if (isNewWallet) {
                         log.info("new seed successfully created and written to disk")
                     } else {

@@ -209,7 +209,7 @@ private fun DecryptSeedAndStartBusiness(
                 is StartupDecryptionState.SeedInputFallback -> {
                     StartupSeedFallback(state = state, checkSeedFallback = { ctx, words ->
                         vm.checkSeedFallback(ctx, words, onSuccess = { seed ->
-                            appVM.service!!.startBusiness(seed, requestCheckLegacyChannels = legacyAppStatus is LegacyAppStatus.Unknown)
+                            appVM.service!!.startBusiness(seed, requestCheckLegacyChannels = false)
                         })
                     })
                 }
