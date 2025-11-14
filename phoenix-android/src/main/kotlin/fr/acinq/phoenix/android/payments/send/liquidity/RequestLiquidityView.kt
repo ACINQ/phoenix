@@ -178,7 +178,7 @@ private fun RequestLiquidityBottomSection(
     val peerManager = business.peerManager
     val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
 
-    val vm = viewModel<RequestLiquidityViewModel>(factory = RequestLiquidityViewModel.Factory(peerManager, application))
+    val vm = viewModel<RequestLiquidityViewModel>(factory = RequestLiquidityViewModel.Factory(application, walletId, peerManager))
     var amount by remember { mutableStateOf(LiquidityLimits.liquidityOptions.first()) }
     var isAmountError by remember { mutableStateOf(false) }
 

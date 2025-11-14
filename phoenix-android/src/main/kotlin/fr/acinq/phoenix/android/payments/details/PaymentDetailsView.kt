@@ -32,17 +32,21 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.PaymentsManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 sealed class PaymentDetailsState {
@@ -58,10 +62,12 @@ sealed class PaymentDetailsState {
 }
 
 class PaymentDetailsViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
     private val paymentsManager: PaymentsManager
 ) : ViewModel() {
 
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     var state by mutableStateOf<PaymentDetailsState>(PaymentDetailsState.Loading)
 
@@ -83,23 +89,26 @@ class PaymentDetailsViewModel(
     }
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val paymentsManager: PaymentsManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return PaymentDetailsViewModel(paymentsManager) as T
+            return PaymentDetailsViewModel(application, walletId, paymentsManager) as T
         }
     }
 }
 
 @Composable
 fun PaymentDetailsView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     paymentId: UUID,
     onBackClick: () -> Unit,
     fromEvent: Boolean,
 ) {
-    val vm: PaymentDetailsViewModel = viewModel(factory = PaymentDetailsViewModel.Factory(business.paymentsManager))
+    val vm: PaymentDetailsViewModel = viewModel(factory = PaymentDetailsViewModel.Factory(application, walletId, business.paymentsManager))
 
     LaunchedEffect(key1 = paymentId) {
         vm.getPayment(paymentId)

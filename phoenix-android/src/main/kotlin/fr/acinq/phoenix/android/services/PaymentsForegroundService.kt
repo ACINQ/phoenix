@@ -16,11 +16,13 @@ import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -73,7 +75,8 @@ class PaymentsForegroundService : Service() {
         val shouldWeWaitLong: Boolean = when {
 
             walletId != null && businessMap[walletId] != null -> {
-                log.info("active business found for wallet=$walletId, ignoring background message (reason=$reason)")
+                val walletLogger = LogHelper.getLogger(applicationContext, walletId, this@PaymentsForegroundService)
+                walletLogger.info("active business found for wallet=$walletId, ignoring background message (reason=$reason)")
                 businessMap[walletId]?.business?.let {
                     if (it.connectionsManager.connections.value.peer !is Connection.ESTABLISHED) {
                         it.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
@@ -88,13 +91,14 @@ class PaymentsForegroundService : Service() {
             }
 
             else -> {
+                val walletLogger = LogHelper.getLogger(applicationContext, walletId, this@PaymentsForegroundService)
                 when (val result = SeedManager.loadAndDecrypt(applicationContext)) {
                     is DecryptSeedResult.Failure.SeedFileNotFound -> {
-                        log.info("seed not found, ignoring background message (reason=$reason)")
+                        walletLogger.info("seed not found, ignoring background message (reason=$reason)")
                         false
                     }
                     is DecryptSeedResult.Failure -> {
-                        log.info("unable to read seed, ignoring background message (reason=$reason)")
+                        walletLogger.info("unable to read seed, ignoring background message (reason=$reason)")
                         serviceScope.launch {
                             val walletMetadataMap = (application as PhoenixApplication).globalPrefs.getAvailableWalletsMeta.first()
                             val metadata = walletMetadataMap.getByWalletIdOrDefault(walletId)
@@ -110,13 +114,13 @@ class PaymentsForegroundService : Service() {
                         val userWallets = result.userWalletsMap
                         val wallet = userWallets[walletId]
                         if (wallet == null) {
-                            log.info("seed not found for node_id=$walletId, ignoring background message (reason=$reason)")
+                            walletLogger.info("seed not found for node_id=$walletId, ignoring background message (reason=$reason)")
                             false
                         } else {
                             serviceScope.launch(Dispatchers.Default) {
                                 when (val res = BusinessManager.startNewBusiness(wallet.words, isHeadless = true)) {
                                     is StartBusinessResult.Failure -> {
-                                        log.error("error when starting wallet=$walletId... from foreground service: $res")
+                                        walletLogger.error("error when starting wallet=$walletId... from foreground service: $res")
                                         stopForeground(STOP_FOREGROUND_REMOVE)
                                         stopSelf()
                                     }

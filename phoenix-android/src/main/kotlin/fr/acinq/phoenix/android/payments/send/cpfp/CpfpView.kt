@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
@@ -67,7 +66,7 @@ fun CpfpView(
     onSuccess: () -> Unit,
 ) {
     val peerManager = business.peerManager
-    val vm = viewModel<CpfpViewModel>(factory = CpfpViewModel.Factory(peerManager))
+    val vm = viewModel<CpfpViewModel>(factory = CpfpViewModel.Factory(application, walletId, peerManager))
     val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
 
     val recommendedFeerate by peerManager.recommendedFeerateFlow.collectAsState()

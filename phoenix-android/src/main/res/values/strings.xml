@@ -370,8 +370,8 @@
     <string name="logs_title">Application logs</string>
     <string name="logs_exporting">Exporting logs…</string>
     <string name="logs_failed">Error: logs could not be exported</string>
-    <string name="logs_view_button">View logs…</string>
-    <string name="logs_view_with">View logs with…</string>
+    <string name="logs_view_button">View log excerpt…</string>
+    <string name="logs_view_with">View log excerpt with…</string>
     <string name="logs_share_button">Share logs…</string>
     <string name="logs_share_subject">Phoenix App logs</string>
     <string name="logs_share_title">Share Phoenix logs…</string>

@@ -24,16 +24,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.blockchain.electrum.WalletState
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.phoenixSwapInWallet
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
+class SwapInAddressesViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
+    private val peerManager: PeerManager
+) : ViewModel() {
 
-class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel() {
-
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     val taprootAddresses = mutableStateListOf<TaprootAddress>()
     val legacyAddress = mutableStateOf<Pair<String, WalletState.AddressState>?>(null)
@@ -65,12 +71,14 @@ class SwapInAddressesViewModel(private val peerManager: PeerManager) : ViewModel
     data class TaprootAddress(val address: String, val state: WalletState.AddressState, val isCurrent: Boolean)
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val peerManager: PeerManager,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             @Suppress("UNCHECKED_CAST")
-            return SwapInAddressesViewModel(peerManager) as T
+            return SwapInAddressesViewModel(application, walletId, peerManager) as T
         }
     }
 }

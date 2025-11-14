@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.utils.logger
 
+import android.content.Context
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.Severity.Assert
@@ -32,11 +33,15 @@ import org.slf4j.LoggerFactory
  * Use SLF4J writer on Android. Note that writing logs to Logcat is already done in
  * phoenix-android SLF4J configuration.
  */
-actual fun phoenixLogWriters(ctx: PlatformContext): List<LogWriter> = listOf(Slf4jLogWriter())
+actual fun phoenixLogWriters(ctx: PlatformContext, walletId: String?): List<LogWriter> = listOf(Slf4jLogWriter(ctx.applicationContext, walletId))
 
-class Slf4jLogWriter : LogWriter() {
+class Slf4jLogWriter(val context: Context, val walletId: String?) : LogWriter() {
     override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
-        val logger = LoggerFactory.getLogger(tag)
+        val logger = if (walletId == null) {
+            LoggerFactory.getLogger(tag)
+        } else {
+            LogHelper.getLogger(context, walletId, tag)
+        }
         when (severity) {
             Verbose -> logger.trace(message, throwable)
             Debug -> logger.debug(message, throwable)

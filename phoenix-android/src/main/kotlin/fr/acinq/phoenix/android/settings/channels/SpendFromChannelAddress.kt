@@ -42,7 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.LocalWalletId
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.inputs.AmountInput
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
@@ -60,7 +62,7 @@ fun SpendFromChannelAddress(
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<SpendFromChannelAddressViewModel>(factory = SpendFromChannelAddressViewModel.Factory(business))
+    val vm = viewModel<SpendFromChannelAddressViewModel>(factory = SpendFromChannelAddressViewModel.Factory(application, LocalWalletId.current!!, business))
     val state = vm.state.value
 
     var amount by remember { mutableStateOf<MilliSatoshi?>(null) }
@@ -91,7 +93,7 @@ fun SpendFromChannelAddress(
             // tx index
             TextInput(
                 text = txIndex,
-                onTextChange = {newValue ->
+                onTextChange = { newValue ->
                     if (newValue != txIndex) { vm.resetState() }
                     newValue.toLongOrNull()?.let { txIndex = newValue }
                 },

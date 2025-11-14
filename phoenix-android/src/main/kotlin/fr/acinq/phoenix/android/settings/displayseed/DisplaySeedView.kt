@@ -82,7 +82,7 @@ fun DisplaySeedView(
     val isDisclaimerRead by internalPrefs.isSeedLossDisclaimerRead.collectAsState(initial = null)
     val showBackupNotice by internalPrefs.showSeedBackupNotice.collectAsState(initial = false)
 
-    val vm = viewModel<DisplaySeedViewModel>(factory = DisplaySeedViewModel.Factory(application))
+    val vm = viewModel<DisplaySeedViewModel>(factory = DisplaySeedViewModel.Factory(application, walletId))
 
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.displayseed_title))

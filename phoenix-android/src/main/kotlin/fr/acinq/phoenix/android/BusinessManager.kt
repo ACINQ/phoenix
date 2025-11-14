@@ -20,11 +20,15 @@ import android.content.Context
 import android.text.format.DateUtils
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.LiquidityEvents
 import fr.acinq.lightning.PaymentEvents
+import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.components.wallet.WalletAvatars
 import fr.acinq.phoenix.android.services.InflightPaymentsWatcher
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
@@ -41,6 +45,9 @@ import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.managers.global.CurrencyManager
 import fr.acinq.phoenix.utils.MnemonicLanguage
+import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.phoenix.utils.logger.LogHelper
+import fr.acinq.phoenix.utils.logger.PhoenixLoggerConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -101,7 +108,7 @@ object BusinessManager {
     }
 
     /**
-     * This method creates and starts a new business from a given [decryptedMnemonics], and adds it to the flow of started businesses.
+     * This method creates and starts a new business from a given [words] list, and adds it to the flow of started businesses.
      *
      * If a business already exists for that seed, the method does nothing.
      *
@@ -110,18 +117,33 @@ object BusinessManager {
      */
     suspend fun startNewBusiness(words: List<String>, isHeadless: Boolean): StartBusinessResult = startupMutex.withLock {
 
-        val business = PhoenixBusiness(application.phoenixGlobal)
-
-        val walletInfo = try {
-            log.debug("loading wallet before starting a new business")
-            val seed = business.walletManager.mnemonicsToSeed(words, wordList = MnemonicLanguage.English.wordlist())
-            business.walletManager.loadWallet(seed)
-        } catch (e: Exception) {
-            log.error("unable to load wallet, likely because of an invalid seed, aborting...")
+        val (walletId, seed) = try {
+            MnemonicCode.validate(mnemonics = words, wordlist = MnemonicLanguage.English.wordlist())
+            val seed = MnemonicCode.toSeed(words, "")
+            val km = LocalKeyManager(
+                seed = seed.byteVector(),
+                chain = NodeParamsManager.chain,
+                remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub,
+            )
+            WalletId(km.nodeKeys.nodeKey.publicKey) to seed
+        } catch (_: Exception) {
+            log.error("unable to make valid seed, aborting...")
             return StartBusinessResult.Failure.LoadWalletError
         }
 
-        val walletId = WalletId(walletInfo.nodeIdHash)
+        val business = PhoenixBusiness(
+            phoenixGlobal = application.phoenixGlobal,
+            loggerFactory = fr.acinq.lightning.logging.LoggerFactory(PhoenixLoggerConfig(PlatformContext(appContext), walletId.nodeIdHash))
+        )
+
+        val walletInfo = try {
+            log.debug("loading wallet before starting a new business")
+            business.walletManager.loadWallet(seed)
+        } catch (_: Exception) {
+            log.error("unable to load wallet, aborting...")
+            return StartBusinessResult.Failure.LoadWalletError
+        }
+
         val nodeId = walletInfo.nodeId.toHex()
         val globalPrefs = application.globalPrefs
         val walletMetadata = globalPrefs.getAvailableWalletsMeta.first()[walletId] ?: run {
@@ -139,7 +161,8 @@ object BusinessManager {
         }
 
         return try {
-            log.info("preparing new business with node_id=$nodeId wallet_id=$walletId...")
+            val walletLogger = LogHelper.getLogger(application.applicationContext, walletId, this)
+            walletLogger.info("preparing new business with node_id=$nodeId wallet_id=$walletId...")
 
             // check last used version to display a patch note
             val lastVersionUsed = globalPrefs.getLastUsedAppCode.first()
@@ -162,7 +185,7 @@ object BusinessManager {
                     scope.launch { monitorPaymentsWhenHeadless(walletId, walletMetadata, business.nodeParamsManager, application.phoenixGlobal.currencyManager, userPrefs) }
                 } else null,
                 monitorNodeEventsJob = scope.launch { monitorNodeEvents(walletId, business.peerManager, business.nodeParamsManager, internalPrefs) },
-                monitorFcmTokenJob = scope.launch { monitorFcmToken(business) },
+                monitorFcmTokenJob = scope.launch { monitorFcmToken(walletId, business) },
                 monitorInFlightPaymentsJob = scope.launch { monitorInFlightPayments(business.peerManager, internalPrefs) },
             )
 
@@ -171,7 +194,7 @@ object BusinessManager {
             delay(1_000)
 
             // actually start the business
-            log.info("starting new business with node_id=$nodeId...")
+            walletLogger.info("starting new business with node_id=$nodeId...")
             _businessFlow.value += walletId to BusinessRunning(business = business, isHeadless = isHeadless)
             business.start(startupParams)
 
@@ -183,7 +206,7 @@ object BusinessManager {
                 business.peerManager.getPeer().startWatchSwapInWallet()
             }
 
-            log.info("business initialisation has successfully completed")
+            walletLogger.info("business initialisation has successfully completed")
             StartBusinessResult.Success(walletInfo, business)
         } catch (e: Exception) {
             log.error("there was an error when initialising new business: ", e)
@@ -247,23 +270,24 @@ object BusinessManager {
         })
     }
 
-    private suspend fun monitorFcmToken(business: PhoenixBusiness) {
+    private suspend fun monitorFcmToken(walletId: WalletId, business: PhoenixBusiness) {
+        val walletLogger = LogHelper.getLogger(application.applicationContext, walletId, this)
         val token = application.globalPrefs.getFcmToken.filterNotNull().first()
         business.connectionsManager.connections.first { it.peer == Connection.ESTABLISHED }
         delay(5000)
-        log.info("registering fcm token=$token")
+        walletLogger.info("registering fcm token=$token")
         business.registerFcmToken(token)
     }
 
     private suspend fun monitorNodeEvents(walletId: WalletId, peerManager: PeerManager, nodeParamsManager: NodeParamsManager, internalPrefs: InternalPrefs) {
+        val walletLogger = LogHelper.getLogger(application.applicationContext, walletId, this)
         val monitoringStartedAt = currentTimestampMillis()
         combine(peerManager.swapInNextTimeout, nodeParamsManager.nodeParams.filterNotNull().first().nodeEvents) { nextTimeout, nodeEvent ->
             nextTimeout to nodeEvent
         }.collect { (nextTimeout, event) ->
-            // TODO: click on notif must deeplink to the notification screen
             when (event) {
                 is LiquidityEvents.Rejected -> {
-                    log.debug("processing liquidity_event={}", event)
+                    walletLogger.debug("processing liquidity_event={}", event)
                     if (event.source == LiquidityEvents.Source.OnChainWallet) {
                         // Check the last time a rejected on-chain swap notification has been shown. If recent, we do not want to trigger a notification every time.
                         val lastRejectedSwap = internalPrefs.getLastRejectedOnchainSwap.first().takeIf {
@@ -274,7 +298,7 @@ object BusinessManager {
                             && lastRejectedSwap.first == event.amount
                             && currentTimestampMillis() - lastRejectedSwap.second <= 2 * DateUtils.HOUR_IN_MILLIS
                         ) {
-                            log.debug("ignore this liquidity event as a similar notification was recently displayed")
+                            walletLogger.debug("ignore this liquidity event as a similar notification was recently displayed")
                             return@collect
                         } else {
                             internalPrefs.saveLastRejectedOnchainSwap(event)

@@ -39,8 +39,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.android.LocalWalletId
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.CardHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -48,7 +50,7 @@ import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.layouts.ItemCard
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.payments.details.PaymentLine
-import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.components.logger
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -100,12 +102,13 @@ private sealed class PaymentsGroup {
 @OptIn(ExperimentalTime::class)
 @Composable
 fun PaymentsHistoryView(
+    walletId: WalletId,
     onBackClick: () -> Unit,
     paymentsViewModel: PaymentsViewModel,
     onPaymentClick: (UUID) -> Unit,
     onCsvExportClick: () -> Unit,
 ) {
-    val log = logger("PaymentsHistory")
+    val log = logger(walletId, "PaymentsHistory")
     val listState = rememberLazyListState()
     LaunchedEffect(Unit) {
         paymentsViewModel.subscribeToPayments(offset = 0, count = PaymentsViewModel.pageSize)

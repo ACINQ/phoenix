@@ -22,8 +22,6 @@ import fr.acinq.phoenix.android.utils.extensions.tryWith
 import fr.acinq.phoenix.utils.MnemonicLanguage
 import fr.acinq.secp256k1.Hex
 import kotlinx.serialization.json.Json
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.security.GeneralSecurityException
@@ -53,8 +51,7 @@ sealed class EncryptedSeed {
                         val mnemonics = String(Hex.decode(String(array, Charsets.UTF_8)), Charsets.UTF_8).split(" ")
                         MnemonicCode.validate(mnemonics = mnemonics, wordlist = MnemonicLanguage.English.wordlist())
                         mnemonics
-                    } catch (e: Exception) {
-                        log.error("seed is invalid", e)
+                    } catch (_: Exception) {
                         null
                     }
                 }
@@ -96,6 +93,7 @@ sealed class EncryptedSeed {
             // version=2 has been used and removed, do not use again.
             private const val MULTIPLE_SEED_VERSION = 3
 
+            @Suppress("DEPRECATION")
             fun deserialize(stream: ByteArrayInputStream): V2 {
                 val version = stream.read()
                 val iv = ByteArray(IV_LENGTH)
@@ -120,8 +118,6 @@ sealed class EncryptedSeed {
     }
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(this::class.java)
-
         const val SEED_FILE_VERSION_2: Byte = 2
 
         /** Reads an array of byte and de-serializes it as an [EncryptedSeed] object. */

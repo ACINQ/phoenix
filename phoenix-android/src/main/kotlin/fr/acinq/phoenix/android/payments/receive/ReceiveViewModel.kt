@@ -34,20 +34,19 @@ import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
-import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.android.utils.datastore.SwapAddressFormat
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.images.QRCodeHelper
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.managers.phoenixSwapInWallet
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.seconds
 
 sealed class LightningInvoiceState {
@@ -74,14 +73,17 @@ sealed class LightningInvoiceState {
 data class BitcoinAddressState(val currentIndex: Int, val currentAddress: String, val image: ImageBitmap)
 
 class ReceiveViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
     private val chain: Chain,
     private val peerManager: PeerManager,
     private val nodeParamsManager: NodeParamsManager,
     private val walletManager: WalletManager,
-    private val internalPrefs: InternalPrefs,
-    private val userPrefs: UserPrefs
 ): ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
+
+    val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId)
+    val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
 
     var lightningInvoiceState by mutableStateOf<LightningInvoiceState>(LightningInvoiceState.Init)
     var bitcoinAddressState by mutableStateOf<BitcoinAddressState?>(null)
@@ -166,10 +168,8 @@ class ReceiveViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-            val userPrefs = DataStoreManager.loadUserPrefsForWallet(application.applicationContext, walletId)
-            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
             @Suppress("UNCHECKED_CAST")
-            return ReceiveViewModel(chain, peerManager, nodeParamsManager, walletManager, internalPrefs, userPrefs) as T
+            return ReceiveViewModel(application, walletId,chain, peerManager, nodeParamsManager, walletManager) as T
         }
     }
 }

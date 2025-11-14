@@ -32,6 +32,7 @@ import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
@@ -39,6 +40,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.data.LocalChannelInfo
 import fr.acinq.phoenix.data.inFlightPaymentsCount
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -66,7 +68,7 @@ import kotlin.time.toJavaDuration
  * This service is scheduled whenever there's a pending htlc in a channel.
  * See [LocalChannelInfo.inFlightPaymentsCount].
  */
-class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class InflightPaymentsWatcher(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -101,24 +103,25 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
     }
 
     private suspend fun watchWallet(walletId: WalletId, walletMetadata: UserWalletMetadata, words: List<String>): Boolean {
+        val walletLogger = LogHelper.getLogger(context, walletId, this@InflightPaymentsWatcher)
         try {
             val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId = walletId)
             val inFlightPaymentsCount = internalPrefs.getInFlightPaymentsCount.first()
 
             if (inFlightPaymentsCount == 0) {
-                log.info("aborting $name: expecting NO in-flight payments")
+                walletLogger.info("aborting $name: expecting NO in-flight payments")
                 return true
             }
 
             val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
             if (res is StartBusinessResult.Failure) {
-                log.info("failed to start business for wallet=$walletId")
+                walletLogger.info("failed to start business for wallet=$walletId")
                 return false
             }
 
             val business = BusinessManager.businessFlow.value[walletId]?.business
             if (business == null) {
-                log.info("failed to access business for wallet=$walletId")
+                walletLogger.info("failed to access business for wallet=$walletId")
                 return false
             }
 
@@ -127,7 +130,7 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
 
                 val jobTimer = launch {
                     delay(2.minutes)
-                    log.info("stopping $name-$walletId after 2 minutes without resolution - show notification")
+                    walletLogger.info("stopping $name-$walletId after 2 minutes without resolution - show notification")
                     scheduleOnce(applicationContext)
                     SystemNotificationHelper.notifyInFlightHtlc(applicationContext, walletMetadata)
                     stopJobs.value = true
@@ -136,29 +139,29 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                 val watcher = launch {
                     business.appConnectionsDaemon?.forceReconnect()
                     business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
-                    log.debug("watching in-flight payments for wallet={}", walletId)
+                    walletLogger.debug("watching in-flight payments for wallet={}", walletId)
 
                     business.peerManager.channelsFlow.filterNotNull().collectIndexed { index, channels ->
                         val paymentsCount = channels.inFlightPaymentsCount()
                         internalPrefs.saveInFlightPaymentsCount(paymentsCount)
                         when {
                             channels.isEmpty() -> {
-                                log.info("no channels found, successfully terminating watcher (#$index)")
+                                walletLogger.info("no channels found, successfully terminating watcher (#$index)")
                                 stopJobs.value = true
                             }
 
                             channels.any { it.value.state is Syncing } -> {
-                                log.debug("channels syncing, pausing 10s before next check (#$index)")
+                                walletLogger.debug("channels syncing, pausing 10s before next check (#$index)")
                                 delay(10.seconds)
                             }
 
                             paymentsCount > 0 -> {
-                                log.debug("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
+                                walletLogger.debug("$paymentsCount payments in-flight, pausing 5s before next check (#$index)...")
                                 delay(5.seconds)
                             }
 
                             else -> {
-                                log.info("$paymentsCount payments in-flight, successfully completing worker (#$index)...")
+                                walletLogger.info("$paymentsCount payments in-flight, successfully completing worker (#$index)...")
                                 stopJobs.value = true
                             }
                         }
@@ -166,14 +169,14 @@ class InflightPaymentsWatcher(context: Context, workerParams: WorkerParameters) 
                 }
 
                 stopJobs.first { it }
-                log.debug("stop-job signal detected")
+                walletLogger.debug("stop-job signal detected")
                 watcher.cancelAndJoin()
                 jobTimer.cancelAndJoin()
             }
 
             return true
         } catch (e: Exception) {
-            log.error("error in $name-$walletId: ", e)
+            walletLogger.error("error in $name-$walletId: ", e)
             return false
         }
     }

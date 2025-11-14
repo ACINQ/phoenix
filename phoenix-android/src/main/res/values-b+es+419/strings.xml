@@ -268,8 +268,8 @@
     <string name="logs_title">Registros de la aplicación</string>
     <string name="logs_exporting">Exportando registros…</string>
     <string name="logs_failed">Error: no se pudieron exportar los registros</string>
-    <string name="logs_view_button">Ver registros…</string>
-    <string name="logs_view_with">Ver registros con…</string>
+    <string name="logs_view_button">Ver un extracto de los registros…</string>
+    <string name="logs_view_with">Ver un extracto de los registros con…</string>
     <string name="logs_share_button">Compartir registros…</string>
     <string name="logs_share_subject">Registros de la aplicación Phoenix</string>
     <string name="logs_share_title">Compartir registros de Phoenix…</string>

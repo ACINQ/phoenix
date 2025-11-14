@@ -29,10 +29,13 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.EncryptedData
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.utils.MnemonicLanguage
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -103,19 +106,20 @@ class RestoreWalletViewModel(val application: PhoenixApplication) : ViewModel() 
             if (words.size != 12) throw RuntimeException("invalid mnemonics size=${words.size}")
             MnemonicCode.validate(words, MnemonicLanguage.English.wordlist())
 
+            val seed = MnemonicCode.toSeed(words, "")
+            val keyManager = LocalKeyManager(seed = seed.byteVector(), chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
+            val nodeId = keyManager.nodeKeys.nodeKey.publicKey
+            val walletLogger = LogHelper.getLogger(application, WalletId(nodeId), this@RestoreWalletViewModel)
+
             val restoreDbState = restorePaymentsDbState
             if (restoreDbState is RestorePaymentsDbState.Success) {
-                log.info("restoring payments-db file=${restoreDbState.fileName}")
+                walletLogger.info("restoring payments-db file=${restoreDbState.fileName}")
                 try {
-                    val seed = MnemonicCode.toSeed(words, "")
-                    val keyManager = LocalKeyManager(seed = seed.byteVector(), chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
-                    val nodeId = keyManager.nodeKeys.nodeKey.publicKey
-
                     restoreDbFile(DatabaseManager.paymentsDbName(NodeParamsManager.chain, nodeId), restoreDbState.decryptedDatabase.toByteArray(), canOverwrite = true)
                     delay(200)
-                    log.info("payments-db has been restored")
+                    walletLogger.info("payments-db has been restored")
                 } catch (e: Exception) {
-                    log.error("cannot write payments-db file to database directory: ", e)
+                    walletLogger.error("cannot write payments-db file to database directory: ", e)
                     restorePaymentsDbState = RestorePaymentsDbState.Failure.CannotWriteDatabaseFile
                     return@launch
                 }
@@ -147,30 +151,32 @@ class RestoreWalletViewModel(val application: PhoenixApplication) : ViewModel() 
         }) {
             restorePaymentsDbState = RestorePaymentsDbState.Importing
             val words = mnemonics.filterNot { it.isNullOrBlank() }.filterNotNull()
-            val seed = try {
-                MnemonicCode.toSeed(words, "")
-            } catch (e: Exception) {
+            val keyManager = try {
+                val seed = MnemonicCode.toSeed(words, "")
+                LocalKeyManager(seed = seed.byteVector(), chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
+            } catch (_: Exception) {
                 log.info("invalid seed, aborting wallet restore")
                 restorePaymentsDbState = RestorePaymentsDbState.Failure.InvalidSeed
                 return@launch
             }
+            val walletId = WalletId(keyManager.nodeKeys.nodeKey.publicKey)
+            val walletLogger = LogHelper.getLogger(application, walletId, this@RestoreWalletViewModel)
 
             when (val result = resolveUriContent(uri)) {
                 null -> {
                     delay(500)
-                    log.info("payments-db file could not be resolved for uri=$uri")
+                    walletLogger.info("payments-db file could not be resolved for uri=$uri")
                     restorePaymentsDbState = RestorePaymentsDbState.Failure.UnresolvedDatabaseFile
                     return@launch
                 }
                 else -> {
-                    log.info("decrypting payments database files")
+                    walletLogger.info("decrypting payments database files")
                     try {
                         delay(1000)
-                        val keyManager = LocalKeyManager(seed = seed.byteVector(), chain = NodeParamsManager.chain, remoteSwapInExtendedPublicKey = NodeParamsManager.remoteSwapInXpub)
                         val decryptedData = EncryptedData.read(result.second).decrypt(keyManager)
                         restorePaymentsDbState = RestorePaymentsDbState.Success(result.first, decryptedData)
                     } catch (e: Exception) {
-                        log.error("cannot decrypt payments-db file: ", e)
+                        walletLogger.error("cannot decrypt payments-db file: ", e)
                         restorePaymentsDbState = RestorePaymentsDbState.Failure.CannotDecryptDatabase
                         return@launch
                     }

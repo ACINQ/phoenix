@@ -48,6 +48,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.AmountWithFiatRowView
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
@@ -80,7 +81,7 @@ fun SendToOfferView(
     val peer by business.peerManager.peerState.collectAsState()
     val trampolineFees = peer?.walletParams?.trampolineFees?.firstOrNull()
 
-    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(offer, business.peerManager, business.nodeParamsManager, business.databaseManager), key = offer.encode())
+    val vm = viewModel<SendOfferViewModel>(factory = SendOfferViewModel.Factory(application, walletId, offer, business.peerManager, business.nodeParamsManager, business.databaseManager), key = offer.encode())
     val requestedAmount = offer.amount
     var amount by remember { mutableStateOf(requestedAmount) }
     val amountErrorMessage: String = remember(amount) {

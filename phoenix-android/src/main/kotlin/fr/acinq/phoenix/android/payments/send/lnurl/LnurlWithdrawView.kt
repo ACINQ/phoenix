@@ -31,6 +31,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -50,6 +52,7 @@ import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlWithdrawView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     withdraw: LnurlWithdraw,
     onBackClick: () -> Unit,
@@ -64,7 +67,7 @@ fun LnurlWithdrawView(
     var amount by remember { mutableStateOf<MilliSatoshi?>(maxWithdrawable) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
-    val vm = viewModel<LnurlWithdrawViewModel>(factory = LnurlWithdrawViewModel.Factory(business.sendManager))
+    val vm = viewModel<LnurlWithdrawViewModel>(factory = LnurlWithdrawViewModel.Factory(application, walletId, business.sendManager))
     val withdrawState = vm.state.value
 
     val isAmountDisabled = remember(withdraw, withdrawState) { withdraw.minWithdrawable == withdraw.maxWithdrawable || withdrawState is LnurlWithdrawViewState.SendingInvoice }

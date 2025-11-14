@@ -26,15 +26,16 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.ChannelFundingResponse
-import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 sealed class CpfpState {
     object Init : CpfpState()
@@ -53,8 +54,12 @@ sealed class CpfpState {
 }
 
 
-class CpfpViewModel(val peerManager: PeerManager) : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
+class CpfpViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId,
+    val peerManager: PeerManager
+) : ViewModel() {
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     var state by mutableStateOf<CpfpState>(CpfpState.Init)
 
     fun estimateFee(
@@ -118,11 +123,13 @@ class CpfpViewModel(val peerManager: PeerManager) : ViewModel() {
     }
 
     class Factory(
+        val application: PhoenixApplication,
+        val walletId: WalletId,
         private val peerManager: PeerManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return CpfpViewModel(peerManager) as T
+            return CpfpViewModel(application, walletId, peerManager) as T
         }
     }
 }

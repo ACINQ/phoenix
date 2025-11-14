@@ -67,6 +67,7 @@ fun NavGraphBuilder.paymentsNavGraph(navController: NavController, appViewModel:
         } else if (paymentId != null) {
             val fromEvent = backstackEntry.arguments?.getBoolean("fromEvent") ?: false
             PaymentDetailsView(
+                walletId = walletId,
                 business = business,
                 paymentId = paymentId,
                 onBackClick = {

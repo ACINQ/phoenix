@@ -52,7 +52,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
-import fr.acinq.phoenix.android.utils.isLegacyMigration
+import fr.acinq.phoenix.android.utils.extensions.isLegacyMigration
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor

@@ -29,7 +29,9 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -46,7 +48,7 @@ import java.util.concurrent.TimeUnit
  * then shuts down. The purpose is to settle pending payments that may have been missed by the
  * [InflightPaymentsWatcher], to complete closings properly, etc...
  */
-class DailyConnect(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class DailyConnect(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -68,13 +70,13 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
             val businessMap = userWallets.map { (walletId, wallet) ->
                 val res = BusinessManager.startNewBusiness(words = wallet.words, isHeadless = true)
                 if (res is StartBusinessResult.Failure) {
-                    log.info("failed to start business for wallet=$walletId")
+                    log.debug("failed to start business for wallet={}", walletId)
                     return Result.success()
                 }
 
                 val business = BusinessManager.businessFlow.value[walletId]
                 if (business == null) {
-                    log.info("failed to access business for wallet=$walletId")
+                    log.debug("failed to access business for wallet={}", walletId)
                     return Result.success()
                 }
 
@@ -85,27 +87,28 @@ class DailyConnect(context: Context, workerParams: WorkerParameters) : Coroutine
                 val stopJobSignal = MutableStateFlow(false)
 
                 val watchers = businessMap.map { (walletId, running) ->
+                    val walletLogger = LogHelper.getLogger(context, walletId, this@DailyConnect)
                     val business = running.business
                     launch {
                         business.appConnectionsDaemon?.forceReconnect()
                         business.connectionsManager.connections.first { it.global is Connection.ESTABLISHED }
-                        log.debug("connections established for wallet={}", walletId)
+                        walletLogger.debug("connections established for wallet={}", walletId)
 
                         business.peerManager.channelsFlow.filterNotNull().collect { channels ->
                             when {
                                 channels.isEmpty() -> {
-                                    log.info("no channels found for wallet=$walletId")
+                                    walletLogger.info("no channels found for wallet=$walletId")
                                     stopJobSignal.value = true
                                 }
                                 else -> {
-                                    log.info("${channels.size} channel(s) found for wallet=$walletId, waiting 60s...")
+                                    walletLogger.info("${channels.size} channel(s) found for wallet=$walletId, waiting 60s...")
                                     delay(60_000)
                                     stopJobSignal.value = true
                                 }
                             }
                         }
                     }.also {
-                        it.invokeOnCompletion { log.debug("completed watching-channels job for wallet={} ({})", walletId, it?.localizedMessage) }
+                        it.invokeOnCompletion { walletLogger.debug("completed watching-channels job for wallet={} ({})", walletId, it?.localizedMessage) }
                     }
                 }
                 stopJobSignal.first { it }

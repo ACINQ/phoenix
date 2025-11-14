@@ -68,7 +68,7 @@ class ZxingQrCodeAnalyzer(
         } catch (e: ChecksumException) {
             log.debug("QR code detected but checksum failed: ", e)
         } catch (e: FormatException) {
-            log.warn("QR code detected but content does not match expectations: ", e)
+            log.debug("QR code detected but content does not match expectations: ", e)
         } catch (e: Exception) {
             log.debug("error when decoding: ", e)
         }

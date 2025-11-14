@@ -29,17 +29,20 @@ import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.utils.Parser
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 sealed class SwapInRefundState {
@@ -58,12 +61,14 @@ sealed class SwapInRefundState {
 }
 
 class SwapInRefundViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
     private val peerManager: PeerManager,
     private val walletManager: WalletManager,
     private val electrumClient: ElectrumClient,
 ) : ViewModel() {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     var state by mutableStateOf<SwapInRefundState>(SwapInRefundState.Init)
 
@@ -77,7 +82,7 @@ class SwapInRefundViewModel(
         }) {
             when (val parseAddress = Parser.parseBip21Uri(NodeParamsManager.chain, address)) {
                 is Either.Left -> {
-                    log.debug("invalid refund address=$address (${parseAddress.value}")
+                    log.debug("invalid refund address={} ({}", address, parseAddress.value)
                     state = SwapInRefundState.Done.Failed.InvalidAddress(address, parseAddress.value)
                     return@launch
                 }
@@ -125,13 +130,15 @@ class SwapInRefundViewModel(
     }
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val peerManager: PeerManager,
         private val walletManager: WalletManager,
         private val electrumClient: ElectrumClient,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SwapInRefundViewModel(peerManager, walletManager, electrumClient) as T
+            return SwapInRefundViewModel(application, walletId, peerManager, walletManager, electrumClient) as T
         }
     }
 }

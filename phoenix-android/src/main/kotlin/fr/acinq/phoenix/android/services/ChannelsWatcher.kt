@@ -31,11 +31,13 @@ import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.data.WatchTowerOutcome
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
@@ -45,7 +47,7 @@ import java.util.concurrent.TimeUnit
 
 
 /** Worker that monitors channels in the background. Triggers a user-facing notification when an unexpected spending is detected. */
-class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class ChannelsWatcher(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         log.info("starting $name")
@@ -79,17 +81,19 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
     /** Watches channels for a given node id ; return false if an error occurred. */
     private suspend fun watchWallet(walletId: WalletId, words: List<String>): Boolean {
 
+        val walletLogger = LogHelper.getLogger(context, walletId, this@ChannelsWatcher)
+
         val res = BusinessManager.startNewBusiness(words = words, isHeadless = true)
         val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(applicationContext, walletId)
         if (res is StartBusinessResult.Failure) {
-            log.info("failed to start business for wallet=$walletId")
+            walletLogger.info("failed to start business for wallet=$walletId")
             internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return true
         }
 
         val business = BusinessManager.businessFlow.value[walletId]?.business
         if (business == null) {
-            log.info("failed to access business for wallet=$walletId")
+            walletLogger.info("failed to access business for wallet=$walletId")
             internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return true
         }
@@ -106,50 +110,50 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Corout
 
             val channelsAtBoot = peer.bootChannelsFlow.filterNotNull().first()
             if (channelsAtBoot.isEmpty()) {
-                log.info("no channels found, nothing to watch")
+                walletLogger.info("no channels found, nothing to watch")
                 internalPrefs.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
                 return true
             } else {
-                log.info("watching ${channelsAtBoot.size} channel(s)")
+                walletLogger.info("watching ${channelsAtBoot.size} channel(s)")
             }
 
             // connect electrum (and only electrum), and wait for the watcher to catch-up
             withTimeout(ELECTRUM_TIMEOUT_MILLIS) {
                 business.electrumWatcher.openUpToDateFlow().first()
             }
-            log.info("electrum watcher is up-to-date")
+            walletLogger.info("electrum watcher is up-to-date")
             business.appConnectionsDaemon?.decrementDisconnectCount(AppConnectionsDaemon.ControlTarget.Electrum)
 
             val revokedCommitsBeforeWatching = channelsAtBoot.map { (channelId, state) ->
                 (state as? Closing)?.revokedCommitPublished?.let { channelId to it }
             }.filterNotNull().toMap()
 
-            log.info("there were initially ${revokedCommitsBeforeWatching.size} channel(s) with revoked commitments")
-            log.info("checking for new revoked commitments on ${peer.channels.size} channel(s)")
+            walletLogger.info("there were initially ${revokedCommitsBeforeWatching.size} channel(s) with revoked commitments")
+            walletLogger.info("checking for new revoked commitments on ${peer.channels.size} channel(s)")
             val unknownRevokedAfterWatching = peer.channels.filter { (channelId, state) ->
                 state is Closing && state.revokedCommitPublished.any {
                     val isKnown = revokedCommitsBeforeWatching[channelId]?.contains(it) ?: false
                     if (!isKnown) {
-                        log.warn("found unknown revoked commit for channel=${channelId.toHex()}, tx=${it.commitTx}")
+                        walletLogger.warn("found unknown revoked commit for channel=${channelId.toHex()}, tx=${it.commitTx}")
                     }
                     !isKnown
                 }
             }.keys
 
             if (unknownRevokedAfterWatching.isNotEmpty()) {
-                log.warn("new revoked commits found, notifying user")
+                walletLogger.warn("new revoked commits found, notifying user")
                 notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.RevokedFound(channels = unknownRevokedAfterWatching))
                 internalPrefs.saveChannelsWatcherOutcome(Outcome.RevokedFound(currentTimestampMillis()))
                 SystemNotificationHelper.notifyRevokedCommits(applicationContext)
             } else {
-                log.info("no revoked commit found, channels-watcher job completed successfully")
+                walletLogger.info("no revoked commit found, channels-watcher job completed successfully")
                 notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Nominal(channelsWatchedCount = peer.channels.size))
                 internalPrefs.saveChannelsWatcherOutcome(Outcome.Nominal(currentTimestampMillis()))
             }
 
             return true
         } catch (e: Exception) {
-            log.error("failed to run channels-watcher job: ", e)
+            walletLogger.error("failed to run channels-watcher job: ", e)
             notificationsManager.saveWatchTowerOutcome(WatchTowerOutcome.Unknown())
             internalPrefs.saveChannelsWatcherOutcome(Outcome.Unknown(currentTimestampMillis()))
             return false

@@ -34,8 +34,8 @@ import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.converters.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.extensions.isLegacyMigration
 import fr.acinq.phoenix.android.utils.extensions.smartDescription
-import fr.acinq.phoenix.android.utils.isLegacyMigration
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentMetadata

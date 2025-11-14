@@ -20,9 +20,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
+import fr.acinq.phoenix.utils.logger.LogHelper
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.network.tls.*
@@ -31,14 +37,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.security.cert.CertPathValidatorException
 import java.security.cert.Certificate
 import kotlin.time.Duration.Companion.seconds
 
-class ElectrumDialogViewModel : ViewModel() {
-    val log: Logger = LoggerFactory.getLogger(this::class.java)
+class ElectrumDialogViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId?,
+) : ViewModel() {
+    private val log = walletId?.let { LogHelper.getLogger(application.applicationContext, walletId, this) } ?: LoggerFactory.getLogger(this::class.java)
 
     var state by mutableStateOf<CertificateCheckState>(CertificateCheckState.Init)
 
@@ -93,5 +101,13 @@ class ElectrumDialogViewModel : ViewModel() {
         data object Checking : CertificateCheckState()
         data class Rejected(val host: String, val port: Int, val certificate: Certificate) : CertificateCheckState()
         data class Failure(val e: Throwable) : CertificateCheckState()
+    }
+
+    class Factory(val application: PhoenixApplication, val walletId: WalletId?) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            @Suppress("UNCHECKED_CAST")
+            return ElectrumDialogViewModel(application, walletId) as T
+        }
     }
 }

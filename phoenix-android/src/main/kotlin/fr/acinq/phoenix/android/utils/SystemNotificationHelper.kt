@@ -47,7 +47,6 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.flow.first
-import org.slf4j.LoggerFactory
 import java.text.DecimalFormat
 
 object SystemNotificationHelper {
@@ -66,8 +65,6 @@ object SystemNotificationHelper {
 
     private const val SWAP_TIMEOUT_ID = 354325
     private const val SWAP_TIMEOUT_CHANNEL = "${BuildConfig.APPLICATION_ID}.SWAP_TIMEOUT"
-
-    private val log = LoggerFactory.getLogger(this::class.java)
 
     /** If the remaining blocks count before a swap timeout is lower than this, we should mention it in the notification. */
     private const val SWAP_TIMEOUT_THRESHOLD_IN_BLOCKS = 144 * 30  * 2 // ~2 months

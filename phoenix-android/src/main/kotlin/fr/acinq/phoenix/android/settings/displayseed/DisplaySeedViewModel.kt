@@ -23,14 +23,18 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
-class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
+class DisplaySeedViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId,
+) : ViewModel() {
 
     sealed class ReadingSeedState() {
         data object Init : ReadingSeedState()
@@ -42,7 +46,7 @@ class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
         }
     }
 
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     val state = mutableStateOf<ReadingSeedState>(ReadingSeedState.Init)
 
     fun readActiveSeed(walletId: WalletId) {
@@ -71,11 +75,11 @@ class DisplaySeedViewModel(val application: PhoenixApplication) : ViewModel() {
         }
     }
 
-    class Factory(val application: PhoenixApplication) : ViewModelProvider.Factory {
+    class Factory(val application: PhoenixApplication, val walletId: WalletId) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             @Suppress("UNCHECKED_CAST")
-            return DisplaySeedViewModel(application) as T
+            return DisplaySeedViewModel(application, walletId) as T
         }
     }
 }

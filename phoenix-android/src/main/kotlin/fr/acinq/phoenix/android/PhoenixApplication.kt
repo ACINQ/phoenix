@@ -22,10 +22,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import fr.acinq.phoenix.PhoenixGlobal
-import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.SystemNotificationHelper
 import fr.acinq.phoenix.android.utils.datastore.GlobalPrefs
 import fr.acinq.phoenix.utils.PlatformContext
+import fr.acinq.phoenix.utils.logger.LogHelper
 import org.slf4j.LoggerFactory
 
 
@@ -41,7 +41,7 @@ class PhoenixApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Logging.setupLogger(applicationContext)
+        LogHelper.setupDefaultLogger(applicationContext)
 
         phoenixGlobal = PhoenixGlobal(PlatformContext(applicationContext))
         globalPrefs = GlobalPrefs(applicationContext.globalPrefs)

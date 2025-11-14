@@ -31,6 +31,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
+import androidx.core.graphics.scale
+import androidx.core.graphics.createBitmap
 
 
 object QRCodeHelper {
@@ -53,7 +55,7 @@ object QRCodeHelper {
                 i++
             }
         }
-        return Bitmap.createScaledBitmap(Bitmap.createBitmap(rgbArray, width, height, Bitmap.Config.RGB_565), 260, 260, false)
+        return Bitmap.createBitmap(rgbArray, width, height, Bitmap.Config.RGB_565).scale(260, 260, false)
     }
 
     /** Saves a bitmap to the device's [MediaStore.Images] after adding white padding around it. */
@@ -82,7 +84,7 @@ object QRCodeHelper {
 
                 val padding = 15
                 val paddedBitmap = {
-                    val outputimage = Bitmap.createBitmap(bitmap.getWidth() + padding * 2, bitmap.getHeight() + padding * 2, Bitmap.Config.RGB_565)
+                    val outputimage = createBitmap(bitmap.getWidth() + padding * 2, bitmap.getHeight() + padding * 2, Bitmap.Config.RGB_565)
                     val canvas = Canvas(outputimage)
                     canvas.drawARGB(0xff, 0xff, 0xff, 0xff)
                     canvas.drawBitmap(bitmap, padding.toFloat(), padding.toFloat(), null)

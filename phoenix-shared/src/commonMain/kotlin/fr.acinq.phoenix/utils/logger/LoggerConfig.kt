@@ -28,8 +28,8 @@ import fr.acinq.phoenix.utils.PlatformContext
  *
  * Would have used [StaticConfig] but it cannot be extended.
  */
-data class PhoenixLoggerConfig(private val platformContext: PlatformContext): LoggerConfig {
-    override val logWriterList: List<LogWriter> = phoenixLogWriters(platformContext)
+data class PhoenixLoggerConfig(private val platformContext: PlatformContext, val walletId: String?): LoggerConfig {
+    override val logWriterList: List<LogWriter> = phoenixLogWriters(platformContext, walletId)
     override val minSeverity: Severity = Severity.Debug
 }
 
@@ -37,4 +37,4 @@ data class PhoenixLoggerConfig(private val platformContext: PlatformContext): Lo
  * Factory function to return a default list of LogWriters for each platform. The LogWriter is targeted at local development.
  * For production implementations, you may need to directly initialize your Logger config.
  */
-expect fun phoenixLogWriters(ctx: PlatformContext): List<LogWriter>
+expect fun phoenixLogWriters(ctx: PlatformContext, walletId: String?): List<LogWriter>

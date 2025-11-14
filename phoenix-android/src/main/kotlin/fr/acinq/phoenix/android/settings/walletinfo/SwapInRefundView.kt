@@ -106,7 +106,8 @@ private fun AvailableForRefundView(
 ) {
     val electrumClient = business.electrumClient
     val walletManager = business.walletManager
-    val vm = viewModel<SwapInRefundViewModel>(factory = SwapInRefundViewModel.Factory(business.peerManager, walletManager, electrumClient))
+    val vm = viewModel<SwapInRefundViewModel>(factory = SwapInRefundViewModel.Factory(
+        application, walletId, business.peerManager, walletManager, electrumClient))
     val state = vm.state
     val keyboardManager = LocalSoftwareKeyboardController.current
 

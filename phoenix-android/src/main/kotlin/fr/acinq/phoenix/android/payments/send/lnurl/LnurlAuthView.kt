@@ -32,6 +32,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -46,6 +48,7 @@ import fr.acinq.phoenix.managers.SendManager
 
 @Composable
 fun LnurlAuthView(
+    walletId: WalletId,
     business: PhoenixBusiness,
     auth: LnurlAuth,
     onBackClick: () -> Unit,
@@ -55,7 +58,7 @@ fun LnurlAuthView(
     var showHowItWorks by remember { mutableStateOf(false) }
     val prefAuthScheme = LocalUserPrefs.current?.getLnurlAuthScheme?.collectAsState(initial = null)?.value
     val isLegacyDomain = remember(auth) { LnurlAuth.LegacyDomain.isEligible(auth.initialUrl) }
-    val vm = viewModel<LnurlAuthViewModel>(factory = LnurlAuthViewModel.Factory(business.sendManager))
+    val vm = viewModel<LnurlAuthViewModel>(factory = LnurlAuthViewModel.Factory(application, walletId,business.sendManager))
 
     Column(
         modifier = Modifier

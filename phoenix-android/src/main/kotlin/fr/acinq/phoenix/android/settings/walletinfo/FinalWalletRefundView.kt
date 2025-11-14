@@ -78,7 +78,8 @@ fun FinalWalletRefundView(
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<FinalWalletRefundViewModel>(factory = FinalWalletRefundViewModel.Factory(business.peerManager, business.electrumClient))
+    val vm = viewModel<FinalWalletRefundViewModel>(factory = FinalWalletRefundViewModel.Factory(
+        application, walletId,business.peerManager, business.electrumClient))
     val state = vm.state.value
 
     val finalWallet by business.peerManager.finalWallet.collectAsState()

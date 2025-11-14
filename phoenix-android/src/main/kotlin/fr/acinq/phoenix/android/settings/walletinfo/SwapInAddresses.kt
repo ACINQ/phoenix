@@ -44,6 +44,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.blockchain.electrum.WalletState
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.CardHeader
@@ -62,10 +64,11 @@ import fr.acinq.phoenix.android.utils.monoTypo
 
 @Composable
 fun SwapInAddresses(
+    walletId: WalletId,
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<SwapInAddressesViewModel>(factory = SwapInAddressesViewModel.Factory(business.peerManager))
+    val vm = viewModel<SwapInAddressesViewModel>(factory = SwapInAddressesViewModel.Factory(application, walletId, business.peerManager))
 
     DefaultScreenLayout(isScrollable = false) {
         DefaultScreenHeader(

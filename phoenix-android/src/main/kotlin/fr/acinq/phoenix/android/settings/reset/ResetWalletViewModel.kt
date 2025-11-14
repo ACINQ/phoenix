@@ -22,21 +22,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.google.firebase.messaging.FirebaseMessaging
-import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.utils.extensions.phoenixName
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 sealed class ResetWalletStep {
     data object Init : ResetWalletStep()
@@ -58,7 +57,7 @@ sealed class ResetWalletStep {
 }
 
 class ResetWalletViewModel(val application: PhoenixApplication, val walletId: WalletId) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
 

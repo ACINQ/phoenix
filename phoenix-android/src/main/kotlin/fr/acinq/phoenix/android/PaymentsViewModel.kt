@@ -20,9 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.managers.PaymentsPageFetcher
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,10 +34,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
     paymentsManager: PaymentsManager,
 ) : ViewModel() {
 
@@ -44,7 +47,7 @@ class PaymentsViewModel(
         const val paymentsCountInHome = 10
     }
 
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     private val paymentsPageFetcher: PaymentsPageFetcher = paymentsManager.makePageFetcher()
     val paymentsPage = paymentsPageFetcher.paymentsPage
@@ -108,11 +111,13 @@ class PaymentsViewModel(
     }
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val paymentsManager: PaymentsManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return PaymentsViewModel(paymentsManager) as T
+            return PaymentsViewModel(application, walletId, paymentsManager) as T
         }
     }
 }

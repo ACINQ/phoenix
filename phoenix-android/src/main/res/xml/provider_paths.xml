@@ -19,4 +19,5 @@
   <files-path name="logs_dir" path="logs" />
   <cache-path name="csv_export" path="payments/" />
   <cache-path name="contacts" path="contacts/" />
+  <cache-path name="logs_cache" path="logs/" />
 </paths>

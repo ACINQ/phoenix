@@ -54,7 +54,7 @@ import fr.acinq.phoenix.android.components.dialogs.Dialog
 import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.utils.annotatedStringResource
-import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.components.logger
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -138,7 +138,7 @@ fun TorConfigView(
                 ) {
                     Button(text = stringResource(id = R.string.btn_cancel), onClick = { showConfirmTorDialog = false }, shape = RoundedCornerShape(16.dp))
                     Spacer(modifier = Modifier.width(16.dp))
-                    val log = logger("TorConfigView")
+                    val log = logger(walletId, "TorConfigView")
                     Button(
                         text = stringResource(id = R.string.btn_confirm),
                         icon = R.drawable.ic_check_circle,

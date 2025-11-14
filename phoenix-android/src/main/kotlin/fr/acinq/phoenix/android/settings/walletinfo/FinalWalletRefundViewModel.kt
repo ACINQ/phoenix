@@ -23,22 +23,22 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.Transaction
-import fr.acinq.bitcoin.TxId
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.data.BitcoinUriError
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 sealed class FinalWalletRefundState {
@@ -54,8 +54,13 @@ sealed class FinalWalletRefundState {
     }
 }
 
-class FinalWalletRefundViewModel(val peerManager: PeerManager, val electrumClient: ElectrumClient) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
+class FinalWalletRefundViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
+    val peerManager: PeerManager,
+    val electrumClient: ElectrumClient
+) : ViewModel() {
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     val state = mutableStateOf<FinalWalletRefundState>(FinalWalletRefundState.Init)
 
@@ -114,12 +119,14 @@ class FinalWalletRefundViewModel(val peerManager: PeerManager, val electrumClien
     }
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val peerManager: PeerManager,
         private val electrumClient: ElectrumClient,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return FinalWalletRefundViewModel(peerManager, electrumClient) as T
+            return FinalWalletRefundViewModel(application, walletId, peerManager, electrumClient) as T
         }
     }
 }

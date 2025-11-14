@@ -24,18 +24,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.FileProvider
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.logger
 import fr.acinq.phoenix.android.components.settings.SettingButton
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.shareFile
+import fr.acinq.phoenix.utils.logger.LogHelper
 
 private sealed class LogsExportState {
     object Init: LogsExportState()
@@ -43,10 +43,11 @@ private sealed class LogsExportState {
     object Failed: LogsExportState()
 }
 @Composable
-fun LogsView() {
+fun LogsView(walletId: WalletId) {
     val nc = navController
     val context = LocalContext.current
     val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }
+    val log = logger(walletId, "LogsView")
 
     DefaultScreenLayout {
         DefaultScreenHeader(
@@ -67,7 +68,7 @@ fun LogsView() {
                 onClick = {
                     viewLogState = LogsExportState.Exporting
                     try {
-                        val logFile = Logging.exportLogFile(context)
+                        val logFile = LogHelper.getCurrentLogFile(context, walletId.nodeIdHash)
                         val uri = FileProvider.getUriForFile(context, authority, logFile)
                         val localViewIntent: Intent = Intent().apply {
                             action = Intent.ACTION_VIEW
@@ -79,6 +80,7 @@ fun LogsView() {
                         context.startActivity(viewIntent)
                         viewLogState = LogsExportState.Init
                     } catch (e: Exception) {
+                        log.error("could not view current log file: ", e)
                         viewLogState = LogsExportState.Failed
                     }
                 }
@@ -97,7 +99,7 @@ fun LogsView() {
                 onClick = {
                     shareLogState = LogsExportState.Exporting
                     try {
-                        val logFile = Logging.exportLogFile(context)
+                        val logFile = LogHelper.exportLogFile(context, walletId.nodeIdHash)
                         shareFile(
                             context = context,
                             data = FileProvider.getUriForFile(context, authority, logFile),
@@ -106,16 +108,11 @@ fun LogsView() {
                         )
                         shareLogState = LogsExportState.Init
                     } catch (e: Exception) {
+                        log.error("could not export logs: ", e)
                         shareLogState = LogsExportState.Failed
                     }
                 }
             )
         }
     }
-}
-
-@Preview(device = Devices.PIXEL_3A)
-@Composable
-private fun Preview() {
-    LogsView()
 }

@@ -23,12 +23,15 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.managers.SendManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 sealed class LnurlPayViewState {
@@ -41,9 +44,13 @@ sealed class LnurlPayViewState {
     }
 }
 
-class LnurlPayViewModel(private val sendManager: SendManager) : ViewModel() {
+class LnurlPayViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId,
+    private val sendManager: SendManager
+) : ViewModel() {
 
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     val state = mutableStateOf<LnurlPayViewState>(LnurlPayViewState.Init)
 
     fun requestAndPayInvoice(pay: SendManager.ParseResult.Lnurl.Pay, amount: MilliSatoshi, fees: TrampolineFees, comment: String?, onPaymentSent: () -> Unit) {
@@ -69,11 +76,13 @@ class LnurlPayViewModel(private val sendManager: SendManager) : ViewModel() {
     }
 
     class Factory(
+        val application: PhoenixApplication,
+        val walletId: WalletId,
         private val sendManager: SendManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return LnurlPayViewModel(sendManager) as T
+            return LnurlPayViewModel(application, walletId, sendManager) as T
         }
     }
 }

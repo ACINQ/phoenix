@@ -28,18 +28,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.EncryptedData
 import fr.acinq.phoenix.android.utils.converters.DateFormatter.toAbsoluteDateTimeString
 import fr.acinq.phoenix.csv.WalletPaymentCsvWriter
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.WalletManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
@@ -64,10 +67,12 @@ sealed class DatabaseExportState {
 }
 
 class PaymentsExportViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
     private val dbManager: DatabaseManager,
     private val walletManager: WalletManager,
 ) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     /** Timestamp in millis of the oldest completed payment (incoming or outgoing) */
     var oldestCompletedTimestamp by mutableStateOf<Long?>(null)
@@ -205,12 +210,14 @@ class PaymentsExportViewModel(
     }
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val dbManager: DatabaseManager,
-        private val walletManager: WalletManager
+        private val walletManager: WalletManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return PaymentsExportViewModel(dbManager, walletManager) as T
+            return PaymentsExportViewModel(application, walletId, dbManager, walletManager) as T
         }
     }
 }

@@ -267,8 +267,8 @@
     <string name="logs_title">App Logs</string>
     <string name="logs_exporting">Protokolle exportieren..</string>
     <string name="logs_failed">Fehler: Logs konnten nicht exportiert werden</string>
-    <string name="logs_view_button">Logs anzeigen…</string>
-    <string name="logs_view_with">Logs anzeigen mit…</string>
+    <string name="logs_view_button">Log-Auszug anzeigen…</string>
+    <string name="logs_view_with">Logs-Auszug anzeigen mit…</string>
     <string name="logs_share_button">Logs teilen…</string>
     <string name="logs_share_subject">Phoenix App Logs</string>
     <string name="logs_share_title">Phoenix Logs teilen…</string>

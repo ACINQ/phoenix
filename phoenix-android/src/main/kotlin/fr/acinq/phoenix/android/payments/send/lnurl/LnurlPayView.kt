@@ -43,6 +43,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
 import fr.acinq.phoenix.android.components.buttons.Button
@@ -85,7 +86,7 @@ fun LnurlPayView(
     var amount by remember { mutableStateOf<MilliSatoshi?>(minRequestedAmount) }
     var amountErrorMessage by remember { mutableStateOf("") }
 
-    val vm = viewModel<LnurlPayViewModel>(factory = LnurlPayViewModel.Factory(business.sendManager))
+    val vm = viewModel<LnurlPayViewModel>(factory = LnurlPayViewModel.Factory(application, walletId, business.sendManager))
 
     SplashLayout(
         header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },

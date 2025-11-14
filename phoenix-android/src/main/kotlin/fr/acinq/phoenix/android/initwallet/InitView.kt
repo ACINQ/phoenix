@@ -142,6 +142,7 @@ private fun InitWalletOptionsDialog(
 
         if (showCustomServerDialog) {
             ElectrumServerDialog(
+                walletId = null,
                 initialConfig = customElectrumAddress,
                 onConfirm = {
                     initViewModel.customElectrumServer.value = it

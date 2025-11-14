@@ -21,7 +21,7 @@ import co.touchlab.kermit.OSLogWriter
 import fr.acinq.phoenix.utils.PassthruLogWriter
 import fr.acinq.phoenix.utils.PlatformContext
 
-actual fun phoenixLogWriters(ctx: PlatformContext): List<LogWriter> {
+actual fun phoenixLogWriters(ctx: PlatformContext, walletId: String?): List<LogWriter> {
     return if (ctx.logger != null) {
         listOf(PassthruLogWriter(ctx))
     } else {

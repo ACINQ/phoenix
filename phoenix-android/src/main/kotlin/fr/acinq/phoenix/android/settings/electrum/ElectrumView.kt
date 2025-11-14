@@ -68,6 +68,7 @@ import java.text.NumberFormat
 
 @Composable
 fun ElectrumView(
+    walletId: WalletId,
     onBackClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -88,6 +89,7 @@ fun ElectrumView(
                 val config = model.configuration
                 if (showCustomServerDialog) {
                     ElectrumServerDialog(
+                        walletId = walletId,
                         initialConfig = electrumConfigInPrefs,
                         onConfirm = { newConfig ->
                             scope.launch {
@@ -170,6 +172,7 @@ fun ElectrumView(
 
 @Composable
 fun ElectrumServerDialog(
+    walletId: WalletId?,
     initialConfig: ElectrumConfig.Custom?,
     onConfirm: (ElectrumConfig.Custom?) -> Unit,
     onDismiss: () -> Unit
@@ -190,7 +193,7 @@ fun ElectrumServerDialog(
     var requireOnionIfTorEnabled by remember { mutableStateOf(initialConfig?.requireOnionIfTorEnabled ?: true) }
     val isViolatingTorRule = remember(isOnionHost, isTorEnabled, useCustomServer, requireOnionIfTorEnabled) { useCustomServer && isTorEnabled?.value == true && !isOnionHost && requireOnionIfTorEnabled }
 
-    val vm = viewModel<ElectrumDialogViewModel>()
+    val vm = viewModel<ElectrumDialogViewModel>(factory = ElectrumDialogViewModel.Factory(application, walletId))
 
     Dialog(
         onDismiss = onDismiss,

@@ -36,6 +36,7 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.utils.extensions.desc
 import fr.acinq.phoenix.utils.extensions.description
 
@@ -63,7 +64,6 @@ fun ManualLiquidityPurchasePayment.smartDescription(): String =
 fun AutomaticLiquidityPurchasePayment.smartDescription(): String =
     stringResource(id = R.string.paymentdetails_desc_liquidity_automated, liquidityPurchase.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
 
-@Suppress("DEPRECATION")
 @Composable
 fun IncomingPayment.smartDescription() : String? = when (this) {
     is Bolt11IncomingPayment -> paymentRequest.description
@@ -93,7 +93,6 @@ fun WalletPayment.smartDescription(): String? = when (this) {
     is AutomaticLiquidityPurchasePayment -> smartDescription()
 }
 
-@Suppress("DEPRECATION")
 fun WalletPayment.basicDescription(): String? = when (this) {
     is Bolt11IncomingPayment -> paymentRequest.description?.takeIf { it.isNotBlank() }
     is LegacyPayToOpenIncomingPayment -> when (val origin = origin) {
@@ -112,3 +111,12 @@ fun WalletPayment.basicDescription(): String? = when (this) {
     is ManualLiquidityPurchasePayment -> null
     is AutomaticLiquidityPurchasePayment -> null
 }?.takeIf { it.isNotBlank() }
+
+/** Returns true if the payment is a channel-close made by the legacy app to the node's swap-in address. */
+fun WalletPayment.isLegacyMigration(metadata: WalletPaymentMetadata): Boolean? {
+    return when {
+        this !is ChannelCloseOutgoingPayment -> false
+        metadata.userDescription == "kmp-migration-override" -> true
+        else -> false
+    }
+}

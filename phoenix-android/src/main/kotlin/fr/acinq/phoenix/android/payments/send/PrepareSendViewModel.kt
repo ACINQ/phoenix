@@ -31,13 +31,16 @@ import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.multi.qrcode.QRCodeMultiReader
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.data.BitcoinUri
 import fr.acinq.phoenix.managers.SendManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 sealed class ReadImageState {
@@ -74,8 +77,12 @@ sealed class ParsePaymentState {
     val hasFailed by lazy { this is Error }
 }
 
-class PrepareSendViewModel(val sendManager: SendManager) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
+class PrepareSendViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
+    val sendManager: SendManager
+) : ViewModel() {
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     var readImageState by mutableStateOf<ReadImageState>(ReadImageState.Ready)
 
@@ -164,11 +171,13 @@ class PrepareSendViewModel(val sendManager: SendManager) : ViewModel() {
     }
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val sendManager: SendManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return PrepareSendViewModel(sendManager) as T
+            return PrepareSendViewModel(application, walletId, sendManager) as T
         }
     }
 }

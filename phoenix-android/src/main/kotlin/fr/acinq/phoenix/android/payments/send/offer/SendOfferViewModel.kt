@@ -30,15 +30,18 @@ import fr.acinq.lightning.io.PaymentNotSent
 import fr.acinq.lightning.io.PaymentSent
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.seconds
 
 sealed class OfferState {
@@ -56,13 +59,14 @@ sealed class OfferState {
 }
 
 class SendOfferViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId,
     val offer: OfferTypes.Offer,
     val peerManager: PeerManager,
     val nodeParamsManager: NodeParamsManager,
     val databaseManager: DatabaseManager,
 ) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
-
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     var state by mutableStateOf<OfferState>(OfferState.Init)
 
     fun sendOffer(amount: MilliSatoshi, message: String, offer: OfferTypes.Offer) {
@@ -98,6 +102,8 @@ class SendOfferViewModel(
     }
 
     class Factory(
+        val application: PhoenixApplication,
+        val walletId: WalletId,
         private val offer: OfferTypes.Offer,
         private val peerManager: PeerManager,
         private val nodeParamsManager: NodeParamsManager,
@@ -105,7 +111,7 @@ class SendOfferViewModel(
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SendOfferViewModel(offer, peerManager, nodeParamsManager, databaseManager) as T
+            return SendOfferViewModel(application, walletId, offer, peerManager, nodeParamsManager, databaseManager) as T
         }
     }
 }

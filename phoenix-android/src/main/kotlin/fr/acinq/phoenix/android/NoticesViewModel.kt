@@ -32,17 +32,18 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.data.WalletNotice
 import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.ConnectionsManager
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 sealed class Notice() {
     abstract val priority: Int
@@ -69,11 +70,11 @@ class NoticesViewModel(
     val peerManager: PeerManager,
     private val connectionsManager: ConnectionsManager,
 ) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
 
     val notices = mutableStateListOf<Notice>()
     var isPowerSaverModeOn by mutableStateOf(false)
-    val internalPrefs: InternalPrefs
+    val internalPrefs: InternalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -83,7 +84,6 @@ class NoticesViewModel(
     }
 
     init {
-        internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
         viewModelScope.launch { monitorWalletContext() }
         viewModelScope.launch { monitorSwapInCloseToTimeout() }
         viewModelScope.launch { monitorWalletNotice() }

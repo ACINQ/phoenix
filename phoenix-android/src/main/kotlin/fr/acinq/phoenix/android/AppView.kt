@@ -62,7 +62,7 @@ import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.datastore.getBitcoinUnits
 import fr.acinq.phoenix.android.utils.datastore.getFiatCurrencies
 import fr.acinq.phoenix.android.utils.datastore.getIsAmountInFiat
-import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.components.logger
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -70,11 +70,11 @@ fun AppRoot(
     navController: NavHostController,
     appViewModel: AppViewModel,
 ) {
-    val log = logger("AppRoot")
-
     val activeWallet by appViewModel.activeWalletInUI.collectAsState(null)
-    log.debug("entering app root with active_wallet={}", activeWallet)
     val activeWalletId = activeWallet?.id
+    val log = logger(walletId = activeWalletId, "AppRoot")
+    log.debug("entering app root with active_wallet={}", activeWalletId)
+
     val business = activeWallet?.business
     val activeUserPrefs = activeWallet?.userPrefs
     val activeInternalPrefs = activeWallet?.internalPrefs

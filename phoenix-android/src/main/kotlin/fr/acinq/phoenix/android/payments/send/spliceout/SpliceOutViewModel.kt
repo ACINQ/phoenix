@@ -26,16 +26,17 @@ import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
 import fr.acinq.lightning.blockchain.fee.FeeratePerKw
-import fr.acinq.lightning.channel.ChannelCommand
 import fr.acinq.lightning.channel.ChannelFundingResponse
-import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.managers.PeerManager
 import fr.acinq.phoenix.utils.Parser
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 sealed class SpliceOutState {
@@ -56,8 +57,13 @@ sealed class SpliceOutState {
     }
 }
 
-class SpliceOutViewModel(private val peerManager: PeerManager, private val chain: Chain): ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
+class SpliceOutViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId,
+    private val peerManager: PeerManager,
+    private val chain: Chain
+): ViewModel() {
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     var state by mutableStateOf<SpliceOutState>(SpliceOutState.Init)
 
     /** Estimate the fee for the splice-out, given a feerate. */
@@ -130,11 +136,14 @@ class SpliceOutViewModel(private val peerManager: PeerManager, private val chain
     }
 
     class Factory(
-        private val peerManager: PeerManager, private val chain: Chain
+        val application: PhoenixApplication,
+        val walletId: WalletId,
+        private val peerManager: PeerManager,
+        private val chain: Chain
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SpliceOutViewModel(peerManager, chain) as T
+            return SpliceOutViewModel(application, walletId, peerManager, chain) as T
         }
     }
 }

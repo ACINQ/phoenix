@@ -35,6 +35,7 @@ import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.FilledButton
@@ -57,7 +58,7 @@ fun PaymentsExportView(
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val vm: PaymentsExportViewModel = viewModel(factory = PaymentsExportViewModel.Factory(dbManager = business.databaseManager, walletManager = business.walletManager))
+    val vm: PaymentsExportViewModel = viewModel(factory = PaymentsExportViewModel.Factory(application, walletId, business.databaseManager, business.walletManager))
     DefaultScreenLayout {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(R.string.payments_export_title))
         ExportAsCsvView(vm)

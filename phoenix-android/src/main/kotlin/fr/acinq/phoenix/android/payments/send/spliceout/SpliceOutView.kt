@@ -88,7 +88,7 @@ fun SendSpliceOutView(
     val mempoolFeerate by application.phoenixGlobal.feerateManager.mempoolFeerate.collectAsState()
     val balance = business.balanceManager.balance.collectAsState(null).value
     val mayDoPayments by business.peerManager.mayDoPayments.collectAsState()
-    val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(peerManager, business.chain))
+    val vm = viewModel<SpliceOutViewModel>(factory = SpliceOutViewModel.Factory(application, walletId, peerManager, business.chain))
 
     var feerate by remember { mutableStateOf(recommendedFeerate.feerate) }
     var amount by remember { mutableStateOf(requestedAmount) }

@@ -36,14 +36,14 @@ open class MVIControllerViewModel<M : MVI.Model, I : MVI.Intent>(val controller:
     private val unsubscribe: () -> Unit
 
     init {
-        log.debug("initializing view-model for controller=$controller, subscribing to model changes")
+        log.debug("initializing view-model for controller={}, subscribing to model changes", controller)
         unsubscribe = controller.subscribe {
             model = it
         }
     }
 
     override fun onCleared() {
-        log.debug("clearing view-model for controller=$controller with model=$model")
+        log.debug("clearing view-model for controller={} with model={}", controller, model)
         unsubscribe()
         controller.stop()
     }

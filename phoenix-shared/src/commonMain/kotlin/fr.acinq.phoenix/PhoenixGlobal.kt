@@ -33,7 +33,7 @@ class PhoenixGlobal(val ctx: PlatformContext) {
 
     // this logger factory will be used throughout the project (including dependencies like lightning-kmp) to
     // create new [Logger] instances, and output logs to platform dependent writers.
-    val loggerFactory = LoggerFactory(PhoenixLoggerConfig(ctx))
+    val loggerFactory = LoggerFactory(PhoenixLoggerConfig(ctx, null))
     private val logger = loggerFactory.newLogger(this::class)
 
     val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }

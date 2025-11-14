@@ -75,6 +75,7 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.Clickable
@@ -121,7 +122,7 @@ fun SendView(
     fromRoute: String?
 ) {
     val navController = navController
-    val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(sendManager = business.sendManager))
+    val vm = viewModel<PrepareSendViewModel>(factory = PrepareSendViewModel.Factory(application, walletId, business.sendManager))
     var showScanner by remember { mutableStateOf(immediatelyOpenScanner) }
     val keyboardManager = LocalSoftwareKeyboardController.current
 
@@ -160,10 +161,11 @@ fun SendView(
                     LnurlPayView(walletId = walletId, business = business, pay = data, onBackClick = onBackClick, onPaymentSent = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Withdraw -> {
-                    LnurlWithdrawView(business = business, withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
+                    LnurlWithdrawView(walletId = walletId, business = business, withdraw = data.lnurlWithdraw, onBackClick = onBackClick, onFeeManagementClick = { navController.navigate(Screen.BusinessNavGraph.LiquidityPolicy.route) }, onWithdrawDone = { navController.popToHome() })
                 }
                 is SendManager.ParseResult.Lnurl.Auth -> {
-                    LnurlAuthView(business = business, auth = data.auth, onBackClick = onBackClick, onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.BusinessNavGraph.PaymentSettings.route}?showAuthSchemeDialog=true") },
+                    LnurlAuthView(walletId = walletId, business = business, auth = data.auth, onBackClick = onBackClick,
+                        onChangeAuthSchemeSettingClick = { navController.navigate("${Screen.BusinessNavGraph.PaymentSettings.route}?showAuthSchemeDialog=true") },
                         onAuthDone = { navController.popToHome() },)
                 }
             }

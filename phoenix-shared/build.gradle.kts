@@ -125,6 +125,7 @@ kotlin {
                     implementation("io.ktor:ktor-network-tls:${libs.versions.ktor.get()}")
                     implementation("io.ktor:ktor-client-android:${libs.versions.ktor.get()}")
                     implementation("app.cash.sqldelight:android-driver:${libs.versions.sqldelight.get()}")
+                    implementation("com.github.tony19:logback-android:${libs.versions.logback.get()}")
                 }
             }
             val androidUnitTest by getting {

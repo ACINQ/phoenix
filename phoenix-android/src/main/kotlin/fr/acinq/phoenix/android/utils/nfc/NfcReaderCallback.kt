@@ -135,7 +135,7 @@ class NfcReaderCallback(val onFoundData: (String) -> Unit) : NfcAdapter.ReaderCa
             if (NfcStateRepository.isReading()) {
                 NfcStateRepository.updateState(NfcState.Inactive)
             }
-            log.info("terminated nfc reader callback")
+            log.debug("terminated nfc reader callback")
         }
     }
 }

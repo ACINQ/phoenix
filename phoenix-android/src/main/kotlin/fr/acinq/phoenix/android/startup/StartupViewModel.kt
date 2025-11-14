@@ -25,8 +25,10 @@ import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.StartBusinessResult
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.services.ChannelsWatcher
 import fr.acinq.phoenix.android.services.ContactsPhotoCleaner
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,7 +50,6 @@ sealed class StartupViewState {
 class StartupViewModel(
     val application: PhoenixApplication,
 ) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
     val state = mutableStateOf<StartupViewState>(StartupViewState.Init)
 
@@ -57,8 +58,10 @@ class StartupViewModel(
             return
         }
 
+        val walletLogger = LogHelper.getLogger(application.applicationContext, walletId, this@StartupViewModel)
+
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.error("error when initialising startup-view: ", e)
+            walletLogger.error("error when initialising startup-view: ", e)
             state.value = StartupViewState.Error.Generic(walletId = walletId, cause = e)
         }) {
             state.value = StartupViewState.StartingBusiness(walletId)
@@ -76,8 +79,14 @@ class StartupViewModel(
                         onStartupSuccess(startResult.business)
                     }
                 }
-                is StartBusinessResult.Failure.Generic -> state.value = StartupViewState.Error.Generic(walletId = walletId, cause = startResult.cause)
-                is StartBusinessResult.Failure.LoadWalletError -> state.value = StartupViewState.Error.Generic(walletId = walletId, cause = null)
+                is StartBusinessResult.Failure.Generic -> {
+                    walletLogger.error("failed to start business: ", startResult.cause)
+                    state.value = StartupViewState.Error.Generic(walletId = walletId, cause = startResult.cause)
+                }
+                is StartBusinessResult.Failure.LoadWalletError -> {
+                    walletLogger.error("failed to load wallet")
+                    state.value = StartupViewState.Error.Generic(walletId = walletId, cause = null)
+                }
             }
         }
     }

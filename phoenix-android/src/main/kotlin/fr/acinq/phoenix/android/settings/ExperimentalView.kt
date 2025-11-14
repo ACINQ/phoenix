@@ -39,9 +39,11 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.PhoenixIcon
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.layouts.CardHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
@@ -52,11 +54,11 @@ import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.data.canRequestLiquidity
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
-import org.slf4j.LoggerFactory
 
 
 sealed class ClaimAddressState {
@@ -67,8 +69,14 @@ sealed class ClaimAddressState {
     data class Failure(val e: Throwable) : ClaimAddressState()
 }
 
-class ExperimentalViewModel(val peerManager: PeerManager, private val internalPrefs: InternalPrefs) : ViewModel() {
-    private val log = LoggerFactory.getLogger(this::class.java)
+class ExperimentalViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
+    val peerManager: PeerManager,
+) : ViewModel() {
+
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
+    val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
 
     var claimAddressState by mutableStateOf<ClaimAddressState>(ClaimAddressState.Init)
         private set
@@ -105,15 +113,14 @@ class ExperimentalViewModel(val peerManager: PeerManager, private val internalPr
     }
 
     class Factory(
+        private val application: PhoenixApplication,
         private val walletId: WalletId,
         private val peerManager: PeerManager,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as? PhoenixApplication)
-            val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(application.applicationContext, walletId)
             @Suppress("UNCHECKED_CAST")
-            return ExperimentalViewModel(peerManager, internalPrefs) as T
+            return ExperimentalViewModel(application, walletId, peerManager) as T
         }
     }
 }
@@ -124,7 +131,7 @@ fun ExperimentalView(
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(walletId, business.peerManager))
+    val vm = viewModel<ExperimentalViewModel>(factory = ExperimentalViewModel.Factory(application, walletId, business.peerManager))
 
     DefaultScreenLayout {
         DefaultScreenHeader(

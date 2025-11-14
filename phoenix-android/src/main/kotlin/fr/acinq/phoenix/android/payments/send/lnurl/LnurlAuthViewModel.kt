@@ -20,12 +20,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.managers.SendManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 sealed class LnurlAuthViewState {
     data object Init : LnurlAuthViewState()
@@ -35,9 +38,12 @@ sealed class LnurlAuthViewState {
     data class Error(val cause: Throwable) : LnurlAuthViewState()
 }
 
-class LnurlAuthViewModel(private val sendManager: SendManager) : ViewModel() {
-
-    val log = LoggerFactory.getLogger(this::class.java)
+class LnurlAuthViewModel(
+    val application: PhoenixApplication,
+    val walletId: WalletId,
+    private val sendManager: SendManager
+) : ViewModel() {
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     val state = mutableStateOf<LnurlAuthViewState>(LnurlAuthViewState.Init)
 
     fun authenticateToDomain(auth: LnurlAuth, scheme: LnurlAuth.Scheme) {
@@ -57,11 +63,13 @@ class LnurlAuthViewModel(private val sendManager: SendManager) : ViewModel() {
     }
 
     class Factory(
+        val application: PhoenixApplication,
+        val walletId: WalletId,
         private val sendManager: SendManager
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return LnurlAuthViewModel(sendManager) as T
+            return LnurlAuthViewModel(application, walletId, sendManager) as T
         }
     }
 }

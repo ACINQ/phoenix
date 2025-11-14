@@ -360,8 +360,8 @@
     <string name="logs_title">Logy aplikace</string>
     <string name="logs_exporting">Exportování logů…</string>
     <string name="logs_failed">Chyba: logy se nepodařilo exportovat</string>
-    <string name="logs_view_button">Zobrazit logy…</string>
-    <string name="logs_view_with">Otevřít logy s…</string>
+    <string name="logs_view_button">Zobrazit výňatek z logů……</string>
+    <string name="logs_view_with">Zobrazit výňatek z logů……</string>
     <string name="logs_share_button">Sdílet logy…</string>
     <string name="logs_share_subject">Logy aplikace Phoenix</string>
     <string name="logs_share_title">Sdílet logy Phoenixu…</string>

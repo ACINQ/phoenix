@@ -26,13 +26,15 @@ import fr.acinq.lightning.channel.ChannelFundingResponse
 import fr.acinq.lightning.channel.ChannelManagementFees
 import fr.acinq.lightning.wire.LiquidityAds
 import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 sealed class RequestLiquidityState {
@@ -54,10 +56,10 @@ sealed class RequestLiquidityState {
 
 class RequestLiquidityViewModel(
     val application: PhoenixApplication,
+    val walletId: WalletId,
     val peerManager: PeerManager
 ): ViewModel() {
-
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     val state = mutableStateOf<RequestLiquidityState>(RequestLiquidityState.Init)
 
     fun estimateFeeForInboundLiquidity(amount: Satoshi) {
@@ -114,12 +116,13 @@ class RequestLiquidityViewModel(
     }
 
     class Factory(
-        private val peerManager: PeerManager,
         private val application: PhoenixApplication,
+        private val walletId: WalletId,
+        private val peerManager: PeerManager,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return RequestLiquidityViewModel(application, peerManager) as T
+            return RequestLiquidityViewModel(application, walletId, peerManager) as T
         }
     }
 }

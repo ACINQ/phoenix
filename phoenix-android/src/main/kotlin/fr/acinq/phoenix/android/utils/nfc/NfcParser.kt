@@ -27,7 +27,7 @@ object NdefParser {
         val tnf = record.tnf
         val type = record.type
         val payload = record.payload
-        log.info("parsing ndef record tnf=$tnf type=${type.toHexString()} payload=${payload.decodeToString()}")
+        log.debug("parsing ndef record tnf=$tnf type=${type.toHexString()} payload=${payload.decodeToString()}")
 
         return try {
             when (tnf) {

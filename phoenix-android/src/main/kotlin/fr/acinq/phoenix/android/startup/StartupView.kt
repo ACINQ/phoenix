@@ -62,6 +62,7 @@ import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.ListWalletState
+import fr.acinq.phoenix.android.LocalWalletId
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.UserWallet
 import fr.acinq.phoenix.android.WalletId
@@ -73,16 +74,17 @@ import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.buttons.Button
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
+import fr.acinq.phoenix.android.components.logger
 import fr.acinq.phoenix.android.components.wallet.WalletAvatar
 import fr.acinq.phoenix.android.components.wallet.WalletsSelector
 import fr.acinq.phoenix.android.globalPrefs
 import fr.acinq.phoenix.android.utils.BiometricsHelper
-import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.utils.datastore.UserWalletMetadata
 import fr.acinq.phoenix.android.utils.datastore.getByWalletIdOrDefault
 import fr.acinq.phoenix.android.utils.extensions.findActivity
 import fr.acinq.phoenix.android.utils.shareFile
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.collections.get
@@ -325,6 +327,7 @@ private fun ListWalletsError(state: ListWalletState.Error, onManualRecoveryClick
 private fun StartErrorShareLogsButton() {
     val context = LocalContext.current
     val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }
+    val logger = logger(LocalWalletId.current, "Startup")
 
     TransparentFilledButton(
         text = stringResource(id = R.string.logs_share_button),
@@ -332,14 +335,15 @@ private fun StartErrorShareLogsButton() {
         iconTint = MaterialTheme.typography.caption.color,
         onClick = {
             try {
-                val logFile = Logging.exportLogFile(context)
+                val logFile = LogHelper.exportLogFile(context, walletId = null)
                 shareFile(
                     context = context,
                     data = FileProvider.getUriForFile(context, authority, logFile),
                     subject = context.getString(R.string.logs_share_subject),
                     chooserTitle = context.getString(R.string.logs_share_title)
                 )
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logger.error("failed to export logs: ", e)
                 Toast.makeText(context, "Failed to export logs...", Toast.LENGTH_SHORT).show()
             }
         },

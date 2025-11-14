@@ -29,6 +29,7 @@ import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.payments.history.PaymentsExportView
 import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.send.liquidity.RequestLiquidityView
@@ -57,8 +58,8 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
         SettingsView(business, appViewModel, emptyList(), notifications.value)
     }
 
-    businessComposable(Screen.BusinessNavGraph.ElectrumServer.route, appViewModel) { _, _, _ ->
-        ElectrumView(onBackClick = { navController.popBackStack() })
+    businessComposable(Screen.BusinessNavGraph.ElectrumServer.route, appViewModel) { _, walletId, _ ->
+        ElectrumView(walletId = walletId, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.BusinessNavGraph.TorConfig.route, appViewModel) { _, walletId, _ ->
@@ -91,14 +92,15 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
         AppAccessSettings(walletId = walletId, onBackClick = { navController.popBackStack() }, onScheduleAutoLock = appViewModel::scheduleAutoLock)
     }
 
-    businessComposable(Screen.BusinessNavGraph.Logs.route, appViewModel) { _, _, _ ->
-        LogsView()
+    businessComposable(Screen.BusinessNavGraph.Logs.route, appViewModel) { _, walletId, _ ->
+        LogsView(walletId)
     }
 
     businessComposable(Screen.BusinessNavGraph.PaymentsHistory.route, appViewModel) { backStackEntry, walletId, business ->
         val homeGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.BusinessNavGraph.route) }
-        val paymentsViewModel = viewModel<PaymentsViewModel>(factory = PaymentsViewModel.Factory(business.paymentsManager), viewModelStoreOwner = homeGraphEntry)
+        val paymentsViewModel = viewModel<PaymentsViewModel>(factory = PaymentsViewModel.Factory(application, walletId, business.paymentsManager), viewModelStoreOwner = homeGraphEntry)
         PaymentsHistoryView(
+            walletId = walletId,
             onBackClick = { navController.popBackStack() },
             paymentsViewModel  = paymentsViewModel,
             onPaymentClick = { navigateToPaymentDetails(navController, id = it, isFromEvent = false) },

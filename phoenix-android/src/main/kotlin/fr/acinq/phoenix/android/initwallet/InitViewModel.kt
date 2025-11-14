@@ -28,11 +28,13 @@ import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.managers.NodeParamsManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -87,14 +89,15 @@ class InitViewModel(val application: PhoenixApplication) : ViewModel() {
             val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
             val newWalletId = WalletId(keyManager.nodeKeys.nodeKey.publicKey)
 
+            val walletLogger = LogHelper.getLogger(application, newWalletId, this@InitViewModel)
             when {
                 existingSeeds == null -> {
-                    log.error("could not load the existing seed map, aborting...")
+                    walletLogger.error("could not load the existing seed map, aborting...")
                     writingState = WritingSeedState.Error.CannotLoadSeedMap
                     return@launch
                 }
                 existingSeeds.containsKey(newWalletId) -> {
-                    log.info("attempting to import a seed that already exists, aborting...")
+                    walletLogger.info("attempting to import a seed that already exists, aborting...")
                     writingState = WritingSeedState.Error.SeedAlreadyExists
                     return@launch
                 }
@@ -104,9 +107,9 @@ class InitViewModel(val application: PhoenixApplication) : ViewModel() {
                     SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
                     writingState = WritingSeedState.WrittenToDisk(walletId = newWalletId, encryptedSeed = encrypted)
                     if (isRestoringWallet) {
-                        log.info("successfully restored wallet=$newWalletId")
+                        walletLogger.info("successfully restored wallet=$newWalletId")
                     } else {
-                        log.info("successfully created wallet=$newWalletId")
+                        walletLogger.info("successfully created wallet=$newWalletId")
                     }
                 }
             }

@@ -32,7 +32,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.components.logger
 import io.ktor.http.encodeURLParameter
 
 /** Navigates to Home and pops everything from the backstack up to Home. This effectively resets the nav stack. */
@@ -63,10 +63,10 @@ fun NavGraphBuilder.businessComposable(
     content: @Composable AnimatedContentScope.(NavBackStackEntry, WalletId, PhoenixBusiness) -> Unit
 ) {
     composable(route = route, arguments = arguments, deepLinks = deepLinks) { entry ->
-        val log = logger("Navigation")
         val activeWallet by appViewModel.activeWalletInUI.collectAsState()
         val walletId = activeWallet?.id
         val business = activeWallet?.business
+        val log = logger(walletId, "Navigation")
         if (walletId == null || business == null) {
 
             // in case it's a deeplink we need to look into the intent and apply some optional prefix

@@ -26,13 +26,16 @@ import fr.acinq.bitcoin.crypto.musig2.Musig2
 import fr.acinq.bitcoin.utils.toResult
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.managers.WalletManager
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 
 
 enum class SwapInOptions { LEGACY, TAPROOT }
@@ -72,11 +75,13 @@ sealed class TaprootSwapInSignerState : SwapInSignerState() {
 }
 
 class SwapInSignerViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
     private val walletManager: WalletManager,
     private val electrumClient: ElectrumClient,
 ) : ViewModel() {
 
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     val state = mutableStateOf<SwapInSignerState>(LegacySwapInSignerState.Init)
 
     fun signLegacy(
@@ -196,12 +201,14 @@ class SwapInSignerViewModel(
     }
 
     class Factory(
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
         private val walletManager: WalletManager,
         private val electrumClient: ElectrumClient,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SwapInSignerViewModel(walletManager, electrumClient) as T
+            return SwapInSignerViewModel(application, walletId, walletManager, electrumClient) as T
         }
     }
 }

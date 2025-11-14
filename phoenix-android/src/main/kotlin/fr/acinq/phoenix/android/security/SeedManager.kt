@@ -61,7 +61,7 @@ object SeedManager {
 
         return when (encryptedSeed) {
             is EncryptedSeed.V2.SingleSeed -> {
-                log.info("decrypting [V2.SingleSeed]...")
+                log.debug("decrypting [V2.SingleSeed]...")
                 val payload = try {
                     encryptedSeed.decrypt()
                 } catch (e: Exception) {
@@ -85,7 +85,7 @@ object SeedManager {
             }
 
             is EncryptedSeed.V2.MultipleSeed -> {
-                log.info("decrypting [V2.MultipleSeed]")
+                log.debug("decrypting [V2.MultipleSeed]")
                 val seedMap = try {
                     encryptedSeed.decryptAndGetSeedMap()
                 } catch (e: Exception) {

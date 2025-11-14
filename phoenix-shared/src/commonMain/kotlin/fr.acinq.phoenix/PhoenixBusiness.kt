@@ -42,8 +42,9 @@ import kotlin.time.Duration.Companion.seconds
 
 class PhoenixBusiness(
     val phoenixGlobal: PhoenixGlobal,
+    val loggerFactory: LoggerFactory,
 ) {
-    val loggerFactory = phoenixGlobal.loggerFactory
+//    val loggerFactory = phoenixGlobal.loggerFactory
     private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()

@@ -26,13 +26,16 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.PhoenixApplication
+import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.components.getLogger
 import fr.acinq.phoenix.utils.channels.SpendChannelAddressHelper
 import fr.acinq.phoenix.utils.channels.SpendChannelAddressResult
+import fr.acinq.phoenix.utils.logger.LogHelper
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.milliseconds
 
 sealed class SpendFromChannelAddressViewState {
@@ -54,9 +57,12 @@ sealed class SpendFromChannelAddressViewState {
 }
 
 class SpendFromChannelAddressViewModel(
+    application: PhoenixApplication,
+    walletId: WalletId,
     private val business: PhoenixBusiness
 ) : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
+
+    private val log = LogHelper.getLogger(application.applicationContext, walletId, this)
     val state = mutableStateOf<SpendFromChannelAddressViewState>(SpendFromChannelAddressViewState.Init)
 
     fun resetState() {
@@ -119,11 +125,13 @@ class SpendFromChannelAddressViewModel(
     }
 
     class Factory(
-        private val business: PhoenixBusiness
+        private val application: PhoenixApplication,
+        private val walletId: WalletId,
+        private val business: PhoenixBusiness,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return SpendFromChannelAddressViewModel(business) as T
+            return SpendFromChannelAddressViewModel(application, walletId, business) as T
         }
     }
 }

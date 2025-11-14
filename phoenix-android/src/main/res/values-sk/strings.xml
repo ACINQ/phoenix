@@ -278,8 +278,8 @@
     <string name="logs_title">Logy aplikácie</string>
     <string name="logs_exporting">Exportovanie logov…</string>
     <string name="logs_failed">Chyba: logy sa nepodarilo exportovať</string>
-    <string name="logs_view_button">Zobraziť logy…</string>
-    <string name="logs_view_with">Otvoriť logy s…</string>
+    <string name="logs_view_button">Zobraziť výňatok z logov……</string>
+    <string name="logs_view_with">Zobraziť výňatok z logov s…</string>
     <string name="logs_share_button">Zdieľať logy…</string>
     <string name="logs_share_subject">Logy aplikácie Phoenix</string>
     <string name="logs_share_title">Zdieľať logy Phoenixu…</string>

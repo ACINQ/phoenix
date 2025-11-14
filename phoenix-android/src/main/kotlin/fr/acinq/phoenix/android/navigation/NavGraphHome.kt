@@ -33,6 +33,7 @@ import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.Notice
 import fr.acinq.phoenix.android.NoticesViewModel
 import fr.acinq.phoenix.android.PaymentsViewModel
+import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.home.HomeView
 import kotlinx.coroutines.flow.first
 
@@ -40,7 +41,7 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController, appViewModel: App
     businessComposable(Screen.BusinessNavGraph.Home.route, appViewModel) { backStackEntry, walletId, business ->
 
         val homeGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.BusinessNavGraph.route) }
-        val paymentsViewModel = viewModel<PaymentsViewModel>(factory = PaymentsViewModel.Factory(business.paymentsManager), viewModelStoreOwner = homeGraphEntry)
+        val paymentsViewModel = viewModel<PaymentsViewModel>(factory = PaymentsViewModel.Factory(application, walletId, business.paymentsManager), viewModelStoreOwner = homeGraphEntry)
 
         val noticesViewModel = viewModel<NoticesViewModel>(
             factory = NoticesViewModel.Factory(
