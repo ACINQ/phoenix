@@ -30,7 +30,6 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LocalChannelInfo
-import fr.acinq.phoenix.utils.extensions.isTerminated
 import fr.acinq.phoenix.utils.extensions.nextTimeout
 import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
@@ -148,19 +147,14 @@ class PeerManager(
     @OptIn(ExperimentalCoroutinesApi::class)
     val swapInNextTimeout = swapInWallet.filterNotNull().mapLatest { it.nextTimeout }
 
-    /**
-     * FIXME: Temporary workaround. Must be done in lightning-kmp with proper testing.
-     * See [Peer.waitForPeerReady]
-     *
-     * Return true if peer is connected & channels are normal. Terminated channels are ignored.
-     */
+    /** Return true if peer is connected there's 1 normal channels. */
     @OptIn(ExperimentalCoroutinesApi::class)
     val mayDoPayments = peerState.filterNotNull().flatMapLatest { peer ->
         combine(peer.connectionState, peer.channelsFlow) { connectionState, channels ->
             when {
                 connectionState !is Connection.ESTABLISHED -> false
                 channels.isEmpty() -> true
-                else -> channels.values.filterNot { it.isTerminated() }.all { it is Normal }
+                else -> channels.values.any { it is Normal }
             }
         }
     }.stateIn(
