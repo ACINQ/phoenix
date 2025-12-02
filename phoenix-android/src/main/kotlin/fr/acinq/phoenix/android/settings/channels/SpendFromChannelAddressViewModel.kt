@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.crypto.musig2.IndividualNonce
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddressViewState.Error.ResultError
 import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddressViewState.Success
@@ -38,7 +39,7 @@ import kotlin.time.Duration.Companion.milliseconds
 sealed class SpendFromChannelAddressViewState {
     data object Init : SpendFromChannelAddressViewState()
     data object Processing : SpendFromChannelAddressViewState()
-    data class Success(val pubkey: PublicKey, val signature: ByteVector32) : SpendFromChannelAddressViewState()
+    data class Success(val pubkey: PublicKey, val partialSignature: ByteVector32, val localNonce: IndividualNonce) : SpendFromChannelAddressViewState()
 
     sealed class Error : SpendFromChannelAddressViewState() {
         data class Generic(val cause: Throwable) : Error()
@@ -96,7 +97,7 @@ class SpendFromChannelAddressViewModel(
             when (result) {
                 is SpendChannelAddressResult.Success -> {
                     delay(300.milliseconds)
-                    state.value = Success(result.publicKey, result.signature)
+                    state.value = Success(result.publicKey, result.signature, result.localNonce)
                 }
                 is SpendChannelAddressResult.Failure -> {
                     state.value = ResultError(result)

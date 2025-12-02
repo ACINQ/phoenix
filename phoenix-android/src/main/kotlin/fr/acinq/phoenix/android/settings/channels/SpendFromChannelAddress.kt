@@ -71,7 +71,7 @@ fun SpendFromChannelAddress(
     var unsignedTx by remember { mutableStateOf("") }
     var remoteNonce by remember { mutableStateOf("") }
 
-    DefaultScreenLayout {
+    DefaultScreenLayout(addImePadding = true) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.spendchanneladdress_title))
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = stringResource(id = R.string.spendchanneladdress_instructions))
@@ -247,7 +247,8 @@ fun SpendFromChannelAddress(
                     Card {
                         Spacer(modifier = Modifier.height(8.dp))
                         SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_pubkey), value = state.pubkey.toHex())
-                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_signature), value = state.signature.toHex())
+                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_signature), value = state.partialSignature.toHex())
+                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_nonce), value = state.localNonce.toString())
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             text = stringResource(id = R.string.btn_copy),
@@ -258,7 +259,8 @@ fun SpendFromChannelAddress(
                                     context = context,
                                     data = """
                                         pubkey=${state.pubkey.toHex()}
-                                        signature=${state.signature.toHex()}
+                                        signature=${state.partialSignature.toHex()}
+                                        nonce=${state.localNonce}
                                     """.trimIndent(),
                                     dataLabel = "channel outpoint spending data"
                                 )

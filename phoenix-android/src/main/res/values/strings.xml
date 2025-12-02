@@ -323,6 +323,7 @@
     <string name="spendchanneladdress_success_header">Signature successfully generated.</string>
     <string name="spendchanneladdress_success_pubkey">Public key</string>
     <string name="spendchanneladdress_success_signature">Signature</string>
+    <string name="spendchanneladdress_success_nonce">Nonce</string>
 
     <string name="spendchanneladdress_error_generic">Failed to sign data</string>
     <string name="spendchanneladdress_error_amount">Invalid amount</string>

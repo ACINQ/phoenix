@@ -120,12 +120,12 @@ object SpendChannelAddressHelper {
         try {
             val localFundingKey = channelKeys.fundingKey(fundingTxIndex)
 
-            val outputScript = Script.pay2tr(Scripts.Taproot.musig2Aggregate(localFundingKey.publicKey(), remoteFundingPubKey))
+            val outputScript = Script.pay2tr(internalKey = Scripts.Taproot.musig2Aggregate(localFundingKey.publicKey(), remoteFundingPubKey), scripts = null)
             val inputInfo = Transactions.InputInfo(unsignedTx.txIn.first().outPoint, TxOut(amount, outputScript))
 
             val tx = Transactions.SpliceTx(inputInfo, unsignedTx)
-            val localNonce = Musig2.generateNonce(sessionId = randomBytes32(), signingKey = Either.Left(localFundingKey),
-                publicKeys = listOf(localFundingKey.publicKey()), message = null, extraInput = null).let { Transactions.LocalNonce(it.first, it.second) }
+            val localNonce = Musig2.generateNonce(sessionId = randomBytes32(), signingKey = Either.Left(localFundingKey), publicKeys = listOf(localFundingKey.publicKey()), message = null, extraInput = null)
+                .let { Transactions.LocalNonce(it.first, it.second) }
 
             val sigResult = tx.partialSign(localFundingKey, remoteFundingPubKey, extraUtxos = emptyMap(), localNonce = localNonce, publicNonces = listOf(localNonce.publicNonce, remoteNonce))
             return when (sigResult) {
@@ -134,9 +134,9 @@ object SpendChannelAddressHelper {
                     SpendChannelAddressResult.Failure.SignatureFailure
                 }
                 is Either.Right -> {
-                    log.info { "successfully signed transaction" }
+                    log.info { "successfully generated partial signature" }
                     SpendChannelAddressResult.Success(txId = tx.tx.txid, publicKey = localFundingKey.publicKey(),
-                        fundingScript = Script.write(outputScript).byteVector(), signature = sigResult.value.partialSig)
+                        fundingScript = Script.write(outputScript).byteVector(), signature = sigResult.value.partialSig, localNonce = localNonce.publicNonce)
                 }
             }
         } catch (e: Exception) {
@@ -147,7 +147,7 @@ object SpendChannelAddressHelper {
 }
 
 sealed class SpendChannelAddressResult {
-    data class Success(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector32) : SpendChannelAddressResult()
+    data class Success(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector32, val localNonce: IndividualNonce) : SpendChannelAddressResult()
     sealed class Failure : SpendChannelAddressResult() {
         data class Generic(val error: Throwable) : Failure()
         data object InvalidChannelBackup : Failure()
