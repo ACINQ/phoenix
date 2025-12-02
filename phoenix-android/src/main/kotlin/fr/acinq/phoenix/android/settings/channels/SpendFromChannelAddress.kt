@@ -69,6 +69,7 @@ fun SpendFromChannelAddress(
     var channelData by remember { mutableStateOf("") }
     var remoteFundingPubkey by remember { mutableStateOf("") }
     var unsignedTx by remember { mutableStateOf("") }
+    var channelId by remember { mutableStateOf("") }
     var remoteNonce by remember { mutableStateOf("") }
 
     DefaultScreenLayout(addImePadding = true) {
@@ -102,6 +103,20 @@ fun SpendFromChannelAddress(
                 maxLines = 1,
                 enabled = state.canProcess,
                 keyboardType = KeyboardType.Number
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // channel id
+            TextInput(
+                text = channelId,
+                onTextChange = {
+                    if (it != channelId) { vm.resetState() }
+                    channelId = it
+                },
+                staticLabel = stringResource(id = R.string.spendchanneladdress_channel_id),
+                minLines = 1,
+                maxLines = 3,
+                enabled = state.canProcess
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -181,43 +196,21 @@ fun SpendFromChannelAddress(
                                     stringResource(id = R.string.spendchanneladdress_error_tx_index)
                                 }
                                 is SpendFromChannelAddressViewState.Error.ResultError -> {
-                                    when (state.details) {
-                                        is SpendChannelAddressResult.Failure.Generic -> TODO()
-                                        is SpendChannelAddressResult.Failure.InvalidSig -> stringResource(R.string.spendchanneladdress_error_invalid_sig)
-                                        is SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed -> TODO()
-                                        is SpendChannelAddressResult.Failure.RemoteNonceMalformed -> TODO()
-                                        is SpendChannelAddressResult.Failure.SignatureFailure -> TODO()
-                                        is SpendChannelAddressResult.Failure.TransactionMalformed -> TODO()
-                                        is SpendChannelAddressResult.Failure.InvalidChannelBackup -> TODO()
-                                        is SpendChannelAddressResult.Failure.UnhandledChannelBackupVersion -> TODO()
-                                        is SpendChannelAddressResult.Failure.UnhandledChannelState -> TODO()
+                                    when (val details = state.details) {
+                                        is SpendChannelAddressResult.Failure.Generic -> details.error.message ?: details.error.javaClass.name
+                                        is SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed -> stringResource(R.string.spendchanneladdress_error_remote_pubkey, details.details)
+                                        is SpendChannelAddressResult.Failure.RemoteNonceMalformed -> stringResource(R.string.spendchanneladdress_error_remote_nonce)
+                                        is SpendChannelAddressResult.Failure.TransactionMalformed -> stringResource(R.string.spendchanneladdress_error_unsigned_tx, details.details)
+                                        is SpendChannelAddressResult.Failure.InvalidChannelBackup -> stringResource(R.string.spendchanneladdress_error_channel_data)
+                                        is SpendChannelAddressResult.Failure.UnhandledChannelBackupVersion -> stringResource(R.string.spendchanneladdress_error_channel_version, details.version.toString())
+                                        is SpendChannelAddressResult.Failure.UnhandledChannelState -> stringResource(R.string.spendchanneladdress_error_channel_state, details.state)
+                                        is SpendChannelAddressResult.Failure.MissingChannelState -> stringResource(R.string.spendchanneladdress_error_no_channel_matching)
+                                        is SpendChannelAddressResult.Failure.SigningFailure -> stringResource(R.string.spendchanneladdress_error_sig_failed)
                                     }
                                 }
                             },
                             alignment = Alignment.CenterHorizontally
                         )
-
-                        if (state is SpendFromChannelAddressViewState.Error.ResultError) {
-                            val details = state.details
-                            if (details is SpendChannelAddressResult.Failure.InvalidSig) {
-                                val context = LocalContext.current
-                                FilledButton(
-                                    text = "Copy error data",
-                                    onClick = {
-                                        copyToClipboard(
-                                            context = context,
-                                            data = """
-                                                tx_id=${details.txId}
-                                                funding_script=${details.fundingScript.toHex()}
-                                                public_key=${details.publicKey.toHex()}
-                                                signature=${details.signature.toHex()}
-                                            """.trimIndent(),
-                                            dataLabel = "signature error data"
-                                        )
-                                    }
-                                )
-                            }
-                        }
                     }
 
                     Card {
@@ -228,6 +221,7 @@ fun SpendFromChannelAddress(
                                 vm.spendFromChannelAddress(
                                     amount = amount?.truncateToSatoshi(),
                                     fundingTxIndex = txIndex.toLongOrNull(),
+                                    channelId = channelId,
                                     channelData = channelData,
                                     remoteFundingPubkey = remoteFundingPubkey,
                                     unsignedTx = unsignedTx,

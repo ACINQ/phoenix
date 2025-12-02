@@ -54,7 +54,7 @@ sealed class SpendFromChannelAddressViewState {
 class SpendFromChannelAddressViewModel(
     private val business: PhoenixBusiness
 ) : ViewModel() {
-    val log = LoggerFactory.getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
     val state = mutableStateOf<SpendFromChannelAddressViewState>(SpendFromChannelAddressViewState.Init)
 
     fun resetState() {
@@ -64,6 +64,7 @@ class SpendFromChannelAddressViewModel(
     fun spendFromChannelAddress(
         amount: Satoshi?,
         fundingTxIndex: Long?,
+        channelId: String,
         channelData: String,
         remoteFundingPubkey: String,
         unsignedTx: String,
@@ -88,6 +89,7 @@ class SpendFromChannelAddressViewModel(
                 business = business,
                 amount = amount,
                 fundingTxIndex = fundingTxIndex,
+                channelId = channelId,
                 channelData = channelData,
                 remoteFundingPubkeyRaw = remoteFundingPubkey,
                 unsignedTxRaw = unsignedTx,
