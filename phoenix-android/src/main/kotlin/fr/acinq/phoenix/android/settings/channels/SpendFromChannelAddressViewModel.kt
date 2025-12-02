@@ -20,12 +20,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.ByteVector64
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.bitcoin.TxId
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddressViewState.Error.ResultError
+import fr.acinq.phoenix.android.settings.channels.SpendFromChannelAddressViewState.Success
 import fr.acinq.phoenix.utils.channels.SpendChannelAddressHelper
 import fr.acinq.phoenix.utils.channels.SpendChannelAddressResult
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -38,19 +38,16 @@ import kotlin.time.Duration.Companion.milliseconds
 sealed class SpendFromChannelAddressViewState {
     data object Init : SpendFromChannelAddressViewState()
     data object Processing : SpendFromChannelAddressViewState()
-    data class SignedTransaction(val pubkey: PublicKey, val signature: ByteVector64) : SpendFromChannelAddressViewState()
+    data class Success(val pubkey: PublicKey, val signature: ByteVector32) : SpendFromChannelAddressViewState()
 
     sealed class Error : SpendFromChannelAddressViewState() {
         data class Generic(val cause: Throwable) : Error()
         data object AmountMissing : Error()
         data object TxIndexMalformed : Error()
-        data object InvalidChannelKeyPath: Error()
-        data class PublicKeyMalformed(val details: String) : Error()
-        data class TransactionMalformed(val details: String) : Error()
-        data class InvalidSig(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector64): Error()
+        data class ResultError(val details: SpendChannelAddressResult.Failure): Error()
     }
 
-    val canProcess: Boolean = this !is Processing && this !is SignedTransaction
+    val canProcess: Boolean = this !is Processing && this !is Success
 }
 
 class SpendFromChannelAddressViewModel(
@@ -69,6 +66,7 @@ class SpendFromChannelAddressViewModel(
         channelData: String,
         remoteFundingPubkey: String,
         unsignedTx: String,
+        remoteNonce: String,
     ) {
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("error when spending from channel address: ", e)
@@ -89,30 +87,19 @@ class SpendFromChannelAddressViewModel(
                 business = business,
                 amount = amount,
                 fundingTxIndex = fundingTxIndex,
-                channelKeyPath = "FIXME",
-                remoteFundingPubkey = remoteFundingPubkey,
-                unsignedTx = unsignedTx,
+                channelData = channelData,
+                remoteFundingPubkeyRaw = remoteFundingPubkey,
+                unsignedTxRaw = unsignedTx,
+                remoteNonceRaw = remoteNonce,
             )
 
             when (result) {
                 is SpendChannelAddressResult.Success -> {
                     delay(300.milliseconds)
-                    state.value = SpendFromChannelAddressViewState.SignedTransaction(result.publicKey, result.signature)
+                    state.value = Success(result.publicKey, result.signature)
                 }
-                is SpendChannelAddressResult.Failure.InvalidChannelKeyPath -> {
-                    state.value = SpendFromChannelAddressViewState.Error.InvalidChannelKeyPath
-                }
-                is SpendChannelAddressResult.Failure.Generic -> {
-                    state.value = SpendFromChannelAddressViewState.Error.Generic(result.error)
-                }
-                is SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed -> {
-                    state.value = SpendFromChannelAddressViewState.Error.PublicKeyMalformed(result.details)
-                }
-                is SpendChannelAddressResult.Failure.TransactionMalformed -> {
-                    state.value = SpendFromChannelAddressViewState.Error.TransactionMalformed(result.details)
-                }
-                is SpendChannelAddressResult.Failure.InvalidSig -> {
-                    state.value = SpendFromChannelAddressViewState.Error.InvalidSig(result.txId, result.publicKey, result.fundingScript, result.signature)
+                is SpendChannelAddressResult.Failure -> {
+                    state.value = ResultError(result)
                 }
             }
         }

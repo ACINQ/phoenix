@@ -316,6 +316,7 @@
     <string name="spendchanneladdress_channel_data">Raw channel data</string>
     <string name="spendchanneladdress_remote_funding_pubkey">Remote funding pubkey</string>
     <string name="spendchanneladdress_unsigned_tx">Unsigned tx</string>
+    <string name="spendchanneladdress_remote_nonce">Remote nonce</string>
     <string name="spendchanneladdress_sign_button">Sign</string>
     <string name="spendchanneladdress_signing">Signing…</string>
 
