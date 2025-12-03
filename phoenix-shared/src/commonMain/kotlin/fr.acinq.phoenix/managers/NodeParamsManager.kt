@@ -28,8 +28,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.shared.BuildVersions
 import fr.acinq.lightning.logging.info
 import fr.acinq.lightning.wire.OfferTypes
+import fr.acinq.phoenix.defaultScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -39,7 +39,7 @@ class NodeParamsManager(
     chain: Chain,
     walletManager: WalletManager,
     appConfigurationManager: AppConfigurationManager,
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,

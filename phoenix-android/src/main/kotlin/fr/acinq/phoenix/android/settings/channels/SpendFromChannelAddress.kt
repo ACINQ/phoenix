@@ -54,6 +54,7 @@ import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.utils.channels.SpendChannelAddressResult
 
 @Composable
 fun SpendFromChannelAddress(
@@ -68,8 +69,10 @@ fun SpendFromChannelAddress(
     var channelData by remember { mutableStateOf("") }
     var remoteFundingPubkey by remember { mutableStateOf("") }
     var unsignedTx by remember { mutableStateOf("") }
+    var channelId by remember { mutableStateOf("") }
+    var remoteNonce by remember { mutableStateOf("") }
 
-    DefaultScreenLayout {
+    DefaultScreenLayout(addImePadding = true) {
         DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.spendchanneladdress_title))
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = stringResource(id = R.string.spendchanneladdress_instructions))
@@ -103,6 +106,20 @@ fun SpendFromChannelAddress(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
+            // channel id
+            TextInput(
+                text = channelId,
+                onTextChange = {
+                    if (it != channelId) { vm.resetState() }
+                    channelId = it
+                },
+                staticLabel = stringResource(id = R.string.spendchanneladdress_channel_id),
+                minLines = 1,
+                maxLines = 3,
+                enabled = state.canProcess
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
             // encrypted channel data
             TextInput(
                 text = channelData,
@@ -127,6 +144,20 @@ fun SpendFromChannelAddress(
                 staticLabel = stringResource(id = R.string.spendchanneladdress_remote_funding_pubkey),
                 minLines = 1,
                 maxLines = 2,
+                enabled = state.canProcess
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // remote nonce
+            TextInput(
+                text = remoteNonce,
+                onTextChange = {
+                    if (it != remoteNonce) { vm.resetState() }
+                    remoteNonce = it
+                },
+                staticLabel = stringResource(id = R.string.spendchanneladdress_remote_nonce),
+                minLines = 1,
+                maxLines = 3,
                 enabled = state.canProcess
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -164,46 +195,39 @@ fun SpendFromChannelAddress(
                                 is SpendFromChannelAddressViewState.Error.TxIndexMalformed -> {
                                     stringResource(id = R.string.spendchanneladdress_error_tx_index)
                                 }
-                                is SpendFromChannelAddressViewState.Error.InvalidChannelKeyPath -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_channel_keypath)
-                                }
-                                is SpendFromChannelAddressViewState.Error.PublicKeyMalformed -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_remote_funding_pubkey, state.details)
-                                }
-                                is SpendFromChannelAddressViewState.Error.TransactionMalformed -> {
-                                    stringResource(id = R.string.spendchanneladdress_error_tx, state.details)
-                                }
-                                is SpendFromChannelAddressViewState.Error.InvalidSig -> {
-                                    stringResource(R.string.spendchanneladdress_error_invalid_sig)
+                                is SpendFromChannelAddressViewState.Error.ResultError -> {
+                                    when (val details = state.details) {
+                                        is SpendChannelAddressResult.Failure.Generic -> details.error.message ?: details.error.javaClass.name
+                                        is SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed -> stringResource(R.string.spendchanneladdress_error_remote_pubkey, details.details)
+                                        is SpendChannelAddressResult.Failure.RemoteNonceMalformed -> stringResource(R.string.spendchanneladdress_error_remote_nonce)
+                                        is SpendChannelAddressResult.Failure.TransactionMalformed -> stringResource(R.string.spendchanneladdress_error_unsigned_tx, details.details)
+                                        is SpendChannelAddressResult.Failure.InvalidChannelBackup -> stringResource(R.string.spendchanneladdress_error_channel_data)
+                                        is SpendChannelAddressResult.Failure.UnhandledChannelBackupVersion -> stringResource(R.string.spendchanneladdress_error_channel_version, details.version.toString())
+                                        is SpendChannelAddressResult.Failure.UnhandledChannelState -> stringResource(R.string.spendchanneladdress_error_channel_state, details.state)
+                                        is SpendChannelAddressResult.Failure.MissingChannelState -> stringResource(R.string.spendchanneladdress_error_no_channel_matching)
+                                        is SpendChannelAddressResult.Failure.SigningFailure -> stringResource(R.string.spendchanneladdress_error_sig_failed)
+                                    }
                                 }
                             },
                             alignment = Alignment.CenterHorizontally
                         )
-                        if (state is SpendFromChannelAddressViewState.Error.InvalidSig) {
-                            val context = LocalContext.current
-                            FilledButton(
-                                text = "Copy error data",
-                                onClick = {
-                                    copyToClipboard(
-                                        context = context,
-                                        data = """
-                                            tx_id=${state.txId}
-                                            funding_script=${state.fundingScript.toHex()}
-                                            public_key=${state.publicKey.toHex()}
-                                            signature=${state.signature.toHex()}
-                                        """.trimIndent(),
-                                        dataLabel = "signature error data"
-                                    )
-                                }
-                            )
-                        }
                     }
 
                     Card {
                         FilledButton(
                             text = stringResource(id = R.string.spendchanneladdress_sign_button),
                             icon = R.drawable.ic_build,
-                            onClick = { vm.spendFromChannelAddress(amount?.truncateToSatoshi(), txIndex.toLongOrNull(), channelData, remoteFundingPubkey, unsignedTx) },
+                            onClick = {
+                                vm.spendFromChannelAddress(
+                                    amount = amount?.truncateToSatoshi(),
+                                    fundingTxIndex = txIndex.toLongOrNull(),
+                                    channelId = channelId,
+                                    channelData = channelData,
+                                    remoteFundingPubkey = remoteFundingPubkey,
+                                    unsignedTx = unsignedTx,
+                                    remoteNonce = remoteNonce,
+                                )
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RectangleShape
                         )
@@ -212,12 +236,13 @@ fun SpendFromChannelAddress(
                 is SpendFromChannelAddressViewState.Processing -> {
                     ProgressView(text = stringResource(id = R.string.spendchanneladdress_signing))
                 }
-                is SpendFromChannelAddressViewState.SignedTransaction -> {
+                is SpendFromChannelAddressViewState.Success -> {
                     val context = LocalContext.current
                     Card {
                         Spacer(modifier = Modifier.height(8.dp))
                         SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_pubkey), value = state.pubkey.toHex())
-                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_signature), value = state.signature.toHex())
+                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_signature), value = state.partialSignature.toHex())
+                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_nonce), value = state.localNonce.toString())
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             text = stringResource(id = R.string.btn_copy),
@@ -228,7 +253,8 @@ fun SpendFromChannelAddress(
                                     context = context,
                                     data = """
                                         pubkey=${state.pubkey.toHex()}
-                                        signature=${state.signature.toHex()}
+                                        signature=${state.partialSignature.toHex()}
+                                        nonce=${state.localNonce}
                                     """.trimIndent(),
                                     dataLabel = "channel outpoint spending data"
                                 )

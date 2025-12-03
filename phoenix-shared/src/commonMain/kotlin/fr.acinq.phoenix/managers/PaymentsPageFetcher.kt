@@ -3,6 +3,7 @@ package fr.acinq.phoenix.managers
 import fr.acinq.lightning.logging.LoggerFactory
 import fr.acinq.lightning.logging.debug
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.defaultScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +30,7 @@ data class PaymentsPage(
 class PaymentsPageFetcher(
     loggerFactory: LoggerFactory,
     private val databaseManager: DatabaseManager
-): CoroutineScope by MainScope() {
+): CoroutineScope by defaultScope() {
 
     private val log = loggerFactory.newLogger(this::class)
 

@@ -11,6 +11,7 @@ import fr.acinq.lightning.logging.debug
 import fr.acinq.lightning.logging.error
 import fr.acinq.lightning.logging.info
 import fr.acinq.phoenix.PhoenixGlobal
+import fr.acinq.phoenix.defaultScope
 import fr.acinq.phoenix.managers.global.NetworkState
 import fr.acinq.phoenix.utils.extensions.isOnion
 import kotlinx.coroutines.*
@@ -35,7 +36,7 @@ class AppConnectionsDaemon(
     private val phoenixGlobal: PhoenixGlobal,
     private val tcpSocketBuilder: suspend () -> TcpSocket.Builder,
     private val electrumClient: ElectrumClient,
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,

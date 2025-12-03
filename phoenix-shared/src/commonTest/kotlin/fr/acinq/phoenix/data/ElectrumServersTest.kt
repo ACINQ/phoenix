@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.TxId
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumConnectionStatus
 import fr.acinq.lightning.blockchain.fee.FeeratePerByte
@@ -13,6 +14,7 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.measureTimedValue
 
 
 /**
@@ -20,9 +22,7 @@ import kotlin.time.Duration.Companion.seconds
  *
  * Some servers used pinned pubkey. To update the public key manually:
  * ```
- * $ openssl s_client -connect testnet.qtornado.com:51002
- * // write to file, then
- * $ openssl x509 -in testnet.qtornado.com.pem -noout -pubkey
+ * openssl s_client -connect host:port -servername host </dev/null 2>/dev/null | openssl x509 -pubkey -noout
  * ```
  */
 @Ignore
@@ -46,31 +46,56 @@ class ElectrumServersTest {
 
     @Test
     fun connect_and_get_fee_mainnet() = runBlocking {
-        val res = mainnetElectrumServers.map { server ->
+        val res = mainnetElectrumServers.associate { server ->
+            val client = ElectrumClient(scope = this, loggerFactory = testLoggerFactory, pingInterval = 30.seconds, rpcTimeout = 5.seconds)
             try {
-                val client = ElectrumClient(scope = this, loggerFactory = testLoggerFactory, pingInterval = 30.seconds, rpcTimeout = 5.seconds)
-                client.connect(socketBuilder = TcpSocket.Builder(), serverAddress = server)
+                println("-------- testing [ ${server.host}:${server.port} ${server.tls::class.simpleName} ] --------")
                 withTimeout(5.seconds) {
-                    client.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
-                    val fees = client.estimateFees(1)
-                    println("✅ ${fees?.let { FeeratePerByte(it) }} sat/b (1 block) from ${server.host}:${server.port}")
+                    val (status, t) = measureTimedValue {
+                        client.connect(socketBuilder = TcpSocket.Builder(), serverAddress = server)
+                        client.connectionStatus.filterIsInstance<ElectrumConnectionStatus.Connected>().first()
+                    }
+                    println("✅ [${t.inWholeMilliseconds} ms] connected at height=${status.height}")
                 }
+                // evaluate the server's estimate-fee performance
+                withTimeout(10.seconds) {
+                    val (fees, t) = measureTimedValue { client.estimateFees(1) }
+                    println("✅ [${t.inWholeMilliseconds} ms] next block is ${fees?.let { FeeratePerByte(it) }}")
+                }
+                // evaluate the server's get-confirmation count on a random transaction
+                withTimeout(10.seconds) {
+                    val (tx, t1) = measureTimedValue { client.getTx(TxId("6703c9dc67a2d66ec027b2aaa4016e72dcb7ecc5fe6f4a270a35bdf52f3c4eeb")) }
+                    tx?.let {
+                        println("✅ [${t1.inWholeMilliseconds} ms] tx found")
+                        val (conf, t2) = measureTimedValue { client.getConfirmations(tx) }
+                        println("✅ [${t2.inWholeMilliseconds} ms] tx reached $conf confs")
+                    } ?: error("could not find tx")
+                }
+
+                server.host to true
+            } catch (e: Exception) {
+                println("❌ failure: ${e.message}")
+                server.host to false
+            } finally {
                 client.disconnect()
                 client.stop()
-
-                true
-            } catch (e: Exception) {
-                println("❌ failed to establish connection with ${server.host}:${server.port} with tls=${server.tls::class.simpleName}: ${e.message}")
-                false
+                println("------------------------------------\n")
             }
         }
-        assertTrue("at least one of the mainnet servers is unreliable") { res.all { it } }
+        val faulty = res.filter { (server, success) -> !success }
+        if (faulty.isNotEmpty()) {
+            println("\uD83D\uDD34 ${faulty.size} servers are unreliable:")
+            println(faulty.keys.joinToString(", "))
+            error("consider updating list or removing unreliable servers")
+        } else {
+            println("\uD83D\uDFE2 no unreliable servers in mainnet list")
+        }
     }
 
     /** Return false if cannot connect or timeout in 5s. */
     private suspend fun testConnection(server: ServerAddress): Boolean {
         return try {
-            withTimeout(8.seconds) { connect(server) }
+            withTimeout(5.seconds) { connect(server) }
             println("✅ ${server.host}:${server.port}")
             true
         } catch (e: Exception) {

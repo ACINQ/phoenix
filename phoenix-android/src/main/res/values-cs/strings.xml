@@ -314,15 +314,6 @@
     <string name="spendchanneladdress_success_pubkey">Veřejný klíč</string>
     <string name="spendchanneladdress_success_signature">Podpis</string>
 
-    <string name="spendchanneladdress_error_generic">Nepodařilo se podepsat data</string>
-    <string name="spendchanneladdress_error_amount">Neplatná částka</string>
-    <string name="spendchanneladdress_error_tx_index">Neplatný index transakce</string>
-    <string name="spendchanneladdress_error_remote_pubkey">Chybný vzdálený financující funding veřejný klíč [%1$s]</string>
-    <string name="spendchanneladdress_error_unsigned_tx">Chybná nepodepsaná transakce [%1$s]</string>
-    <string name="spendchanneladdress_error_remote_funding_pubkey">Chybný vzdálený financující funding veřejný klíč [%1$s]</string>
-    <string name="spendchanneladdress_error_tx">Chybná transakce [%1$s]</string>
-    <string name="spendchanneladdress_error_invalid_sig">Neplatný podpis</string>
-
     <!-- home: balance section & misc -->
 
     <string name="home_balance_loading">Načítání…</string>

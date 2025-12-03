@@ -29,6 +29,7 @@ import fr.acinq.phoenix.data.lnurl.LnurlAuth
 import fr.acinq.phoenix.data.lnurl.LnurlError
 import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.data.lnurl.LnurlWithdraw
+import fr.acinq.phoenix.defaultScope
 import fr.acinq.phoenix.utils.DnsResolvers
 import fr.acinq.phoenix.utils.EmailLikeAddress
 import fr.acinq.phoenix.utils.Parser
@@ -36,7 +37,6 @@ import io.ktor.http.Url
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
@@ -60,7 +60,7 @@ class SendManager(
     private val lnurlManager: LnurlManager,
     private val databaseManager: DatabaseManager,
     private val chain: Chain,
-) : CoroutineScope by MainScope() {
+) : CoroutineScope by defaultScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
