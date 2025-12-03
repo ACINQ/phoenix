@@ -313,25 +313,32 @@
     <string name="spendchanneladdress_instructions">This screen is a debugging tool that helps recover funds that have been accidentally sent to a channel\'s outpoint.</string>
     <string name="spendchanneladdress_amount">Amount</string>
     <string name="spendchanneladdress_tx_index">Tx index</string>
+    <string name="spendchanneladdress_channel_id">Channel id</string>
     <string name="spendchanneladdress_channel_data">Raw channel data</string>
     <string name="spendchanneladdress_remote_funding_pubkey">Remote funding pubkey</string>
     <string name="spendchanneladdress_unsigned_tx">Unsigned tx</string>
+    <string name="spendchanneladdress_remote_nonce">Remote nonce</string>
     <string name="spendchanneladdress_sign_button">Sign</string>
     <string name="spendchanneladdress_signing">Signing…</string>
 
     <string name="spendchanneladdress_success_header">Signature successfully generated.</string>
     <string name="spendchanneladdress_success_pubkey">Public key</string>
     <string name="spendchanneladdress_success_signature">Signature</string>
+    <string name="spendchanneladdress_success_nonce">Nonce</string>
 
     <string name="spendchanneladdress_error_generic">Failed to sign data</string>
     <string name="spendchanneladdress_error_amount">Invalid amount</string>
     <string name="spendchanneladdress_error_tx_index">Invalid tx index</string>
-    <string name="spendchanneladdress_error_channel_keypath">Invalid channel keypath</string>
-    <string name="spendchanneladdress_error_remote_pubkey">Malformed remote funding pubkey [%1$s]</string>
-    <string name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
-    <string name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
-    <string name="spendchanneladdress_error_tx">Malformed transaction [%1$s]</string>
-    <string name="spendchanneladdress_error_invalid_sig">Invalid signature</string>
+
+    <string translatable="false" name="spendchanneladdress_error_channel_data">Invalid channel data</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_version">Unhandled channel version [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_state">Unhandled channel state [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_no_channel_matching">No match found in channel backup</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_nonce">Malformed remote nonce</string>
+    <string translatable="false" name="spendchanneladdress_error_sig_failed">Failed to partially sign transaction</string>
 
     <!-- home: balance section & misc -->
 

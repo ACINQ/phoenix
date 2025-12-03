@@ -25,6 +25,7 @@ sdk-dependencies
 apk
 .cxx
 logs/
+mapping
 
 # LangTool
 .langtool/deepl.authtoken

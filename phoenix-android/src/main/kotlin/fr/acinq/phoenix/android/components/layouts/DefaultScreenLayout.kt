@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,7 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
-/** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
+/**
+ * The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default.
+ *
+ * @param addImePadding Ensures the bottom of the screen remains visible if the keyboard shows up by adding a standardized inset. Especially needed in
+ *      screens with many text inputs.
+ */
 @Composable
 fun DefaultScreenLayout(
     isScrollable: Boolean = true,
@@ -42,11 +48,13 @@ fun DefaultScreenLayout(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     backgroundColor: Color? = null,
     navBarColor: Color = Color.Transparent,
+    addImePadding: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize() // ignored if scrollable!
+            .then(if (isScrollable && addImePadding) Modifier.imePadding() else Modifier)
             .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
             .then(if (backgroundColor != null) Modifier.background(backgroundColor) else Modifier),
         verticalArrangement = verticalArrangement,

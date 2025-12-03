@@ -41,7 +41,6 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
                 }
             },
             onChannelClick = { navController.navigate("${Screen.BusinessNavGraph.ChannelDetails.route}?id=$it") },
-            onImportChannelsDataClick = { navController.navigate(Screen.BusinessNavGraph.ImportChannelsData.route) },
             onSpendFromChannelBalance = { navController.navigate(Screen.BusinessNavGraph.SpendChannelAddress.route) },
         )
     }
@@ -56,7 +55,7 @@ fun NavGraphBuilder.channelsNavGraph(navController: NavController, appViewModel:
     }
 
     businessComposable(Screen.BusinessNavGraph.SpendChannelAddress.route, appViewModel) { _, _, business ->
-        // SpendFromChannelAddress(business = business, onBackClick = { navController.popBackStack() })
+        SpendFromChannelAddress(business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.BusinessNavGraph.MutualClose.route, appViewModel) { _, walletId, business ->
