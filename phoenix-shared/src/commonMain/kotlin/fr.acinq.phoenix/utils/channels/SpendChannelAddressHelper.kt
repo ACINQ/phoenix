@@ -19,6 +19,7 @@ package fr.acinq.phoenix.utils.channels
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.ByteVector64
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.Script
@@ -128,7 +129,7 @@ object SpendChannelAddressHelper {
         try {
             val localFundingKey = channelKeys.fundingKey(fundingTxIndex)
 
-            val outputScript = Script.pay2tr(internalKey = Scripts.Taproot.musig2Aggregate(localFundingKey.publicKey(), remoteFundingPubKey), scripts = null)
+            val outputScript = Script.pay2tr(internalKey = Scripts.Taproot.musig2Aggregate(localFundingKey.publicKey(), remoteFundingPubKey), Crypto.TaprootTweak.KeyPathTweak)
             val inputInfo = Transactions.InputInfo(unsignedTx.txIn.first().outPoint, TxOut(amount, outputScript))
 
             val tx = Transactions.SpliceTx(inputInfo, unsignedTx)
