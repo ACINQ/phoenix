@@ -498,7 +498,7 @@
     <string name="prefs_display_theme_dark_label">Dark Theme</string>
     <string name="prefs_display_theme_light_label">Light Theme</string>
     <string name="prefs_display_theme_system_label">Systemeinstellung verwenden</string>
-    <string name="prefs_locale_label">Sprache der Bewerbung</string>
+    <string name="prefs_locale_label">Sprache</string>
 
     <!-- settings: electrum server -->
 

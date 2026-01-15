@@ -37,7 +37,7 @@ struct LogFileEntryTimestampWrapper {
 
 class LogFileParser {
 	
-	/// Parses multiple log files simulataneously, streaming entries from earliest to latest.
+	/// Parses multiple log files simultaneously, streaming entries from earliest to latest.
 	///
 	/// This function is designed to minimize memory pressure, allowing dozens of log files to
 	/// be streamed, while only reading minimal information into memory during the streaming process.
