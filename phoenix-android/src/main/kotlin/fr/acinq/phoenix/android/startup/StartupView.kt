@@ -304,7 +304,7 @@ private fun StartErrorShareLogsButton() {
     val authority = remember { "${BuildConfig.APPLICATION_ID}.provider" }
 
     TransparentFilledButton(
-        text = stringResource(id = R.string.logs_share_button),
+        text = stringResource(id = R.string.troubleshooting_logs_share_button),
         icon = R.drawable.ic_share,
         iconTint = MaterialTheme.typography.caption.color,
         onClick = {
@@ -313,8 +313,8 @@ private fun StartErrorShareLogsButton() {
                 shareFile(
                     context = context,
                     data = FileProvider.getUriForFile(context, authority, logFile),
-                    subject = context.getString(R.string.logs_share_subject),
-                    chooserTitle = context.getString(R.string.logs_share_title)
+                    subject = context.getString(R.string.troubleshooting_logs_share_subject),
+                    chooserTitle = context.getString(R.string.troubleshooting_logs_share_title)
                 )
             } catch (_: Exception) {
                 Toast.makeText(context, "Failed to export logs...", Toast.LENGTH_SHORT).show()

@@ -262,14 +262,15 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Logs de aplicativos</string>
-    <string name="logs_exporting">Exportando registros…</string>
-    <string name="logs_failed">Erro: não foi possível exportar logs</string>
-    <string name="logs_view_button">Ver registros…</string>
-    <string name="logs_view_with">Ver registros com…</string>
-    <string name="logs_share_button">Compartilhar registros…</string>
-    <string name="logs_share_subject">Logs do aplicativo Phoenix</string>
-    <string name="logs_share_title">Compartilhe registros do Phoenix…</string>
+    <string name="troubleshooting_title">Diagnósticos e registros</string>
+    <string name="troubleshooting_diagnostics_copy_button">Copiar diagnósticos do aplicativo</string>
+    <string name="troubleshooting_logs_exporting">Exportando registros…</string>
+    <string name="troubleshooting_logs_failed">Erro: não foi possível exportar logs</string>
+    <string name="troubleshooting_logs_view_button">Ver registros…</string>
+    <string name="troubleshooting_logs_view_with">Ver registros com…</string>
+    <string name="troubleshooting_logs_share_button">Compartilhar registros…</string>
+    <string name="troubleshooting_logs_share_subject">Logs do aplicativo Phoenix</string>
+    <string name="troubleshooting_logs_share_title">Compartilhe registros do Phoenix…</string>
 
     <!-- payment details -->
 

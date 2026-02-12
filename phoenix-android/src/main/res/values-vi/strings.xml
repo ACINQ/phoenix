@@ -266,14 +266,15 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Nhật ký ứng dụng</string>
-    <string name="logs_exporting">Truy xuất nhật ký…</string>
-    <string name="logs_failed">Báo lỗi: không thể truy xuất nhật ký</string>
-    <string name="logs_view_button">Xem nhật ký…</string>
-    <string name="logs_view_with">Xem nhật ký bằng…</string>
-    <string name="logs_share_button">Chia sẻ nhật ký…</string>
-    <string name="logs_share_subject">Nhật ký ứng dụng Phoenix</string>
-    <string name="logs_share_title">Chia sẻ nhật ký ứng dụng Phoenix…</string>
+    <string name="troubleshooting_title">Chẩn đoán &amp; Nhật ký</string>
+    <string name="troubleshooting_diagnostics_copy_button">Sao chép chẩn đoán ứng dụng</string>
+    <string name="troubleshooting_logs_exporting">Truy xuất nhật ký…</string>
+    <string name="troubleshooting_logs_failed">Báo lỗi: không thể truy xuất nhật ký</string>
+    <string name="troubleshooting_logs_view_button">Xem nhật ký…</string>
+    <string name="troubleshooting_logs_view_with">Xem nhật ký bằng…</string>
+    <string name="troubleshooting_logs_share_button">Chia sẻ nhật ký…</string>
+    <string name="troubleshooting_logs_share_subject">Nhật ký ứng dụng Phoenix</string>
+    <string name="troubleshooting_logs_share_title">Chia sẻ nhật ký ứng dụng Phoenix…</string>
 
     <!-- payment details -->
 

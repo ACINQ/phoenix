@@ -68,6 +68,15 @@ struct LogsConfigurationView: View {
 				}
 				.disabled(isExporting)
 				
+				Button {
+					copyDiagnostics() // actually call diagnostics method
+				} label: {
+					Label {
+						Text("Copy app diagnostics")
+					} icon: {
+						Image(systemName: "waveform.path.ecg.rectangle")
+					}
+				}
 			} // </List>
 			.listStyle(.insetGrouped)
 			.listBackgroundColor(.primaryBackground)
@@ -120,6 +129,20 @@ struct LogsConfigurationView: View {
 		}
 	}
 	
+	private func copyDiagnostics() {
+		log.trace("copydiagnostics()")
+
+		Task { @MainActor [self] in
+			let data = try await DiagnosticsHelper.shared.getDiagnostics(business: Biz.business)
+			UIPasteboard.general.string = data
+			toast.pop(
+				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
+				colorScheme: colorScheme.opposite,
+				style: .chrome
+			)
+		}
+	}
+
 	// --------------------------------------------------
 	// MARK: Exporting
 	// --------------------------------------------------

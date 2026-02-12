@@ -34,10 +34,10 @@ import fr.acinq.phoenix.android.payments.history.PaymentsHistoryView
 import fr.acinq.phoenix.android.payments.send.liquidity.RequestLiquidityView
 import fr.acinq.phoenix.android.settings.AboutView
 import fr.acinq.phoenix.android.settings.AppAccessSettings
+import fr.acinq.phoenix.android.settings.troubleshoot.TroubleshootingView
 import fr.acinq.phoenix.android.settings.DisplayPrefsView
 import fr.acinq.phoenix.android.settings.ExperimentalView
 import fr.acinq.phoenix.android.settings.ForceCloseView
-import fr.acinq.phoenix.android.settings.LogsView
 import fr.acinq.phoenix.android.settings.NotificationsView
 import fr.acinq.phoenix.android.settings.PaymentSettingsView
 import fr.acinq.phoenix.android.settings.reset.ResetWallet
@@ -91,8 +91,8 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
         AppAccessSettings(walletId = walletId, onBackClick = { navController.popBackStack() }, onScheduleAutoLock = appViewModel::scheduleAutoLock)
     }
 
-    businessComposable(Screen.BusinessNavGraph.Logs.route, appViewModel) { _, _, _ ->
-        LogsView()
+    businessComposable(Screen.BusinessNavGraph.Troubleshooting.route, appViewModel) { _, walletId, business ->
+        TroubleshootingView(walletId = walletId, business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable(Screen.BusinessNavGraph.PaymentsHistory.route, appViewModel) { backStackEntry, walletId, business ->

@@ -185,7 +185,7 @@ private fun FinalWalletView(
                     OnchainBalanceView(confirmed = wallet.deeplyConfirmed.balance, unconfirmed = wallet.unconfirmed.balance)
                 } ?: ProgressView(text = stringResource(id = R.string.walletinfo_loading_data))
             },
-            onClick =onFinalWalletClick,
+            onClick = onFinalWalletClick,
         )
         keyManager?.let {
             HSeparator(modifier = Modifier.padding(start = 16.dp), width = 50.dp)
