@@ -215,7 +215,16 @@ struct ChannelsConfigurationView: View {
 					}
 				}
 			}
-			
+
+			Button {
+				goToSpendChannel()
+			} label: {
+				Label {
+					Text(verbatim: "Spend from channel address")
+				} icon: {
+					Image(systemName: "wrench.and.screwdriver.fill")
+				}
+			}
 		} label: {
 			Image(systemName: "ellipsis")
 		}
@@ -296,19 +305,16 @@ struct ChannelsConfigurationView: View {
 	
 	func closeAllChannels() {
 		log.trace(#function)
-		
-		presentationMode.wrappedValue.dismiss()
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
-			deepLinkManager.broadcast(.drainWallet)
-		}
+		deepLinkManager.broadcast(.drainWallet)
 	}
 	
 	func forceCloseAllChannels() {
 		log.trace(#function)
-		
-		presentationMode.wrappedValue.dismiss()
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
-			deepLinkManager.broadcast(.forceCloseChannels)
-		}
+		deepLinkManager.broadcast(.forceCloseChannels)
+	}
+
+	func goToSpendChannel() {
+		log.trace(#function)
+		deepLinkManager.broadcast(.spendChannelAddress)
 	}
 }

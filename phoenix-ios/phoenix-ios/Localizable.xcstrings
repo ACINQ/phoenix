@@ -6187,6 +6187,9 @@
         }
       }
     },
+    "An error occured" : {
+
+    },
     "An error occurred on a node in the payment route. The payment may succeed if you try again." : {
       "localizations" : {
         "ar" : {
@@ -12730,6 +12733,9 @@
           }
         }
       }
+    },
+    "Copy data" : {
+
     },
     "Copy Image" : {
       "localizations" : {
@@ -30211,6 +30217,9 @@
         }
       }
     },
+    "Nonce" : {
+
+    },
     "none" : {
       "localizations" : {
         "ar" : {
@@ -34287,6 +34296,9 @@
           }
         }
       }
+    },
+    "Please fill all required fields" : {
+
     },
     "Please perform a backup before enabling any options here. If you lock yourself out of Phoenix without a backup of your recovery phrase, you will **lose your funds**!" : {
       "localizations" : {
@@ -40079,6 +40091,9 @@
         }
       }
     },
+    "Sign" : {
+
+    },
     "Sign into iCloud to backup your payments" : {
       "localizations" : {
         "ar" : {
@@ -40118,6 +40133,12 @@
           }
         }
       }
+    },
+    "Signature" : {
+
+    },
+    "Signing..." : {
+
     },
     "Since you've enabled Tor, you should use an onion address for this server." : {
       "localizations" : {
@@ -40440,6 +40461,9 @@
           }
         }
       }
+    },
+    "Spend from channel address" : {
+      "comment" : "Navigation bar title"
     },
     "Spend from final wallet" : {
       "localizations" : {
@@ -44884,6 +44908,9 @@
           }
         }
       }
+    },
+    "This screen is a debugging tool that helps recover funds that have been accidentally sent to a channel's outpoint." : {
+
     },
     "This seed is invalid and cannot be imported.\n\nPlease try again" : {
       "localizations" : {

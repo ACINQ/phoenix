@@ -41,6 +41,9 @@ import fr.acinq.lightning.transactions.Scripts
 import fr.acinq.lightning.transactions.Transactions
 import fr.acinq.lightning.wire.EncryptedPeerStorage
 import fr.acinq.phoenix.PhoenixBusiness
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 object SpendChannelAddressHelper {
 
@@ -59,69 +62,81 @@ object SpendChannelAddressHelper {
         business: PhoenixBusiness,
         amount: Satoshi,
         fundingTxIndex: Long,
-        channelId: String,
+        channelIdRaw: String,
         channelData: String,
         remoteFundingPubkeyRaw: String,
         unsignedTxRaw: String,
         remoteNonceRaw: String
-    ): SpendChannelAddressResult {
+    ): SpendChannelAddressResult = withContext(Dispatchers.Default) {
         val loggerFactory = business.loggerFactory
         val log = loggerFactory.newLogger(this::class)
         val peer = business.peerManager.getPeer()
-
-        log.info { "signing channel outpoint spending: [ channel_id=$channelId, channel_data=${channelData.take(20)}..., remote_pubkey=$remoteFundingPubkeyRaw, unsigned_tx=$unsignedTxRaw, remote_nonce=$remoteNonceRaw ]" }
+        delay(1000)
+        log.info { "signing channel outpoint spending: [ channel_id=$channelIdRaw, channel_data=${channelData.take(20)}..., remote_pubkey=$remoteFundingPubkeyRaw, unsigned_tx=$unsignedTxRaw, remote_nonce=$remoteNonceRaw ]" }
 
         val remoteNonce = try {
             IndividualNonce(remoteNonceRaw)
         } catch (e: Exception) {
             log.error(e) { "failed to read remote nonce hex" }
-            return SpendChannelAddressResult.Failure.RemoteNonceMalformed
+            return@withContext SpendChannelAddressResult.Failure.RemoteNonceMalformed
         }
 
         val unsignedTx = try {
             Transaction.read(unsignedTxRaw)
         } catch (e: Exception) {
             log.error(e) { "failed to read transaction hex" }
-            return SpendChannelAddressResult.Failure.TransactionMalformed(e.message ?: e::class.simpleName.toString())
+            return@withContext SpendChannelAddressResult.Failure.TransactionMalformed(e.message ?: e::class.simpleName.toString())
         }
 
         val remoteFundingPubKey = try {
             PublicKey.fromHex(remoteFundingPubkeyRaw)
         } catch (e: Exception) {
             log.error(e) { "failed to read remote-funding-pubkey" }
-            return SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed(e.message ?: e::class.simpleName.toString())
+            return@withContext SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed(e.message ?: e::class.simpleName.toString())
         }
 
-        val channelState = PersistedChannelState
-            .fromEncryptedPeerStorage(peer.nodeParams.nodePrivateKey, EncryptedPeerStorage(ByteVector.fromHex(channelData)), null)
-            .fold(
-                onSuccess = {
-                    when (it) {
-                        is Serialization.PeerStorageDeserializationResult.UnknownVersion -> {
-                            log.error { "unhandled channel data version: ${it.version}" }
-                            return SpendChannelAddressResult.Failure.UnhandledChannelBackupVersion(it.version)
-                        }
-                        is Serialization.PeerStorageDeserializationResult.Success -> {
-                            val matchingState = it.states.firstOrNull { it.channelId == ByteVector32.fromValidHex(channelId) }
-                            when (matchingState) {
-                                is ChannelStateWithCommitments -> matchingState
-                                null -> {
-                                    log.error { "no matching state for channel=$channelId" }
-                                    return SpendChannelAddressResult.Failure.MissingChannelState
-                                }
-                                else -> {
-                                    log.error { "unhandled channel data state=${matchingState.stateName}" }
-                                    return SpendChannelAddressResult.Failure.UnhandledChannelState(matchingState.stateName)
+        val channelId = try {
+            ByteVector32.fromValidHex(channelIdRaw)
+        } catch (e: Exception) {
+            log.error(e) { "failed to read channel id" }
+            return@withContext SpendChannelAddressResult.Failure.InvalidChannelId
+        }
+
+        val channelState = try {
+            PersistedChannelState
+                .fromEncryptedPeerStorage(peer.nodeParams.nodePrivateKey, EncryptedPeerStorage(ByteVector.fromHex(channelData)), null)
+                .fold(
+                    onSuccess = {
+                        when (it) {
+                            is Serialization.PeerStorageDeserializationResult.UnknownVersion -> {
+                                log.error { "unhandled channel data version: ${it.version}" }
+                                return@withContext SpendChannelAddressResult.Failure.UnhandledChannelBackupVersion(it.version)
+                            }
+                            is Serialization.PeerStorageDeserializationResult.Success -> {
+                                val matchingState = it.states.firstOrNull { it.channelId == channelId }
+                                when (matchingState) {
+                                    is ChannelStateWithCommitments -> matchingState
+                                    null -> {
+                                        log.error { "no matching state for channel=$channelId" }
+                                        return@withContext SpendChannelAddressResult.Failure.MissingChannelState
+                                    }
+                                    else -> {
+                                        log.error { "unhandled channel data state=${matchingState.stateName}" }
+                                        return@withContext SpendChannelAddressResult.Failure.UnhandledChannelState(matchingState.stateName)
+                                    }
                                 }
                             }
                         }
+                    },
+                    onFailure = {
+                        log.error(it) { "unreadable peer storage" }
+                        return@withContext SpendChannelAddressResult.Failure.InvalidChannelBackup
                     }
-                },
-                onFailure = {
-                    log.error(it) { "unreadable peer storage" }
-                    return SpendChannelAddressResult.Failure.InvalidChannelBackup
-                }
-            )
+                )
+        } catch (e: Exception) {
+            log.error(e) { "failed to read raw channel data" }
+            return@withContext SpendChannelAddressResult.Failure.InvalidChannelBackup
+        }
 
         val channelKeyPath = channelState.commitments.channelParams.localParams.fundingKeyPath
         val channelKeys = peer.nodeParams.keyManager.channelKeys(channelKeyPath)
@@ -137,28 +152,29 @@ object SpendChannelAddressHelper {
                 .let { Transactions.LocalNonce(it.first, it.second) }
 
             val sigResult = tx.partialSign(localFundingKey, remoteFundingPubKey, extraUtxos = emptyMap(), localNonce = localNonce, publicNonces = listOf(localNonce.publicNonce, remoteNonce))
-            return when (sigResult) {
+            return@withContext when (sigResult) {
                 is Either.Left -> {
                     log.error(sigResult.value) { "failed to partially sign transaction" }
                     SpendChannelAddressResult.Failure.SigningFailure
                 }
                 is Either.Right -> {
                     log.info { "successfully generated partial signature" }
-                    SpendChannelAddressResult.Success(txId = tx.tx.txid, publicKey = localFundingKey.publicKey(),
-                        fundingScript = Script.write(outputScript).byteVector(), signature = sigResult.value.partialSig, localNonce = localNonce.publicNonce)
+                    SpendChannelAddressResult.Success(txId = tx.tx.txid, publicKey = localFundingKey.publicKey().toHex(),
+                        fundingScript = Script.write(outputScript).byteVector(), signature = sigResult.value.partialSig.toHex(), localNonce = localNonce.publicNonce.toString())
                 }
             }
         } catch (e: Exception) {
             log.error(e) { "failed to sign transaction" }
-            return SpendChannelAddressResult.Failure.Generic(e)
+            return@withContext SpendChannelAddressResult.Failure.Generic(e)
         }
     }
 }
 
 sealed class SpendChannelAddressResult {
-    data class Success(val txId: TxId, val publicKey: PublicKey, val fundingScript: ByteVector, val signature: ByteVector32, val localNonce: IndividualNonce) : SpendChannelAddressResult()
+    data class Success(val txId: TxId, val publicKey: String, val fundingScript: ByteVector, val signature: String, val localNonce: String) : SpendChannelAddressResult()
     sealed class Failure : SpendChannelAddressResult() {
         data class Generic(val error: Throwable) : Failure()
+        data object InvalidChannelId : Failure()
         data object InvalidChannelBackup : Failure()
         data class UnhandledChannelBackupVersion(val version: Int) : Failure()
         data object MissingChannelState : Failure()
