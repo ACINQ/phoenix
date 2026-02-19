@@ -24,356 +24,356 @@
 
     <!-- generic -->
 
-    <string name="utils_ack">I understand.</string>
+    <string name="utils_ack">Saya mengerti.</string>
 
     <!-- system notifications -->
 
-    <string name="notif_headless_title_default">Phoenix is running in the background</string>
-    <string name="notif_headless_received">%1$s Received %2$s</string>
+    <string name="notif_headless_title_default">Phoenix sedang berjalan di latar belakang</string>
+    <string name="notif_headless_received">%1$s Diterima %2$s</string>
 
-    <string name="notif_pending_settlement_title">Please start wallet</string>
-    <string name="notif_pending_settlement_message">An incoming settlement is pending.</string>
+    <string name="notif_pending_settlement_title">Silakan mulai dompet</string>
+    <string name="notif_pending_settlement_message">Penyelesaian yang masuk sedang dalam proses.</string>
 
-    <string name="notif_inflight_payment_title">A payment is pending</string>
-    <string name="notif_inflight_payment_message">Start Phoenix so the payment can be finalised in due course.</string>
+    <string name="notif_inflight_payment_title">Pembayaran sedang diproses</string>
+    <string name="notif_inflight_payment_message">Jalankan Phoenix agar pembayaran dapat diselesaikan pada waktunya.</string>
 
-    <string name="notif_missed_title">Missed incoming payment</string>
-    <string name="notif_missed_unavailable">Phoenix was unable to start in the background.</string>
+    <string name="notif_missed_title">Pembayaran masuk terlewat</string>
+    <string name="notif_missed_unavailable">Phoenix tidak dapat dijalankan di latar belakang.</string>
 
-    <string name="notif_rejected_deposit_title">On-chain deposit pending (+%1$s)</string>
-    <string name="notif_rejected_payment_title">Payment rejected (+%1$s)</string>
-    <string name="notif_rejected_policy_disabled">Automated channel management is disabled. Tap for details.</string>
-    <string name="notif_rejected_policy_disabled_timeout">Automated channel management is disabled. This deposit will expire by %1$s.</string>
-    <string name="notif_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s. Tap for details.</string>
-    <string name="notif_rejected_over_absolute_timeout">The fee was %1$s, but your max fee was set to %2$s. This deposit will expire by %3$s.</string>
-    <string name="notif_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount received. Tap for details.</string>
-    <string name="notif_rejected_over_relative_timeout">The fee was %1$s which is more than %2$s%% of the amount received. This deposit will expire by %3$s.</string>
-    <string name="notif_rejected_amount_too_low">Payment amount is too low.</string>
-    <string name="notif_rejected_generic_error">An error occurred during funding. Please try again later.</string>
+    <string name="notif_rejected_deposit_title">Deposit on-chain tertunda (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Pembayaran ditolak (+%1$s)</string>
+    <string name="notif_rejected_policy_disabled">Pengelolaan Saluran otomatis dinonaktifkan. Ketuk untuk detail.</string>
+    <string name="notif_rejected_policy_disabled_timeout">Pengelolaan Saluran otomatis dinonaktifkan. Deposit ini akan kedaluwarsa dalam %1$s.</string>
+    <string name="notif_rejected_over_absolute">Biayanya adalah 1 dolar AS, tetapi biaya maksimum Anda ditetapkan menjadi 2 dolar AS. Ketuk untuk detailnya.</string>
+    <string name="notif_rejected_over_absolute_timeout">Biaya yang dikenakan adalah 1%, tetapi biaya maksimum Anda ditetapkan sebesar 2%. Deposit ini akan kedaluwarsa pada 3%.</string>
+    <string name="notif_rejected_over_relative">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Ketuk untuk detail selengkapnya.</string>
+    <string name="notif_rejected_over_relative_timeout">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Deposit ini akan kedaluwarsa pada %3$s.</string>
+    <string name="notif_rejected_amount_too_low">Jumlah pembayaran terlalu rendah.</string>
+    <string name="notif_rejected_generic_error">Terjadi kesalahan selama pendanaan. Silakan coba lagi nanti.</string>
 
-    <string name="notif_watcher_revoked_commit_title">Please start Phoenix</string>
-    <string name="notif_watcher_revoked_commit_message">Some of your channels may have closed.</string>
+    <string name="notif_watcher_revoked_commit_title">Silakan mulai Phoenix</string>
+    <string name="notif_watcher_revoked_commit_message">Beberapa Saluran Anda mungkin telah ditutup.</string>
 
     <!-- settings list -->
 
-    <string name="settings_general_title">General</string>
-    <string name="settings_fees_title">Fees</string>
-    <string name="settings_security_title">Privacy &amp; Security</string>
-    <string name="settings_advanced_title">Advanced</string>
-    <string name="settings_danger_title">Danger zone</string>
+    <string name="settings_general_title">Umum</string>
+    <string name="settings_fees_title">Biaya</string>
+    <string name="settings_security_title">Privasi &amp; Keamanan</string>
+    <string name="settings_advanced_title">Tingkat Lanjut</string>
+    <string name="settings_danger_title">Zona berbahaya</string>
 
-    <string name="settings_display_prefs">Display</string>
-    <string name="settings_wallet_info">Wallet info</string>
-    <string name="settings_liquidity_policy">Channel management</string>
-    <string name="settings_display_seed">Recovery phrase</string>
-    <string name="settings_access_control">Access control</string>
-    <string name="settings_list_channels">Payment channels</string>
-    <string name="settings_logs">Logs</string>
-    <string name="settings_electrum">Electrum server</string>
-    <string name="settings_reset_wallet">Delete wallet</string>
-    <string name="settings_mutual_close">Close channels</string>
-    <string name="settings_force_close">Force-close channels</string>
+    <string name="settings_display_prefs">Tampilan</string>
+    <string name="settings_wallet_info">Info dompet</string>
+    <string name="settings_liquidity_policy">Manajemen Saluran</string>
+    <string name="settings_display_seed">Frasa pemulihan</string>
+    <string name="settings_access_control">Kontrol akses</string>
+    <string name="settings_list_channels">Saluran pembayaran</string>
+    <string name="settings_logs">Log</string>
+    <string name="settings_electrum">Server Electrum</string>
+    <string name="settings_reset_wallet">Hapus dompet</string>
+    <string name="settings_mutual_close">Tutup Saluran</string>
+    <string name="settings_force_close">Paksa tutup Saluran</string>
     <string name="settings_tor">Tor</string>
-    <string name="settings_about">About</string>
-    <string name="settings_payment_settings">Payment options</string>
-    <string name="settings_payment_history">Payment history</string>
-    <string name="settings_notifications">Notifications</string>
-    <string name="settings_contacts">Contacts</string>
-    <string name="settings_converter">Currency converter</string>
-    <string name="settings_add_liquidity">Add liquidity</string>
+    <string name="settings_about">Tentang</string>
+    <string name="settings_payment_settings">Opsi pembayaran</string>
+    <string name="settings_payment_history">Riwayat pembayaran</string>
+    <string name="settings_notifications">Notifikasi</string>
+    <string name="settings_contacts">Kontak</string>
+    <string name="settings_converter">Konverter mata uang</string>
+    <string name="settings_add_liquidity">Tambahkan likuiditas</string>
 
     <!-- home: swap help -->
 
-    <string name="home_swapin_confirming_title">Confirming</string>
-    <string name="home_swapin_confirming_desc">Waiting for confirmation first before they can be swapped to Lightning.</string>
+    <string name="home_swapin_confirming_title">Mengkonfirmasi</string>
+    <string name="home_swapin_confirming_desc">Menunggu konfirmasi terlebih dahulu sebelum dapat diganti ke Lightning.</string>
 
-    <string name="home_swapin_ready_title">Waiting for swap</string>
-    <string name="home_swapin_ready_desc_auto">Will deploy to Lightning when mining fees are below %1$s.</string>
-    <string name="home_swapin_ready_desc_disabled">Will remain on-chain because automated channels management is disabled.</string>
-    <string name="home_swapin_ready_desc_generic">Will deploy to Lightning when conditions apply.</string>
-    <string name="home_swapin_ready_expiring">Attention! Some funds will expire soon and won\'t be eligible for a swap anymore.</string>
+    <string name="home_swapin_ready_title">Menunggu pertukaran</string>
+    <string name="home_swapin_ready_desc_auto">Akan diimplementasikan ke Lightning ketika biaya penambangan di bawah 1%.</string>
+    <string name="home_swapin_ready_desc_disabled">Akan tetap berada di blockchain karena manajemen Saluran otomatis dinonaktifkan.</string>
+    <string name="home_swapin_ready_desc_generic">Akan diimplementasikan ke Lightning jika kondisinya memungkinkan.</string>
+    <string name="home_swapin_ready_expiring">Perhatian! Beberapa dana akan segera kedaluwarsa dan tidak lagi memenuhi syarat untuk pertukaran.</string>
 
-    <string name="home_swapin_expired_title">Expired</string>
-    <string name="home_swapin_expired_desc">Cannot be swapped anymore, after 4 months waiting. These funds must be spent manually.</string>
+    <string name="home_swapin_expired_title">Kedaluwarsa</string>
+    <string name="home_swapin_expired_desc">Tidak dapat ditukar lagi setelah menunggu selama 4 bulan. Dana ini harus dibelanjakan secara manual.</string>
 
-    <string name="home_final_title">Final wallet</string>
-    <string name="home_final_desc">These funds come from closed Lightning channels. They must be spent manually.</string>
-    <string name="home_onchain_balance_only">On-chain balance</string>
+    <string name="home_final_title">Dompet terakhir</string>
+    <string name="home_final_desc">Dana ini berasal dari Saluran Lightning yang telah ditutup. Dana ini harus dibelanjakan secara manual.</string>
+    <string name="home_onchain_balance_only">Saldo On-chain</string>
 
-    <string name="home_background_restriction_title">Background processing restricted</string>
-    <string name="home_background_restriction_body_1">Phoenix may not be able to receive payments when it is in the background, or when it is closed.</string>
-    <string name="home_background_restriction_body_2">This happens because:</string>
-    <string name="home_background_restriction_powersaver">The device is in power saving mode</string>
-    <string name="home_background_restriction_fcm">FCM notifications unavailable</string>
-    <string name="home_background_restriction_fcm_details">If you\'re on GrapheneOS or CalyxOS, install Google Play Services to get FCM notifications. Check the FAQ for guidance.</string>
+    <string name="home_background_restriction_title">Pemrosesan latar belakang dibatasi</string>
+    <string name="home_background_restriction_body_1">Phoenix mungkin tidak dapat menerima pembayaran saat berada di latar belakang, atau saat ditutup.</string>
+    <string name="home_background_restriction_body_2">Hal ini terjadi karena:</string>
+    <string name="home_background_restriction_powersaver">Perangkat sedang dalam mode hemat dadaya</string>
+    <string name="home_background_restriction_fcm">Notifikasi FCM tidak tersedia</string>
+    <string name="home_background_restriction_fcm_details">Jika Anda menggunakan GrapheneOS atau CalyxOS, instal Google Play Services untuk mendapatkan notifikasi FCM. Periksa FAQ untuk panduan lebih lanjut.</string>
 
     <!-- home: bottom menu -->
 
-    <string name="menu_settings">Settings</string>
-    <string name="menu_send">Send</string>
-    <string name="menu_receive">Receive</string>
+    <string name="menu_settings">Pengaturan</string>
+    <string name="menu_send">Mengirim</string>
+    <string name="menu_receive">Menerima</string>
 
     <!-- init wallet / automated wallet creation -->
 
-    <string name="initwallet_create">Create new wallet</string>
-    <string name="initwallet_restore">Restore my wallet</string>
+    <string name="initwallet_create">Membuat dompet baru</string>
+    <string name="initwallet_restore">Pulihkan dompet saya</string>
 
-    <string name="restore_disclaimer_message_1_title">Phoenix is only on Lightning</string>
-    <string name="restore_disclaimer_message_1_body">Phoenix will only display funds that have already been managed by Phoenix. Funds attached to a seed generated by another application will not appear here (this includes on-chain funds).</string>
-    <string name="restore_disclaimer_message_2_title">Beware of using the same seed in parallel</string>
-    <string name="restore_disclaimer_message_2_body">Do not use the same seed simultaneously on different devices. This can cause conflicts between the two instances of Phoenix, and result in Lightning channels being closed.</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix hanya ada di Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix hanya akan menampilkan dana yang telah dikelola oleh Phoenix. Dana yang terkait dengan seed yang dihasilkan oleh aplikasi lain tidak akan muncul di sini (ini termasuk dana on-chain).</string>
+    <string name="restore_disclaimer_message_2_title">Hati-hati menggunakan seed yang sama secara paralel.</string>
+    <string name="restore_disclaimer_message_2_body">Jangan gunakan seed yang sama secara bersamaan pada perangkat yang berbeda. Hal ini dapat menyebabkan konflik antara dua instance Phoenix, dan mengakibatkan Saluran Lightning ditutup.</string>
 
-    <string name="restore_instructions">Your wallet\'s seed is a list of 12 English words. Type-in each word of this list in the box below.</string>
-    <string name="restore_input_label">Enter word #%1$s</string>
-    <string name="restore_input_invalid">This is not a valid word.</string>
-    <string name="restore_seed_valid">This seed is valid</string>
-    <string name="restore_seed_valid_details">You can now proceed and restore your wallet</string>
-    <string name="restore_seed_invalid">This seed is not valid</string>
-    <string name="restore_seed_invalid_details">Make sure you entered the correct words in the right order.</string>
+    <string name="restore_instructions">Seed dompet Anda adalah daftar 12 kata bahasa Inggris. Ketik setiap kata dari daftar ini di kotak di bawah ini.</string>
+    <string name="restore_input_label">Masukkan kata #%1$s</string>
+    <string name="restore_input_invalid">Ini bukan kata yang valid.</string>
+    <string name="restore_seed_valid">Benih ini valid</string>
+    <string name="restore_seed_valid_details">Anda sekarang dapat melanjutkan dan memulihkan dompet Anda</string>
+    <string name="restore_seed_invalid">Benih ini tidak valid</string>
+    <string name="restore_seed_invalid_details">Pastikan Anda memasukkan kata-kata yang benar dalam urutan yang tepat.</string>
 
-    <string name="restore_payments_button">Import payments history</string>
-    <string name="restore_payments_button_details">Optional. Use this button to restore a payments database file from another device.</string>
-    <string name="restore_payments_success">Will restore payments history</string>
-    <string name="restore_payments_success_button">Use another file</string>
-    <string name="restore_payments_error_header">Cannot restore payments</string>
-    <string name="restore_payments_error_button">Try again</string>
-    <string name="restore_payments_error_encryption">The file cannot be decrypted. Make sure you are using a Phoenix database file (not a CSV), and that this file matches the wallet you\'re restoring.</string>
-    <string name="restore_payments_error_open">This file cannot be opened. Try again.</string>
-    <string name="restore_payments_error_writing">This file could not be written to the application\'s data folder. Try again.</string>
-    <string name="restore_import_button">Restore wallet</string>
+    <string name="restore_payments_button">Import riwayat pembayaran</string>
+    <string name="restore_payments_button_details">Opsional. Gunakan tombol ini untuk memulihkan file basis data pembayaran dari perangkat lain.</string>
+    <string name="restore_payments_success">Riwayat pembayaran akan dipulihkan</string>
+    <string name="restore_payments_success_button">Gunakan file lain</string>
+    <string name="restore_payments_error_header">Tidak dapat memulihkan pembayaran</string>
+    <string name="restore_payments_error_button">Coba lagi</string>
+    <string name="restore_payments_error_encryption">File tersebut tidak dapat didekripsi. Pastikan Anda menggunakan file basis data Phoenix (bukan CSV), dan file ini sesuai dengan dompet yang Anda pulihkan.</string>
+    <string name="restore_payments_error_open">File ini tidak dapat dibuka. Coba lagi.</string>
+    <string name="restore_payments_error_writing">File ini tidak dapat ditulis ke folder data aplikasi. Coba lagi.</string>
+    <string name="restore_import_button">Pulihkan dompet</string>
 
     <!-- upgrade required dialog -->
 
-    <string name="upgraderequired_title">Update required</string>
-    <string name="upgraderequired_message">This version of Phoenix (v%1$s) is not compatible with your wallet. Please update, or use a compatible version.</string>
-    <string name="upgraderequired_button">Update on Google Play</string>
+    <string name="upgraderequired_title">Pembaruan diperlukan</string>
+    <string name="upgraderequired_message">Versi Phoenix ini (v%1$s) tidak kompatibel dengan dompet Anda. Harap perbarui, atau gunakan versi yang kompatibel.</string>
+    <string name="upgraderequired_button">Perbarui di Google Play</string>
 
     <!-- receive view: warning about fee/liquidity -->
 
-    <string name="receive_lightning_warning_title_surefail">Payment will fail</string>
-    <string name="receive_lightning_warning_title_fee_expected">On-chain fee expected</string>
-    <string name="receive_lightning_warning_hint_show_details">Tap to know more</string>
+    <string name="receive_lightning_warning_title_surefail">Pembayaran akan gagal</string>
+    <string name="receive_lightning_warning_title_fee_expected">Biaya on-chain diperkirakan</string>
+    <string name="receive_lightning_warning_hint_show_details">Ketuk untuk mengetahui selengkapnya</string>
 
-    <string name="receive_lightning_sheet_dismiss">Dismiss</string>
-    <string name="receive_lightning_sheet_button_enable">Enable automated channels</string>
-    <string name="receive_lightning_sheet_button_configure">Configure fee limit</string>
+    <string name="receive_lightning_sheet_dismiss">Membubarkan</string>
+    <string name="receive_lightning_sheet_button_enable">Aktifkan Saluran otomatis</string>
+    <string name="receive_lightning_sheet_button_configure">Konfigurasi batas biaya</string>
 
-    <string name="receive_lightning_warning_message_fee_expected">An on-chain operation will be likely required for you to receive this amount.\n\nThe fee is estimated to be around %1$s.</string>
-    <string name="receive_lightning_warning_message_fee_expected_unknown">An on-chain operation will likely be required for you to receive this amount.</string>
+    <string name="receive_lightning_warning_message_fee_expected">Kemungkinan besar Anda akan memerlukan operasi on-chain agar dapat menerima jumlah tersebut.\n\nBiaya tersebut diperkirakan sekitar %1$.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Kemungkinan besar Anda akan memerlukan operasi on-chain agar dapat menerima jumlah ini.</string>
 
-    <string name="receive_lightning_warning_message_above_limit">A fee of %1$s is expected to receive this amount, and that fee is above your limit of %2$s.\n\nIncrease this limit in the channel management settings.</string>
-    <string name="receive_lightning_warning_message_above_limit_or_liquidity">A fee of %1$s is expected to receive this amount, and that fee is above your limit of %2$s.\n\nIncrease this limit in the channel management settings, or request additional liquidity.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channel management settings.</string>
-    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">A fee of %1$s is expected to receive this amount, and that fee is more than %2$s%% of the amount.\n\nIncrease this limit in the channel management settings, or request additional liquidity.</string>
+    <string name="receive_lightning_warning_message_above_limit">Biaya sebesar %1$s diharapkan untuk menerima jumlah ini, dan biaya tersebut melebihi batas Anda sebesar %2$s.\n\nTingkatkan batas ini di pengaturan manajemen Saluran.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Biaya sebesar %1$s diharapkan untuk menerima jumlah ini, dan biaya tersebut melebihi batas Anda sebesar %2$s.\n\nTingkatkan batas ini di pengaturan manajemen Saluran, atau minta likuiditas tambahan.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Biaya sebesar %1$s diharapkan untuk menerima jumlah ini, dan biaya tersebut lebih besar dari %2$s%% dari jumlah tersebut.\n\nTingkatkan batas ini di pengaturan manajemen Saluran.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Biaya sebesar %1$s diharapkan untuk menerima jumlah ini, dan biaya tersebut lebih besar dari %2$s%% dari jumlah tersebut.\n\nTingkatkan batas ini di pengaturan manajemen Saluran, atau minta likuiditas tambahan.</string>
 
-    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Inbound liquidity is insufficient for this amount, and you have disabled automated channel management.</string>
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Likuiditas masuk tidak mencukupi untuk jumlah ini, dan Anda telah menonaktifkan manajemen Saluran otomatis.</string>
 
     <!-- receive: Tor warning -->
 
-    <string name="receive_tor_warning_title">Tor is enabled</string>
-    <string name="receive_tor_warning_dialog_content_1">Phoenix may have issues receiving payments. Make sure the app stays open in the foreground and that connection is stable.</string>
+    <string name="receive_tor_warning_title">Tor diaktifkan</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix mungkin mengalami masalah dalam menerima pembayaran. Pastikan aplikasi tetap terbuka di latar depan dan koneksi stabil.</string>
 
     <!-- send errors -->
 
-    <string name="send_error_invoice_expired">This invoice is expired.</string>
-    <string name="send_error_payment_pending">This payment is already being processed. Please wait for it to complete.</string>
-    <string name="send_error_already_paid">This payment has already been paid.</string>
-    <string name="send_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
-    <string name="send_error_lnurl_invalid">Failed to process this LNURL link. Make sure it is valid.</string>
-    <string name="send_error_lnurl_unsupported">This type of LNURL is not supported yet.</string>
-    <string name="send_error_invalid_generic">This is not a supported payment request.</string>
-    <string name="send_error_bip353_connect">Unable to retrieve data for this address. You may be experiencing a connectivity issue.</string>
-    <string name="send_error_bip353_name_not_found">Name \"%1$s\" is not found on \"%2$s\".</string>
-    <string name="send_error_bip353_invalid_uri">This address uses an invalid Bip21 resource.</string>
-    <string name="send_error_bip353_invalid_offer">This address uses an invalid Bolt12 offer.</string>
-    <string name="send_error_bip353_dnssec">This address is hosted on an unsecure DNS. DNSSEC must be enabled.</string>
+    <string name="send_error_invoice_expired">Faktur ini sudah kedaluwarsa.</string>
+    <string name="send_error_payment_pending">Pembayaran ini sedang diproses. Mohon tunggu hingga selesai.</string>
+    <string name="send_error_already_paid">Pembayaran ini sudah dilakukan.</string>
+    <string name="send_error_invalid_chain">Pembayaran ini tidak menggunakan blockchain yang sama dengan dompet Anda.</string>
+    <string name="send_error_lnurl_invalid">Gagal memproses tautan LNURL ini. Pastikan tautan tersebut valid.</string>
+    <string name="send_error_lnurl_unsupported">Jenis LNURL ini belum didukung.</string>
+    <string name="send_error_invalid_generic">Ini bukan permintaan pembayaran yang didukung.</string>
+    <string name="send_error_bip353_connect">Tidak dapat mengambil data untuk alamat ini. Anda mungkin mengalami masalah konektivitas.</string>
+    <string name="send_error_bip353_name_not_found">Nama \"%1$s\" tidak ditemukan pada \"%2$s\".</string>
+    <string name="send_error_bip353_invalid_uri">Alamat ini menggunakan sumber daya Bip21 yang tidak valid.</string>
+    <string name="send_error_bip353_invalid_offer">Alamat ini menggunakan penawaran Bolt12 yang tidak valid.</string>
+    <string name="send_error_bip353_dnssec">Alamat ini dihosting pada DNS yang tidak aman. DNSSEC harus diaktifkan.</string>
 
     <!-- validation -->
 
-    <string name="validation_below_min">Must be at least %1$s</string>
-    <string name="validation_above_max">Must be no more than %1$s</string>
+    <string name="validation_below_min">Harus minimal %1$s</string>
+    <string name="validation_above_max">Tidak boleh lebih dari %1$s</string>
 
     <!-- closing channels -->
 
-    <string name="mutualclose_input_label">Bitcoin address</string>
-    <string name="mutualclose_input_instructions">Send all funds to a Bitcoin address. All payments channels will be closed.</string>
-    <string name="mutualclose_confirm_title">Confirm closing</string>
-    <string name="mutualclose_confirm_details">All the funds will be sent to:</string>
-    <string name="mutualclose_confirm_fee">Miner fees estimated to:</string>
-    <string name="mutualclose_confirm_fee_unknown">Fee cost could not be estimated.</string>
+    <string name="mutualclose_input_label">Alamat Bitcoin</string>
+    <string name="mutualclose_input_instructions">Kirim seluruh dana ke alamat Bitcoin. Semua Saluran pembayaran akan ditutup.</string>
+    <string name="mutualclose_confirm_title">Konfirmasi penutupan</string>
+    <string name="mutualclose_confirm_details">Seluruh dana akan dikirim ke:</string>
+    <string name="mutualclose_confirm_fee">Perkiraan biaya penambang adalah:</string>
+    <string name="mutualclose_confirm_fee_unknown">Biaya tidak dapat diperkirakan.</string>
 
-    <string name="forceclose_title">Force-close channels</string>
-    <string name="forceclose_instructions">This screen allows you to unilaterally close your channels.\n\nThis is not a \"fix-everything\" magic button: it is here as a safety measure and <b>should only be used in extreme scenarios</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.\n\nForce closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.\n\n<b>Do not uninstall the app until your channels are fully closed, or you will lose money.</b>\n\n<b>Do not use this feature if you don\'t fully understand what it does.</b></string>
-    <string name="forceclose_address_label">Funds will eventually be sent to the final wallet:</string>
+    <string name="forceclose_title">Paksa tutup Saluran</string>
+    <string name="forceclose_instructions">Layar ini memungkinkan Anda menutup Saluran Anda secara sepihak.\n\nIni bukan tombol ajaib yang bisa “memperbaiki segalanya”: fitur ini ada sebagai langkah pengamanan dan <b>hanya boleh digunakan dalam situasi ekstrem</b>. Misalnya, jika rekan Anda (ACINQ) hilang permanen, sehingga mencegah Anda menggunakan dana Anda. Dalam semua kasus lain, <b>jika Anda mengalami masalah dengan Phoenix, Anda sebaiknya menghubungi dukungan</b>.\n\nMenutup Saluran secara paksa akan menghabiskan biaya (untuk menutupi biaya on-chain) dan akan membuat dana Anda terkunci selama beberapa hari.\n\n<b>Jangan hapus aplikasi sampai Saluran Anda benar-benar tertutup, atau Anda akan kehilangan dana.</b>\n\n<b>Jangan gunakan fitur ini jika Anda tidak sepenuhnya memahami apa yang dilakukannya.</b></string>
+    <string name="forceclose_address_label">Dana akhirnya akan dikirim ke dompet akhir:</string>
 
-    <string name="forceclose_confirm_title">Confirm force-closing</string>
-    <string name="forceclose_confirm_details">All the funds will be sent to your final wallet, after a significant delay.</string>
-    <string name="forceclose_button">Force-close all my channels</string>
+    <string name="forceclose_confirm_title">Konfirmasi penutupan paksa</string>
+    <string name="forceclose_confirm_details">Semua dana akan dikirim ke dompet akhir Anda, setelah jeda waktu yang cukup lama.</string>
+    <string name="forceclose_button">Tutup paksa semua Saluran saya</string>
 
     <!-- in-app notifications -->
 
-    <string name="inappnotif_backup_seed_message">Backup your wallet to prevent losing your bitcoins.</string>
-    <string name="inappnotif_backup_seed_action">Backup my wallet</string>
+    <string name="inappnotif_backup_seed_message">Cadangkan dompet Anda untuk mencegah kehilangan bitcoin Anda.</string>
+    <string name="inappnotif_backup_seed_action">Cadangkan dompet saya</string>
 
-    <string name="inappnotif_notification_permission_message_short">Enable Android notifications</string>
-    <string name="inappnotif_notification_permission_message">Notifications are disabled in Android settings. Phoenix won\'t be able to notify you when a payment is processing.</string>
-    <string name="inappnotif_notification_permission_enable">Enable</string>
+    <string name="inappnotif_notification_permission_message_short">Aktifkan notifikasi Android</string>
+    <string name="inappnotif_notification_permission_message">Notifikasi dinonaktifkan di pengaturan Android. Phoenix tidak akan dapat memberi tahu Anda saat pembayaran sedang diproses.</string>
+    <string name="inappnotif_notification_permission_enable">Aktifkan</string>
 
-    <string name="inappnotif_swapin_timeout_message">A deposit will expire soon.</string>
-    <string name="inappnotif_swapin_timeout_action">View details</string>
+    <string name="inappnotif_swapin_timeout_message">Setoran akan segera kedaluwarsa.</string>
+    <string name="inappnotif_swapin_timeout_action">Lihat detail</string>
 
-    <string name="inappnotif_watchtower_late_message">Phoenix regularly monitors the blockchain when in the background, but was unable to do so the last few days.\n\nMake sure Android does not block Phoenix, and that it can connect to Electrum.</string>
-    <string name="inappnotif_watchtower_late_action">Dismiss</string>
+    <string name="inappnotif_watchtower_late_message">Phoenix secara rutin memantau blockchain saat berjalan di latar belakang, tetapi tidak dapat melakukannya beberapa hari terakhir.\n\nPastikan Android tidak memblokir Phoenix, dan bahwa aplikasi dapat terhubung ke Electrum.</string>
+    <string name="inappnotif_watchtower_late_action">Tutup</string>
 
-    <string name="inappnotif_upgrade_message">An update is available</string>
-    <string name="inappnotif_upgrade_critical_message">A critical update is available. You should update Phoenix as soon as possible.</string>
-    <string name="inappnotif_upgrade_button">Update on Google Play</string>
+    <string name="inappnotif_upgrade_message">Pembaruan tersedia</string>
+    <string name="inappnotif_upgrade_critical_message">Pembaruan kritis tersedia. Anda sebaiknya memperbarui Phoenix sesegera mungkin.</string>
+    <string name="inappnotif_upgrade_button">Perbarui di Google Play</string>
 
-    <string name="inappnotif_mempool_full_message">On-chain fees are high.</string>
-    <string name="inappnotif_mempool_full_action">See how Phoenix is affected</string>
+    <string name="inappnotif_mempool_full_message">Biaya on-chain sedang tinggi.</string>
+    <string name="inappnotif_mempool_full_action">Lihat bagaimana Phoenix terpengaruh</string>
 
-    <string name="inappnotif_tor_disconnected_message">Cannot access the Tor network. Phoenix will not function correctly.</string>
-    <string name="inappnotif_tor_disconnected_action">Fix it</string>
+    <string name="inappnotif_tor_disconnected_message">Tidak dapat mengakses jaringan Tor. Phoenix tidak akan berfungsi dengan benar.</string>
+    <string name="inappnotif_tor_disconnected_action">Perbaiki ini</string>
 
-    <string name="inappnotif_payment_onchain_pending_title">On-chain funds pending (+%1$s)</string>
-    <string name="inappnotif_payments_rejection_overview_one">An incoming payment has been recently rejected</string>
-    <string name="inappnotif_payments_rejection_overview_many">%1$d incoming payments recently rejected</string>
-    <string name="inappnotif_payment_rejected_title">Payment rejected (+%1$s)</string>
-    <string name="inappnotif_payment_rejected_disabled">Automated channel management is disabled.</string>
-    <string name="inappnotif_payment_rejected_over_absolute">The fee was %1$s, but your max fee was set to %2$s.</string>
-    <string name="inappnotif_payment_rejected_over_relative">The fee was %1$s which is more than %2$s%% of the amount.</string>
-    <string name="inappnotif_payment_rejected_tweak_setting">Tap to configure.</string>
-    <string name="inappnotif_payment_rejected_view_wallet">View details</string>
+    <string name="inappnotif_payment_onchain_pending_title">Dana on-chain tertunda (+%1$s)</string>
+    <string name="inappnotif_payments_rejection_overview_one">Pembayaran masuk baru-baru ini ditolak</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d pembayaran masuk baru-baru ini ditolak</string>
+    <string name="inappnotif_payment_rejected_title">Pembayaran ditolak (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_disabled">Manajemen Saluran otomatis dinonaktifkan.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">Biaya adalah %1$s, tetapi batas maksimum biaya Anda ditetapkan sebesar %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">Biaya adalah %1$s yang melebihi %2$s%% dari jumlah.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Ketuk untuk mengkonfigurasi</string>
+    <string name="inappnotif_payment_rejected_view_wallet">Lihat detail</string>
 
-    <string name="inappnotif_watchtower_nominal_title">Watchtower report</string>
-    <string name="inappnotif_watchtower_nominal_description_one">%1$d channel was successfully checked on %2$s. No issues were found.</string>
-    <string name="inappnotif_watchtower_nominal_description_many">%1$d channels were successfully checked on %2$s. No issues were found.</string>
-    <string name="inappnotif_watchtower_revokedfound_title">Watchtower alert</string>
-    <string name="inappnotif_watchtower_revokedfound_description">Revoked commitments were found on %1$s for channel(s): %2$s. This channel may be closed.</string>
+    <string name="inappnotif_watchtower_nominal_title">Laporan Watchtower</string>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d Saluran berhasil diperiksa pada %2$s. Tidak ada masalah yang ditemukan.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d Saluran berhasil diperiksa pada %2$s. Tidak ada masalah yang ditemukan.</string>
+    <string name="inappnotif_watchtower_revokedfound_title">Peringatan Watchtower</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Commitment yang dicabut ditemukan pada %1$s untuk Saluran: %2$s. Saluran ini mungkin akan ditutup.</string>
 
     <!-- settings: display seed -->
 
-    <string name="displayseed_instructions">The recovery phrase (sometimes called a seed), is a list of 12 English words. It allows you to recover full access to your funds if needed.\n\n<b>Only you alone possess this seed. Keep it private.</b>\n\n<b>Do not share this seed with anyone</b>.\nBeware of phishing. The developers of Phoenix will never ask for your seed.\n\n<b>Do not lose this seed</b>.\nSave it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.</string>
-    <string name="displayseed_authenticate_button">Display seed</string>
-    <string name="displayseed_dialog_header">KEEP THIS SEED SAFE.\nDO NOT SHARE.</string>
-    <string name="displayseed_backup_notice_header">You have not backed up your recovery phrase!</string>
-    <string name="displayseed_backup_notice_details">If you do not back it up and you lose access to Phoenix, you will lose your funds!</string>
-    <string name="displayseed_backup_checkbox">I have saved my recovery phrase somewhere safe.</string>
-    <string name="displayseed_loss_disclaimer_checkbox">I understand that if I lose my phone and my recovery phrase, then I will lose the funds in my wallet.</string>
+    <string name="displayseed_instructions">Frasa pemulihan (kadang disebut seed) adalah daftar 12 kata dalam bahasa Inggris. Ini memungkinkan Anda memulihkan akses penuh ke dana Anda jika diperlukan.\n\n<b>Hanya Anda sendiri yang memiliki seed ini. Jaga kerahasiaannya.</b>\n\n<b>Jangan bagikan seed ini kepada siapapun</b>.\nWaspadai phishing. Pengembang Phoenix tidak akan pernah meminta seed Anda.\n\n<b>Jangan sampai kehilangan seed ini</b>.\nSimpan di tempat yang aman (tidak di ponsel ini). Jika Anda kehilangan seed dan ponsel Anda, berarti Anda kehilangan dana Anda.</string>
+    <string name="displayseed_authenticate_button">Tampilkan seed</string>
+    <string name="displayseed_dialog_header">JAGA SEED INI DENGAN AMAN.\nJANGAN DIBAGIKAN.</string>
+    <string name="displayseed_backup_notice_header">Anda belum mencadangkan frasa pemulihan Anda!</string>
+    <string name="displayseed_backup_notice_details">Jika Anda tidak mencadangkannya dan kehilangan akses ke Phoenix, Anda akan kehilangan dana Anda!</string>
+    <string name="displayseed_backup_checkbox">Saya telah menyimpan frasa pemulihan saya di tempat yang aman.</string>
+    <string name="displayseed_loss_disclaimer_checkbox">Saya mengerti bahwa jika saya kehilangan ponsel dan frasa pemulihan saya, maka saya akan kehilangan dana di dompet saya.</string>
 
     <!-- payment details -->
 
-    <string name="paymentdetails_funding_fees_label">Miner fees</string>
-    <string name="paymentdetails_funding_fees_desc">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
-    <string name="paymentdetails_service_fees_label">Service fees</string>
-    <string name="paymentdetails_service_fees_desc">Fees paid for the creation of a new payment channel. This is not always required.</string>
+    <string name="paymentdetails_funding_fees_label">Biaya penambangan</string>
+    <string name="paymentdetails_funding_fees_desc">Biaya yang dibayarkan kepada penambang jaringan Bitcoin untuk memproses transaksi on-chain.</string>
+    <string name="paymentdetails_service_fees_label">Biaya layanan</string>
+    <string name="paymentdetails_service_fees_desc">Biaya yang dibayarkan untuk pembuatan Saluran pembayaran baru. Ini tidak selalu diperlukan.</string>
 
-    <string name="paymentdetails_liquidity_purchase_label">Liquidity</string>
-    <string name="paymentdetails_liquidity_service_fee_label">Service fees</string>
-    <string name="paymentdetails_liquidity_service_fee_help">Fees paid for the liquidity service.</string>
-    <string name="paymentdetails_liquidity_miner_fee_label">Miner fees</string>
-    <string name="paymentdetails_liquidity_miner_fee_help">Fees paid to the Bitcoin network miners to process the on-chain transaction.</string>
-    <string name="paymentdetails_liquidity_caused_by_label">Caused by</string>
-    <string name="paymentdetails_liquidity_caused_by_help">This liquidity was required to receive a payment.</string>
-    <string name="paymentdetails_liquidity_caused_by_help_link">See how to optimise</string>
+    <string name="paymentdetails_liquidity_purchase_label">Likuiditas</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Biaya layanan</string>
+    <string name="paymentdetails_liquidity_service_fee_help">Biaya yang dibayarkan untuk layanan likuiditas.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Biaya penambangan</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Biaya yang dibayarkan kepada penambang jaringan Bitcoin untuk memproses transaksi on-chain.</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Disebabkan oleh</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Likuiditas ini diperlukan untuk menerima pembayaran.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Lihat cara mengoptimalkan</string>
 
     <!-- lnurl -->
 
-    <string name="lnurl_auth_instructions">You can anonymously sign-in and authorize an action on:</string>
-    <string name="lnurl_withdraw_header">You can redeem funds from\n<b>%1$s</b>.</string>
-    <string name="lnurl_withdraw_success">The withdrawal request has been sent to <b>%1$s</b>.\n\nIt may take some time before they send the funds. Please keep the app online in the meanwhile.</string>
+    <string name="lnurl_auth_instructions">Anda dapat masuk secara anonim dan mengotorisasi tindakan pada:</string>
+    <string name="lnurl_withdraw_header">Anda dapat menukarkan dana dari\n<b>%1$s</b>.</string>
+    <string name="lnurl_withdraw_success">Permintaan penarikan telah dikirim ke <b>%1$s</b>.\n\nMungkin akan memakan waktu sebelum mereka mengirimkan dana. Harap biarkan aplikasi tetap online sementara menunggu.</string>
 
     <!-- Tor -->
 
-    <string name="tor_dialog_enable_title_1">Enabling Tor</string>
-    <string name="tor_dialog_enable_details_1">This requires installing a third-party Tor Proxy VPN app such as Orbot.</string>
-    <string name="tor_dialog_enable_details_2">Tor can improve privacy, but may cause performance issues and missed payments.</string>
-    <string name="tor_dialog_disable_title">Disabling Tor</string>
-    <string name="tor_dialog_disable_details_1">If you disable this option, your IP address may be revealed to various service providers.</string>
-    <string name="tor_dialog_disable_details_2">Are you sure you want to proceed ?</string>
-    <string name="tor_dialog_processing">Processing changes…</string>
+    <string name="tor_dialog_enable_title_1">Aktifkan Tor</string>
+    <string name="tor_dialog_enable_details_1">Hal ini memerlukan pemasangan aplikasi VPN Proksi Tor pihak ketiga seperti Orbot.</string>
+    <string name="tor_dialog_enable_details_2">Tor dapat meningkatkan privasi, tetapi dapat menyebabkan masalah kinerja dan pembayaran yang terlewat.</string>
+    <string name="tor_dialog_disable_title">Nonaktifkan Tor</string>
+    <string name="tor_dialog_disable_details_1">Jika Anda menonaktifkan opsi ini, alamat IP Anda dapat terungkap kepada berbagai penyedia layanan.</string>
+    <string name="tor_dialog_disable_details_2">Apakah Anda yakin ingin melanjutkan?</string>
+    <string name="tor_dialog_processing">Memproses perubahan…</string>
 
-    <string name="tor_disconnected_dialog_title">No access to the Tor network</string>
-    <string name="tor_disconnected_dialog_action">Fix it</string>
-    <string name="tor_disconnected_dialog_details_1">Phoenix needs access to Tor to function properly.</string>
-    <string name="tor_disconnected_dialog_details_2">Make sure your Tor Proxy VPN app is up and running, and that it\'s connected to Tor.</string>
-    <string name="tor_disconnected_dialog_details_3">If you don\'t have a Tor VPN app, install one. We recommend Orbot.</string>
-    <string name="tor_disconnected_dialog_open_settings">Open Tor settings</string>
-    <string name="tor_disconnected_dialog_open_orbot_page">Open Orbot page</string>
+    <string name="tor_disconnected_dialog_title">Tidak ada akses ke jaringan Tor</string>
+    <string name="tor_disconnected_dialog_action">Perbaiki ini</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix membutuhkan akses ke Tor agar berfungsi dengan benar.</string>
+    <string name="tor_disconnected_dialog_details_2">Pastikan aplikasi VPN Proksi Tor Anda aktif dan berjalan, serta terhubung ke Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Jika Anda tidak memiliki aplikasi VPN Tor, instal salah satunya. Kami merekomendasikan Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Buka pengaturan Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Buka halaman Orbot</string>
 
     <!-- about -->
 
-    <string name="about_general_content">Phoenix is a Bitcoin wallet using the Lightning network for sending and receiving payments.\n\nIt is a free open source software, developed by <a href="https://phoenix.acinq.co">ACINQ</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.</string>
-    <string name="about_seed_title">Safeguarding your key</string>
-    <string name="about_seed_content">This wallet is self-custodial: <b>you have sole custody of the wallet\'s 12-words seed key</b>.\n\nThis key gives access to your money. Do not reveal it to anyone, and beware of phishing.</string>
-    <string name="about_rates_title">Exchange rates</string>
-    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
+    <string name="about_general_content">Phoenix adalah dompet Bitcoin yang menggunakan jaringan Lightning untuk mengirim dan menerima pembayaran.\n\nIni adalah perangkat lunak sumber terbuka gratis, yang dikembangkan oleh <a href="https://phoenix.acinq.co">ACINQ</a> di bawah <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Lisensi Apache 2.0</a>.</string>
+    <string name="about_seed_title">Melindungi kunci Anda</string>
+    <string name="about_seed_content">Dompet ini bersifat self-custodial: <b>hanya Anda yang memegang kunci seed 12 kata dompet ini</b>.\n\nKunci ini memberikan akses ke dana Anda. Jangan ungkapkan kepada siapapun, dan waspadai phishing.</string>
+    <string name="about_rates_title">Kurs</string>
+    <string name="about_rates_content">Kurs Bitcoin/fiat diambil dari berbagai API pihak ketiga:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nKurs tersebut mungkin tidak akurat. Selalu periksa jumlah Bitcoin yang sebenarnya sebelum mengirim pembayaran.</string>
 
     <!-- introduction screens -->
 
-    <string name="intro_welcome_title">Welcome!</string>
-    <string name="intro_welcome_sub1">With Phoenix, sending and receiving bitcoins is easy and safe.</string>
-    <string name="intro_welcome_next_button">Next</string>
+    <string name="intro_welcome_title">Selamat datang!</string>
+    <string name="intro_welcome_sub1">Dengan Phoenix, mengirim dan menerima bitcoin menjadi mudah dan aman.</string>
+    <string name="intro_welcome_next_button">Selanjutnya</string>
 
-    <string name="intro_channels_title">Bitcoin supercharged</string>
-    <string name="intro_channels_sub1">Phoenix uses payment channels to make Bitcoin fast and private.</string>
-    <string name="intro_channels_next_button">Next</string>
+    <string name="intro_channels_title">Bitcoin yang ditingkatkan</string>
+    <string name="intro_channels_sub1">Phoenix menggunakan Saluran pembayaran untuk membuat Bitcoin cepat dan pribadi.</string>
+    <string name="intro_channels_next_button">Selanjutnya</string>
 
-    <string name="intro_selfcustody_title">Your key, your bitcoins</string>
-    <string name="intro_selfcustody_sub1">Phoenix is self-custodial. You take control.</string>
-    <string name="intro_selfcustody_sub2">You can restore your wallet at anytime using your secret key. Keep it safe!</string>
-    <string name="intro_selfcustody_next_button">Get started</string>
+    <string name="intro_selfcustody_title">Kunci Anda, bitcoin Anda</string>
+    <string name="intro_selfcustody_sub1">Phoenix bersifat self-custodial. Anda memegang kendali.</string>
+    <string name="intro_selfcustody_sub2">Anda dapat memulihkan dompet kapan saja menggunakan kunci rahasia Anda. Jaga keamanannya!</string>
+    <string name="intro_selfcustody_next_button">Mulai</string>
 
     <!-- wallet info -->
 
-    <string name="walletinfo_onchain_swapin">Swap-in wallet</string>
-    <string name="walletinfo_onchain_swapin_help">The swap-in wallet manages on-chain funds deposited to Phoenix.\n\nIt swaps them automatically to Lightning when possible, according to your channels management setting.</string>
-    <string name="walletinfo_onchain_swapin_help_faq_link">See how it works</string>
-    <string name="walletinfo_onchain_swapin_policy_view">Tap to configure</string>
-    <string name="walletinfo_onchain_swapin_empty">There are no swaps in progress.</string>
+    <string name="walletinfo_onchain_swapin">Dompet tukar masuk</string>
+    <string name="walletinfo_onchain_swapin_help">Dompet swap-in mengelola dana on-chain yang disetorkan ke Phoenix.\n\nDana tersebut akan ditukarkan secara otomatis ke Lightning jika memungkinkan, sesuai dengan pengaturan manajemen saluran Anda.</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">Lihat cara kerjanya</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Ketuk untuk mengonfigurasi</string>
+    <string name="walletinfo_onchain_swapin_empty">Tidak ada swap yang sedang berlangsung.</string>
 
-    <string name="walletinfo_onchain_swapin_policy_auto_details">On-chain funds are automatically swapped into Lightning if the fee paid to miners is <b>less than %1$s</b> (can be configured).</string>
-    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Funds not swapped <b>after %1$d months</b> are recoverable on-chain.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled_details">Automated channels management <b>is disabled</b>. No swap will occur, funds will remain on-chain.</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Dana on-chain secara otomatis ditukar ke Lightning jika biaya yang dibayarkan kepada penambang <b>kurang dari %1$s</b> (dapat dikonfigurasi).</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Dana yang tidak ditukar <b>setelah %1$d bulan</b> dapat dipulihkan secara on-chain.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Manajemen saluran otomatis <b>dinonaktifkan</b>. Tidak ada penukaran yang akan terjadi, dana akan tetap berada di on-chain.</string>
 
-    <string name="walletinfo_onchain_swapin_last_attempt">A swap attempt failed %1$s</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_disabled">Channels management was disabled.</string>
-    <string name="walletinfo_onchain_swapin_timeout_1day">This swap will expire in a day!</string>
-    <string name="walletinfo_onchain_swapin_timeout">This swap will expire in %1$s days.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt">Upaya swap gagal %1$s</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">Manajemen saluran telah dinonaktifkan.</string>
+    <string name="walletinfo_onchain_swapin_timeout_1day">Swap ini akan kedaluwarsa dalam sehari!</string>
+    <string name="walletinfo_onchain_swapin_timeout">Swap ini akan kedaluwarsa dalam %1$s hari.</string>
 
-    <string name="walletinfo_onchain_swapin_locked_title">Timed out</string>
-    <string name="walletinfo_onchain_swapin_locked_description">These funds will be available from %1$s days onwards.</string>
+    <string name="walletinfo_onchain_swapin_locked_title">Waktu habis</string>
+    <string name="walletinfo_onchain_swapin_locked_description">Dana ini akan tersedia mulai %1$s hari ke depan.</string>
 
-    <string name="walletinfo_onchain_swapin_refund_title">Cancelled funds</string>
-    <string name="walletinfo_onchain_swapin_refund_description">These funds were not swapped in time. Tap to spend.</string>
+    <string name="walletinfo_onchain_swapin_refund_title">Dana yang dibatalkan</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Dana ini tidak ditukarkan tepat waktu. Ketuk untuk membelanjakan.</string>
 
-    <string name="walletinfo_onchain_final_about">The final wallet is where funds are sent when your Lightning channels are closed or when there is a problem. It usually should be empty.</string>
+    <string name="walletinfo_onchain_final_about">Dompet akhir adalah tempat dana dikirim ketika saluran Lightning Anda ditutup atau ketika terjadi masalah. Biasanya dompet ini harus dalam keadaan kosong.</string>
 
     <!-- settings: liquidity policy for channels creation -->
 
-    <string name="liquiditypolicy_instructions">Incoming payments sometimes require on-chain transactions. This does not always happen, only when needed.</string>
-    <string name="liquiditypolicy_fees_estimation">Fees are currently estimated at around <b>%1$s</b> (≈%2$s).</string>
-    <string name="liquiditypolicy_disable_label">Automated channel management</string>
-    <string name="liquiditypolicy_disable_desc">Incoming payments that require on-chain operations will be rejected.</string>
+    <string name="liquiditypolicy_instructions">Pembayaran masuk terkadang memerlukan transaksi on-chain. Hal ini tidak selalu terjadi, hanya jika diperlukan saja.</string>
+    <string name="liquiditypolicy_fees_estimation">Biaya saat ini diperkirakan sekitar <b>%1$s</b> (≈%2$s).</string>
+    <string name="liquiditypolicy_disable_label">Manajemen saluran otomatis</string>
+    <string name="liquiditypolicy_disable_desc">Pembayaran masuk yang memerlukan operasi on-chain akan ditolak.</string>
 
-    <string name="liquiditypolicy_fees_base_label">Max fee amount</string>
-    <string name="liquiditypolicy_fees_base_help">Payments whose fees exceed that value will be rejected.</string>
-    <string name="liquiditypolicy_fees_base_too_low">This value is too low.</string>
-    <string name="liquiditypolicy_fees_base_below_estimation">Below the expected fee. Some payments may be rejected.</string>
+    <string name="liquiditypolicy_fees_base_label">Jumlah biaya maksimal</string>
+    <string name="liquiditypolicy_fees_base_help">Pembayaran dengan biaya yang melebihi nilai tersebut akan ditolak.</string>
+    <string name="liquiditypolicy_fees_base_too_low">Nilai ini terlalu rendah.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Di bawah biaya yang diperkirakan. Beberapa pembayaran mungkin bakal ditolak.</string>
 
-    <string name="liquiditypolicy_advanced_menu">Advanced options</string>
-    <string name="liquiditypolicy_advanced_disable">Channel management is disabled. It can be enabled in the Channel management setting screen.</string>
-    <string name="liquiditypolicy_advanced_disclaimer_header">Attention!</string>
-    <string name="liquiditypolicy_advanced_disclaimer_message">This screen is for advanced users. Do not change these settings unless you understand their purposes.</string>
+    <string name="liquiditypolicy_advanced_menu">Opsi lanjutan</string>
+    <string name="liquiditypolicy_advanced_disable">Manajemen saluran dinonaktifkan. Lu bisa aktifin di layar pengaturan manajemen Saluran.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">Perhatian!</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">Layar ini buat pengguna tingkat lanjut. Jangan ganti pengaturan ini kecuali lu paham fungsinya.</string>
 
-    <string name="liquiditypolicy_advanced_verifications_title">Additional verifications</string>
-    <string name="liquiditypolicy_advanced_fees_prop_label">Percentage check</string>
-    <string name="liquiditypolicy_advanced_fees_prop_help">Check the fee relative to the amount received. This option is useful as a sanity check for small payments.</string>
-    <string name="liquiditypolicy_advanced_overrides_title">Policy overrides</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_label">Skip absolute fee check for Lightning</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_help">When enabled, incoming Lightning payments will ignore the absolute max fee limit. Only the percentage check will apply.\n\nAttention: if the Bitcoin mempool feerate is high, incoming LN payments requiring an on-chain operation could be expensive.</string>
-    <string name="liquiditypolicy_save_button">Save policy</string>
-    <string name="liquiditypolicy_request_button">Request inbound liquidity</string>
+    <string name="liquiditypolicy_advanced_verifications_title">Verifikasi tambahan</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">Pemeriksaan persentase</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">Periksa biaya relatif terhadap jumlah yang diterima. Opsi ini berguna sebagai pengecekan masuk akal (sanity check) untuk pembayaran bernilai kecil.</string>
+    <string name="liquiditypolicy_advanced_overrides_title">Penggantian kebijakan</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">Lewati pengecekan biaya absolut untuk Lightning</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">Saat diaktifkan, pembayaran Lightning yang masuk akan mengabaikan batas biaya maksimal absolut. Hanya pemeriksaan persentase yang akan berlaku.\n\nPerhatian: Jika biaya transaksi (feerate) mempool Bitcoin sedang tinggi, pembayaran LN masuk yang memerlukan operasi on-chain bisa jadi mahal.</string>
+    <string name="liquiditypolicy_save_button">Kebijakan penghematan</string>
+    <string name="liquiditypolicy_request_button">Permintaan likuiditas masuk</string>
 
     <string name="liquiditypolicy_help">
       Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).
@@ -389,116 +389,114 @@
 
     <!-- settings: liquidity request -->
 
-    <string name="liquidityads_no_channels_header">No channels yet!</string>
-    <string name="liquidityads_no_channels_details">You first need funds in the wallet to use this feature.</string>
-    <string name="liquidityads_header">Plan ahead your liquidity</string>
-    <string name="liquidityads_instructions">Inbound liquidity lets you avoid on-chain transaction fees for future payments received over Lightning.\n\nBy requesting more liquidity now, you can save fees later.</string>
-    <string name="liquidityads_faq_link">More info</string>
-    <string name="liquidityads_current_liquidity">Current liquidity</string>
+    <string name="liquidityads_no_channels_header">Belum ada saluran!</string>
+    <string name="liquidityads_no_channels_details">Anda perlu memiliki dana di dompet terlebih dahulu untuk menggunakan fitur ini.</string>
+    <string name="liquidityads_header">Rencanakan likuiditas Anda jauh-jauh hari.</string>
+    <string name="liquidityads_instructions">Likuiditas masuk (inbound liquidity) bikin lu bisa ngehindarin biaya transaksi on-chain buat pembayaran Lightning yang bakal diterima nanti.\n\nDengan minta lebih banyak likuiditas sekarang, lu bisa hemat biaya nantinya.</string>
+    <string name="liquidityads_faq_link">Info lebih lanjut</string>
+    <string name="liquidityads_current_liquidity">Likuiditas saat ini</string>
 
-    <string name="liquidityads_amount_label">Request liquidity</string>
-    <string name="liquidityads_estimate_button">Estimate liquidity cost</string>
-    <string name="liquidityads_estimating_spinner">Estimating cost…</string>
-    <string name="liquidityads_estimate_details_miner_fees">Miner fee</string>
-    <string name="liquidityads_estimate_details_miner_fees_help">Mining fee contribution for the underlying on-chain transaction.</string>
-    <string name="liquidityads_estimate_details_service_fees">Service fee</string>
-    <string name="liquidityads_estimate_details_service_fees_help">This fee goes to the service providing the liquidity.</string>
-    <string name="liquidityads_estimate_details_duration">Duration</string>
-    <string name="liquidityads_estimate_details_duration_value">1 year</string>
-    <string name="liquidityads_estimate_details_duration_help">As you receive funds, liquidity will be consumed and become your balance. After one year, the remaining unused liquidity will be reclaimed by the service.</string>
-    <string name="liquidityads_estimate_above_25">The total fee is more than 25% of the liquidity amount requested.</string>
-    <string name="liquidityads_over_balance">The total fees exceed your balance.</string>
+    <string name="liquidityads_amount_label">Meminta likuiditas</string>
+    <string name="liquidityads_estimate_button">Perkirakan biaya likuiditas</string>
+    <string name="liquidityads_estimating_spinner">Memperkirakan biaya…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Biaya penambangan</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Kontribusi biaya penambangan untuk transaksi on-chain yang mendasarinya.</string>
+    <string name="liquidityads_estimate_details_service_fees">Biaya layanan</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Biaya ini diberikan kepada penyedia layanan likuiditas.</string>
+    <string name="liquidityads_estimate_details_duration">Durasi</string>
+    <string name="liquidityads_estimate_details_duration_value">1 tahun</string>
+    <string name="liquidityads_estimate_details_duration_help">Saat Anda menerima dana, likuiditas akan dikonsumsi dan menjadi saldo Anda. Setelah satu tahun, sisa likuiditas yang tidak terpakai akan diambil kembali oleh layanan tersebut.</string>
+    <string name="liquidityads_estimate_above_25">Total biaya yang dikenakan lebih dari 25% dari jumlah likuiditas yang diminta.</string>
+    <string name="liquidityads_over_balance">Total biaya melebihi saldo Anda.</string>
 
-    <string name="liquidityads_review_button">Review</string>
-    <string name="liquidityads_disclaimer_body1">You are requesting an <b>initial</b> amount of liquidity. Liquidity is not constant over time: as you receive funds over Lightning, the liquidity will be consumed and become your balance.</string>
-    <string name="liquidityads_disclaimer_body2">After one year, the remaining unused liquidity will be reclaimed by the service.</string>
+    <string name="liquidityads_review_button">Tinjauan</string>
+    <string name="liquidityads_disclaimer_body1">Lu lagi minta jumlah likuiditas <b>awal</b>. Likuiditas itu nggak konstan: seiring lu nerima dana lewat Lightning, likuiditasnya bakal terpakai dan jadi saldo lu.</string>
+    <string name="liquidityads_disclaimer_body2">Setelah satu tahun, sisa likuiditas yang nggak terpakai bakal ditarik balik sama layanan.</string>
 
-    <string name="liquidityads_request_button">Accept</string>
-    <string name="liquidityads_requesting_spinner">Processing splice…</string>
+    <string name="liquidityads_request_button">Menerima</string>
+    <string name="liquidityads_requesting_spinner">Memproses sambungan...</string>
 
-    <string name="liquidityads_success">Liquidity successfully added!</string>
-    <string name="liquidityads_success_amount">Amount added: %1$s</string>
+    <string name="liquidityads_success">Likuiditas berhasil ditambahkan!</string>
+    <string name="liquidityads_success_amount">Jumlah yang ditambahkan: %1$s</string>
 
-    <string name="liquidityads_error_header">Liquidity request has failed</string>
-    <string name="liquidityads_error_channels_unavailable">Channels are not available. Try again later.</string>
-    <string name="liquidityads_error_invalid_funding_amount">The requested amount is invalid.</string>
+    <string name="liquidityads_error_header">Permintaan likuiditas gagal</string>
+    <string name="liquidityads_error_channels_unavailable">Saluran tidak tersedia. Silakan coba beberapa saat lagi.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Jumlah yang diminta tidak valid.</string>
 
     <!-- payment line -->
 
-    <string name="paymentline_outgoing_unconfirmed">Unconfirmed - tap to accelerate</string>
+    <string name="paymentline_outgoing_unconfirmed">Belum dikonfirmasi - ketuk untuk mempercepat</string>
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Accelerate my transactions.</string>
-    <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher feerate to encourage miners to favour your payments.</string>
-    <string name="cpfp_splice_error_actual_below_user">This feerate is less than what your unconfirmed transactions are already using. Use a higher feerate.</string>
+    <string name="cpfp_title">Percepat transaksi saya.</string>
+    <string name="cpfp_instructions">Anda dapat membuat semua transaksi yang belum dikonfirmasi menggunakan tarif biaya yang lebih tinggi untuk mendorong penambang agar lebih menyukai pembayaran Anda.</string>
+    <string name="cpfp_splice_error_actual_below_user">Tarif biaya ini lebih rendah daripada yang sudah digunakan oleh transaksi Anda yang belum dikonfirmasi. Gunakan tarif biaya yang lebih tinggi.</string>
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_failuremessage_channel_closing">Channels are closing.</string>
-    <string name="outgoing_failuremessage_channel_splicing">Channels are already processing a splice. Try again later.</string>
-    <string name="outgoing_failuremessage_not_enough_fee">Fee is insufficient.</string>
-    <string name="outgoing_failuremessage_not_enough_balance">This payment exceeds your balance.</string>
-    <string name="outgoing_failuremessage_too_big">The payment amount is too big - try splitting it in several parts.</string>
-    <string name="outgoing_failuremessage_too_small">The payment amount is too small.</string>
-    <string name="outgoing_failuremessage_expiry_too_big">The expiry of this payment is too far in the future.</string>
-    <string name="outgoing_failuremessage_rejected_by_recipient">The payment was rejected by the recipient. This particular invoice may have already been paid.</string>
-    <string name="outgoing_failuremessage_recipient_offline">The recipient is offline.</string>
-    <string name="outgoing_failuremessage_not_enough_liquidity">The payment could not be relayed to the recipient (probably insufficient inbound liquidity).</string>
-    <string name="outgoing_failuremessage_temporary_failure">An error occurred on a node in the payment route. The payment may succeed if you try again.</string>
-    <string name="outgoing_failuremessage_too_many_pending">You have too many pending payments. Try again once they are settled.</string>
+    <string name="outgoing_failuremessage_channel_closing">Saluran komunikasi sedang ditutup.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Saluran sedang memproses sambungan. Coba lagi nanti.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Biaya yang dibayarkan tidak mencukupi.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Pembayaran ini melebihi saldo Anda.</string>
+    <string name="outgoing_failuremessage_too_big">Jumlah pembayarannya terlalu besar - coba bagi menjadi beberapa bagian.</string>
+    <string name="outgoing_failuremessage_too_small">Jumlah pembayaran terlalu kecil.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Jangka waktu pembayaran ini masih terlalu jauh di masa depan.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Faktur ini mungkin sudah dibayar.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Penerima sedang offline.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Pembayaran tidak dapat diteruskan ke penerima (kemungkinan likuiditas masuk tidak mencukupi).</string>
+    <string name="outgoing_failuremessage_temporary_failure">Terjadi kesalahan pada sebuah node dalam rute pembayaran. Pembayaran mungkin berhasil jika Anda mencoba lagi.</string>
+    <string name="outgoing_failuremessage_too_many_pending">Anda memiliki terlalu banyak pembayaran yang tertunda. Coba lagi setelah semua pembayaran diselesaikan.</string>
 
-    <string name="outgoing_failuremessage_invalid_id">The ID of the payment is not valid. Try again.</string>
-    <string name="outgoing_failuremessage_alreadypaid">This invoice has already been paid.</string>
-    <string name="outgoing_failuremessage_not_connected">Your channel is not connected yet. Wait for a stable connection and try again.</string>
-    <string name="outgoing_failuremessage_channel_opening">Your channel is still in the process of being opened. Wait and try again.</string>
-    <string name="outgoing_failuremessage_unsupported_features">This invoice uses unsupported features. Make sure you\'re on the latest Phoenix version.</string>
-    <string name="outgoing_failuremessage_invalid_amount">The payment amount is invalid.</string>
-    <string name="outgoing_failuremessage_no_available_channels">The payment could not be sent through your existing channels.</string>
-    <string name="outgoing_failuremessage_noroutefound">Recipient is not reachable, or does not have enough inbound liquidity.</string>
-    <string name="outgoing_failuremessage_unknown">An unknown error occurred and payment has failed.</string>
-    <string name="outgoing_failuremessage_restarted">The wallet was restarted while the payment was processing.</string>
+    <string name="outgoing_failuremessage_invalid_id">ID pembayaran tidak valid. Coba lagi.</string>
+    <string name="outgoing_failuremessage_alreadypaid">Faktur ini sudah dibayar.</string>
+    <string name="outgoing_failuremessage_not_connected">Saluran Anda belum terhubung. Tunggu hingga koneksi stabil dan coba lagi.</string>
+    <string name="outgoing_failuremessage_channel_opening">Saluran Anda masih dalam proses pembukaan. Tunggu dan coba lagi.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Faktur ini menggunakan fitur yang tidak didukung. Pastikan Anda menggunakan versi Phoenix terbaru.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Jumlah pembayaran tidak valid.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Pembayaran tidak dapat dikirim melalui saluran yang Anda miliki saat ini.</string>
+    <string name="outgoing_failuremessage_noroutefound">Penerima tidak dapat dihubungi, atau tidak memiliki likuiditas masuk yang cukup.</string>
+    <string name="outgoing_failuremessage_unknown">Terjadi kesalahan yang tidak diketahui dan pembayaran gagal.</string>
+    <string name="outgoing_failuremessage_restarted">Dompet digital diaktifkan ulang saat pembayaran sedang diproses.</string>
 
     <!-- spliceout: low feerate disclaimer -->
 
-    <string name="spliceout_low_feerate_dialog_title">Low feerate!</string>
-    <string name="spliceout_low_feerate_dialog_body1">Transactions with insufficient feerate may linger for days or weeks without confirming.</string>
-    <string name="spliceout_low_feerate_dialog_body2">Choosing the feerate is your responsibility. Once sent, this transaction cannot be cancelled, only accelerated with higher fees.</string>
-    <string name="spliceout_low_feerate_dialog_body3">Are you sure you want to proceed?</string>
+    <string name="spliceout_low_feerate_dialog_title">Dompet digital diaktifkan ulang saat pembayaran sedang diproses.</string>
+    <string name="spliceout_low_feerate_dialog_body1">Transaksi dengan biaya transaksi yang tidak mencukupi dapat tertunda selama berhari-hari atau berminggu-minggu tanpa konfirmasi.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Memilih tarif biaya adalah tanggung jawab Anda. Setelah dikirim, transaksi ini tidak dapat dibatalkan, hanya dapat dipercepat dengan biaya yang lebih tinggi.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Apakah Anda yakin ingin melanjutkan?</string>
 
     <!-- spliceout: capacity disclaimer -->
 
-    <string name="spliceout_capacity_disclaimer_title">Channel size impacted</string>
-    <string name="spliceout_capacity_disclaimer_body1">Funds sent on-chain are taken from your side of the channel, reducing the channel size by the same amount. Your inbound liquidity remains unchanged.</string>
-    <string name="spliceout_capacity_disclaimer_checkbox">Don\'t show this message again.</string>
+    <string name="spliceout_capacity_disclaimer_title">Ukuran saluran terpengaruh</string>
+    <string name="spliceout_capacity_disclaimer_body1">Dana yang dikirim melalui blockchain diambil dari sisi saluran Anda, sehingga mengurangi ukuran saluran dengan jumlah yang sama. Likuiditas masuk Anda tetap tidak berubah.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Jangan tampilkan pesan ini lagi.</string>
 
     <!-- Spend swap-in refund -->
 
-    <string name="swapinrefund_title">Spend cancelled swap-ins</string>
-    <string name="swapinrefund_none_available_label">No cancelled swap-ins yet.</string>
-    <string name="swapinrefund_available_label">Available: <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Use this screen to spend on-chain deposits that were not swapped in time. This does not affect your Lightning channels.</string>
-    <string name="swapinrefund_instructions_2">Make sure the destination address is valid, and use a reasonable feerate.</string>
-    <string name="swapinrefund_estimate_button">Estimate fees</string>
-    <string name="swapinrefund_estimating">Estimating fees…</string>
-    <string name="swapinrefund_send_button">Broadcast</string>
-    <string name="swapinrefund_sending">Broadcasting…</string>
-    <string name="swapinrefund_failed">Transaction error.</string>
-    <string name="swapinrefund_failed_address">This address is not valid.</string>
-    <string name="swapinrefund_failed_cannot_create">Cannot create the refund transaction.</string>
-    <string name="swapinrefund_success">Transaction published.</string>
-    <string name="swapinrefund_success_details">You can find the transaction below. It will not appear in your payments history, so make a copy of its ID now if needed.</string>
+    <string name="swapinrefund_title">Pengeluaran untuk penggantian yang dibatalkan</string>
+    <string name="swapinrefund_none_available_label">Belum ada pembatalan penggantian pemain.</string>
+    <string name="swapinrefund_available_label">Tersedia: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Gunakan layar ini untuk membelanjakan deposit on-chain yang tidak sempat ditukarkan tepat waktu. Ini tidak memengaruhi saluran Lightning Anda.</string>
+    <string name="swapinrefund_instructions_2">Pastikan alamat tujuan valid, dan gunakan tarif yang wajar.</string>
+    <string name="swapinrefund_estimate_button">Perkiraan biaya</string>
+    <string name="swapinrefund_estimating">Memperkirakan biaya…</string>
+    <string name="swapinrefund_send_button">Menyiarkan</string>
+    <string name="swapinrefund_sending">Menyiarkan...</string>
+    <string name="swapinrefund_failed">Kesalahan transaksi.</string>
+    <string name="swapinrefund_failed_address">Alamat ini tidak valid.</string>
+    <string name="swapinrefund_failed_cannot_create">Transaksi pengembalian dana tidak dapat dibuat.</string>
+    <string name="swapinrefund_success">Transaksi telah dipublikasikan.</string>
+    <string name="swapinrefund_success_details">Anda dapat menemukan transaksi di bawah ini. Transaksi ini tidak akan muncul di riwayat pembayaran Anda, jadi buat salinan ID-nya sekarang jika diperlukan.</string>
 
     <!-- Final wallet refund -->
 
-    <string name="finalwallet_refund_title">Spend funds from final wallet</string>
-    <string name="finalwallet_refund_available_none">No funds available</string>
-    <string name="finalwallet_refund_available">Amount available</string>
-    <string name="finalwallet_refund_instructions">Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels.</string>
+    <string name="finalwallet_refund_title">Gunakan dana dari dompet terakhir.</string>
+    <string name="finalwallet_refund_available_none">Tidak ada dana yang tersedia</string>
+    <string name="finalwallet_refund_available">Jumlah yang tersedia</string>
+    <string name="finalwallet_refund_instructions">Gunakan layar ini untuk membelanjakan dana dari dompet akhir Anda. Dana ini berasal dari saluran yang telah ditutup di masa lalu. Ini tidak memengaruhi saluran Lightning Anda yang sudah ada.</string>
 
     <!-- experimental features -->
 
-    <string name="bip353_subtitle">This is a human-readable address for your Bolt12 payment request.</string>
-    <string name="bip353_subtitle2">Want a prettier address? Use third-party services, or self-host the address!</string>
-
-</resources>
+    <string name="bip353_subtitle">Ini adalah alamat yang mudah dibaca manusia untuk permintaan pembayaran Bolt12 Anda.</string>
+    <string name="bip353_subtitle2">Ingin alamat yang lebih menarik? Gunakan layanan pihak ketiga, atau kelola sendiri alamat tersebut!</string>
