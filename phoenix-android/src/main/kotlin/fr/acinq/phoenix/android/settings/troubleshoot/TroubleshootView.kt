@@ -45,18 +45,32 @@ fun TroubleshootingView(
             onBackClick = onBackClick,
             title = stringResource(R.string.troubleshooting_title)
         )
-        ExportDiagnostics(vm)
         ExportLogs(vm)
+        ExportDiagnostics(vm)
     }
 }
 
 @Composable
 private fun ExportDiagnostics(vm: DiagnosticsViewModel) {
+    val context = LocalContext.current
+    val state by vm.diagnosticExportState.collectAsState()
+    CardHeader(text = stringResource(R.string.troubleshooting_diagnostics_header))
     Card {
         SettingButton(
-            text = stringResource(R.string.troubleshooting_diagnostics_copy_button),
+            text = stringResource(id = R.string.troubleshooting_diagnostics_copy_button),
             onClick = { vm.copyDiagnostics() },
             icon = R.drawable.ic_activity,
+            enabled = state !is DiagnosticsExportState.Generating
+        )
+        SettingButton(
+            text = when (state) {
+                is DiagnosticsExportState.Init, is DiagnosticsExportState.Success -> stringResource(id = R.string.troubleshooting_diagnostics_export_button)
+                is DiagnosticsExportState.Generating -> stringResource(id = R.string.troubleshooting_logs_exporting)
+                is DiagnosticsExportState.Failure -> stringResource(id = R.string.troubleshooting_diagnostics_error)
+            },
+            onClick = { vm.shareDiagnostics(context) },
+            icon = R.drawable.ic_share,
+            enabled = state !is DiagnosticsExportState.Generating
         )
     }
 }
@@ -65,10 +79,10 @@ private fun ExportDiagnostics(vm: DiagnosticsViewModel) {
 private fun ExportLogs(
     vm: DiagnosticsViewModel
 ) {
-    CardHeader(text = "logs")
+    val context = LocalContext.current
+    val viewState by vm.logsViewState.collectAsState()
+    CardHeader(text = stringResource(R.string.troubleshooting_logs_header))
     Card {
-        val context = LocalContext.current
-        val viewState by vm.logsViewState.collectAsState()
         SettingButton(
             text = when (viewState) {
                 is LogsExportState.Init -> stringResource(id = R.string.troubleshooting_logs_view_button)
@@ -89,7 +103,7 @@ private fun ExportLogs(
             },
             icon = R.drawable.ic_share,
             enabled = shareState !is LogsExportState.Exporting,
-            onClick = { vm.shareLogs() }
+            onClick = { vm.shareLogs(context) }
         )
     }
 }

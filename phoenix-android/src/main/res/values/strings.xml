@@ -375,8 +375,15 @@
     <!-- settings: logs -->
 
     <string name="troubleshooting_title">Diagnostics &amp; Logs</string>
-    <string name="troubleshooting_diagnostics_copy_button">Copy app diagnostics</string>
-    <string name="troubleshooting_logs_exporting">Exporting logs…</string>
+    <string name="troubleshooting_diagnostics_header">Wallet diagnostics</string>
+    <string name="troubleshooting_diagnostics_export_button">Share diagnostics…</string>
+    <string name="troubleshooting_diagnostics_share_subject">Phoenix App diagnostics</string>
+    <string name="troubleshooting_diagnostics_share_title">Share Phoenix diagnostics…</string>
+    <string name="troubleshooting_diagnostics_copy_button">Copy diagnostics</string>
+    <string name="troubleshooting_diagnostics_error">Error when generating diagnostics</string>
+
+    <string name="troubleshooting_logs_header">Logs</string>
+    <string name="troubleshooting_logs_exporting">Exporting data…</string>
     <string name="troubleshooting_logs_failed">Error: logs could not be exported</string>
     <string name="troubleshooting_logs_view_button">View logs…</string>
     <string name="troubleshooting_logs_view_with">View logs with…</string>

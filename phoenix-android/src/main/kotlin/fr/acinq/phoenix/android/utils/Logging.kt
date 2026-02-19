@@ -30,6 +30,7 @@ import ch.qos.logback.core.rolling.FixedWindowRollingPolicy
 import ch.qos.logback.core.rolling.RollingFileAppender
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
 import ch.qos.logback.core.util.FileSize
+import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.android.BuildConfig
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -45,11 +46,13 @@ fun logger(name: String? = null): org.slf4j.Logger {
 object Logging {
 
     private const val LOGS_DIR = "logs"
+    const val LOGS_EXPORT_DIR = "logs_export"
     private const val CURRENT_LOG_FILE = "phoenix.log"
     private const val ARCHIVED_LOG_FILE = "phoenix.archive-%i.log"
 
     fun exportLogFile(context: Context): File {
-        val export = File(File(context.filesDir, LOGS_DIR), "phoenix_export.log")
+        val export = File(File(context.cacheDir, LOGS_EXPORT_DIR).also { if (!it.exists()) it.mkdir() },
+            "phoenix_logs-${UUID.randomUUID().toString().substringBefore("-")}.log")
         val exportOutputStream = FileOutputStream(export)
         val exportChannel = exportOutputStream.channel
 
@@ -82,17 +85,10 @@ object Logging {
 
     fun setupLogger(context: Context) {
         // cleanup export file
-        val export = File(File(context.filesDir, LOGS_DIR), "phoenix_export.log")
+        val export = File(File(context.cacheDir, LOGS_DIR), "phoenix_export.log")
         if (export.exists() && export.isFile) {
             try {
                 export.delete()
-            } catch (_: Exception) {}
-        }
-        // cleanup unused archive-2 file
-        val archive2 = File(File(context.filesDir, LOGS_DIR), "phoenix.archive-2.log")
-        if (archive2.exists() && archive2.isFile) {
-            try {
-                archive2.delete()
             } catch (_: Exception) {}
         }
 
