@@ -24,14 +24,14 @@
 
     <!-- generic -->
 
-    <string name="utils_ack">Saya mengerti.</string>
+    <string name="utils_ack">Mengerti.</string>
 
     <!-- system notifications -->
 
     <string name="notif_headless_title_default">Phoenix sedang berjalan di latar belakang</string>
     <string name="notif_headless_received">%1$s Diterima %2$s</string>
 
-    <string name="notif_pending_settlement_title">Silakan mulai dompet</string>
+    <string name="notif_pending_settlement_title">Buka aplikasi dompet</string>
     <string name="notif_pending_settlement_message">Penyelesaian yang masuk sedang dalam proses.</string>
 
     <string name="notif_inflight_payment_title">Pembayaran sedang diproses</string>
@@ -44,8 +44,8 @@
     <string name="notif_rejected_payment_title">Pembayaran ditolak (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">Pengelolaan Saluran otomatis dinonaktifkan. Ketuk untuk detail.</string>
     <string name="notif_rejected_policy_disabled_timeout">Pengelolaan Saluran otomatis dinonaktifkan. Deposit ini akan kedaluwarsa dalam %1$s.</string>
-    <string name="notif_rejected_over_absolute">Biayanya adalah 1 dolar AS, tetapi biaya maksimum Anda ditetapkan menjadi 2 dolar AS. Ketuk untuk detailnya.</string>
-    <string name="notif_rejected_over_absolute_timeout">Biaya yang dikenakan adalah 1%, tetapi biaya maksimum Anda ditetapkan sebesar 2%. Deposit ini akan kedaluwarsa pada 3%.</string>
+    <string name="notif_rejected_over_absolute">Biayanya adalah %1$s, tetapi batas biaya maksimu Anda adalah %2$s. Ketuk untuk detailnya.</string>
+		<string name="notif_rejected_over_absolute_timeout">Biaya sebesar %1$s, namun batas maksimal Anda %2$s. Deposit ini akan kedaluwarsa pada %3$s.</string>
     <string name="notif_rejected_over_relative">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Ketuk untuk detail selengkapnya.</string>
     <string name="notif_rejected_over_relative_timeout">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Deposit ini akan kedaluwarsa pada %3$s.</string>
     <string name="notif_rejected_amount_too_low">Jumlah pembayaran terlalu rendah.</string>
@@ -88,7 +88,7 @@
     <string name="home_swapin_confirming_desc">Menunggu konfirmasi terlebih dahulu sebelum dapat diganti ke Lightning.</string>
 
     <string name="home_swapin_ready_title">Menunggu pertukaran</string>
-    <string name="home_swapin_ready_desc_auto">Akan diimplementasikan ke Lightning ketika biaya penambangan di bawah 1%.</string>
+    <string name="home_swapin_ready_desc_auto">Akan ditukarkan ke Lightning ketika biaya penambangan di bawah 1%.</string>
     <string name="home_swapin_ready_desc_disabled">Akan tetap berada di blockchain karena manajemen Saluran otomatis dinonaktifkan.</string>
     <string name="home_swapin_ready_desc_generic">Akan diimplementasikan ke Lightning jika kondisinya memungkinkan.</string>
     <string name="home_swapin_ready_expiring">Perhatian! Beberapa dana akan segera kedaluwarsa dan tidak lagi memenuhi syarat untuk pertukaran.</string>
@@ -103,7 +103,7 @@
     <string name="home_background_restriction_title">Pemrosesan latar belakang dibatasi</string>
     <string name="home_background_restriction_body_1">Phoenix mungkin tidak dapat menerima pembayaran saat berada di latar belakang, atau saat ditutup.</string>
     <string name="home_background_restriction_body_2">Hal ini terjadi karena:</string>
-    <string name="home_background_restriction_powersaver">Perangkat sedang dalam mode hemat dadaya</string>
+    <string name="home_background_restriction_powersaver">Perangkat sedang dalam mode hemat aya</string>
     <string name="home_background_restriction_fcm">Notifikasi FCM tidak tersedia</string>
     <string name="home_background_restriction_fcm_details">Jika Anda menggunakan GrapheneOS atau CalyxOS, instal Google Play Services untuk mendapatkan notifikasi FCM. Periksa FAQ untuk panduan lebih lanjut.</string>
 
@@ -131,7 +131,7 @@
     <string name="restore_seed_invalid">Benih ini tidak valid</string>
     <string name="restore_seed_invalid_details">Pastikan Anda memasukkan kata-kata yang benar dalam urutan yang tepat.</string>
 
-    <string name="restore_payments_button">Import riwayat pembayaran</string>
+    <string name="restore_payments_button">Impor riwayat pembayaran</string>
     <string name="restore_payments_button_details">Opsional. Gunakan tombol ini untuk memulihkan file basis data pembayaran dari perangkat lain.</string>
     <string name="restore_payments_success">Riwayat pembayaran akan dipulihkan</string>
     <string name="restore_payments_success_button">Gunakan file lain</string>
@@ -154,7 +154,7 @@
     <string name="receive_lightning_warning_title_fee_expected">Biaya on-chain diperkirakan</string>
     <string name="receive_lightning_warning_hint_show_details">Ketuk untuk mengetahui selengkapnya</string>
 
-    <string name="receive_lightning_sheet_dismiss">Membubarkan</string>
+    <string name="receive_lightning_sheet_dismiss">Abaikan</string>
     <string name="receive_lightning_sheet_button_enable">Aktifkan Saluran otomatis</string>
     <string name="receive_lightning_sheet_button_configure">Konfigurasi batas biaya</string>
 
@@ -362,9 +362,9 @@
     <string name="liquiditypolicy_fees_base_below_estimation">Di bawah biaya yang diperkirakan. Beberapa pembayaran mungkin bakal ditolak.</string>
 
     <string name="liquiditypolicy_advanced_menu">Opsi lanjutan</string>
-    <string name="liquiditypolicy_advanced_disable">Manajemen saluran dinonaktifkan. Lu bisa aktifin di layar pengaturan manajemen Saluran.</string>
+    <string name="liquiditypolicy_advanced_disable">Manajemen saluran dinonaktifkan. Dapat diaktifkan melalui layar pengaturan manajemen Saluran.</string>
     <string name="liquiditypolicy_advanced_disclaimer_header">Perhatian!</string>
-    <string name="liquiditypolicy_advanced_disclaimer_message">Layar ini buat pengguna tingkat lanjut. Jangan ganti pengaturan ini kecuali lu paham fungsinya.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">Layar ini untuk pengguna tingkat lanjut. Jangan mengubah pengaturan ini kecuali anda memahami fungsinya.</string>
 
     <string name="liquiditypolicy_advanced_verifications_title">Verifikasi tambahan</string>
     <string name="liquiditypolicy_advanced_fees_prop_label">Pemeriksaan persentase</string>
@@ -376,15 +376,15 @@
     <string name="liquiditypolicy_request_button">Permintaan likuiditas masuk</string>
 
     <string name="liquiditypolicy_help">
-      Phoenix allows you to receive payments on Bitcoin\'s blockchain (L1) and Bitcoin\'s Lightning layer (L2).
+      Phoenix memungkinkan Anda untuk menerima pembayaran di blockchain Bitcoin (L1) dan layer Lightning Bitcoin (L2).
       \n\n
-      - the blockchain layer (L1) is slower, and generally much more expensive (requires miner fees)
+      - Layer blockchain (L1) lebih lambat dan biasanya jauh lebih mahal (memerlukan biaya penambang).
       \n
-      - the Lightning layer (L2) is much faster, and generally much cheaper (especially for smaller payments)
+      - Layer Lightning (L2) jauh lebih cepat dan biasanya jauh lebih murah (terutama untuk pembayaran bernilai kecil).
       \n\n
-      When you receive a payment on L1, Phoenix will automatically move the funds to L2 <b>IF</b> the miner fees adhere to your configured fee policy.
+      Saat Anda menerima pembayaran di L1, Phoenix akan secara otomatis memindahkan dananya ke L2 **JIKA** biaya penambang sesuai dengan kebijakan biaya (fee policy) yang Anda atur.
       \n\n
-      Payments you receive on L2 can be received instantly and for zero fees. However, occasionally an L1 operation is also required in order to manage the L2 payment channel. This can be done automatically <b>IF</b> the miner fees adhere to your configured fee policy.
+      Pembayaran yang Anda terima di L2 dapat masuk secara instan dan tanpa biaya. Namun, terkadang operasi L1 tetap diperlukan untuk mengelola saluran pembayaran L2. Hal ini dapat dilakukan secara otomatis **JIKA** biaya penambang sesuai dengan kebijakan biaya yang Anda atur.
     </string>
 
     <!-- settings: liquidity request -->
@@ -475,7 +475,7 @@
     <!-- Spend swap-in refund -->
 
     <string name="swapinrefund_title">Pengeluaran untuk penggantian yang dibatalkan</string>
-    <string name="swapinrefund_none_available_label">Belum ada pembatalan penggantian pemain.</string>
+    <string name="swapinrefund_none_available_label">Belum ada dana swap-in yang dibatalkan.</string>
     <string name="swapinrefund_available_label">Tersedia: <b>%1$s</b> (%2$s)</string>
     <string name="swapinrefund_instructions_1">Gunakan layar ini untuk membelanjakan deposit on-chain yang tidak sempat ditukarkan tepat waktu. Ini tidak memengaruhi saluran Lightning Anda.</string>
     <string name="swapinrefund_instructions_2">Pastikan alamat tujuan valid, dan gunakan tarif yang wajar.</string>
@@ -498,7 +498,7 @@
 
     <!-- experimental features -->
 
-    <string name="bip353_subtitle">Ini adalah alamat yang mudah dibaca manusia untuk permintaan pembayaran Bolt12 Anda.</string>
+    <string name="bip353_subtitle">Ini adalah alamat tetap yang mudah dibaca untuk permintaan pembayaran Bolt12 Anda.</string>
 		<string name="bip353_subtitle2">Ingin alamat yang lebih menarik? Gunakan layanan pihak ketiga, atau kelola sendiri alamat tersebut!</string>
 
 </resources>
