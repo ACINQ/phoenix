@@ -499,4 +499,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Ini adalah alamat yang mudah dibaca manusia untuk permintaan pembayaran Bolt12 Anda.</string>
-    <string name="bip353_subtitle2">Ingin alamat yang lebih menarik? Gunakan layanan pihak ketiga, atau kelola sendiri alamat tersebut!</string>
+		<string name="bip353_subtitle2">Ingin alamat yang lebih menarik? Gunakan layanan pihak ketiga, atau kelola sendiri alamat tersebut!</string>
+
+</resources>
