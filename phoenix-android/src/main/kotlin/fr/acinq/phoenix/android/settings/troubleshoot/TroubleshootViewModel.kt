@@ -124,11 +124,11 @@ class DiagnosticsViewModel(val application: PhoenixApplication, val business: Ph
             result.appendLine("device: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE})")
 
             result.appendLine(DiagnosticsHelper.SEPARATOR)
-            result.appendLine("fcm token: ${globalPrefs.getFcmToken.first()}")
-            result.appendLine("btc_unit: ${userPrefs.getBitcoinUnits.first()}")
-            result.appendLine("fiat_currency: ${userPrefs.getFiatCurrencies.first()}")
+            result.appendLine("fcm token: ${!globalPrefs.getFcmToken.first().isNullOrBlank()}")
+            result.appendLine("btc unit: ${userPrefs.getBitcoinUnits.first()}")
+            result.appendLine("fiat currency: ${userPrefs.getFiatCurrencies.first()}")
             result.appendLine("spending pin enabled: ${userPrefs.getSpendingPinEnabled.first()}")
-            result.appendLine("custom pin enabled: ${userPrefs.getLockPinEnabled.first()}")
+            result.appendLine("lock pin enabled: ${userPrefs.getLockPinEnabled.first()}")
             result.appendLine("biometric enabled: ${userPrefs.getLockBiometricsEnabled.first()}")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 result.appendLine("notification permission: ${ContextCompat.checkSelfPermission(application.applicationContext, 

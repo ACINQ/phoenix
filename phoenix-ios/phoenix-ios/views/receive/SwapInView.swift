@@ -100,8 +100,6 @@ struct SwapInView: View {
 			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			.padding(.bottom)
 			
-			migrationNotice()
-			
 			Spacer()
 			
 		} // </VStack>
@@ -319,24 +317,6 @@ struct SwapInView: View {
 			didTapEditButton()
 		}
 		.disabled(swapInAddress == nil)
-	}
-	
-	@ViewBuilder
-	func migrationNotice() -> some View {
-		
-		VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-			Label {
-				Text("Migration Notice")
-			} icon: {
-				Image(systemName: "info.circle").foregroundColor(.appAccent)
-			}
-			.font(.headline)
-			
-			Text("This is your new address. Do not reuse your old Bitcoin address from before migration.")
-				.multilineTextAlignment(.center)
-				.font(.callout)
-		}
-		.padding(.horizontal)
 	}
 	
 	// --------------------------------------------------

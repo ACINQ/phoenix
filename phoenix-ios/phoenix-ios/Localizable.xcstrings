@@ -12692,6 +12692,7 @@
       }
     },
     "Copy app diagnostics" : {
+      "extractionState" : "stale",
       "localizations" : {
         "cs" : {
           "stringUnit" : {
@@ -18362,6 +18363,9 @@
         }
       }
     },
+    "Export app diagnostics" : {
+
+    },
     "Export Payments" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -20788,6 +20792,7 @@
       }
     },
     "Here you can export the application logs, or share them." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20867,6 +20872,9 @@
           }
         }
       }
+    },
+    "Here you can shared the application logs and diagnostics for debugging purposes." : {
+
     },
     "hidden amount" : {
       "localizations" : {
@@ -27133,6 +27141,9 @@
         }
       }
     },
+    "Logs & Diagnostics" : {
+      "comment" : "Navigation bar title"
+    },
     "Long Description" : {
       "localizations" : {
         "ar" : {
@@ -28351,6 +28362,7 @@
       }
     },
     "Migration Notice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44596,6 +44608,7 @@
       }
     },
     "This is your new address. Do not reuse your old Bitcoin address from before migration." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

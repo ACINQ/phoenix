@@ -85,11 +85,10 @@ object DiagnosticsHelper {
         result.appendLine(SEPARATOR)
         result.appendLine("balance_ln: ${printAmount(balanceManager.balance.filterNotNull().first())}")
         result.appendLine("may do payments: ${peerManager.mayDoPayments.first()}")
-        result.appendLine("channels: ${channels.size} [")
+        result.appendLine("channels: [")
         channels.values.forEachIndexed { index, info ->
             if (index > 0) result.appendLine()
             result.appendLine("${TAB}channel id: ${info.channelId}")
-            result.appendLine("${TAB}is booting: ${info.isBooting}")
             result.appendLine("${TAB}state: ${info.stateName}")
             result.appendLine("${TAB}available for send: ${info.localBalance?.let { printAmount(it) }}")
             result.appendLine("${TAB}available for receive: ${info.availableForReceive?.let { printAmount(it) }}")
@@ -143,16 +142,6 @@ object DiagnosticsHelper {
         result.appendLine("${TAB}confirmed: (${printAmount(finalWallet.confirmed.balance)}) ${finalWallet.confirmed}")
         result.appendLine("]")
         result.appendLine("final wallet address: ${peerManager.getPeer().phoenixFinalWallet.finalAddress}")
-
-        // payments
-        result.appendLine(SEPARATOR)
-        val paymentsDb = business.databaseManager.paymentsDb()
-        val lastPayments = paymentsDb.listPaymentsAsFlow(15, 0).first()
-        result.appendLine("last 15 payments: [")
-        lastPayments.forEach { payment ->
-            result.appendLine("${TAB}${payment}")
-        }
-        result.appendLine("]")
 
         return result.toString()
     }

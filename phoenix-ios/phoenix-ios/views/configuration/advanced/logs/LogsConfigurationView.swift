@@ -26,13 +26,12 @@ struct LogsConfigurationView: View {
 	var body: some View {
 		
 		layers()
-			.navigationTitle(NSLocalizedString("Logs", comment: "Navigation bar title"))
+			.navigationTitle(NSLocalizedString("Logs & Diagnostics", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 	}
 	
 	@ViewBuilder
 	func layers() -> some View {
-		
 		ZStack {
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
@@ -47,7 +46,7 @@ struct LogsConfigurationView: View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			Text("Here you can export the application logs, or share them.")
+			Text("Here you can shared the application logs and diagnostics for debugging purposes.")
 				.padding()
 			
 			List {
@@ -67,16 +66,17 @@ struct LogsConfigurationView: View {
 					}
 				}
 				.disabled(isExporting)
-				
+
 				Button {
-					copyDiagnostics() // actually call diagnostics method
+					exportDiagnostics()
 				} label: {
 					Label {
-						Text("Copy app diagnostics")
+						Text("Export app diagnostics")
 					} icon: {
 						Image(systemName: "waveform.path.ecg.rectangle")
 					}
-				}
+				}.disabled(isExporting)
+
 			} // </List>
 			.listStyle(.insetGrouped)
 			.listBackgroundColor(.primaryBackground)
@@ -128,18 +128,69 @@ struct LogsConfigurationView: View {
 			await asyncExport_logFiles()
 		}
 	}
-	
-	private func copyDiagnostics() {
-		log.trace("copydiagnostics()")
 
-		Task { @MainActor [self] in
-			let data = try await DiagnosticsHelper.shared.getDiagnostics(business: Biz.business)
-			UIPasteboard.general.string = data
-			toast.pop(
-				NSLocalizedString("Copied to pasteboard!", comment: "Toast message"),
-				colorScheme: colorScheme.opposite,
-				style: .chrome
-			)
+	private  func exportDiagnostics() {
+		log.trace("exportDiagnostics()")
+		guard isExporting == false else {
+			return
+		}
+		isExporting = true
+		Task.detached {
+			do {
+				defer {
+					Task { @MainActor [self] in isExporting = false }
+				}
+
+				var result = try await DiagnosticsHelper.shared.getDiagnostics(business: Biz.business)
+
+				let systemVersion = await UIDevice.current.systemVersion
+				let model = await UIDevice.current.model
+				let deviceName = await hardwareModel()
+
+				result += "\n\(DiagnosticsHelper.shared.SEPARATOR)"
+				result += "\nliquidity policy: \(GroupPrefs.current.liquidityPolicy.toKotlin())"
+
+				result += "\n\(DiagnosticsHelper.shared.SEPARATOR)"
+				result += "\nbtc unit: \(GroupPrefs.current.bitcoinUnit)"
+				result += "\nfiat currency: \(GroupPrefs.current.fiatCurrency)"
+				result += "\nspending pin enabled: \(Keychain.current.enabledSecurity.hasSpendingPin())"
+				result += "\nlock pin enabled: \(Keychain.current.enabledSecurity.contains(.lockPin))"
+				result += "\nbiometrics enabled: \(Keychain.current.enabledSecurity.contains(.biometrics))"
+
+				result += "\n\(DiagnosticsHelper.shared.SEPARATOR)"
+				result += "\niOS version: \(systemVersion)"
+				result += "\ndevice: Apple \(model) (\(deviceName))"
+
+				let random = UUID().uuidString
+					.replacingOccurrences(of: "-", with: "")
+					.substring(location: 0, length: 8)
+	
+				let tempDir = FileManager.default.temporaryDirectory
+				let tempFilename = "\(random)-diagnostics.txt"
+				let tempFileUrl = tempDir.appendingPathComponent(tempFilename, isDirectory: false)
+
+				let writeOptions: Data.WritingOptions = .withoutOverwriting
+				try Data().write(to: tempFileUrl, options: writeOptions)
+				let fileHandle = try FileHandle(forWritingTo: tempFileUrl)
+
+				if let data = result.data(using: .utf8) {
+					try await fileHandle.asyncWrite(data: data)
+				}
+
+				await exportingFinished(tempFileUrl)
+			} catch {
+				log.error("Error exporting diagnostics: \(error)")
+				await exportingFailed()
+			}
+		}
+	}
+
+	func hardwareModel() -> String {
+		var systemInfo = utsname()
+		uname(&systemInfo)
+		return withUnsafeBytes(of: &systemInfo.machine) { bytes in
+			bytes.compactMap { $0 == 0 ? nil : Character(UnicodeScalar($0)) }
+				.map(String.init).joined()
 		}
 	}
 
@@ -212,46 +263,6 @@ struct LogsConfigurationView: View {
 		}
 	}
 
-/*	This doesn't work, because Apple broke OSLogStore on iOS:
- 	- You're unable to fetch log statements from previous app launches (of your own app)
-	- You're unable to fetch log statements from app extensions (part of your own app)
-	
-	This makes OSLogStore practically worthless for our purposes.
-	And we're forced to switch to another logging solution that actually works.
-	
-	nonisolated func asyncExport_osLogStore() async {
-		log.trace("asyncExport_osLogStore()")
-		
-		do {
-			let store = try OSLogStore(scope: .currentProcessIdentifier)
-			let position = store.position(timeIntervalSinceLatestBoot: 0)
-			let entries = try store.getEntries(at: position)
-				.compactMap { $0 as? OSLogEntryLog }
-				.filter { !$0.subsystem.hasPrefix("com.apple.") } // remove Apple spam (there's a LOT of it)
-				.map { "[\($0.date.formatted(.iso8601))] [\($0.subsystem)] [\($0.category)] \($0.composedMessage)" }
-			
-			log.debug("entries.count = \(entries.count)")
-			
-			let random = UUID().uuidString
-				.replacingOccurrences(of: "-", with: "")
-				.substring(location: 0, length: 8)
-			
-			let tempDir = FileManager.default.temporaryDirectory
-			let tempFilename = "\(random).log"
-			let tempFile = tempDir.appendingPathComponent(tempFilename, isDirectory: false)
-			
-			let entriesData = entries.joined(separator: "\n").data(using: .utf8)!
-			try entriesData.write(to: tempFile)
-			
-			await exportingFinished(tempFile)
-			
-		} catch {
-			log.error("Error exporting logs: \(error)")
-			await exportingFailed()
-		}
-	}
-*/
-	
 	@MainActor
 	private func exportingFailed() {
 		log.trace("exportingFailed()")
