@@ -44,8 +44,8 @@
     <string name="notif_rejected_payment_title">Pembayaran ditolak (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">Pengelolaan Saluran otomatis dinonaktifkan. Ketuk untuk detail.</string>
     <string name="notif_rejected_policy_disabled_timeout">Pengelolaan Saluran otomatis dinonaktifkan. Deposit ini akan kedaluwarsa dalam %1$s.</string>
-    <string name="notif_rejected_over_absolute">Biayanya adalah %1$s, tetapi batas biaya maksimu Anda adalah %2$s. Ketuk untuk detailnya.</string>
-		<string name="notif_rejected_over_absolute_timeout">Biaya sebesar %1$s, namun batas maksimal Anda %2$s. Deposit ini akan kedaluwarsa pada %3$s.</string>
+    <string name="notif_rejected_over_absolute">Biayanya adalah %1$s, tetapi batas biaya maksimum Anda adalah %2$s. Ketuk untuk detailnya.</string>
+		<string name="notif_rejected_over_absolute_timeout">Biaya sebesar %1$s, namun batas maksimum Anda %2$s. Deposit ini akan kedaluwarsa pada %3$s.</string>
     <string name="notif_rejected_over_relative">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Ketuk untuk detail selengkapnya.</string>
     <string name="notif_rejected_over_relative_timeout">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Deposit ini akan kedaluwarsa pada %3$s.</string>
     <string name="notif_rejected_amount_too_low">Jumlah pembayaran terlalu rendah.</string>
@@ -85,10 +85,10 @@
     <!-- home: swap help -->
 
     <string name="home_swapin_confirming_title">Mengkonfirmasi</string>
-    <string name="home_swapin_confirming_desc">Menunggu konfirmasi terlebih dahulu sebelum dapat diganti ke Lightning.</string>
+    <string name="home_swapin_confirming_desc">Menunggu konfirmasi terlebih dahulu sebelum dapat ditukar ke Lightning.</string>
 
     <string name="home_swapin_ready_title">Menunggu pertukaran</string>
-    <string name="home_swapin_ready_desc_auto">Akan ditukarkan ke Lightning ketika biaya penambangan di bawah 1%.</string>
+    <string name="home_swapin_ready_desc_auto">Akan ditukarkan ke Lightning ketika biaya penambangan di bawah %1$s.</string>
     <string name="home_swapin_ready_desc_disabled">Akan tetap berada di blockchain karena manajemen Saluran otomatis dinonaktifkan.</string>
     <string name="home_swapin_ready_desc_generic">Akan diimplementasikan ke Lightning jika kondisinya memungkinkan.</string>
     <string name="home_swapin_ready_expiring">Perhatian! Beberapa dana akan segera kedaluwarsa dan tidak lagi memenuhi syarat untuk pertukaran.</string>
@@ -103,7 +103,7 @@
     <string name="home_background_restriction_title">Pemrosesan latar belakang dibatasi</string>
     <string name="home_background_restriction_body_1">Phoenix mungkin tidak dapat menerima pembayaran saat berada di latar belakang, atau saat ditutup.</string>
     <string name="home_background_restriction_body_2">Hal ini terjadi karena:</string>
-    <string name="home_background_restriction_powersaver">Perangkat sedang dalam mode hemat aya</string>
+    <string name="home_background_restriction_powersaver">Perangkat sedang dalam mode hemat daya</string>
     <string name="home_background_restriction_fcm">Notifikasi FCM tidak tersedia</string>
     <string name="home_background_restriction_fcm_details">Jika Anda menggunakan GrapheneOS atau CalyxOS, instal Google Play Services untuk mendapatkan notifikasi FCM. Periksa FAQ untuk panduan lebih lanjut.</string>
 
@@ -118,7 +118,7 @@
     <string name="initwallet_create">Membuat dompet baru</string>
     <string name="initwallet_restore">Pulihkan dompet saya</string>
 
-    <string name="restore_disclaimer_message_1_title">Phoenix hanya ada di Lightning</string>
+    <string name="restore_disclaimer_message_1_title">Phoenix hanya menggunakan jaringan Lightning</string>
     <string name="restore_disclaimer_message_1_body">Phoenix hanya akan menampilkan dana yang telah dikelola oleh Phoenix. Dana yang terkait dengan seed yang dihasilkan oleh aplikasi lain tidak akan muncul di sini (ini termasuk dana on-chain).</string>
     <string name="restore_disclaimer_message_2_title">Hati-hati menggunakan seed yang sama secara paralel.</string>
     <string name="restore_disclaimer_message_2_body">Jangan gunakan seed yang sama secara bersamaan pada perangkat yang berbeda. Hal ini dapat menyebabkan konflik antara dua instance Phoenix, dan mengakibatkan Saluran Lightning ditutup.</string>
@@ -158,7 +158,7 @@
     <string name="receive_lightning_sheet_button_enable">Aktifkan Saluran otomatis</string>
     <string name="receive_lightning_sheet_button_configure">Konfigurasi batas biaya</string>
 
-    <string name="receive_lightning_warning_message_fee_expected">Kemungkinan besar Anda akan memerlukan operasi on-chain agar dapat menerima jumlah tersebut.\n\nBiaya tersebut diperkirakan sekitar %1$.</string>
+    <string name="receive_lightning_warning_message_fee_expected">Kemungkinan besar Anda akan memerlukan operasi on-chain agar dapat menerima jumlah tersebut.\n\nBiaya tersebut diperkirakan sekitar %1$s.</string>
     <string name="receive_lightning_warning_message_fee_expected_unknown">Kemungkinan besar Anda akan memerlukan operasi on-chain agar dapat menerima jumlah ini.</string>
 
     <string name="receive_lightning_warning_message_above_limit">Biaya sebesar %1$s diharapkan untuk menerima jumlah ini, dan biaya tersebut melebihi batas Anda sebesar %2$s.\n\nTingkatkan batas ini di pengaturan manajemen Saluran.</string>
@@ -482,7 +482,7 @@
     <string name="swapinrefund_estimate_button">Perkiraan biaya</string>
     <string name="swapinrefund_estimating">Memperkirakan biaya…</string>
     <string name="swapinrefund_send_button">Menyiarkan</string>
-    <string name="swapinrefund_sending">Menyiarkan...</string>
+    <string name="swapinrefund_sending">Menyiarkan…</string>
     <string name="swapinrefund_failed">Kesalahan transaksi.</string>
     <string name="swapinrefund_failed_address">Alamat ini tidak valid.</string>
     <string name="swapinrefund_failed_cannot_create">Transaksi pengembalian dana tidak dapat dibuat.</string>
