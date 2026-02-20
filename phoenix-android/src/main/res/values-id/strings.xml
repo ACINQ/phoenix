@@ -631,7 +631,7 @@
 
     <string name="lnurl_withdraw_confirm_button">Menukarkan</string>
     <string name="lnurl_withdraw_wait">Meminta dana…</string>
-    <string name="lnurl_withdraw_amount_below_min">Jumlahnya minimal harus %1$.</string>
+    <string name="lnurl_withdraw_amount_below_min">Jumlahnya minimal harus %1$s.</string>
     <string name="lnurl_withdraw_amount_above_max">Jumlah tidak boleh melebihi %1$s.</string>
     <string name="lnurl_withdraw_error_header">Penarikan dana gagal:</string>
 
@@ -690,7 +690,7 @@
     <string name="electrum_about">Untuk mengamankan saluran pembayaran Anda, Phoenix memantau blockchain Bitcoin melalui server Electrum.\n\nSecara default, server acak digunakan. Anda juga dapat mengkonfigurasi Phoenix untuk hanya terhubung ke server Anda sendiri.</string>
     <string name="electrum_block_height_label">Tinggi blok</string>
     <string name="electrum_connection_dialog_tls_port">Gunakan port TLS (default 50002).</string>
-    <string name="electrum_connection_dialog_onion_port">bukan yang TLS.</string>
+		<string name="electrum_connection_dialog_onion_port">Untuk layanan onion, gunakan port TCP biasa, bukan yang TLS.</string>
     <string name="electrum_connection_dialog_tor_enabled_warning">Karena Anda telah mengaktifkan Tor, Anda harus menggunakan alamat onion untuk server ini.</string>
     <string name="electrum_connection_dialog_tor_enabled_ignore_box">Tidak, saya tidak ingin menggunakan alamat onion.</string>
 
@@ -701,7 +701,7 @@
     <string name="electrum_connection_connected">Terhubung ke %1$s</string>
 
     <string name="electrum_description_custom">Anda menggunakan server khusus</string>
-    <string name="electrum_description_bad_certificate">Koneksi ditolak.</string>
+    <string name="electrum_description_bad_certificate">Server ini memberikan sertifikat yang tidak dikenal. Koneksi ditolak.</string>
     <string name="electrum_description_not_onion">Tor diaktifkan. Server ini harus menggunakan alamat onion.</string>
 
     <string name="electrum_dialog_checkbox">Gunakan server khusus</string>
@@ -818,7 +818,7 @@
     <string name="payments_export_csv_invalid_timestamps">Silakan pilih tanggal mulai/akhir yang valid</string>
     <string name="payments_export_csv_in_progress">Mengekspor pembayaran…</string>
     <string name="payments_export_csv_copy_button">Salin data ke papan klip…</string>
-    <string name="payments_export_csv_share_subject">Phoenix - pembayaran mulai dari 1%1$s hingga %2$s</string>
+    <string name="payments_export_csv_share_subject">Phoenix - pembayaran mulai dari %1$s hingga %2$s</string>
     <string name="payments_export_csv_share_title">Bagikan pembayaran Phoenix…</string>
     <string name="payments_export_csv_share_button">Bagikan berkas</string>
     <string name="payments_export_csv_error">Ekspor gagal</string>
