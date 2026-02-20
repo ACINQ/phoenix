@@ -203,8 +203,8 @@
     <string name="mutualclose_confirm_fee_unknown">Biaya tidak dapat diperkirakan.</string>
 
     <string name="forceclose_title">Paksa tutup Saluran</string>
-    <string name="forceclose_instructions">Layar ini memungkinkan Anda menutup Saluran Anda secara sepihak.\n\nIni bukan tombol ajaib yang bisa “memperbaiki segalanya”: fitur ini ada sebagai langkah pengamanan dan <b>hanya boleh digunakan dalam situasi ekstrem</b>. Misalnya, jika rekan Anda (ACINQ) hilang permanen, sehingga mencegah Anda menggunakan dana Anda. Dalam semua kasus lain, <b>jika Anda mengalami masalah dengan Phoenix, Anda sebaiknya menghubungi dukungan</b>.\n\nMenutup Saluran secara paksa akan menghabiskan biaya (untuk menutupi biaya on-chain) dan akan membuat dana Anda terkunci selama beberapa hari.\n\n<b>Jangan hapus aplikasi sampai Saluran Anda benar-benar tertutup, atau Anda akan kehilangan dana.</b>\n\n<b>Jangan gunakan fitur ini jika Anda tidak sepenuhnya memahami apa yang dilakukannya.</b></string>
-    <string name="forceclose_address_label">Dana akhirnya akan dikirim ke dompet akhir:</string>
+		<string name="forceclose_instructions">Layar ini memungkinkan Anda menutup Saluran secara sepihak.\n\nIni bukan tombol ajaib yang bisa "memperbaiki segalanya": fitur ini ada sebagai langkah pengamanan dan <b>hanya boleh digunakan dalam situasi ekstrem</b>. Misalnya, jika rekan Anda (ACINQ) hilang permanen sehingga Anda tidak dapat menggunakan dana Anda. Dalam semua kasus lain, <b>jika Anda mengalami masalah dengan Phoenix, hubungi dukungan</b>.\n\nMenutup Saluran secara paksa akan menghabiskan biaya (untuk biaya on-chain) dan akan membuat dana Anda terkunci selama beberapa hari.\n\n<b>Jangan hapus aplikasi sampai Saluran Anda benar-benar tertutup, atau Anda akan kehilangan dana.</b>\n\n<b>Jangan gunakan fitur ini jika Anda tidak sepenuhnya memahami apa yang dilakukannya.</b></string>
+		<string name="forceclose_address_label">Dana akhirnya akan dikirim ke dompet akhir:</string>
 
     <string name="forceclose_confirm_title">Konfirmasi penutupan paksa</string>
     <string name="forceclose_confirm_details">Semua dana akan dikirim ke dompet akhir Anda, setelah jeda waktu yang cukup lama.</string>
@@ -359,7 +359,7 @@
     <string name="liquiditypolicy_fees_base_label">Jumlah biaya maksimal</string>
     <string name="liquiditypolicy_fees_base_help">Pembayaran dengan biaya yang melebihi nilai tersebut akan ditolak.</string>
     <string name="liquiditypolicy_fees_base_too_low">Nilai ini terlalu rendah.</string>
-    <string name="liquiditypolicy_fees_base_below_estimation">Di bawah biaya yang diperkirakan. Beberapa pembayaran mungkin bakal ditolak.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Di bawah biaya yang diperkirakan. Beberapa pembayaran mungkin akan ditolak.</string>
 
     <string name="liquiditypolicy_advanced_menu">Opsi lanjutan</string>
     <string name="liquiditypolicy_advanced_disable">Manajemen saluran dinonaktifkan. Dapat diaktifkan melalui layar pengaturan manajemen Saluran.</string>
@@ -372,7 +372,7 @@
     <string name="liquiditypolicy_advanced_overrides_title">Penggantian kebijakan</string>
     <string name="liquiditypolicy_advanced_pay_to_open_label">Lewati pengecekan biaya absolut untuk Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Saat diaktifkan, pembayaran Lightning yang masuk akan mengabaikan batas biaya maksimal absolut. Hanya pemeriksaan persentase yang akan berlaku.\n\nPerhatian: Jika biaya transaksi (feerate) mempool Bitcoin sedang tinggi, pembayaran LN masuk yang memerlukan operasi on-chain bisa jadi mahal.</string>
-    <string name="liquiditypolicy_save_button">Kebijakan penghematan</string>
+    <string name="liquiditypolicy_save_button">Simpan kebijakan</string>
     <string name="liquiditypolicy_request_button">Permintaan likuiditas masuk</string>
 
     <string name="liquiditypolicy_help">
@@ -382,9 +382,9 @@
       \n
       - Layer Lightning (L2) jauh lebih cepat dan biasanya jauh lebih murah (terutama untuk pembayaran bernilai kecil).
       \n\n
-      Saat Anda menerima pembayaran di L1, Phoenix akan secara otomatis memindahkan dananya ke L2 **JIKA** biaya penambang sesuai dengan kebijakan biaya (fee policy) yang Anda atur.
+			Saat Anda menerima pembayaran di L1, Phoenix akan secara otomatis memindahkan dananya ke L2 <b>JIKA</b> biaya penambang sesuai dengan kebijakan biaya (fee policy) yang Anda atur.
       \n\n
-      Pembayaran yang Anda terima di L2 dapat masuk secara instan dan tanpa biaya. Namun, terkadang operasi L1 tetap diperlukan untuk mengelola saluran pembayaran L2. Hal ini dapat dilakukan secara otomatis **JIKA** biaya penambang sesuai dengan kebijakan biaya yang Anda atur.
+			Pembayaran yang Anda terima di L2 dapat masuk secara instan dan tanpa biaya. Namun, terkadang operasi L1 tetap diperlukan untuk mengelola saluran pembayaran L2. Hal ini dapat dilakukan secara otomatis <b>JIKA</b> biaya penambang sesuai dengan kebijakan biaya yang Anda atur.
     </string>
 
     <!-- settings: liquidity request -->
@@ -392,7 +392,7 @@
     <string name="liquidityads_no_channels_header">Belum ada saluran!</string>
     <string name="liquidityads_no_channels_details">Anda perlu memiliki dana di dompet terlebih dahulu untuk menggunakan fitur ini.</string>
     <string name="liquidityads_header">Rencanakan likuiditas Anda jauh-jauh hari.</string>
-    <string name="liquidityads_instructions">Likuiditas masuk (inbound liquidity) bikin lu bisa ngehindarin biaya transaksi on-chain buat pembayaran Lightning yang bakal diterima nanti.\n\nDengan minta lebih banyak likuiditas sekarang, lu bisa hemat biaya nantinya.</string>
+    <string name="liquidityads_instructions">Likuiditas masuk memungkinkan Anda menghindari biaya transaksi on-chain untuk pembayaran Lightning yang akan diterima di masa mendatang.\n\nDengan meminta lebih banyak likuiditas sekarang, Anda dapat menghemat biaya nantinya.</string>
     <string name="liquidityads_faq_link">Info lebih lanjut</string>
     <string name="liquidityads_current_liquidity">Likuiditas saat ini</string>
 
@@ -410,8 +410,8 @@
     <string name="liquidityads_over_balance">Total biaya melebihi saldo Anda.</string>
 
     <string name="liquidityads_review_button">Tinjauan</string>
-    <string name="liquidityads_disclaimer_body1">Lu lagi minta jumlah likuiditas <b>awal</b>. Likuiditas itu nggak konstan: seiring lu nerima dana lewat Lightning, likuiditasnya bakal terpakai dan jadi saldo lu.</string>
-    <string name="liquidityads_disclaimer_body2">Setelah satu tahun, sisa likuiditas yang nggak terpakai bakal ditarik balik sama layanan.</string>
+    <string name="liquidityads_disclaimer_body1">Anda sedang meminta jumlah likuiditas <b>awal</b>. Likuiditas tidak bersifat konstan: seiring Anda menerima dana melalui Lightning, likuiditas akan terpakai dan menjadi saldo Anda.</string>
+    <string name="liquidityads_disclaimer_body2">Setelah satu tahun, sisa likuiditas yang tidak terpakai akan diambil kembali oleh layanan.</string>
 
     <string name="liquidityads_request_button">Menerima</string>
     <string name="liquidityads_requesting_spinner">Memproses sambungan...</string>
@@ -435,14 +435,14 @@
 
     <!-- Lightning payment errors -->
 
-    <string name="outgoing_failuremessage_channel_closing">Saluran komunikasi sedang ditutup.</string>
+    <string name="outgoing_failuremessage_channel_closing">Saluran sedang ditutup.</string>
     <string name="outgoing_failuremessage_channel_splicing">Saluran sedang memproses sambungan. Coba lagi nanti.</string>
     <string name="outgoing_failuremessage_not_enough_fee">Biaya yang dibayarkan tidak mencukupi.</string>
     <string name="outgoing_failuremessage_not_enough_balance">Pembayaran ini melebihi saldo Anda.</string>
     <string name="outgoing_failuremessage_too_big">Jumlah pembayarannya terlalu besar - coba bagi menjadi beberapa bagian.</string>
     <string name="outgoing_failuremessage_too_small">Jumlah pembayaran terlalu kecil.</string>
     <string name="outgoing_failuremessage_expiry_too_big">Jangka waktu pembayaran ini masih terlalu jauh di masa depan.</string>
-    <string name="outgoing_failuremessage_rejected_by_recipient">Faktur ini mungkin sudah dibayar.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Pembayaran ditolak oleh penerima. Faktur ini mungkin sudah pernah dibayar sebelumnya.</string>
     <string name="outgoing_failuremessage_recipient_offline">Penerima sedang offline.</string>
     <string name="outgoing_failuremessage_not_enough_liquidity">Pembayaran tidak dapat diteruskan ke penerima (kemungkinan likuiditas masuk tidak mencukupi).</string>
     <string name="outgoing_failuremessage_temporary_failure">Terjadi kesalahan pada sebuah node dalam rute pembayaran. Pembayaran mungkin berhasil jika Anda mencoba lagi.</string>
@@ -461,7 +461,7 @@
 
     <!-- spliceout: low feerate disclaimer -->
 
-    <string name="spliceout_low_feerate_dialog_title">Dompet digital diaktifkan ulang saat pembayaran sedang diproses.</string>
+    <string name="spliceout_low_feerate_dialog_title">Feerate terlalu rendah!</string>
     <string name="spliceout_low_feerate_dialog_body1">Transaksi dengan biaya transaksi yang tidak mencukupi dapat tertunda selama berhari-hari atau berminggu-minggu tanpa konfirmasi.</string>
     <string name="spliceout_low_feerate_dialog_body2">Memilih tarif biaya adalah tanggung jawab Anda. Setelah dikirim, transaksi ini tidak dapat dibatalkan, hanya dapat dipercepat dengan biaya yang lebih tinggi.</string>
     <string name="spliceout_low_feerate_dialog_body3">Apakah Anda yakin ingin melanjutkan?</string>
