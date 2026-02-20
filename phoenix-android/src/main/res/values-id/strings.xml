@@ -312,12 +312,6 @@
     <string name="spendchanneladdress_title">Alamat saluran pengeluaran</string>
     <string name="spendchanneladdress_instructions">Layar ini adalah alat debugging yang membantu memulihkan dana yang secara tidak sengaja dikirim ke titik keluar saluran.</string>
     <string name="spendchanneladdress_amount">Jumlah</string>
-    <string name="spendchanneladdress_tx_index">Index Tx</string>
-    <string name="spendchanneladdress_channel_id">ID saluran</string>
-    <string name="spendchanneladdress_channel_data">Data saluran mentah</string>
-    <string name="spendchanneladdress_remote_funding_pubkey">Kunci publik pendanaan jarak jauh</string>
-    <string name="spendchanneladdress_unsigned_tx">tx belum sah</string>
-    <string name="spendchanneladdress_remote_nonce">Nonce jarak jauh</string>
     <string name="spendchanneladdress_sign_button">Tanda tangan</string>
     <string name="spendchanneladdress_signing">Menandatangani</string>
 
@@ -468,8 +462,6 @@
     <string name="paymentdetails_bitcoin_address_label">Alamat Bitcoin</string>
 
     <string name="paymentdetails_splice_out_channel_label">Saluran yang disambung</string>
-    <string name="paymentdetails_inputs_label">Masukan lokal</string>
-    <string name="paymentdetails_inputs_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Likuiditas yang diminta</string>
 

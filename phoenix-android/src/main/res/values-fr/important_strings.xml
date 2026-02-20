@@ -115,7 +115,7 @@
     <string name="initwallet_restore">Restaurer mon wallet</string>
 
     <string name="restore_disclaimer_message_1_title">Phoenix est uniquement sur Lightning</string>
-    <string name="restore_disclaimer_message_1_body">Phoenix ne pourra afficher que les fonds qui ont déjà gérés par Phoenix. Les fonds attachés à une clé générée par une autre application n\'apparaîtront pas ici (ceci inclut les fonds on-chain).</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix ne pourra afficher que les fonds qui ont déjà été gérés par Phoenix. Les fonds attachés à une clé générée par une autre application n\'apparaîtront pas ici (ceci inclut les fonds on-chain).</string>
     <string name="restore_disclaimer_message_2_title">Utilisation de la même clé en parallèle</string>
     <string name="restore_disclaimer_message_2_body">N\'utilisez pas la même clé simultanément sur différents appareils. Ceci peut causer des conflits entre les deux instances de Phoenix, et entraîner la fermeture des canaux Lightning.</string>
     <string name="utils_ack">Je comprends.</string>
@@ -207,7 +207,7 @@
 
     <string name="forceclose_confirm_title">Confirmer la fermeture forcée</string>
     <string name="forceclose_confirm_details">Tous les fonds seront envoyés vers le wallet final, après expiration d\'un délai.</string>
-    <string name="forceclose_button">Forcer la fermeture</string>
+    <string name="forceclose_button">Forcer la fermeture de tous mes canaux</string>
 
     <!-- in-app notifications -->
 
@@ -221,7 +221,7 @@
     <string name="inappnotif_swapin_timeout_message">Un dépôt va bientôt expirer.</string>
     <string name="inappnotif_swapin_timeout_action">Voir les détails</string>
 
-    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est éteinte. Dernièrement, elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android n\'applique pas de restrictions à Phoenix, et que l\'application puisse se connecter à Electrum.</string>
+    <string name="inappnotif_watchtower_late_message">Phoenix vérifie périodiquement la blockchain lorsque l\'application est en arrière-plan. Dernièrement, elle n\'a pas pu le faire.\n\nAssurez vous qu\'Android n\'applique pas de restrictions à Phoenix, et que l\'application puisse se connecter à Electrum.</string>
     <string name="inappnotif_watchtower_late_action">Fermer</string>
 
     <string name="inappnotif_upgrade_message">Mise à jour disponible</string>
