@@ -12691,6 +12691,41 @@
         }
       }
     },
+    "Copy app diagnostics" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírování diagnostiky aplikace"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Diagnose kopieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar diagnóstico de la aplicación"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar diagnóstico de la aplicación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier les diagnostics de l'app"
+          }
+        }
+      }
+    },
     "Copy certificate" : {
       "localizations" : {
         "ar" : {
@@ -18328,6 +18363,9 @@
         }
       }
     },
+    "Export app diagnostics" : {
+
+    },
     "Export Payments" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -20754,6 +20792,7 @@
       }
     },
     "Here you can export the application logs, or share them." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20833,6 +20872,9 @@
           }
         }
       }
+    },
+    "Here you can shared the application logs and diagnostics for debugging purposes." : {
+
     },
     "hidden amount" : {
       "localizations" : {
@@ -27099,6 +27141,9 @@
         }
       }
     },
+    "Logs & Diagnostics" : {
+      "comment" : "Navigation bar title"
+    },
     "Long Description" : {
       "localizations" : {
         "ar" : {
@@ -28317,6 +28362,7 @@
       }
     },
     "Migration Notice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44562,6 +44608,7 @@
       }
     },
     "This is your new address. Do not reuse your old Bitcoin address from before migration." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

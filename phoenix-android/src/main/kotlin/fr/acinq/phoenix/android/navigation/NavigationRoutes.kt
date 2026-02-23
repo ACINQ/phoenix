@@ -50,7 +50,7 @@ sealed class Screen(val route: String) {
         data object About : Screen("settings/about")
         data object AppAccess : Screen("settings/appaccess")
         data object PaymentSettings : Screen("settings/paymentsettings")
-        data object Logs : Screen("settings/logs")
+        data object Troubleshooting : Screen("settings/troubleshooting")
         data object WalletInfo : Screen("settings/walletinfo") {
             data object SwapInWallet: Screen("settings/walletinfo/swapin")
             data object SwapInAddresses: Screen("settings/walletinfo/swapinaddresses")

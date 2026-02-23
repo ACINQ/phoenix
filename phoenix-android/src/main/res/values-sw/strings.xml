@@ -289,14 +289,15 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Makala za Programu</string>
-    <string name="logs_exporting">Inaongeza makala…</string>
-    <string name="logs_failed">Hitilafu: makala haya hayawezi kupakiwa</string>
-    <string name="logs_view_button">Tazama makala…</string>
-    <string name="logs_view_with">Tazama makala na…</string>
-    <string name="logs_share_button">Shiriki makala…</string>
-    <string name="logs_share_subject">Makala za Phoenix App</string>
-    <string name="logs_share_title">Shiriki makala za Phoenix…</string>
+    <string name="troubleshooting_title">Utambuzi na Kumbukumbu</string>
+    <string name="troubleshooting_diagnostics_copy_button">Nakili utambuzi wa programu</string>
+    <string name="troubleshooting_logs_exporting">Inaongeza makala…</string>
+    <string name="troubleshooting_logs_failed">Hitilafu: makala haya hayawezi kupakiwa</string>
+    <string name="troubleshooting_logs_view_button">Tazama makala…</string>
+    <string name="troubleshooting_logs_view_with">Tazama makala na…</string>
+    <string name="troubleshooting_logs_share_button">Shiriki makala…</string>
+    <string name="troubleshooting_logs_share_subject">Makala za Phoenix App</string>
+    <string name="troubleshooting_logs_share_title">Shiriki makala za Phoenix…</string>
 
     <!-- payment details -->
 
