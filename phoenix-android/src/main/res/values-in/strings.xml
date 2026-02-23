@@ -368,14 +368,14 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Log aplikasi</string>
-    <string name="logs_exporting">Mengekspor log…</string>
-    <string name="logs_failed">Kesalahan: log tidak dapat diekspor</string>
-    <string name="logs_view_button">Lihat log…</string>
-    <string name="logs_view_with">Lihat log dengan…</string>
-    <string name="logs_share_button">Bagikan log…</string>
-    <string name="logs_share_subject">Log Aplikasi Phoenix</string>
-    <string name="logs_share_title">Bagikan log Phoenix…</string>
+    <string name="troubleshooting_title">Log aplikasi</string>
+    <string name="troubleshooting_logs_exporting">Mengekspor log…</string>
+    <string name="troubleshooting_logs_failed">Kesalahan: log tidak dapat diekspor</string>
+    <string name="troubleshooting_logs_view_button">Lihat log…</string>
+    <string name="troubleshooting_logs_view_with">Lihat log dengan…</string>
+    <string name="troubleshooting_logs_share_button">Bagikan log…</string>
+    <string name="troubleshooting_logs_share_subject">Log Aplikasi Phoenix</string>
+    <string name="troubleshooting_logs_share_title">Bagikan log Phoenix…</string>
 
     <!-- payment details -->
 
