@@ -1,0 +1,1025 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+	<string name="app_name">Phoenix Testnet</string>
+
+    <!-- system notification channels -->
+
+    <string name="notification_channels_watcher_title">Pengamat saluran</string>
+    <string name="notification_channels_watcher_desc">Muncul saat Anda perlu memulai Phoenix.</string>
+
+    <string name="notification_pending_settlement_title">Penyelesaian pembayaran</string>
+    <string name="notification_pending_settlement_desc">Memberi tahu Anda kapan Phoenix perlu dijalankan untuk menyelesaikan pembayaran yang tertunda.</string>
+
+    <string name="notification_missed_payment_title">Pembayaran ditolak</string>
+    <string name="notification_missed_payment_desc">Muncul ketika Phoenix tidak dapat menerima pembayaran karena masalah likuiditas.</string>
+
+    <string name="notification_received_payment_title">Pembayaran diterima</string>
+    <string name="notification_received_payment_desc">Muncul saat Anda menerima pembayaran ketika aplikasi berada di latar belakang.</string>
+
+    <string name="notification_headless_title">Berjalan di latar belakang</string>
+    <string name="notification_headless_desc">Memberi tahu Anda kapan Phoenix berjalan di latar belakang.</string>
+
+    <string name="notification_swap_timeout_title">Batas waktu pertukaran</string>
+    <string name="notification_swap_timeout_desc">Memberi tahu Anda kapan proses swap akan habis waktu (timeout).</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="autocreate_generating">Membuat dompet Anda…</string>
+    <string name="autocreate_error">Pembuatan dompet gagal</string>
+    <string name="autocreate_error_already_exists">Benih ini sudah diimpor</string>
+    <string name="autocreate_error_cannot_load_existing">Saat ini, data di dompet tidak dapat ditulis. Coba lagi nanti.</string>
+
+    <string name="restore_title">Pulihkan dompet saya</string>
+    <string name="restore_disclaimer_next">Selanjutnya</string>
+    <string name="restore_in_progress">Mengembalikan isi dompet Anda…</string>
+    <string name="initwallet_electrum_option">Gunakan server Electrum kustom</string>
+
+    <!-- utils: placeholders -->
+
+    <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
+    <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
+    <string name="lipsum_long" translatable="false">
+    Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
+    \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
+    \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
+    \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
+    </string>
+
+    <!-- Lock prompt -->
+
+    <string name="lockprompt_title">Buka kunci untuk melanjutkan</string>
+    <string name="lockprompt_pin_button">Kode PIN</string>
+    <string name="lockprompt_biometrics_button">Kunci sistem</string>
+
+    <!-- Startup -->
+
+    <string name="startup_init">Menginisialisasi…</string>
+    <string name="startup_preparing">Menyiapkan dompet…</string>
+    <string name="startup_loading_seed">Mendekripsi…</string>
+		<string name="startup_starting">Memulai dompet…</string>
+    <string name="startup_started">Membuka dompet…</string>
+    <string name="startup_selector_title">Pilih dompet</string>
+
+    <string name="startup_error_start_business">Dompet tidak dapat diaktifkan</string>
+    <string name="startup_error_generic">Tidak dapat membaca data dompet.</string>
+    <string name="startup_error_try_again">Coba lagi</string>
+    <string name="startup_error_serialisation">Serialisasi berkas yang tidak ditangani</string>
+    <string name="startup_error_decryption_general">Dekripsi gagal:\n%1$s</string>
+    <string name="startup_error_decryption_keystore" translatable="false">Kegagalan keystore Android:\n%1$s</string>
+    <string name="startup_error_recovery_button">Pemulihan manual</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">Pemulihan dompet</string>
+    <string name="startup_recovery_instructions">Layar ini memungkinkan Anda memulihkan satu dompet secara manual dengan memasukkan frasa pemulihan 12 kata.\n\nKata-kata harus dimasukkan dalam urutan yang benar, dan dipisahkan dengan satu spasi.</string>
+    <string name="startup_recovery_input_label">Masukkan kata #%1$d</string>
+    <string name="startup_recovery_input_label_error">Tidak lebih dari 12 kata!</string>
+    <string name="startup_recovery_invalid">Benih ini tidak valid</string>
+
+    <string name="startup_recovery_import_button">Benih impor</string>
+    <string name="startup_recovery_reset_button">Coba lagi</string>
+    <string name="startup_recovery_checking">Memeriksa benih…</string>
+
+    <string name="startup_recovery_error_default">Terjadi kesalahan.</string>
+    <string name="startup_recovery_error_incorrect_seed">Seed ini tidak cocok dengan data dompet yang sudah ada.</string>
+    <string name="startup_recovery_error_keystore_error" translatable="false">Operasi penyimpanan kunci gagal dilakukan.</string>
+    <string name="startup_recovery_success_match">Memulihkan dompet…</string>
+
+    <!-- Payment line -->
+
+    <string name="paymentline_prefix_sent">-</string>
+    <string name="paymentline_prefix_received">+</string>
+    <string name="paymentline_desc_pending_onchain">Menunggu konfirmasi</string>
+    <string name="paymentline_desc_pending_offchain">Pembayaran tertunda</string>
+    <string name="paymentline_desc_success_onchain">Pembayaran dikonfirmasi</string>
+    <string name="paymentline_desc_success_offchain">Pembayaran selesai</string>
+    <string name="paymentline_desc_failed">Pembayaran gagal</string>
+
+    <!-- Receive screen -->
+
+    <string name="receive_help_qr">Kode QR faktur/alamat</string>
+
+    <string name="receive_bitcoin_address_label">Alamat</string>
+    <string name="receive_bitcoin_generating">Menyinkronkan Alamat…</string>
+    <string name="receive_bitcoin_share_title">Alamat Bitcoin</string>
+    <string name="receive_bitcoin_share_subject">Bagikan alamat Bitcoin ini dengan…</string>
+
+    <string name="receive_lightning_generating">Menghasilkan…</string>
+    <string name="receive_lightning_switch_bolt11">Sekali pakai</string>
+    <string name="receive_lightning_switch_bolt11_desc">Bolt11</string>
+    <string name="receive_lightning_switch_bolt12">Gunakan berulang</string>
+    <string name="receive_lightning_switch_bolt12_desc">Bolt12</string>
+    <string name="receive_lightning_amount_label">Jumlah</string>
+    <string name="receive_lightning_desc_label">Deskripsi</string>
+    <string name="receive_lightning_error">Tidak dapat membuat faktur</string>
+    <string name="receive_lightning_share_subject">Pembayaran Lightning</string>
+    <string name="receive_lightning_share_title">Bagikan kode pembayaran Lightning ini dengan…</string>
+
+    <string name="receive_label_bitcoin">Alamat Bitcoin</string>
+    <string name="receive_label_bitcoin_help">Kode QR ini adalah alamat Bitcoin klasik.\n\nKode ini dapat dibaca oleh hampir semua layanan/dompet Bitcoin, tetapi pembayaran akan lebih lambat sampai.</string>
+    <string name="receive_label_bip353">Alamat Lightning</string>
+    <string name="receive_label_lightning">Lightning</string>
+    <string name="receive_label_lightning_help">Kode QR ini adalah faktur Lightning.\n\nPembayaran Lightning sangat cepat dan biasanya lebih murah, tetapi beberapa dompet dan layanan mungkin belum mendukungnya.\n\nKalau begitu, geser ke kiri untuk mendapatkan alamat Bitcoin biasa.</string>
+    <string name="receive_label_bolt11">Lightning Bolt11</string>
+    <string name="receive_label_bolt12">Lightning Bolt12</string>
+    <string name="receive_label_bip21">Bitcoin URI</string>
+
+    <string name="receive_bip353_title">Apa ini?</string>
+    <string name="receive_bip353_info">Alamat Lightning ini menggunakan standar Bip353 modern yang berfungsi dengan permintaan pembayaran Bolt12.\n\nMetode ini lebih menjaga privasi dibandingkan alamat Lightning berbasis LNURL, dan bahkan dapat di-hosting secara mandiri.\n\nNamun, ini adalah teknologi yang sangat mutakhir; beberapa dompet atau layanan belum memahaminya dan tidak akan dapat melakukan pembayaran kepada Anda.</string>
+    <string name="receive_bip353_link">Pelajari selengkapnya</string>
+
+    <string name="receive_lightning_edit_title_bolt11">Sesuaikan faktur Bolt11 ini</string>
+    <string name="receive_lightning_edit_title_bolt12">Sesuaikan faktur Bolt12 ini</string>
+    <string name="receive_lightning_edit_amount_label">Jumlah (opsional)</string>
+    <string name="receive_lightning_edit_amount_placeholder">Jumlah yang akan diterima</string>
+    <string name="receive_lightning_edit_desc_label">Deskripsi (opsional)</string>
+    <string name="receive_lightning_edit_desc_placeholder">Masukkan deskripsi untuk faktur ini</string>
+    <string name="receive_lightning_edit_generate_button">Menghasilkan</string>
+
+    <!-- send -->
+
+    <string name="send_balance_prefix">Saldo</string>
+    <string name="send_error_amount_too_large">Jumlah terlalu besar.</string>
+    <string name="send_error_amount_negative">Jumlah tidak dapat bernilai negatif.</string>
+    <string name="send_error_amount_invalid">Ini bukan jumlah yang valid.</string>
+    <string name="send_error_amount_over_balance">Jumlah ini melebihi saldo Anda.</string>
+    <string name="send_error_amount_overpaying">Tidak dapat membayar lebih dari %1$s.</string>
+    <string name="send_error_amount_below_requested">Jumlah ini lebih rendah dari jumlah yang diminta sebesar %1$s.</string>
+    <string name="send_destination_label">Kirim ke</string>
+    <string name="send_description_label">Deskripsi</string>
+    <string name="send_trampoline_fee_label">Biaya</string>
+    <string name="send_trampoline_fee_no_amount">N/A</string>
+    <string name="send_trampoline_fee_loading">Memuat biaya…</string>
+    <string name="send_connecting_button">Menunggu saluran…</string>
+    <string name="send_pay_button">Bayar</string>
+    <string name="send_confirm_pay_button">Konfirmasi &amp; Bayar</string>
+    <string name="send_pay_retry_button">Coba lagi</string>
+
+    <string name="send_offer_payer_note_label">Pesan</string>
+    <string name="send_offer_payer_note_placeholder">Ketuk untuk melampirkan pesan…</string>
+    <string name="send_offer_payer_note_dialog_title">Lampirkan pesan khusus</string>
+    <string name="send_offer_payer_note_dialog_subtitle">Penerima akan melihat pesan ini</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Masukkan pesan…</string>
+    <string name="send_offer_fetching">Mengambil detail pembayaran…</string>
+    <string name="send_offer_failure_title">Pembayaran gagal</string>
+    <string name="send_offer_failure_timeout">Rincian pembayaran tidak dapat diambil dalam waktu yang wajar.\n\nPenerima mungkin sedang offline atau tidak dapat dihubungi.</string>
+
+    <string name="send_paymentmode_onchain">Bayar on-chain</string>
+    <string name="send_paymentmode_onchain_desc">Transaksi on-chain biasanya lebih lambat dan paling cocok untuk pembayaran dalam jumlah besar.</string>
+    <string name="send_paymentmode_lightning">Bayar dengan Lightning</string>
+    <string name="send_paymentmode_lightning_desc">Pembayaran Lightning cepat dan paling cocok untuk pembayaran dalam jumlah kecil.</string>
+
+    <string name="send_spliceout_address_label">Alamat</string>
+    <string name="send_spliceout_feerate_label">Tarif biaya</string>
+    <string name="send_spliceout_feerate_waiting_for_value">Mengambil tarif saat ini…</string>
+
+    <string name="send_spliceout_error_invalid_feerate">Silakan masukkan tarif yang valid.</string>
+    <string name="send_spliceout_error_cannot_afford_fees">Jumlah total melebihi saldo Anda</string>
+    <string name="send_spliceout_error_failure">Pembayaran gagal</string>
+
+    <string name="send_spliceout_prepare_button">Siapkan transaksi</string>
+    <string name="send_spliceout_prepare_in_progress">Mempersiapkan transaksi…</string>
+    <string name="send_spliceout_execute_in_progress">Melakukan penyambungan…</string>
+    <string name="send_spliceout_complete_recap_fee">Biaya penambangan</string>
+    <string name="send_spliceout_complete_recap_fee_details">Menggunakan tarif efektif sebesar %1$s sat/vbyte.</string>
+    <string name="send_spliceout_complete_recap_total">Total</string>
+
+    <!-- scan -->
+
+    <string name="scan_request_camera_access">Ketuk untuk memberikan izin akses kamera</string>
+    <string name="scan_request_camera_access_denied">Izin penggunaan kamera telah ditolak</string>
+    <string name="scan_help">Perbesar atau ketuk QR untuk memfokuskan</string>
+
+    <!-- prepare send payment -->
+
+    <string name="preparesend_title">Mengirim</string>
+    <string name="preparesend_contacts_none">Belum ada kontak…</string>
+    <string name="preparesend_contacts_no_matches">Tidak ada hasil yang cocok untuk pencarian…</string>
+    <string name="preparesend_manual_input_hint" translatable="false">satoshi@domain, bc1q..., lnbc...</string>
+
+    <string name="preparesend_paste_button">Tempel</string>
+    <string name="preparesend_scan_button">Pindai kode QR</string>
+    <string name="preparesend_imagepicker_button">Pilih gambar</string>
+    <string name="preparesend_imagepicker_error">Gambar ini tidak dapat diproses.</string>
+    <string name="preparesend_imagepicker_not_found">Tidak ditemukan kode QR pada gambar ini.</string>
+    <string name="preparesend_parsing">Membaca masukan…</string>
+    <string name="preparesend_lnurl_fetching">Mengambil data dari layanan…</string>
+    <string name="preparesend_bip353_resolving">Menyelesaikan permintaan pembayaran melalui DNS…</string>
+
+    <string name="preparesend_funds_final_wallet">Anda memiliki dana on-chain di dompet akhir, tetapi tidak ada di Lightning.</string>
+    <string name="preparesend_funds_final_wallet_button">Lihat dompet terakhir</string>
+
+    <!-- utils: misc strings -->
+
+    <string name="utils_rounded">≈</string>
+    <string name="utils_converted_amount">≈ %1$s</string>
+    <string name="utils_unknown_amount" translatable="false">!?</string>
+    <string name="utils_no_conversion">Nilai tukar tidak tersedia</string>
+
+    <string name="utils_date_just_now">baru saja</string>
+    <string name="utils_unknown">N/A</string>
+    <string name="utils_processing_data">Mengolah data…</string>
+    <string name="utils_loading_data">Memuat data…</string>
+    <string name="utils_loading_prefs">Memuat preferensi…</string>
+    <string name="utils_copied">Disalin ke papan klip!</string>
+
+    <string name="utils_bip353_with_prefix" translatable="false">₿%1$s</string>
+
+    <string name="accessibility_link">Buka tautan di peramban</string>
+    <string name="accessibility_explorer_link">Buka transaksi di penjelajah</string>
+    <string name="accessibility_address_explorer_link">Buka alamat di penjelajah blok</string>
+    <string name="validation_empty">Kolom ini tidak boleh kosong</string>
+    <string name="validation_invalid_amount">Silakan masukkan jumlah yang valid</string>
+    <string name="validation_invalid_number">Silakan masukkan nomor yang valid</string>
+    <string name="validation_no_decimal">Kolom ini harus berupa bilangan bulat</string>
+
+    <string name="btn_back">Kembali</string>
+    <string name="btn_next">Selanjutnya</string>
+    <string name="btn_copy">Salin</string>
+    <string name="btn_share">Bagikan</string>
+    <string name="btn_ok">OKE</string>
+    <string name="btn_save">Simpan</string>
+    <string name="btn_delete">Hapus</string>
+    <string name="btn_confirm">Konfirmasi</string>
+    <string name="btn_cancel">Batalkan</string>
+    <string name="btn_close">Tutup</string>
+
+    <!-- mutual close -->
+
+    <string name="mutualclose_title">Menguras dompetku</string>
+    <string name="mutualclose_loading">Memuat…</string>
+    <string name="mutualclose_checking_balance">Mengecek saldo…</string>
+    <string name="mutualclose_balance">Saldo: <b>%1$s</b> (≈ %2$s)</string>
+    <string name="mutualclose_no_channels">Dompet tersebut tidak memiliki saluran apa pun yang memenuhi syarat untuk ditutup.</string>
+    <string name="mutualclose_button">Tinjau Penutupan</string>
+    <string name="mutualclose_error_chain_mismatch">Alamat ini menggunakan blockchain yang berbeda</string>
+    <string name="mutualclose_error_chain_reqparams">Alamat ini menggunakan fitur yang tidak didukung</string>
+    <string name="mutualclose_error_chain_generic">Alamat ini tidak didukung</string>
+    <string name="mutualclose_done">Proses penutupan telah dimulai. Transaksi penutupan ada dalam daftar transaksi Anda.</string>
+
+    <string name="forceclose_no_channels">Tidak ada saluran yang memenuhi syarat untuk ditutup.</string>
+
+    <!-- channels view -->
+
+    <string name="channelsview_title">Saluran pembayaran</string>
+    <string name="channelsview_menu_spend_channel_balance">Alamat saluran pengeluaran</string>
+    <string name="channelsview_header">Ringkasan</string>
+    <string name="channelsview_balance">Saldo</string>
+    <string name="channelsview_balance_about"><b>Saldo</b> adalah saldo gabungan dari saluran aktif Anda. Ini adalah jumlah yang dapat Anda belanjakan melalui Lightning.</string>
+    <string name="channelsview_inbound">Likuiditas masuk</string>
+    <string name="channelsview_inbound_about"><b>Likuiditas masuk</b> adalah jumlah yang dapat diterima saluran Anda melalui Lightning tanpa harus melalui blockchain dan membayar biaya.</string>
+    <string name="channelsview_loading_channels">Memuat data saluran…</string>
+    <string name="channelsview_no_channels">Anda belum memiliki saluran pembayaran.\n\nSaluran pembayaran baru akan dibuat secara otomatis bila diperlukan.</string>
+
+    <!-- channels details -->
+
+    <string name="channeldetails_title">Detail saluran</string>
+    <string name="channeldetails_not_found">Tidak ada saluran aktif yang tersedia untuk pengidentifikasi tersebut.</string>
+    <string name="channeldetails_channel_id">ID saluran</string>
+    <string name="channeldetails_state">Status</string>
+    <string name="channeldetails_spendable">Saldo</string>
+    <string name="channeldetails_receivable">Likuiditas masuk</string>
+
+    <string name="channeldetails_commitments">Komitmen aktif</string>
+    <string name="channeldetails_inactive_commitments">Komitmen tidak aktif</string>
+    <string name="channeldetails_commitment_funding_tx_id">Pendanaan tx:</string>
+    <string name="channeldetails_commitment_balance">Saldo:</string>
+    <string name="channeldetails_commitment_funding_capacity">Kapasitas:</string>
+    <string name="channeldetails_commitment_linked_payments">Dipicu oleh:</string>
+
+    <string name="channeldetails_json">Tampilkan data mentah</string>
+    <string name="channeldetails_share">Bagikan</string>
+    <string name="channeldetails_share_subject">Data saluran</string>
+    <string name="channeldetails_share_title">Bagikan data saluran</string>
+
+    <!-- spend from channel address -->
+
+    <string name="spendchanneladdress_title">Alamat saluran pengeluaran</string>
+    <string name="spendchanneladdress_instructions">Layar ini adalah alat debugging yang membantu memulihkan dana yang secara tidak sengaja dikirim ke titik keluar saluran.</string>
+    <string name="spendchanneladdress_amount">Jumlah</string>
+    <string name="spendchanneladdress_tx_index">Index Tx</string>
+    <string name="spendchanneladdress_channel_id">ID saluran</string>
+    <string name="spendchanneladdress_channel_data">Data saluran mentah</string>
+    <string name="spendchanneladdress_remote_funding_pubkey">Kunci publik pendanaan jarak jauh</string>
+    <string name="spendchanneladdress_unsigned_tx">tx belum sah</string>
+    <string name="spendchanneladdress_remote_nonce">Nonce jarak jauh</string>
+    <string name="spendchanneladdress_sign_button">Tanda tangan</string>
+    <string name="spendchanneladdress_signing">Menandatangani</string>
+
+    <string name="spendchanneladdress_success_header">Tanda tangan berhasil dibuat.</string>
+    <string name="spendchanneladdress_success_pubkey">Kunci publik</string>
+    <string name="spendchanneladdress_success_signature">Tanda tangan</string>
+    <string name="spendchanneladdress_success_nonce">Nonce</string>
+
+    <string name="spendchanneladdress_error_generic">Gagal menandatangani data</string>
+    <string name="spendchanneladdress_error_amount">Jumlah tidak valid</string>
+    <string name="spendchanneladdress_error_tx_index">Indeks transaksi tidak valid</string>
+
+    <string translatable="false" name="spendchanneladdress_error_channel_data">Data saluran tidak valid</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_version">Versi saluran yang tidak ditangani [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_state">Status saluran yang tidak ditangani [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_no_channel_matching">Tidak ditemukan kecocokan dalam pencadangan saluran</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_pubkey">Kunci publik pendanaan jarak jauh yang salah format [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_unsigned_tx">Transaksi tak bertanda yang salah format [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_funding_pubkey">Kunci publik pendanaan jarak jauh yang salah format [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_nonce">Nonce jarak jauh yang salah format</string>
+    <string translatable="false" name="spendchanneladdress_error_sig_failed">Transaksi gagal ditandatangani sebagian</string>
+
+    <!-- home: balance section & misc -->
+
+    <string name="home_balance_loading">Memuat…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
+
+    <string name="home_faq_button">Pertanyaan yang Sering Diajukan (FAQ)</string>
+    <string name="home_payments_none">Gunakan tombol Terima dan Kirim di bagian bawah layar ini untuk memulai!</string>
+    <string name="home_payments_more_button">Tampilkan semua pembayaran…</string>
+    <string name="home_connection_electrum_late">Tidak sinkron!</string>
+    <string name="home_connection_bad_cert">Sertifikat</string>
+    <string name="home_connection_onion">Alamat tidak valid</string>
+    <string name="home_connection_connecting">Menghubungkan…</string>
+    <string name="home_connection_tor_active">Tor</string>
+    <string name="home_request_liquidity">Meminta likuiditas</string>
+    <string name="home_inflight_payments">Saat ini Anda memiliki %1$d pembayaran yang tertunda di dompet Anda.\n\nBiarkan aplikasi tetap terbuka untuk memastikan pembayaran ini diproses dengan benar tanpa masalah.</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_title">Notifikasi</string>
+    <string name="inappnotif_notices_title">Pesan penting</string>
+    <string name="inappnotif_payments_title">Aktivitas terkini</string>
+    <string name="inappnotif_empty">Belum ada notifikasi</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_title">Frasa pemulihan</string>
+    <string name="displayseed_loading">Membuka kunci seed…</string>
+    <string name="displayseed_error_details">Tidak dapat membuka kunci seed</string>
+    <string name="displayseed_derivation_path">Seed BIP39 dengan jalur derivasi BIP84 standar.</string>
+    <string name="displayseed_loading_prefs">Memuat preferensi…</string>
+    <string name="displayseed_backup_title">Konfirmasi pencadangan</string>
+
+    <!-- settings: logs -->
+
+    <string name="logs_title">Log aplikasi</string>
+    <string name="logs_exporting">Mengekspor log…</string>
+    <string name="logs_failed">Kesalahan: log tidak dapat diekspor</string>
+    <string name="logs_view_button">Lihat log…</string>
+    <string name="logs_view_with">Lihat log dengan…</string>
+    <string name="logs_share_button">Bagikan log…</string>
+    <string name="logs_share_subject">Log Aplikasi Phoenix</string>
+    <string name="logs_share_title">Bagikan log Phoenix…</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_loading">Sedang memuat detail pembayaran…</string>
+    <string name="paymentdetails_error">Detail pembayaran tidak ditemukan</string>
+
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>LIKUIDITAS DITAMBAHKAN</b> %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>MANAJEMEN SALURAN</b> %1$s</string>
+    <string name="paymentdetails_status_channelclose_confirmed"><b>SELESAI</b> %1$s</string>
+    <string name="paymentdetails_status_sent_successful"><b>TERKIRIM</b> %1$s</string>
+    <string name="paymentdetails_status_sent_pending">Tertunda…</string>
+    <string name="paymentdetails_status_sent_failed"><b>GAGAL</b>\nTidak ada uang yang terkirim.</string>
+
+    <string name="paymentdetails_status_received_pending">Belum diterima.</string>
+    <string name="paymentdetails_status_received_paytoopen_pending">Menunggu saluran terbuka</string>
+    <string name="paymentdetails_status_received_successful"><b>DITERIMA</b> %1$s</string>
+
+    <string name="paymentdetails_status_unconfirmed">Menunggu konfirmasi</string>
+    <string name="paymentdetails_status_unconfirmed_fetching">Mengambil status…</string>
+    <string name="paymentdetails_status_unconfirmed_zero">0 konfirmasi</string>
+    <string name="paymentdetails_status_unconfirmed_zero_bump">Ketuk untuk mempercepat</string>
+    <string name="paymentdetails_status_unconfirmed_default">Konfirmasi %1$d</string>
+    <string name="paymentdetails_status_confirmed">Dikonfirmasi on-chain</string>
+
+    <string name="paymentdetails_offer_note_label">Pesan</string>
+    <string name="paymentdetails_offer_sender_label">Dikirim oleh</string>
+    <string name="paymentdetails_offer_sender_unknown">Tidak dikenal</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Berhati-hatilah dengan pesan dari sumber yang tidak dikenal</string>
+
+    <string name="paymentdetails_lnurlpay_service">Dilayani oleh</string>
+    <string name="paymentdetails_lnurlpay_action_message_label">Pesan</string>
+    <string name="paymentdetails_lnurlpay_action_url_label">Tautan</string>
+    <string name="paymentdetails_lnurlpay_action_url_button">Buka tautan</string>
+    <string name="paymentdetails_lnurlpay_action_aes_label">Pesan</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">Mendekripsi pesan…</string>
+
+    <string name="paymentdetails_desc_label">Deskripsi</string>
+    <string name="paymentdetails_note_label">Catatan</string>
+    <string name="paymentdetails_destination_label">Dikirim ke</string>
+    <string name="paymentdetails_destination_cpfp_value">Penambang Bitcoin</string>
+    <string name="paymentdetails_fees_label">Biaya</string>
+    <string name="paymentdetails_error_label">Kesalahan</string>
+    <string name="paymentdetails_no_description">Tidak ada deskripsi</string>
+    <string name="paymentdetails_info_uniclose">Pembayaran ini terjadi setelah adanya konflik di sebuah saluran.</string>
+
+    <string name="paymentdetails_desc_splice_out">Pembayaran on-chain</string>
+    <string name="paymentdetails_desc_closing_channel">Tutup saluran</string>
+    <string name="paymentdetails_desc_legacy_migration">Migrasi dari aplikasi lama</string>
+    <string name="paymentdetails_desc_cpfp">Transaksi bump</string>
+    <string name="paymentdetails_desc_liquidity_manual">Likuiditas manual (+%1$s)</string>
+    <string name="paymentdetails_desc_liquidity_automated">Manajemen saluran</string>
+    <string name="paymentdetails_desc_swapout">Ganti dengan %1$s</string>
+    <string name="paymentdetails_desc_swapin">Deposit on-chain</string>
+
+    <string name="paymentdetails_desc_to">ke %1$s</string>
+    <string name="paymentdetails_desc_from">dari %1$s</string>
+
+    <string name="paymentdetails_edit_dialog_title">Tambahkan deskripsi khusus untuk pembayaran ini</string>
+    <string name="paymentdetails_edit_dialog_input_label">Deskripsi</string>
+    <string name="paymentdetails_attach_desc_button">Lampirkam catatan</string>
+    <string name="paymentdetails_edit_desc_button">Ubah catatan</string>
+    <string name="paymentdetails_details_button">Detail teknis</string>
+
+    <!-- payment details: technicals data -->
+
+    <string name="paymentdetails_technical_title">Detail teknis</string>
+    <string name="paymentdetails_payment_type_label">Jenis pembayaran</string>
+    <string name="paymentdetails_type_outgoing_close">Penutupan saluran</string>
+    <string name="paymentdetails_type_incoming_onchain_splice">Pembayaran on-chain masuk (splice)</string>
+    <string name="paymentdetails_type_incoming_onchain_newchannel">Pembayaran on-chain masuk (saluran baru)</string>
+    <string name="paymentdetails_type_incoming_legacy_paytopen">Pembayaran masuk (sistem pembayaran lama untuk pembukaan)</string>
+    <string name="paymentdetails_type_incoming_legacy_swapin">Pembayaran on-chain masuk (legacy swap-in)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Pembayaran Lightning masuk (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Pembayaran Lightning masuk (bolt12)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Pembayaran Lightning Keluar (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Pembayaran Lightning Keluar (bolt12)</string>
+    <string name="paymentdetails_type_outgoing_splice">Pembayaran keluar on-chain</string>
+    <string name="paymentdetails_type_outgoing_swapout">Pembayaran keluar on-chain (legacy swap)</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">Mempercepat transaksi on-chain</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">Permintaan likuiditas masuk (manual)</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">Permintaan likuiditas masuk (otomatis)</string>
+
+    <string name="paymentdetails_swapin_address_label">Alamat setoran</string>
+    <string name="paymentdetails_bitcoin_address_label">Alamat Bitcoin</string>
+
+    <string name="paymentdetails_splice_out_channel_label">Saluran yang disambung</string>
+    <string name="paymentdetails_inputs_label">Masukan lokal</string>
+    <string name="paymentdetails_inputs_value">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">Likuiditas yang diminta</string>
+
+    <string name="paymentdetails_closing_type_label">Jenis penutup</string>
+    <string name="paymentdetails_closing_type_mutual">Saling</string>
+    <string name="paymentdetails_closing_type_local">Lokal</string>
+    <string name="paymentdetails_closing_type_remote">Jarak jauh</string>
+    <string name="paymentdetails_closing_type_revoked">Dicabut</string>
+    <string name="paymentdetails_closing_type_other">Lainnya</string>
+
+    <string name="paymentdetails_pubkey_label">Kunci publik target</string>
+    <string name="paymentdetails_payment_hash_label">Hash Pembayaran</string>
+    <string name="paymentdetails_preimage_label">Citra Awal</string>
+    <string name="paymentdetails_preimage_help">Bukti kriptografis bahwa penerima telah berhasil menerima pembayaran.</string>
+    <string name="paymentdetails_bolt11_label">Faktur Bolt11</string>
+    <string name="paymentdetails_bolt12_label">Faktur Bolt12</string>
+    <string name="paymentdetails_bolt11_description_label">Deskripsi faktur</string>
+    <string name="paymentdetails_bolt12_description_label">Deskripsi penawaran</string>
+    <string name="paymentdetails_offer_label">Menawarkan</string>
+    <string name="paymentdetails_offer_metadata_label">Metadata</string>
+    <string name="paymentdetails_payerkey_label">Kunci pembayar</string>
+    <string name="paymentdetails_payerkey_is_mine">Kunci penawaran Anda</string>
+    <string name="paymentdetails_liquidity_purchase_type">Jenis pembelian</string>
+
+    <string name="paymentdetails_status_label">Status pembayaran</string>
+    <string name="paymentdetails_status_success">Berhasil</string>
+    <string name="paymentdetails_status_confirming">Mengkonfirmasi</string>
+    <string name="paymentdetails_status_pending">Tertunda</string>
+    <string name="paymentdetails_status_failed">Gagal</string>
+
+    <string name="paymentdetails_parts_label">Bagian pembayaran (%1$d)</string>
+    <string name="paymentdetails_part_label">Bagian</string>
+    <string name="paymentdetails_part_hops_label">Hop</string>
+
+    <string name="paymentdetails_received_with_label">Diterima melalui</string>
+    <string name="paymentdetails_received_with_legacy_onchain">Pengoperasian saluran (baru atau penyambungan)</string>
+    <string name="paymentdetails_received_with_lightning">Pembayaran Lightning</string>
+    <string name="paymentdetails_received_with_fee_credit">Kredit biaya</string>
+    <string name="paymentdetails_channel_id_label">ID saluran</string>
+    <string name="paymentdetails_tx_id_label">Transaksi</string>
+
+    <string name="paymentdetails_created_at_label">Dibuat pada</string>
+    <string name="paymentdetails_completed_at_label">Selesai pada</string>
+    <string name="paymentdetails_elapsed_label">Waktu berlalu</string>
+    <string name="paymentdetails_elapsed">%1$s ms</string>
+
+    <string name="paymentdetails_invoice_requested_label">Jumlah yang diminta</string>
+    <string name="paymentdetails_amount_sent_label">Jumlah yang dikirim (termasuk biaya)</string>
+    <string name="paymentdetails_amount_received_label">Jumlah yang diterima</string>
+    <string name="paymentdetails_amount_fee_credit_label">Kredit biaya yang terakumulasi</string>
+    <string name="paymentdetails_amount_added_to_fee_credit_label">Jumlah yang ditambahkan ke kredit biaya</string>
+    <string name="paymentdetails_amount_rate_now">≈ %1$s (sekarang)</string>
+    <string name="paymentdetails_amount_rate_then">≈ %1$s (lalu)</string>
+
+    <!-- offer contact -->
+
+    <string name="contact_add_contact_button">Tambahkan kontak</string>
+    <string name="contact_pay_button">Kirim pembayaran</string>
+
+    <string name="contact_attach_offer_new">Buat kontak baru…</string>
+
+    <string name="contact_error_name_empty">Nama tidak boleh kosong</string>
+    <string name="contact_error_offer_invalid">Kode Bolt12 tidak valid</string>
+    <string name="contact_error_offer_known">Kode sudah terlampir pada \"%1$s\"</string>
+    <string name="contact_error_address_invalid">Alamat Lightning tidak valid</string>
+    <string name="contact_error_address_known">Alamat sudah terlampir pada \"%1$s\"</string>
+    <string name="contact_error_invalid">Kode atau alamat ini tidak valid</string>
+
+    <string name="contact_codedialog_title_generic">Tambahkan alamat untuk kontak ini</string>
+    <string name="contact_codedialog_title_offer">Edit kode Bolt12</string>
+    <string name="contact_codedialog_title_address">Edit alamat Lightning untuk kontak ini.</string>
+
+    <string name="contact_codedialog_label_label">Label (opsional)</string>
+    <string name="contact_codedialog_label_generic">Kode Bolt12 atau alamat Lightning</string>
+    <string name="contact_codedialog_label_address">Alamat Lightning</string>
+    <string name="contact_codedialog_label_offer">Kode penawaran Bolt12</string>
+
+    <string name="contact_delete_code_confirm">Apakah Anda ingin menghapus alamat ini?</string>
+    <string name="contact_delete_contact_confirm">Apakah Anda ingin menghapus kontak ini?</string>
+
+    <string name="contact_add_title">Berikan nama pada kode Bolt12</string>
+    <string name="contact_name_label">Nama</string>
+    <string name="contact_name_hint">Masukkan nama</string>
+    <string name="contact_offer_key_title">Bayar dengan kunci Bolt12 Anda</string>
+    <string name="contact_offer_key_enabled">Jika mereka mengetahui kode pembayaran Bolt12 Anda, mereka akan dapat mengetahui kapan pembayaran tersebut berasal dari Anda.</string>
+    <string name="contact_offer_key_disabled">Gunakan ID sekali pakai saat Anda membayar kontak ini.</string>
+    <string name="contact_codes_list">Alamat</string>
+    <string name="contact_codes_add_new">Tambahkan kode Bolt12 atau alamat Lightning…</string>
+    <string name="contact_codes_add_new_short">Tambahkan yang baru…</string>
+
+    <string name="contact_search_name">Cari berdasarkan nama</string>
+    <string name="contact_none">Tidak ada kontak yang ditemukan…</string>
+
+    <string name="contact_photo_open_camera">Ambil foto</string>
+    <string name="contact_photo_open_gallery">Jelajahi gambar</string>
+    <string name="contact_photo_remove">Hapus gambar</string>
+
+    <!-- settings: access control -->
+
+    <string name="accessctrl_title">Kontrol akses</string>
+
+    <string name="accessctrl_auth_error_header">Autentikasi sistem tidak tersedia</string>
+    <string name="accessctrl_auth_error_no_hw">Tidak ada perangkat keras otentikasi yang sesuai pada perangkat ini.</string>
+    <string name="accessctrl_auth_error_hw_unavailable">Perangkat keras biometrik tidak tersedia. Coba lagi nanti.</string>
+    <string name="accessctrl_auth_error_none_enrolled">Harap daftarkan PIN/Skema/Sidik Jari di Android terlebih dahulu.</string>
+    <string name="accessctrl_auth_error_update_required">Perangkat keras tidak aman. Pembaruan keamanan Android diperlukan.</string>
+    <string name="accessctrl_auth_error_unsupported">Tidak didukung oleh versi Android ini.</string>
+    <string name="accessctrl_auth_error_lockout">Terlalu banyak percobaan, coba lagi nanti.</string>
+    <string name="accessctrl_auth_error_vendor">Kesalahan vendor perangkat keras yang tidak ditangani</string>
+    <string name="accessctrl_auth_error_timeout">Upaya otentikasi habis waktu</string>
+    <string name="accessctrl_auth_error_cancelled">Autentikasi telah dibatalkan</string>
+    <string name="accessctrl_auth_error_too_old">Versi Android ini tidak kompatibel.</string>
+    <string name="accessctrl_auth_error_unhandled">Kode kesalahan yang tidak ditangani: %1$d</string>
+
+    <string name="accessctrl_screenlock_header">Mengakses aplikasi</string>
+    <string name="accessctrl_screenlock_biometrics_label">Autentikasi sistem</string>
+    <string name="accessctrl_screenlock_biometrics_desc">Mengamankan akses aplikasi di balik kredensial pengguna Android</string>
+    <string name="accessctrl_screenlock_pin_label">Kunci PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">Mengamankan akses aplikasi dengan kode PIN 6 digit</string>
+
+    <string name="accessctrl_autolock_label">Kunci kadaluwarsa</string>
+    <string name="accessctrl_autolock_desc">Setelah %1$s menit tidak aktif</string>
+    <string name="accessctrl_autolock_desc_never">Tidak pernah</string>
+
+    <string name="accessctrl_spendlock_header">Mengirim pembayaran</string>
+    <string name="accessctrl_spendlock_pin_label">PIN pengeluaran</string>
+    <string name="accessctrl_spendlock_pin_desc">Jika diaktifkan, kode PIN diperlukan untuk menggunakan dana dari dompet.</string>
+
+    <string name="accessctrl_misc_header">Lain-lain</string>
+    <string name="accessctrl_shuffle_pin">Tombol PIN acak</string>
+
+    <!-- lnurl-auth -->
+
+    <string name="lnurl_auth_legacy_notice">Mode lama</string>
+    <string name="lnurl_auth_help">Ketuk di sini untuk informasi selengkapnya</string>
+    <string name="lnurl_auth_help_dialog_title">Bagaimana cara kerjanya?</string>
+    <string name="lnurl_auth_help_dialog_general_details">Phoenix melakukan otentikasi dengan kunci unik untuk <b>%1$s</b>. Kunci unik ini menjadi kata sandi Anda untuk akun Anda di sana.</string>
+    <string name="lnurl_auth_help_dialog_privacy_title">Privasi</string>
+    <string name="lnurl_auth_help_dialog_privacy_details">Layanan ini tidak akan memiliki akses ke dompet Anda sama sekali. Mereka tidak dapat melihat saldo, pembayaran, atau kunci Anda.</string>
+    <string name="lnurl_auth_help_dialog_compat_title">Mode lama</string>
+    <string name="lnurl_auth_help_dialog_compat_details">Phoenix menggunakan skema non-standar pada layanan ini agar kompatibel dengan versi aplikasi yang lebih lama. Akun terkait tidak akan dapat dipindahkan ke dompet lain.</string>
+    <string name="lnurl_auth_help_dialog_compat_button">Ubah skema</string>
+    <string name="lnurl_auth_button">Masuk</string>
+    <string name="lnurl_auth_try_again_button">Coba lagi</string>
+    <string name="lnurl_auth_in_progress">Masuk ke \n<b>%1$s</b></string>
+    <string name="lnurl_auth_success">Autentikasi berhasil.</string>
+    <string name="lnurl_auth_failure">Otentikasi gagal:</string>
+    <string name="lnurl_auth_error_network">Terjadi kesalahan jaringan. Periksa koneksi internet Anda dan coba lagi.</string>
+    <string name="lnurl_auth_error_other">Terjadi kesalahan yang tidak diketahui. Coba lagi.</string>
+
+    <!-- lnurl-auth settings: scheme types -->
+
+    <string name="lnurl_auth_scheme_default">Default</string>
+    <string name="lnurl_auth_scheme_default_desc">Gunakan skema standar yang sesuai dengan spesifikasi LNURL. Ini adalah opsi yang direkomendasikan untuk dompet baru, dan yang digunakan oleh aplikasi Phoenix iOS.</string>
+    <string name="lnurl_auth_scheme_legacy">Android lama</string>
+    <string name="lnurl_auth_scheme_legacy_desc">Gunakan skema lama untuk terhubung ke akun yang dibuat dengan aplikasi Phoenix Android versi lama.</string>
+
+    <!-- lnurl-withdraw -->
+
+    <string name="lnurl_withdraw_confirm_button">Menukarkan</string>
+    <string name="lnurl_withdraw_wait">Meminta dana…</string>
+    <string name="lnurl_withdraw_amount_below_min">Jumlahnya minimal harus %1$s.</string>
+    <string name="lnurl_withdraw_amount_above_max">Jumlah tidak boleh melebihi %1$s.</string>
+    <string name="lnurl_withdraw_error_header">Penarikan dana gagal:</string>
+
+    <!-- lnurl: common remote error messages -->
+
+    <string name="lnurl_error_remote_details">Layanan <b>%1$s</b> mengembalikan kesalahan. Hubungi helpdesk layanan ini jika masalah berlanjut.\n\nDetail pesan layanan: \"<i>%2$s</i>\"</string>
+    <string name="lnurl_error_remote_code">Layanan <b>%1$s</b> mengembalikan kesalahan HTTP (%2$s). Hubungi helpdesk mereka jika diperlukan.</string>
+    <string name="lnurl_error_remote_unreadable">Layanan <b>%1$s</b> mengembalikan pesan yang salah format.</string>
+    <string name="lnurl_error_remote_connection">Tidak dapat terhubung ke layanan <b>%1$s</b>.</string>
+    <string name="lnurl_error_remote_is_website">Ini tampaknya adalah situs web (bukan faktur kilat):\n\n<i>%1$s</i></string>
+    <string name="lnurl_error_remote_unknown_lnaddress">Layanan %1$s tidak mendukung alamat Lightning, atau tidak mengenali pengguna ini.</string>
+
+    <!-- lnurl-pay -->
+
+    <string name="lnurl_pay_domain">Disajikan oleh</string>
+    <string name="lnurl_pay_meta_description">Deskripsi</string>
+    <string name="lnurl_pay_comment_add_button">Lampirkan pesan</string>
+    <string name="lnurl_pay_comment_label">Pesan saya</string>
+    <string name="lnurl_pay_comment_instructions">Anda dapat melampirkan pesan pada pembayaran. Pesan ini akan dikirimkan kepada penerima.</string>
+    <string name="lnurl_pay_pay_button">Bayar</string>
+    <string name="lnurl_pay_requesting_invoice">Meminta faktur…</string>
+    <string name="lnurl_pay_paying_invoice">Membayar tagihan…</string>
+
+    <string name="lnurl_pay_amount_below_min">Jumlahnya minimal harus %1$s</string>
+    <string name="lnurl_pay_amount_above_max">Jumlahnya paling banyak adalah %1$s</string>
+
+    <string name="lnurl_pay_error_header">Pembayaran gagal.</string>
+    <string name="lnurl_pay_error_invalid_chain">Faktur yang dikembalikan oleh <b>%1$s</b> tidak menggunakan rantai yang sama dengan dompet Anda.</string>
+    <string name="lnurl_pay_error_payment_pending">Faktur yang dikembalikan oleh <b>%1$s</b> sudah dalam proses.</string>
+    <string name="lnurl_pay_error_already_paid">Faktur yang dikembalikan oleh <b>%1$s</b> sudah dibayar.</string>
+    <string name="lnurl_pay_error_invalid_amount">Faktur yang dikembalikan oleh <b>%1$s</b> memiliki jumlah yang salah.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Faktur yang dikembalikan oleh <b>%1$s</b> tidak sesuai format.</string>
+
+    <!-- settings: display preferences -->
+
+    <string name="prefs_display_title">Opsi tampilan</string>
+    <string name="prefs_filter_name">Saring berdasarkan nama</string>
+    <string name="prefs_display_coin_label">Satuan Bitcoin</string>
+    <string name="prefs_display_coin_sat_label">Satoshi</string>
+    <string name="prefs_display_coin_sat_desc">1 satoshi sama dengan 0,00000001 btc</string>
+    <string name="prefs_display_coin_bit_label">Bit</string>
+    <string name="prefs_display_coin_bit_desc">1 bit sama dengan 0,000001 btc</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin</string>
+    <string name="prefs_display_coin_mbtc_desc">1 mbtc sama dengan 0,001 btc</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin</string>
+    <string name="prefs_display_fiat_label">Mata uang fiat</string>
+    <string name="prefs_display_theme_label">Tema aplikasi</string>
+    <string name="prefs_display_theme_dark_label">Tema gelap</string>
+    <string name="prefs_display_theme_light_label">Tema terang</string>
+    <string name="prefs_display_theme_system_label">Ikuti sistem</string>
+    <string name="prefs_locale_label">Bahasa aplikasi</string>
+
+    <!-- settings: electrum server -->
+
+    <string name="electrum_title">Server Electrum</string>
+    <string name="electrum_about">Untuk mengamankan saluran pembayaran Anda, Phoenix memantau blockchain Bitcoin melalui server Electrum.\n\nSecara default, server acak digunakan. Anda juga dapat mengkonfigurasi Phoenix untuk hanya terhubung ke server Anda sendiri.</string>
+    <string name="electrum_block_height_label">Tinggi blok</string>
+    <string name="electrum_connection_dialog_tls_port">Gunakan port TLS (default 50002).</string>
+		<string name="electrum_connection_dialog_onion_port">Untuk layanan onion, gunakan port TCP biasa, bukan yang TLS.</string>
+    <string name="electrum_connection_dialog_tor_enabled_warning">Karena Anda telah mengaktifkan Tor, Anda harus menggunakan alamat onion untuk server ini.</string>
+    <string name="electrum_connection_dialog_tor_enabled_ignore_box">Tidak, saya tidak ingin menggunakan alamat onion.</string>
+
+    <string name="electrum_connection_closed_with_random">Terputus dari Electrum</string>
+    <string name="electrum_connection_closed_with_custom">Terputus dari %1$s</string>
+    <string name="electrum_connection_connecting_to_random">Menghubungkan ke (acak) %1$s</string>
+    <string name="electrum_connection_connecting_to_custom">Menghubungkan ke %1$s</string>
+    <string name="electrum_connection_connected">Terhubung ke %1$s</string>
+
+    <string name="electrum_description_custom">Anda menggunakan server khusus</string>
+    <string name="electrum_description_bad_certificate">Server ini memberikan sertifikat yang tidak dikenal. Koneksi ditolak.</string>
+    <string name="electrum_description_not_onion">Tor diaktifkan. Server ini harus menggunakan alamat onion.</string>
+
+    <string name="electrum_dialog_checkbox">Gunakan server khusus</string>
+    <string name="electrum_dialog_input">Alamat server (host:port)</string>
+    <string name="electrum_dialog_invalid_input">Alamat ini tidak valid.</string>
+    <string name="electrum_dialog_cert_check_button">Menghubungkan</string>
+    <string name="electrum_dialog_cert_checking">Memeriksa sertifikat…</string>
+    <string name="electrum_dialog_cert_failure">Gagal terhubung</string>
+    <string name="electrum_dialog_cert_unresolved">Alamat ini tidak dapat diakses.</string>
+    <string name="electrum_dialog_cert_header">Sertifikat tidak tepercaya</string>
+    <string name="electrum_dialog_cert_sha1">Sidik Jari SHA1</string>
+    <string name="electrum_dialog_cert_sha256">Sidik Jari SHA256</string>
+    <string name="electrum_dialog_cert_issuer">Penerbit</string>
+    <string name="electrum_dialog_cert_subject">Subjek</string>
+    <string name="electrum_dialog_cert_expiration">Berlaku hingga</string>
+    <string name="electrum_dialog_cert_copy">Salinan sertifikat</string>
+    <string name="electrum_dialog_cert_accept">Sertifikat kepercayaan</string>
+
+    <!-- settings: Tor -->
+
+    <string name="tor_settings_title">Tor</string>
+    <string name="tor_settings_switch_label">Aktifkan Tor</string>
+    <string name="tor_settings_instructions_title">Cara kerjanya</string>
+
+    <!-- home: connectivity dialog -->
+
+    <string name="conndialog_title">Status koneksi</string>
+    <string name="conndialog_summary_not_ok">Beberapa koneksi belum terjalin. Aplikasi tidak akan berfungsi dengan benar sampai koneksi tersebut terjalin.</string>
+    <string name="conndialog_network">Perangkat Anda tidak memiliki koneksi internet. Aplikasi tidak akan berfungsi dengan benar.\n\nSilakan periksa pengaturan perangkat Anda.</string>
+    <string name="conndialog_electrum">Electrum</string>
+    <string name="conndialog_lightning">Peer</string>
+    <string name="conndialog_accessibility_desc">Kelola koneksi untuk %1$s</string>
+    <string name="conndialog_connecting">Menghubungkan…</string>
+    <string name="conndialog_connected">Terhubung</string>
+    <string name="conndialog_closed">Terputus</string>
+    <string name="conndialog_closed_bad_cert">Sertifikat buruk!</string>
+    <string name="conndialog_electrum_not_onion">Alamat tidak valid!</string>
+    <string name="conndialog_tor_disclaimer_title">Tor sudah diaktifkan!</string>
+    <string name="conndialog_tor_disclaimer_body">Pastikan VPN Tor Anda aktif dan berjalan.</string>
+
+    <!-- settings: about -->
+
+    <string name="about_title">Tentang Phoenix</string>
+    <string name="about_version">Versi Phoenix: <b>%1$s</b></string>
+    <string name="about_faq_link">Ada pertanyaan? Silakan lihat FAQ</string>
+    <string name="about_support_link">Dukungan</string>
+    <string name="about_privacy_link">Privasi</string>
+    <string name="about_terms_link">Ketentuan</string>
+
+    <!-- settings: options for payments -->
+
+    <string name="paymentsettings_title">Opsi pembayaran</string>
+
+    <string name="paymentsettings_category_incoming">Pembayaran masuk</string>
+    <string name="paymentsettings_category_outgoing">Pembayaran keluar</string>
+    <string name="paymentsettings_category_lnurl">LNURL</string>
+
+    <string name="paymentsettings_defaultdesc_title">Deskripsi faktur</string>
+    <string name="paymentsettings_defaultdesc_none">Tidak ada deskripsi yang ditetapkan…</string>
+    <string name="paymentsettings_defaultdesc_dialog_title">Deskripsi default</string>
+    <string name="paymentsettings_defaultdesc_dialog_description">Secara default, faktur Anda akan menggunakan deskripsi ini. Anda dapat menggantinya berdasarkan kasus per kasus.</string>
+    <string name="paymentsettings_defaultdesc_dialog_label">Deskripsi faktur</string>
+
+    <string name="paymentsettings_expiry_title">Tanggal kedaluwarsa faktur</string>
+    <string name="paymentsettings_expiry_dialog_title">Tanggal kedaluwarsa faktur</string>
+    <string name="paymentsettings_expiry_dialog_description">Faktur yang Anda buat akan kedaluwarsa setelah jangka waktu ini. Nilai default adalah 1 minggu.</string>
+    <string name="paymentsettings_expiry_one_hour">1 jam</string>
+    <string name="paymentsettings_expiry_one_day">1 hari</string>
+    <string name="paymentsettings_expiry_one_week">1 minggu (default)</string>
+    <string name="paymentsettings_expiry_two_weeks">2 minggu</string>
+    <string name="paymentsettings_expiry_three_weeks">3 minggu</string>
+    <string name="paymentsettings_expiry_value">%1$s detik</string>
+
+    <string name="paymentsettings_lnurlauth_scheme_title">Skema otentikasi LNURL</string>
+
+    <string name="paymentsettings_swap_format_title">Format alamat Bitcoin</string>
+    <string name="paymentsettings_swap_format_legacy_title">Legacy</string>
+    <string name="paymentsettings_swap_format_legacy_desc">Format yang kurang efisien dan kurang privat yang tidak melakukan rotasi alamat. Namun, format ini kompatibel dengan hampir semua layanan dan dompet.</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot (direkomendasikan)</string>
+    <string name="paymentsettings_swap_format_taproot_desc">Format standar, dengan privasi yang lebih baik, biaya lebih murah, dan rotasi alamat. Namun, beberapa layanan atau dompet mungkin tidak memahami alamat tersebut.</string>
+
+    <string name="paymentsettings_overpayment_title">Aktifkan pembayaran berlebih</string>
+    <string name="paymentsettings_overpayment_enabled">Anda dapat membayar lebih dari jumlah yang diminta pada faktur Lightning. Berguna untuk pemberian tip secara manual, atau sebagai langkah menjaga privasi.</string>
+    <string name="paymentsettings_overpayment_disabled">Dinonaktifkan (default)</string>
+
+    <!-- settings: currencies -->
+
+    <string name="currency_ars_official">Peso Argentina (kurs resmi)</string>
+    <string name="currency_ars_bm">Peso Argentina</string>
+    <string name="currency_cup_official">Peso Kuba (kurs resmi)</string>
+    <string name="currency_cup_fm">Peso Kuba</string>
+    <string name="currency_lbp_official">Pound Lebanon (kurs resmi)</string>
+    <string name="currency_lbp_bm">Pound Lebanon</string>
+
+    <!-- payments history -->
+
+    <string name="payments_history_title">Pembayaran lokal</string>
+    <string name="payments_history_export_button">Ekspor</string>
+    <string name="payments_history_empty">Belum ada pembayaran…</string>
+    <string name="payments_history_today">Hari ini</string>
+    <string name="payments_history_yesterday">Kemarin</string>
+    <string name="payments_history_thisweek">Awal pekan ini</string>
+    <string name="payments_history_lastweek">Minggu lalu</string>
+
+    <string name="payments_export_title">Ekspor pembayaran</string>
+    <string name="payments_export_csv_header">Ekspor CSV</string>
+    <string name="payments_export_csv_instructions">Ekspor pembayaran lokal Anda yang berhasil dalam format CSV. Berguna untuk keperluan akuntansi.</string>
+    <string name="payments_export_csv_start_label">Tanggal mulai</string>
+    <string name="payments_export_csv_end_label">Tanggal berakhir</string>
+    <string name="payments_export_csv_context_label">Sertakan titik asal/tujuan</string>
+    <string name="payments_export_csv_description_label">Sertakan deskripsi</string>
+    <string name="payments_export_csv_generate_button">Ekspor</string>
+    <string name="payments_export_csv_no_payments">Belum ada pembayaran yang berhasil</string>
+    <string name="payments_export_csv_invalid_timestamps">Silakan pilih tanggal mulai/akhir yang valid</string>
+    <string name="payments_export_csv_in_progress">Mengekspor pembayaran…</string>
+    <string name="payments_export_csv_copy_button">Salin data ke papan klip…</string>
+    <string name="payments_export_csv_share_subject">Phoenix - pembayaran mulai dari %1$s hingga %2$s</string>
+    <string name="payments_export_csv_share_title">Bagikan pembayaran Phoenix…</string>
+    <string name="payments_export_csv_share_button">Bagikan berkas</string>
+    <string name="payments_export_csv_error">Ekspor gagal</string>
+    <string name="payments_export_csv_no_data">Tidak ditemukan pembayaran.</string>
+
+    <string name="payments_export_database_header">Ekspor basis data</string>
+    <string name="payments_export_database_instructions">Enkripsikan dan ekspor basis data pembayaran Anda. Ini dapat digunakan untuk memindahkan riwayat pembayaran Anda dari perangkat ini ke perangkat lain.</string>
+    <string name="payments_export_database_button">Ekspor basis data</string>
+    <string name="payments_export_database_failed">Ekspor gagal</string>
+    <string name="payments_export_database_success">File tersebut dapat ditemukan di folder publik perangkat Anda.</string>
+
+    <!-- components -->
+
+    <string name="component_calendar_inclusive">(inklusif)</string>
+
+    <!-- settings: wallet info -->
+
+    <string name="walletinfo_title">Informasi dompet</string>
+    <string name="walletinfo_descriptor_legacy">Deskriptor legacy</string>
+    <string name="walletinfo_descriptor">Deskriptor</string>
+    <string name="walletinfo_swapin_user_pubkey">Kunci publik pengguna</string>
+    <string name="walletinfo_swapin_addresses">Tukar alamat</string>
+    <string name="walletinfo_xpub">Kunci publik utama</string>
+    <string name="walletinfo_path">(Jalur: %1$s)</string>
+
+    <string name="walletinfo_swappable_title">Siap untuk ditukar</string>
+    <string name="walletinfo_confirming_title">Menunggu konfirmasi %1$d</string>
+    <string name="walletinfo_confirming_more">+%1$d lebih lanjut…</string>
+    <string name="walletinfo_confirmed_title">Saldo terkonfirmasi</string>
+    <string name="walletinfo_unconfirmed_title">Saldo belum dikonfirmasi</string>
+    <string name="walletinfo_incoming_balance">+%1$s masuk</string>
+    <string name="walletinfo_loading_data">Memuat data dompet…</string>
+
+    <string name="swapinaddresses_title">Alamat pengganti</string>
+    <string name="swapinaddresses_sync">Sinkronisasi…</string>
+    <string name="swapinaddresses_taproot">Taproot</string>
+    <string name="swapinaddresses_legacy">Legacy</string>
+
+    <string name="walletinfo_lightning">Lightning</string>
+    <string name="walletinfo_nodeid">ID node</string>
+    <string name="walletinfo_legacy_nodeid_toggle">Tampilkan ID node lama</string>
+    <string name="walletinfo_legacy_nodeid">ID node lama</string>
+
+    <string name="walletinfo_onchain_final">Dompet terakhir</string>
+    <string name="walletinfo_onchain_final_spend_button">Membelanjakan</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_title">Manajemen saluran</string>
+    <string name="liquiditypolicy_fees_estimation_loading">Mengambil tarif biaya…</string>
+    <string name="liquiditypolicy_fees_header">Pengaturan biaya saya</string>
+    <string name="liquiditypolicy_advanced_title">Manajemen saluran tingkat lanjut</string>
+    <string name="liquiditypolicy_loading">Mengambil kebijakan…</string>
+
+    <!-- CPFP splices -->
+
+    <string name="cpfp_feerate_label">Tarif biaya</string>
+    <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
+
+    <string name="cpfp_prepare_button">Siapkan pembayaran</string>
+    <string name="cpfp_estimating">Memperkirakan biaya…</string>
+    <string name="cpfp_estimation">Anda akan membayar <b>%1$s</b> kepada penambang Bitcoin</string>
+    <string name="cpfp_execute_button">Lakukan pembayaran</string>
+    <string name="cpfp_executing">Melakukan pembayaran…</string>
+    <string name="cpfp_success">Pembayaran selesai</string>
+    <string name="cpfp_failure_title">Pembayaran gagal</string>
+    <string name="cpfp_error_title">Tidak dapat melanjutkan</string>
+
+    <!-- mempool -->
+
+    <string name="mempool_unknown_feerate_title">Status mempool tidak diketahui</string>
+    <string name="mempool_unknown_feerate_details">Phoenix tidak dapat mengambil status mempool saat ini dan tidak dapat memperkirakan kecepatan transaksi Anda.\n\nPeriksa mempool secara manual di explorer, dan gunakan nilai yang sesuai!</string>
+    <string name="mempool_fastest">≈ 10 menit</string>
+    <string name="mempool_halfhour">≈ 30 menit</string>
+    <string name="mempool_hour">≈ 1 jam</string>
+    <string name="mempool_slow">Tarif biaya rendah</string>
+
+    <!-- splice errors -->
+
+    <string name="splice_error_nochannels">Anda tidak memiliki saluran apa pun</string>
+    <string name="splice_error_aborted_by_peer">Dibatalkan oleh rekan [%1$s]</string>
+    <string name="splice_error_cannot_create_commit">Tidak dapat membuat komitmen baru</string>
+    <string name="splice_error_concurrent_remote">Ada penyambungan lain yang sedang berlangsung</string>
+    <string name="splice_error_channel_not_quiescent">Dibatalkan karena kesalahan</string>
+    <string name="splice_error_disconnected">Saluran terputus</string>
+    <string name="splice_error_funding_error">Pendanaan gagal [%1$s]</string>
+    <string name="splice_error_insufficient_funds">Dana tidak mencukupi</string>
+    <string name="splice_error_cannot_start_session">Tidak dapat memulai sesi transaksi dengan pihak lawan</string>
+    <string name="splice_error_interactive_session">Sesi transaksi interaktif gagal [%1$s]</string>
+    <string name="splice_error_invalid_pubkey">Skrip kunci publik pemutus sambungan tidak valid</string>
+    <string name="splice_error_splice_in_progress">Pembayaran sambungan sudah sedang berlangsung</string>
+    <string name="splice_error_invalid_liquidity_ads">Permintaan liquidity-ads tidak valid: [%1$s]</string>
+    <string name="splice_error_invalid_channel_params">Parameter saluran tidak valid: [%1$s]</string>
+    <string name="splice_error_unexpected">Kesalahan tak terduga: [%1$s]</string>
+
+    <!-- reset wallet -->
+
+    <string name="reset_wallet_title">Hapus dompet</string>
+    <string name="reset_wallet_instructions_header">Layar ini memungkinkan Anda menghapus dompet ini dari perangkat Anda.</string>
+    <string name="reset_wallet_instructions_details">Semua data untuk dompet ini akan dihapus. Ini termasuk riwayat pembayaran Anda.</string>
+    <string name="reset_wallet_payments_history_button">Simpan riwayat pembayaran</string>
+    <string name="reset_wallet_review_button">Tinjauan</string>
+
+    <string name="reset_wallet_confirm_title">Konfirmasi penghapusan dompet</string>
+    <string name="reset_wallet_confirm_header">Dompet akan dihapus sepenuhnya dari <b>perangkat ini</b>.</string>
+    <string name="reset_wallet_confirm_details">Seed dompet ini dan riwayat pembayarannya akan dihapus dari disk. Anda akan diminta untuk menggunakan dompet lain, atau membuat yang baru.</string>
+    <string name="reset_wallet_confirm_details2">Dompet lain yang telah Anda impor sebelumnya tidak akan dihapus.</string>
+    <string name="reset_wallet_confirm_seed_balance">Jangan sampai kehilangan dana Anda</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Saya mengerti bahwa jika saya kehilangan frasa pemulihan setelah menghapus dompet, semua dana yang tersisa akan hilang secara permanen.</string>
+    <string name="reset_wallet_confirm_button">Hapus dompet</string>
+    <string name="reset_wallet_shutting_down">Mematikan…</string>
+    <string name="reset_wallet_deleting_prefs">Menghapus preferensi…</string>
+    <string name="reset_wallet_deleting_seed">Menghapus seed…</string>
+    <string name="reset_wallet_deleting_db">Menghapus basis data…</string>
+    <string name="reset_wallet_success">Dompet telah berhasil direset.</string>
+    <string name="reset_wallet_failure_title">Reset gagal</string>
+
+    <!-- swap input signer tool -->
+
+    <string name="swapin_signer_title">Penandatangan pengganti</string>
+    <string name="swapin_signer_instructions">Alat penelusuran kesalahan (debugging) ini memungkinkan Anda menandatangani input swap-in. Gunakan hanya jika Anda memahami fungsinya</string>
+    <string name="swapin_signer_tx">tx belum ditandatangani</string>
+    <string name="swapin_signer_server_nonce">Nonce server</string>
+    <string name="swapin_signer_sign">tandatangan</string>
+    <string name="swapin_signer_signing">menandatangani…</string>
+    <string name="swapin_signer_signed_sig">Tanda tangan pengguna</string>
+    <string name="swapin_signer_invalid_tx_header">Transaksi tyang belum ditandatangani tidak valid</string>
+    <string name="swapin_signer_invalid_tx_details">Pastikan input sudah lengkap dan tidak ada karakter yang hilang.</string>
+    <string name="swapin_signer_error_header">Gagal menandatangani input</string>
+
+    <!-- settings: contacts list -->
+
+    <string name="settings_contacts_help">Layar ini memungkinkan Anda untuk menghubungkan kode Bolt12 atau alamat Lightning ke sebuah nama.\n\nData kontak ini khusus untuk Phoenix dan disimpan secara lokal.</string>
+
+    <!-- experimental -->
+
+    <string name="experimental_title">Fitur eksperimental</string>
+
+    <string name="bip353_header">Alamat DNS Bip353</string>
+    <string name="bip353_empty">Belum ada alamat…</string>
+    <string name="bip353_claim_button">Klaim alamat saya</string>
+    <string name="bip353_claiming">Mengklaim alamat…</string>
+    <string name="bip353_error">Alamat tidak dapat diklaim</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_screenlock_title">Masukkan PIN penguncian</string>
+    <string name="pincode_check_spending_payment_title">Masukkan PIN Pengeluaran</string>
+    <string name="pincode_check_spending_displayseed_title">Masukkan PIN Pengeluaran untuk melihat seed</string>
+    <string name="pincode_check_disabling_title">Masukkan PIN untuk melanjutkan</string>
+    <string name="pincode_new_screenlock_title">Buat PIN Kunci</string>
+    <string name="pincode_new_spending_title">Buat PIN Pengeluaran</string>
+    <string name="pincode_confirm_title">Konfirmasi PIN</string>
+
+    <string name="pincode_checking_label">Memeriksa PIN…</string>
+    <string name="pincode_failure_label">Salah</string>
+    <string name="pincode_locked_label">Terkunci selama %1$s</string>
+
+    <string name="pincode_error_generic">Terjadi kesalahan</string>
+    <string name="pincode_error_malformed">PIN yang cacat</string>
+    <string name="pincode_error_confirm_do_not_match">PIN tidak cocok!</string>
+    <string name="pincode_error_write">Terjadi kesalahan saat menyimpan PIN</string>
+
+    <!-- nfc & hce labels -->
+
+    <string name="nfc_hce_service_desc">Layanan APDU untuk Phoenix untuk meniru tag NFC</string>
+    <string name="nfc_hce_aid_desc">AID untuk tag NFC yang diemulasikan oleh Phoenix</string>
+
+    <string name="nfc_err_busy">NFC sedang sibuk</string>
+    <string name="nfc_err_not_available">NFC tidak tersedia</string>
+    <string name="nfc_err_disabled">NFC dinonaktifkan</string>
+    <string name="nfc_err_hce_not_supported">Emulasi tag tidak didukung.</string>
+
+    <string name="nfc_button">Nfc</string>
+    <string name="nfc_hce_emulation_title">Dekatkan ke pembaca NFC</string>
+    <string name="nfc_reader_title">Siap untuk memindai</string>
+    <string name="nfc_reader_desc">Dekatkan ke perangkat NFC untuk membacanya</string>
+
+    <!-- Currency converter -->
+
+    <string name="converter_title">Konverter Mata Uang</string>
+    <string name="converter_done_button">Selesai</string>
+    <string name="converter_placeholder_label">Masukkan jumlah dalam %1$s</string>
+    <string name="converter_add_new_button">Tambahkan mata uang baru…</string>
+    <string name="converter_timestamp_refresh">Terakhir diperbarui: %1$s</string>
+    <string name="unitdropdown_more">Lainnya…</string>
+    <string name="currencypicker_title">Pilih mata uang</string>
+    <string name="currencypicker_no_match">Tidak ditemukan kecocokan…</string>
+
+    <!-- user wallet -->
+
+    <string name="wallet_name_default">Dompet</string>
+    <string name="wallet_add_new">Tambahkan dompet baru</string>
+    <string name="wallet_lock">Mengunci</string>
+
+
+    <string name="wallet_edit_name_placeholder">Masukkan nama</string>
+    <string name="wallet_edit_default_label">Dompet default</string>
+    <string name="wallet_edit_default_description">Jika dompet default dipilih, dompet tersebut akan otomatis terbuka saat aplikasi diluncurkan.</string>
+    <string name="wallet_edit_secret_label">Dompet Tersembunyi (Dalam Pengembangan)</string>
+    <string name="wallet_edit_secret_description">Dompet tidak akan terlihat di layar pemilihan. Untuk mengakses dompet, Anda harus memasukkan PIN kuncinya.</string>
+		<string name="wallet_edit_pick_avatar">Pilih avatar</string>
+
+</resources> 
