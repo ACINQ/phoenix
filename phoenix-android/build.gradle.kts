@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -8,14 +9,8 @@ plugins {
     alias(libs.plugins.compose)
 }
 
-fun gitCommitHash(): String {
-    val stream = ByteArrayOutputStream()
-    project.exec {
-        commandLine = "git rev-parse --verify --short HEAD".split(" ")
-        standardOutput = stream
-    }
-    return String(stream.toByteArray()).split("\n").first()
-}
+fun gitCommitHash(): String = providers.exec { commandLine("git", "rev-parse", "--verify", "--short", "HEAD") }
+    .standardOutput.asText.get().trim()
 
 val chain: String by project
 
@@ -66,11 +61,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + "-opt-in=androidx.constraintlayout.compose.ExperimentalMotionApi"
-    }
-
     buildFeatures {
         compose = true
         viewBinding = true
@@ -84,6 +74,10 @@ android {
 }
 
 kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("1.8")
+        freeCompilerArgs.add("-opt-in=androidx.constraintlayout.compose.ExperimentalMotionApi")
+    }
     target {
         compilerOptions {
             optIn.addAll("kotlin.RequiresOptIn")
