@@ -45,7 +45,7 @@
     <string name="notif_rejected_policy_disabled">Pengelolaan Saluran otomatis dinonaktifkan. Ketuk untuk detail.</string>
     <string name="notif_rejected_policy_disabled_timeout">Pengelolaan Saluran otomatis dinonaktifkan. Deposit ini akan kedaluwarsa dalam %1$s.</string>
     <string name="notif_rejected_over_absolute">Biayanya adalah %1$s, tetapi batas biaya maksimum Anda adalah %2$s. Ketuk untuk detailnya.</string>
-		<string name="notif_rejected_over_absolute_timeout">Biaya sebesar %1$s, namun batas maksimum Anda %2$s. Deposit ini akan kedaluwarsa pada %3$s.</string>
+    <string name="notif_rejected_over_absolute_timeout">Biaya sebesar %1$s, namun batas maksimum Anda %2$s. Deposit ini akan kedaluwarsa pada %3$s.</string>
     <string name="notif_rejected_over_relative">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Ketuk untuk detail selengkapnya.</string>
     <string name="notif_rejected_over_relative_timeout">Biaya yang dikenakan adalah %1$s, yang lebih besar dari %2$s%% dari jumlah yang diterima. Deposit ini akan kedaluwarsa pada %3$s.</string>
     <string name="notif_rejected_amount_too_low">Jumlah pembayaran terlalu rendah.</string>
@@ -499,6 +499,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Ini adalah alamat tetap yang mudah dibaca untuk permintaan pembayaran Bolt12 Anda.</string>
-		<string name="bip353_subtitle2">Ingin alamat yang lebih menarik? Gunakan layanan pihak ketiga, atau kelola sendiri alamat tersebut!</string>
+    <string name="bip353_subtitle2">Ingin alamat yang lebih menarik? Gunakan layanan pihak ketiga, atau kelola sendiri alamat tersebut!</string>
 
 </resources>
