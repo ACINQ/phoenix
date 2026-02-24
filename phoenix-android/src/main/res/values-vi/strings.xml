@@ -266,14 +266,15 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Nhật ký ứng dụng</string>
-    <string name="logs_exporting">Truy xuất nhật ký…</string>
-    <string name="logs_failed">Báo lỗi: không thể truy xuất nhật ký</string>
-    <string name="logs_view_button">Xem nhật ký…</string>
-    <string name="logs_view_with">Xem nhật ký bằng…</string>
-    <string name="logs_share_button">Chia sẻ nhật ký…</string>
-    <string name="logs_share_subject">Nhật ký ứng dụng Phoenix</string>
-    <string name="logs_share_title">Chia sẻ nhật ký ứng dụng Phoenix…</string>
+    <string name="troubleshooting_title">Chẩn đoán &amp; Nhật ký</string>
+    <string name="troubleshooting_diagnostics_copy_button">Sao chép chẩn đoán ứng dụng</string>
+    <string name="troubleshooting_logs_exporting">Truy xuất nhật ký…</string>
+    <string name="troubleshooting_logs_failed">Báo lỗi: không thể truy xuất nhật ký</string>
+    <string name="troubleshooting_logs_view_button">Xem nhật ký…</string>
+    <string name="troubleshooting_logs_view_with">Xem nhật ký bằng…</string>
+    <string name="troubleshooting_logs_share_button">Chia sẻ nhật ký…</string>
+    <string name="troubleshooting_logs_share_subject">Nhật ký ứng dụng Phoenix</string>
+    <string name="troubleshooting_logs_share_title">Chia sẻ nhật ký ứng dụng Phoenix…</string>
 
     <!-- payment details -->
 
@@ -614,7 +615,7 @@
     <string name="payments_export_csv_generate_button">Truy xuất</string>
     <string name="payments_export_csv_no_payments">Chưa có khoản thanh toán thành công nào</string>
     <string name="payments_export_csv_invalid_timestamps">Vui lòng chọn ngày bắt đầu/kết thúc hợp lệ</string>
-    <string name="payments_export_csv_in_progress">Đang truy xuất thanh toán #%1$d</string>
+    <string name="payments_export_csv_in_progress">Đang xuất các khoản thanh toán…</string>
     <string name="payments_export_csv_share_subject">Phoenix - các thanh toán từ %1$s tới %2$s</string>
     <string name="payments_export_csv_share_title">Chia sẻ các thanh toán Phoenix…</string>
     <string name="payments_export_csv_share_button">Chia sẻ tập tin</string>

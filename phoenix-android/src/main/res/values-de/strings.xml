@@ -264,14 +264,15 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">App Logs</string>
-    <string name="logs_exporting">Protokolle exportieren..</string>
-    <string name="logs_failed">Fehler: Logs konnten nicht exportiert werden</string>
-    <string name="logs_view_button">Logs anzeigen…</string>
-    <string name="logs_view_with">Logs anzeigen mit…</string>
-    <string name="logs_share_button">Logs teilen…</string>
-    <string name="logs_share_subject">Phoenix App Logs</string>
-    <string name="logs_share_title">Phoenix Logs teilen…</string>
+    <string name="troubleshooting_title">Diagnose &amp; Logs</string>
+    <string name="troubleshooting_diagnostics_copy_button">App-Diagnose kopieren</string>
+    <string name="troubleshooting_logs_exporting">Protokolle exportieren..</string>
+    <string name="troubleshooting_logs_failed">Fehler: Logs konnten nicht exportiert werden</string>
+    <string name="troubleshooting_logs_view_button">Logs anzeigen…</string>
+    <string name="troubleshooting_logs_view_with">Logs anzeigen mit…</string>
+    <string name="troubleshooting_logs_share_button">Logs teilen…</string>
+    <string name="troubleshooting_logs_share_subject">Phoenix App Logs</string>
+    <string name="troubleshooting_logs_share_title">Phoenix Logs teilen…</string>
 
     <!-- payment details -->
 
@@ -621,7 +622,7 @@
     <string name="payments_export_csv_generate_button">Exportieren</string>
     <string name="payments_export_csv_no_payments">Noch keine erfolgreichen Zahlungen</string>
     <string name="payments_export_csv_invalid_timestamps">Bitte wählen Sie ein gültiges Anfangs-/Enddatum</string>
-    <string name="payments_export_csv_in_progress">Exportiere Zahlung #%1$d</string>
+    <string name="payments_export_csv_in_progress">Zahlungen exportieren…</string>
     <string name="payments_export_csv_share_subject">Phoenix-Zahlungen vom %1$s bis %2$s</string>
     <string name="payments_export_csv_share_title">Phoenix-Zahlungen teilen…</string>
     <string name="payments_export_csv_share_button">Datei teilen</string>

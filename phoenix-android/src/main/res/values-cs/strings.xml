@@ -303,9 +303,6 @@
     <string name="spendchanneladdress_title">Utratit z adresy kanálu</string>
     <string name="spendchanneladdress_instructions">Tato obrazovka slouží jako debugovací nástroj, který pomáhá obnovit prostředky, které byly omylem zaslány na výstup kanálu.</string>
     <string name="spendchanneladdress_amount">Částka</string>
-    <string name="spendchanneladdress_tx_index">Index transakce</string>
-    <string name="spendchanneladdress_channel_data">Holá data kanálu</string>
-    <string name="spendchanneladdress_remote_funding_pubkey">Vzdálený financující funding veřejný klíč</string>
     <string name="spendchanneladdress_unsigned_tx">Nepodepsaná transakce</string>
     <string name="spendchanneladdress_sign_button">Podepsat</string>
     <string name="spendchanneladdress_signing">Podepisování…</string>
@@ -348,14 +345,15 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Logy aplikace</string>
-    <string name="logs_exporting">Exportování logů…</string>
-    <string name="logs_failed">Chyba: logy se nepodařilo exportovat</string>
-    <string name="logs_view_button">Zobrazit logy…</string>
-    <string name="logs_view_with">Otevřít logy s…</string>
-    <string name="logs_share_button">Sdílet logy…</string>
-    <string name="logs_share_subject">Logy aplikace Phoenix</string>
-    <string name="logs_share_title">Sdílet logy Phoenixu…</string>
+    <string name="troubleshooting_title">Diagnostika a logy</string>
+    <string name="troubleshooting_diagnostics_copy_button">Kopírování diagnostiky aplikace</string>
+    <string name="troubleshooting_logs_exporting">Exportování logů…</string>
+    <string name="troubleshooting_logs_failed">Chyba: logy se nepodařilo exportovat</string>
+    <string name="troubleshooting_logs_view_button">Zobrazit logy…</string>
+    <string name="troubleshooting_logs_view_with">Otevřít logy s…</string>
+    <string name="troubleshooting_logs_share_button">Sdílet logy…</string>
+    <string name="troubleshooting_logs_share_subject">Logy aplikace Phoenix</string>
+    <string name="troubleshooting_logs_share_title">Sdílet logy Phoenixu…</string>
 
     <!-- payment details -->
 
@@ -442,8 +440,6 @@
     <string name="paymentdetails_bitcoin_address_label">Bitcoinová adresa</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced kanál</string>
-    <string name="paymentdetails_inputs_label">Místní vstupy</string>
-    <string name="paymentdetails_inputs_value">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Likvidita vyžádána</string>
 
@@ -789,7 +785,7 @@
     <string name="payments_export_csv_generate_button">Exportovat</string>
     <string name="payments_export_csv_no_payments">Zatím žádné úspěšné platby</string>
     <string name="payments_export_csv_invalid_timestamps">Vyberte prosím platné od/do datum</string>
-    <string name="payments_export_csv_in_progress">Exportování platby #%1$d</string>
+    <string name="payments_export_csv_in_progress">Export plateb…</string>
     <string name="payments_export_csv_copy_button">Zkopírovat data do schránky…</string>
     <string name="payments_export_csv_share_subject">Phoenix - platby od %1$s do %2$s</string>
     <string name="payments_export_csv_share_title">Sdílet Phoenix platby…</string>

@@ -29,19 +29,25 @@
     <string name="notification_missed_payment_desc">Affiché lorsqu\'un paiement est rejeté par insuffisance de liquidité.</string>
 
     <string name="notification_received_payment_title">Paiement reçu</string>
-    <string name="notification_received_payment_desc">Affiché lorsqu\'un paiement est reçu et que l\'appli est éteinte.</string>
+    <string name="notification_received_payment_desc">Affiché lorsqu\'un paiement est reçu et que l\'appli est en arrière-plan.</string>
 
     <string name="notification_headless_title">Arrière-plan</string>
-    <string name="notification_headless_desc">Vous notifie que Phoenix fonctionne en arrière plan.</string>
+    <string name="notification_headless_desc">Vous notifie que Phoenix fonctionne en arrière-plan.</string>
+
+    <string name="notification_swap_timeout_title">Expiration du swap</string>
+    <string name="notification_swap_timeout_desc">Vous notifie lorsqu\'un swap est sur le point d\'expirer.</string>
 
     <!-- init wallet / automated wallet creation -->
 
-    <string name="autocreate_generating">Création de votre portefeuille…</string>
-    <string name="autocreate_error">Échec de la création du portefeuille</string>
+    <string name="autocreate_generating">Création de votre wallet…</string>
+    <string name="autocreate_error">Échec de la création du wallet</string>
+    <string name="autocreate_error_already_exists">Cette seed a déjà été importée</string>
+    <string name="autocreate_error_cannot_load_existing">Le wallet n\'a pas pu être écrit pour le moment. Réessayez plus tard.</string>
 
-    <string name="restore_title">Restaurer mon portefeuille</string>
+    <string name="restore_title">Restaurer mon wallet</string>
     <string name="restore_disclaimer_next">Suivant</string>
-    <string name="restore_in_progress">Restauration du portefeuille…</string>
+    <string name="restore_in_progress">Restauration du wallet…</string>
+    <string name="initwallet_electrum_option">Utiliser un serveur Electrum personnalisé</string>
 
     <!-- Auth prompt (v2) -->
 
@@ -61,19 +67,21 @@
     <string name="startup_error_start_business">Le wallet n\'a pas pu démarrer</string>
     <string name="startup_error_generic">Échec de la lecture des données du wallet</string>
     <string name="startup_error_try_again">Réessayer</string>
+    <string name="startup_error_serialisation">Sérialisation de fichier non gérée</string>
     <string name="startup_error_decryption_general">Erreur de déchiffrement:\n%1$s</string>
     <string name="startup_error_recovery_button">Restaurer manuellement</string>
 
     <!-- Startup wallet recovery -->
 
+    <string name="startup_recovery_title">Restauration du wallet</string>
     <string name="startup_recovery_instructions">Cet écran vous permet de restaurer un wallet en saissant sa clé de 12 mots.\n\nLes mots de la clé doivent être entrés dans le bon ordre, et séparés par un seul espace.</string>
     <string name="startup_recovery_input_label">Saisir le mot #%1$d</string>
     <string name="startup_recovery_input_label_error">Pas plus de 12 mots !</string>
     <string name="startup_recovery_invalid">Cette seed n\'est pas valide</string>
 
     <string name="startup_recovery_import_button">Import seed</string>
-    <string name="startup_recovery_checking">Vérification de la seed…</string>
     <string name="startup_recovery_reset_button">Réessayer</string>
+    <string name="startup_recovery_checking">Vérification de la seed…</string>
 
     <string name="startup_recovery_error_default">Une erreur est survenue.</string>
     <string name="startup_recovery_error_incorrect_seed">La clé saisie ne correspond pas à un wallet existant.</string>
@@ -94,26 +102,41 @@
     <string name="receive_help_qr">QR Code de l\'adresse ou de la requête de paiement</string>
 
     <string name="receive_bitcoin_address_label">Adresse</string>
+    <string name="receive_bitcoin_generating">Synchronisation de l\'adresse…</string>
     <string name="receive_bitcoin_share_title">Adresse Bitcoin</string>
     <string name="receive_bitcoin_share_subject">Partagez cette adresse Bitcoin avec…</string>
 
-    <string name="receive_label_bitcoin_help">Ce QR code représente une adresse Bitcoin classique.\n\nCelle-ci est compréhensible par presque tous les services et wallets Bitcoin, mais les paiements seront plus lents à arriver.</string>
-    <string name="receive_label_lightning_help">Ce QR code est une requête de paiement Lightning.\n\nLes paiements Lightning sont très rapides et habituellement moins cher, mais certains wallets et services ne les comprennent pas encore.\n\nDans ce cas, passez sur l\'écran de droite pour afficher une adresse Bitcoin classique.</string>
-
     <string name="receive_lightning_generating">Création d\'une requête de paiement…</string>
     <string name="receive_lightning_switch_bolt11">Usage unique</string>
+    <string name="receive_lightning_switch_bolt11_desc">Bolt11</string>
     <string name="receive_lightning_switch_bolt12">Réutilisable</string>
+    <string name="receive_lightning_switch_bolt12_desc">Bolt12</string>
     <string name="receive_lightning_amount_label">Montant</string>
     <string name="receive_lightning_desc_label">Desc</string>
     <string name="receive_lightning_error">Échec de la création de la requête</string>
     <string name="receive_lightning_share_subject">Paiement Lightning</string>
     <string name="receive_lightning_share_title">Partagez cette requête de paiement Lightning avec…</string>
 
+    <string name="receive_label_bitcoin">Adresse Bitcoin</string>
+    <string name="receive_label_bitcoin_help">Ce QR code représente une adresse Bitcoin classique.\n\nCelle-ci est compréhensible par presque tous les services et wallets Bitcoin, mais les paiements seront plus lents à arriver.</string>
+    <string name="receive_label_bip353">Adresse Lightning</string>
+    <string name="receive_label_lightning">Lightning</string>
+    <string name="receive_label_lightning_help">Ce QR code est une requête de paiement Lightning.\n\nLes paiements Lightning sont très rapides et habituellement moins chers, mais certains wallets et services ne les comprennent pas encore.\n\nDans ce cas, passez sur l\'écran de droite pour afficher une adresse Bitcoin classique.</string>
+    <string name="receive_label_bolt11">Lightning Bolt11</string>
+    <string name="receive_label_bolt12">Lightning Bolt12</string>
+    <string name="receive_label_bip21">URI Bitcoin</string>
+
+    <string name="receive_bip353_title">Qu\'est-ce que c\'est ?</string>
+    <string name="receive_bip353_info">Cette adresse Lightning utilise le standard moderne Bip353 qui fonctionne avec les requêtes de paiement Bolt12.\n\nElle est plus privée que les adresses Lightning basées sur LNURL, et peut même être auto-hébergée.\n\nCependant, c\'est une technologie de pointe ; certains wallets ou services ne la comprennent pas encore et ne pourront pas vous payer.</string>
+    <string name="receive_bip353_link">En savoir plus.</string>
+
+    <string name="receive_lightning_edit_title_bolt11">Personnaliser cette requête Bolt11</string>
+    <string name="receive_lightning_edit_title_bolt12">Personnaliser cette requête Bolt12</string>
     <string name="receive_lightning_edit_amount_label">Montant (optionnel)</string>
     <string name="receive_lightning_edit_amount_placeholder">Montant demandé</string>
     <string name="receive_lightning_edit_desc_label">Description (optionnel)</string>
     <string name="receive_lightning_edit_desc_placeholder">Entrez une description pour cette requête</string>
-    <string name="receive_lightning_edit_generate_button">Créer une requête</string>
+    <string name="receive_lightning_edit_generate_button">Générer</string>
 
     <!-- send -->
 
@@ -131,11 +154,22 @@
     <string name="send_trampoline_fee_loading">Calcul des frais…</string>
     <string name="send_connecting_button">En attente des canaux…</string>
     <string name="send_pay_button">Payer</string>
+    <string name="send_confirm_pay_button">Confirmer et payer</string>
+    <string name="send_pay_retry_button">Réessayer</string>
+
+    <string name="send_offer_payer_note_label">Message</string>
+    <string name="send_offer_payer_note_placeholder">Joindre un message…</string>
+    <string name="send_offer_payer_note_dialog_title">Joindre un message</string>
+    <string name="send_offer_payer_note_dialog_subtitle">Le destinataire recevra ce message</string>
+    <string name="send_offer_payer_note_dialog_placeholder">Saisir un message…</string>
+    <string name="send_offer_fetching">Récupération des détails du paiement…</string>
+    <string name="send_offer_failure_title">Le paiement a échoué</string>
+    <string name="send_offer_failure_timeout">Les détails pour ce paiement n\'ont pas pu être récupérés en un temps raisonnable.\n\nLe destinataire est possiblement hors-ligne, ou indisponible.</string>
 
     <string name="send_paymentmode_onchain">Payer sur chaîne</string>
-    <string name="send_paymentmode_onchain_desc">Les transactions sur la chaîne Bitcoin sont généralement plus lentes et adaptées au gros paiements.</string>
+    <string name="send_paymentmode_onchain_desc">Les transactions sur la chaîne Bitcoin sont généralement plus lentes et adaptées aux gros paiements.</string>
     <string name="send_paymentmode_lightning">Payer via Lightning</string>
-    <string name="send_paymentmode_lightning_desc">Les paiement Lightning sont rapides et adaptés aux petits montants.</string>
+    <string name="send_paymentmode_lightning_desc">Les paiements Lightning sont rapides et adaptés aux petits montants.</string>
 
     <string name="send_spliceout_address_label">Adresse</string>
     <string name="send_spliceout_feerate_label">Taux de frais</string>
@@ -149,41 +183,50 @@
     <string name="send_spliceout_prepare_in_progress">Préparation de la transaction…</string>
     <string name="send_spliceout_execute_in_progress">Exécution du splice…</string>
     <string name="send_spliceout_complete_recap_fee">Frais de minage</string>
-    <string name="send_spliceout_complete_recap_fee_details">Utilise un taux effective de %1$s sat/vbyte.</string>
+    <string name="send_spliceout_complete_recap_fee_details">Utilise un taux effectif de %1$s sat/vbyte.</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
-
-    <string name="send_pay_retry_button">Réessayer</string>
-    <string name="send_offer_payer_note_label">Message</string>
-    <string name="send_offer_payer_note_placeholder">Joindre un message…</string>
-    <string name="send_offer_payer_note_dialog_title">Joindre un message</string>
-    <string name="send_offer_payer_note_dialog_subtitle">Le destinataire recevra ce message</string>
-    <string name="send_offer_payer_note_dialog_placeholder">Saisir un message…</string>
-    <string name="send_offer_fetching">Récupération des détails du paiement…</string>
-    <string name="send_offer_failure_title">Le paiement a échoué</string>
-    <string name="send_offer_failure_timeout">Les détails pour ce paiement n\'ont pas pu être récupérés en un temps raisonnable.\n\nLe destinataire est possiblement hors-ligne, ou indisponible.</string>
 
     <!-- scan -->
 
     <string name="scan_request_camera_access">Autoriser l\'accès à la caméra</string>
     <string name="scan_request_camera_access_denied">L\'accès à la caméra a été refusé</string>
+    <string name="scan_help">Zoomez ou tapez sur le QR pour faire la mise au point</string>
 
+    <!-- prepare send payment -->
+
+    <string name="preparesend_title">Envoyer</string>
+    <string name="preparesend_contacts_none">Aucun contact pour l\'instant…</string>
+    <string name="preparesend_contacts_no_matches">Aucun résultat pour cette recherche…</string>
+
+    <string name="preparesend_paste_button">Coller</string>
+    <string name="preparesend_scan_button">Scanner un QR code</string>
+    <string name="preparesend_imagepicker_button">Choisir une image</string>
+    <string name="preparesend_imagepicker_error">Cette image n\'a pas pu être traitée.</string>
+    <string name="preparesend_imagepicker_not_found">Aucun QR code trouvé dans cette image.</string>
+    <string name="preparesend_parsing">Lecture de l\'entrée…</string>
     <string name="preparesend_lnurl_fetching">Récupération des données auprès du service…</string>
     <string name="preparesend_bip353_resolving">Résolution de la requête de paiement via DNS…</string>
+
+    <string name="preparesend_funds_final_wallet">Vous avez des fonds on-chain dans le wallet final, mais aucun sur Lightning.</string>
+    <string name="preparesend_funds_final_wallet_button">Voir le wallet final</string>
 
     <!-- utils: misc strings -->
 
     <string name="utils_rounded">≈</string>
     <string name="utils_converted_amount">≈ %1$s</string>
+    <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">Taux de change Bitcoin indisponible</string>
 
     <string name="utils_date_just_now">à l\'instant</string>
     <string name="utils_unknown">N/A</string>
+    <string name="utils_processing_data">Traitement des données…</string>
     <string name="utils_loading_data">Chargement des données…</string>
     <string name="utils_loading_prefs">Chargement des préférences…</string>
     <string name="utils_copied">Copié dans le presse-papiers</string>
 
     <string name="accessibility_link">Ouvrir le lien dans un navigateur</string>
     <string name="accessibility_explorer_link">Ouvrir la transaction dans un explorateur</string>
+    <string name="accessibility_address_explorer_link">Ouvrir l\'adresse dans un explorateur</string>
     <string name="validation_empty">Ce champ ne peut être vide</string>
     <string name="validation_invalid_amount">Veuillez saisir un montant valide</string>
     <string name="validation_invalid_number">Veuillez saisir un chiffre valide</string>
@@ -192,31 +235,34 @@
     <string name="btn_back">Revenir en arrière</string>
     <string name="btn_next">Suivant</string>
     <string name="btn_copy">Copier</string>
-    <string name="btn_ok">OK</string>
     <string name="btn_share">Partager</string>
-    <string name="btn_save">Sauver</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_save">Enregistrer</string>
+    <string name="btn_delete">Supprimer</string>
     <string name="btn_confirm">Confirmer</string>
     <string name="btn_cancel">Annuler</string>
     <string name="btn_close">Fermer</string>
 
     <!-- mutual close -->
 
-    <string name="mutualclose_title">Vider mon portefeuille</string>
+    <string name="mutualclose_title">Vider mon wallet</string>
     <string name="mutualclose_loading">Chargement…</string>
     <string name="mutualclose_checking_balance">Vérification du solde…</string>
     <string name="mutualclose_balance">Solde: <b>%1$s</b> (≈ %2$s)</string>
-    <string name="mutualclose_no_channels">Ce portefeuille n\'a pas de canaux éligibles à une clôture.</string>
+    <string name="mutualclose_no_channels">Ce wallet n\'a pas de canaux éligibles à une clôture.</string>
     <string name="mutualclose_button">Vérifier la clôture</string>
     <string name="mutualclose_error_chain_mismatch">Cette adresse utilise une blockchain différente</string>
     <string name="mutualclose_error_chain_reqparams">Cette adresse utilise des fonctionnalités non supportées</string>
     <string name="mutualclose_error_chain_generic">Cette adresse n\'est pas compatible</string>
     <string name="mutualclose_done">La clôture a été initiée. La transaction de clôture figure dans votre liste de transactions.</string>
 
-    <string name="forceclose_no_channels">Aucun canaux éligible à une clôture.</string>
+    <string name="forceclose_no_channels">Aucun canal éligible à une clôture.</string>
 
     <!-- channels view -->
 
     <string name="channelsview_title">Canaux de paiements</string>
+    <string name="channelsview_menu_spend_channel_balance">Dépenser l\'adresse du canal</string>
+    <string name="channelsview_header">Vue d\'ensemble</string>
     <string name="channelsview_balance">Solde</string>
     <string name="channelsview_balance_about">Votre <b>solde</b> est le total du solde de vos canaux actifs. C\'est ce que vous pouvez dépenser via Lightning.</string>
     <string name="channelsview_inbound">Liquidité entrante</string>
@@ -231,6 +277,7 @@
     <string name="channeldetails_channel_id">Identifiant du canal</string>
     <string name="channeldetails_state">État</string>
     <string name="channeldetails_spendable">Solde</string>
+    <string name="channeldetails_receivable">Liquidité entrante</string>
 
     <string name="channeldetails_commitments">Commitments actifs</string>
     <string name="channeldetails_inactive_commitments">Commitments inactifs</string>
@@ -244,47 +291,66 @@
     <string name="channeldetails_share_subject">Données du canal</string>
     <string name="channeldetails_share_title">Partager les données du canal</string>
 
+    <!-- spend from channel address -->
+
+    <string name="spendchanneladdress_title">Dépenser l\'adresse du canal</string>
+    <string name="spendchanneladdress_instructions">Cet écran est un outil de débogage permettant de récupérer des fonds envoyés accidentellement à l\'outpoint d\'un canal.</string>
+    <string name="spendchanneladdress_amount">Montant</string>
+    <string name="spendchanneladdress_sign_button">Signer</string>
+    <string name="spendchanneladdress_signing">Signature…</string>
+
+    <string name="spendchanneladdress_success_header">Signature générée avec succès.</string>
+    <string name="spendchanneladdress_success_pubkey">Clé publique</string>
+    <string name="spendchanneladdress_success_signature">Signature</string>
+    <string name="spendchanneladdress_success_nonce">Nonce</string>
+
+    <string name="spendchanneladdress_error_generic">Échec de la signature des données</string>
+    <string name="spendchanneladdress_error_amount">Montant invalide</string>
+    <string name="spendchanneladdress_error_tx_index">Index de transaction invalide</string>
+
     <!-- home: balance section & misc -->
 
     <string name="home_balance_loading">Chargement…</string>
     <string name="home_onchain_incoming">+%1$s</string>
 
     <string name="home_faq_button">FAQ</string>
-    <string name="home_payments_none">Utilisez les boutons Envoyer et Recevoir ci-dessous pour débuter !</string>
+    <string name="home_payments_none">Utilisez les boutons Recevoir et Envoyer ci-dessous pour débuter !</string>
     <string name="home_payments_more_button">Montrer tous les paiements…</string>
     <string name="home_connection_electrum_late">Electrum en retard</string>
     <string name="home_connection_bad_cert">Certificat Electrum</string>
+    <string name="home_connection_onion">Adresse invalide</string>
     <string name="home_connection_connecting">Connexion…</string>
     <string name="home_connection_tor_active">Tor</string>
+    <string name="home_request_liquidity">Demande de liquidité</string>
+    <string name="home_inflight_payments">Vous avez actuellement %1$d paiement(s) en cours dans le wallet. Gardez l\'application ouverte pour vous assurer que ces paiements se finalisent proprement.</string>
 
     <!-- in-app notifications -->
 
-    <string name="home_request_liquidity">Demande de liquidité</string>
-    <string name="home_inflight_payments">Vous avez actuellement %1$d paiement(s) en cours dans le wallet. Gardez l\'application ouverte pour vous assurer que ces paiements se finalisent proprement.</string>
     <string name="inappnotif_title">Notifications</string>
     <string name="inappnotif_notices_title">Messages importants</string>
     <string name="inappnotif_payments_title">Activité récente</string>
-    <string name="inappnotif_empty">Aucune notifications pour l\'instant</string>
+    <string name="inappnotif_empty">Aucune notification pour l\'instant</string>
 
     <!-- settings: display seed -->
 
     <string name="displayseed_title">Phrase de sauvegarde</string>
     <string name="displayseed_loading">Déverrouillage de la clé…</string>
-    <string name="displayseed_error_details">La clé n\'a pas pu étre déverrouillée</string>
+    <string name="displayseed_error_details">La clé n\'a pas pu être déverrouillée</string>
     <string name="displayseed_derivation_path">Seed BIP39 avec chemin de dérivation BIP84</string>
     <string name="displayseed_loading_prefs">Chargement des préférences…</string>
     <string name="displayseed_backup_title">Confirmation de la sauvegarde</string>
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Logs applicatifs</string>
-    <string name="logs_exporting">Export des logs…</string>
-    <string name="logs_failed">Erreur: les logs n\'ont pu être exportés</string>
-    <string name="logs_view_button">Voir les logs…</string>
-    <string name="logs_view_with">Voir les logs avec…</string>
-    <string name="logs_share_button">Partagez les logs…</string>
-    <string name="logs_share_subject">Phoenix App logs</string>
-    <string name="logs_share_title">Partagez les logs Phoenix…</string>
+    <string name="troubleshooting_title">Diagnostics et logs</string>
+    <string name="troubleshooting_diagnostics_copy_button">Copier les diagnostics de l\'application</string>
+    <string name="troubleshooting_logs_exporting">Export des logs…</string>
+    <string name="troubleshooting_logs_failed">Erreur: les logs n\'ont pu être exportés</string>
+    <string name="troubleshooting_logs_view_button">Voir les logs…</string>
+    <string name="troubleshooting_logs_view_with">Voir les logs avec…</string>
+    <string name="troubleshooting_logs_share_button">Partagez les logs…</string>
+    <string name="troubleshooting_logs_share_subject">Phoenix App logs</string>
+    <string name="troubleshooting_logs_share_title">Partagez les logs Phoenix…</string>
 
     <!-- payment details -->
 
@@ -292,6 +358,7 @@
     <string name="paymentdetails_error">Détails du paiement introuvable</string>
 
     <string name="paymentdetails_status_inbound_liquidity_success"><b>AJOUT DE LIQUIDITÉ</b> %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>GESTION DE CANAL</b> %1$s</string>
     <string name="paymentdetails_status_channelclose_confirmed"><b>CLÔTURÉ</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>ENVOYÉ</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">En attente…</string>
@@ -308,6 +375,11 @@
     <string name="paymentdetails_status_unconfirmed_default">%1$d confirmation(s)</string>
     <string name="paymentdetails_status_confirmed">Confirmé sur la chaîne</string>
 
+    <string name="paymentdetails_offer_note_label">Message</string>
+    <string name="paymentdetails_offer_sender_label">Envoyé par</string>
+    <string name="paymentdetails_offer_sender_unknown">Inconnu</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Prenez garde aux messages de source inconnue</string>
+
     <string name="paymentdetails_lnurlpay_service">Servi par</string>
     <string name="paymentdetails_lnurlpay_action_message_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_url_label">Lien</string>
@@ -323,12 +395,6 @@
     <string name="paymentdetails_error_label">Erreur</string>
     <string name="paymentdetails_no_description">Sans description</string>
     <string name="paymentdetails_info_uniclose">Ce paiement a eu lieu suite à un conflit dans un canal Lightning.</string>
-
-    <string name="paymentdetails_offer_note_label">Message</string>
-    <string name="paymentdetails_offer_sender_label">Envoyé par</string>
-    <string name="paymentdetails_offer_sender_unknown">Inconnu</string>
-    <string name="paymentdetails_offer_sender_unknown_details">Prenez garde aux messages de source inconnue</string>
-    <string name="paymentdetails_payerkey_is_mine">Clé de votre code Bolt12</string>
 
     <string name="paymentdetails_desc_splice_out">Paiement on-chain</string>
     <string name="paymentdetails_desc_closing_channel">Fermeture de canal</string>
@@ -353,14 +419,20 @@
     <string name="paymentdetails_technical_title">Détails techniques</string>
     <string name="paymentdetails_payment_type_label">Type de paiement</string>
     <string name="paymentdetails_type_outgoing_close">Clôture de canal de paiement</string>
-    <string name="paymentdetails_type_outgoing_splice">Splice sortant</string>
+    <string name="paymentdetails_type_incoming_onchain_splice">Paiement on-chain entrant (splice)</string>
+    <string name="paymentdetails_type_incoming_onchain_newchannel">Paiement on-chain entrant (nouveau canal)</string>
+    <string name="paymentdetails_type_incoming_legacy_paytopen">Paiement entrant (pay-to-open legacy)</string>
+    <string name="paymentdetails_type_incoming_legacy_swapin">Paiement on-chain entrant (swap-in legacy)</string>
+    <string name="paymentdetails_type_incoming_bolt11">Paiement Lightning entrant (bolt11)</string>
+    <string name="paymentdetails_type_incoming_bolt12">Paiement Lightning entrant (bolt12)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">Paiement Lightning sortant (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">Paiement Lightning sortant (bolt12)</string>
+    <string name="paymentdetails_type_outgoing_splice">Paiement on-chain sortant</string>
+    <string name="paymentdetails_type_outgoing_swapout">Paiement on-chain sortant (swap legacy)</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Accélération de transactions on-chain</string>
     <string name="paymentdetails_type_outgoing_liquidity_manual">Requête de liquidité entrante (manuelle)</string>
     <string name="paymentdetails_type_outgoing_liquidity_auto">Requête de liquidité entrante (auto)</string>
-    <string name="paymentdetails_type_outgoing_bolt11">Paiement Lightning sortant (bolt11)</string>
-    <string name="paymentdetails_type_outgoing_bolt12">Paiement Lightning sortant (bolt12)</string>
-    <string name="paymentdetails_type_incoming_bolt11">Paiement Lightning entrant (bolt11)</string>
-    <string name="paymentdetails_type_incoming_bolt12">Paiement Lightning entrant (bolt12)</string>
+
     <string name="paymentdetails_swapin_address_label">Adresse de dépôt on-chain</string>
     <string name="paymentdetails_bitcoin_address_label">Adresse Bitcoin</string>
 
@@ -376,11 +448,18 @@
     <string name="paymentdetails_closing_type_other">Autre</string>
 
     <string name="paymentdetails_pubkey_label">Clé publique du destinataire</string>
+    <string name="paymentdetails_payment_hash_label">Hash du paiement</string>
+    <string name="paymentdetails_preimage_label">Préimage</string>
+    <string name="paymentdetails_preimage_help">Preuve cryptographique que le destinataire a bien reçu le paiement.</string>
+    <string name="paymentdetails_bolt11_label">Requête de paiement Bolt11</string>
+    <string name="paymentdetails_bolt12_label">Requête de paiement Bolt12</string>
     <string name="paymentdetails_bolt11_description_label">Description de la requête de paiement</string>
     <string name="paymentdetails_bolt12_description_label">Description de l\'offer</string>
-    <string name="paymentdetails_payment_hash_label">Hash du paiement</string>
-    <string name="paymentdetails_bolt11_label">Requête de paiement</string>
-    <string name="paymentdetails_preimage_label">Préimage</string>
+    <string name="paymentdetails_offer_label">Offer</string>
+    <string name="paymentdetails_offer_metadata_label">Métadonnées</string>
+    <string name="paymentdetails_payerkey_label">Clé de l\'émetteur</string>
+    <string name="paymentdetails_payerkey_is_mine">Clé de votre code Bolt12</string>
+    <string name="paymentdetails_liquidity_purchase_type">Type d\'achat</string>
 
     <string name="paymentdetails_status_label">Statut du paiement</string>
     <string name="paymentdetails_status_success">Succès</string>
@@ -393,7 +472,9 @@
     <string name="paymentdetails_part_hops_label">Saut</string>
 
     <string name="paymentdetails_received_with_label">Reçu via</string>
+    <string name="paymentdetails_received_with_legacy_onchain">Opération de canal (nouveau ou splice-in)</string>
     <string name="paymentdetails_received_with_lightning">Paiement lightning</string>
+    <string name="paymentdetails_received_with_fee_credit">Crédit de frais</string>
     <string name="paymentdetails_channel_id_label">Identifiant du canal</string>
     <string name="paymentdetails_tx_id_label">Transaction</string>
 
@@ -405,27 +486,59 @@
     <string name="paymentdetails_invoice_requested_label">Montant demandé</string>
     <string name="paymentdetails_amount_sent_label">Montant envoyé (frais inclus)</string>
     <string name="paymentdetails_amount_received_label">Montant reçu</string>
+    <string name="paymentdetails_amount_fee_credit_label">Fee credit accumulé</string>
+    <string name="paymentdetails_amount_added_to_fee_credit_label">Montant ajouté au fee credit</string>
     <string name="paymentdetails_amount_rate_now">≈ %1$s (actuel)</string>
     <string name="paymentdetails_amount_rate_then">≈ %1$s (à l\'époque)</string>
 
     <!-- offer contact -->
 
-    <string name="contact_add_title">Associez un nom à un code de paiement</string>
     <string name="contact_add_contact_button">Ajouter un contact</string>
+    <string name="contact_pay_button">Envoyer un paiement</string>
 
-    <string name="contact_name_label">Nom</string>
-    <string name="contact_offer_key_title">Payer avec la clé de votre code Bolt12</string>
-    <string name="contact_offer_key_enabled">S\'il connaît votre code de paiement Bolt12, il pourra savoir quand des paiement viennent de votre part.</string>
-    <string name="contact_offer_key_disabled">Utiliser un identifiant jetable quand vous payez ce contact.</string>
+    <string name="contact_attach_offer_new">Créer un nouveau contact…</string>
 
+    <string name="contact_error_name_empty">Le nom ne peut pas être vide</string>
     <string name="contact_error_offer_invalid">Code Bolt12 invalide</string>
-    <string name="contact_error_offer_known">Ce code Bolt12 est déjà associée au contact %1$s</string>
+    <string name="contact_error_offer_known">Ce code Bolt12 est déjà associé au contact « %1$s »</string>
+    <string name="contact_error_address_invalid">Adresse Lightning invalide</string>
+    <string name="contact_error_address_known">Cette adresse est déjà associée à « %1$s »</string>
+    <string name="contact_error_invalid">Ce code ou cette adresse est invalide</string>
+
+    <string name="contact_codedialog_title_generic">Ajouter une adresse pour ce contact</string>
+    <string name="contact_codedialog_title_offer">Modifier le code Bolt12</string>
+    <string name="contact_codedialog_title_address">Modifier l\'adresse Lightning de ce contact.</string>
+
+    <string name="contact_codedialog_label_label">Libellé (optionnel)</string>
+    <string name="contact_codedialog_label_generic">Code Bolt12 ou adresse Lightning</string>
+    <string name="contact_codedialog_label_address">Adresse Lightning</string>
+    <string name="contact_codedialog_label_offer">Code Bolt12</string>
+
+    <string name="contact_delete_code_confirm">Voulez-vous supprimer cette adresse ?</string>
+    <string name="contact_delete_contact_confirm">Voulez-vous supprimer ce contact ?</string>
+
+    <string name="contact_add_title">Associez un nom à un code de paiement</string>
+    <string name="contact_name_label">Nom</string>
+    <string name="contact_name_hint">Entrez un nom</string>
+    <string name="contact_offer_key_title">Payer avec la clé de votre code Bolt12</string>
+    <string name="contact_offer_key_enabled">S\'il connaît votre code de paiement Bolt12, il pourra savoir quand des paiements viennent de votre part.</string>
+    <string name="contact_offer_key_disabled">Utiliser un identifiant jetable quand vous payez ce contact.</string>
+    <string name="contact_codes_list">Adresses</string>
+    <string name="contact_codes_add_new">Ajouter un code Bolt12 ou une adresse Lightning…</string>
+    <string name="contact_codes_add_new_short">Ajouter…</string>
+
+    <string name="contact_search_name">Chercher par nom…</string>
+    <string name="contact_none">Aucun contact trouvé…</string>
+
+    <string name="contact_photo_open_camera">Prendre une photo</string>
+    <string name="contact_photo_open_gallery">Parcourir les images</string>
+    <string name="contact_photo_remove">Supprimer la photo</string>
 
     <!-- settings: access control -->
 
     <string name="accessctrl_title">Contrôle d\'accès</string>
 
-    <string name="accessctrl_auth_error_header">Le verrouillage ne peut pas être activé</string>
+    <string name="accessctrl_auth_error_header">Authentification système indisponible</string>
     <string name="accessctrl_auth_error_no_hw">Cet appareil ne dispose pas d\'équipement biométrique adéquat.</string>
     <string name="accessctrl_auth_error_hw_unavailable">L\'équipement biométrique de cet appareil est indisponible.</string>
     <string name="accessctrl_auth_error_none_enrolled">Veuillez préalablement enregistrer un code PIN/schéma/empreinte digitale dans Android.</string>
@@ -461,7 +574,7 @@
     <string name="lnurl_auth_help">Voir ici pour plus d\'infos</string>
     <string name="lnurl_auth_help_dialog_title">Comment cela fonctionne-t-il?</string>
     <string name="lnurl_auth_help_dialog_general_details">Phoenix s\'authentifie en utilisant une clé spécifique à <b>%1$s</b>. Cette clé unique est en quelque sorte le mot de passe de votre compte sur ce service.</string>
-    <string name="lnurl_auth_help_dialog_privacy_title">Condidentialité</string>
+    <string name="lnurl_auth_help_dialog_privacy_title">Confidentialité</string>
     <string name="lnurl_auth_help_dialog_privacy_details">Ce service n\'aura en aucun cas accès à votre wallet Phoenix. Ils ne pourront pas voir votre solde, vos paiements ou votre clé privée.</string>
     <string name="lnurl_auth_help_dialog_compat_title">Mode de compatibilité</string>
     <string name="lnurl_auth_help_dialog_compat_details">Phoenix va utiliser un schéma non standard pour ce service, afin de rester compatible avec des comptes créés via d\'anciennes versions de Phoenix. Les comptes liés à ce mode ne seront pas utilisables sur d\'autres wallets.</string>
@@ -491,10 +604,12 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">Le service <b>%1$s</b> a renvoyé une erreur. Contacter leur service d\'assistance si ce problème persiste.\n\n\Détails du message du service : \"<i>%2$s</i>\"</string>
+    <string name="lnurl_error_remote_details">Le service <b>%1$s</b> a renvoyé une erreur. Contacter leur service d\'assistance si ce problème persiste.\n\nDétails du message du service : \"<i>%2$s</i>\"</string>
     <string name="lnurl_error_remote_code">Le service <b>%1$s</b> a renvoyé une erreur HTTP (%2$s). Contacter leur service d\'assistance si ce problème persiste.</string>
     <string name="lnurl_error_remote_unreadable">Le service <b>%1$s</b> a renvoyé un message mal formatté.</string>
     <string name="lnurl_error_remote_connection">Échec de la connexion au service <b>%1$s</b>.</string>
+    <string name="lnurl_error_remote_is_website">Ceci semble être un site web (et non une requête de paiement Lightning) :\n\n<i>%1$s</i></string>
+    <string name="lnurl_error_remote_unknown_lnaddress">Le service %1$s ne supporte pas les adresses Lightning, ou ne connaît pas cet utilisateur.</string>
 
     <!-- lnurl-pay -->
 
@@ -505,12 +620,14 @@
     <string name="lnurl_pay_comment_instructions">Vous pouvez joindre un message à ce paiement. Le message sera envoyé au destinataire.</string>
     <string name="lnurl_pay_pay_button">Payer</string>
     <string name="lnurl_pay_requesting_invoice">Récupération des détails du paiement…</string>
+    <string name="lnurl_pay_paying_invoice">Paiement de la requête en cours…</string>
 
     <string name="lnurl_pay_amount_below_min">Le montant doit être au moins %1$s</string>
     <string name="lnurl_pay_amount_above_max">Le montant ne peut excéder %1$s</string>
 
     <string name="lnurl_pay_error_header">Le paiement a échoué.</string>
     <string name="lnurl_pay_error_invalid_chain">La requête de paiement renvoyée par <b>%1$s</b> n\'utilise pas la même chaîne que votre wallet.</string>
+    <string name="lnurl_pay_error_payment_pending">La requête de paiement renvoyée par <b>%1$s</b> est déjà en train d\'être payée.</string>
     <string name="lnurl_pay_error_already_paid">La requête de paiement renvoyée par <b>%1$s</b> a déjà été réglée.</string>
     <string name="lnurl_pay_error_invalid_amount">Le montant de la requête de paiement renvoyée par <b>%1$s</b> est incorrect.</string>
     <string name="lnurl_pay_error_invalid_malformed">La requête de paiement renvoyée par <b>%1$s</b> est malformée.</string>
@@ -518,6 +635,7 @@
     <!-- settings: display preferences -->
 
     <string name="prefs_display_title">Options d\'affichage</string>
+    <string name="prefs_filter_name">Filtrer par nom</string>
     <string name="prefs_display_coin_label">Dénomination Bitcoin</string>
     <string name="prefs_display_coin_sat_label">Satoshi</string>
     <string name="prefs_display_coin_sat_desc">1 sat = 0.00000001 btc</string>
@@ -530,16 +648,18 @@
     <string name="prefs_display_theme_label">Thème de l\'application</string>
     <string name="prefs_display_theme_dark_label">Thème sombre</string>
     <string name="prefs_display_theme_light_label">Thème clair</string>
-    <string name="prefs_display_theme_system_label">Iso système</string>
+    <string name="prefs_display_theme_system_label">Thème système</string>
     <string name="prefs_locale_label">Langue de l\'application</string>
 
     <!-- settings: electrum server -->
 
-    <string name="electrum_title">Serveur Electrum server</string>
+    <string name="electrum_title">Serveur Electrum</string>
     <string name="electrum_about">Pour sécuriser vos canaux de paiement, Phoenix surveille la chaîne Bitcoin via des serveurs Electrum.\n\nPar défaut, Phoenix se connecte à un serveur aléatoire, mais vous pouvez le configurer pour ne se connecter qu\'à votre propre serveur.</string>
     <string name="electrum_block_height_label">Hauteur de blocs</string>
     <string name="electrum_connection_dialog_tls_port">Utilisez le port TLS (par défaut 50002).</string>
     <string name="electrum_connection_dialog_onion_port">Utilisez le port TCP ordinaire, pas TLS, car il s\'agit d\'une adresse onion.</string>
+    <string name="electrum_connection_dialog_tor_enabled_warning">Puisque vous avez activé Tor, vous devriez utiliser une adresse onion pour ce serveur.</string>
+    <string name="electrum_connection_dialog_tor_enabled_ignore_box">Non, je ne veux pas utiliser d\'adresse onion</string>
 
     <string name="electrum_connection_closed_with_random">Déconnecté</string>
     <string name="electrum_connection_closed_with_custom">Déconnecté de %1$s</string>
@@ -549,6 +669,7 @@
 
     <string name="electrum_description_custom">Vous utilisez un serveur spécifique</string>
     <string name="electrum_description_bad_certificate">Ce serveur fournit un certificat inconnu. La connexion a été rejetée.</string>
+    <string name="electrum_description_not_onion">Tor est activé. Ce serveur devrait utiliser une adresse onion.</string>
 
     <string name="electrum_dialog_checkbox">Utiliser un serveur spécifique</string>
     <string name="electrum_dialog_input">Adresse du serveur (host:port)</string>
@@ -569,6 +690,8 @@
     <!-- settings: Tor -->
 
     <string name="tor_settings_title">Tor</string>
+    <string name="tor_settings_switch_label">Activer Tor</string>
+    <string name="tor_settings_instructions_title">Comment cela fonctionne</string>
 
     <!-- home: connectivity dialog -->
 
@@ -577,10 +700,14 @@
     <string name="conndialog_network">Votre appareil n\'a pas de connexion internet. L\'application ne fonctionnera pas correctement.\n\nVérifiez votre configuration réseau.</string>
     <string name="conndialog_electrum">Electrum</string>
     <string name="conndialog_lightning">Lightning</string>
+    <string name="conndialog_accessibility_desc">Gérer la connexion pour %1$s</string>
     <string name="conndialog_connecting">Connexion…</string>
     <string name="conndialog_connected">Connecté</string>
     <string name="conndialog_closed">Déconnecté</string>
     <string name="conndialog_closed_bad_cert">Certificat invalide</string>
+    <string name="conndialog_electrum_not_onion">Adresse invalide !</string>
+    <string name="conndialog_tor_disclaimer_title">Tor est activé !</string>
+    <string name="conndialog_tor_disclaimer_body">Assurez-vous que votre VPN Tor est actif et en fonctionnement.</string>
 
     <!-- settings: about -->
 
@@ -640,25 +767,29 @@
 
     <string name="payments_history_title">Paiements locaux</string>
     <string name="payments_history_export_button">Exporter</string>
+    <string name="payments_history_empty">Aucun paiement pour l\'instant…</string>
     <string name="payments_history_today">Aujourd\'hui</string>
     <string name="payments_history_yesterday">Hier</string>
     <string name="payments_history_thisweek">Plus tôt dans la semaine</string>
     <string name="payments_history_lastweek">Semaine dernière</string>
+
     <string name="payments_export_title">Exporter les paiements</string>
-    <string name="payments_export_csv_instructions">Exporte vos paiements réussis dans un format CSV.</string>
+    <string name="payments_export_csv_header">Export CSV</string>
+    <string name="payments_export_csv_instructions">Exporte vos paiements réussis dans un format CSV. Utile à des fins comptables.</string>
     <string name="payments_export_csv_start_label">Date de début</string>
     <string name="payments_export_csv_end_label">Date de fin</string>
     <string name="payments_export_csv_context_label">Inclure origine et destinataire</string>
     <string name="payments_export_csv_description_label">Inclure la description</string>
     <string name="payments_export_csv_generate_button">Exporter</string>
-    <string name="payments_export_csv_no_payments">Aucun paiement réussis</string>
+    <string name="payments_export_csv_no_payments">Aucun paiement réussi</string>
     <string name="payments_export_csv_invalid_timestamps">Veuillez choisir une date de début/fin valide</string>
-    <string name="payments_export_csv_in_progress">Export du paiement #%1$d</string>
+    <string name="payments_export_csv_in_progress">Export des paiements…</string>
+    <string name="payments_export_csv_copy_button">Copier les données dans le presse-papiers…</string>
     <string name="payments_export_csv_share_subject">Phoenix - paiement du %1$s au %2$s</string>
-    <string name="payments_export_csv_share_title">Partager les paiement Phoenix…</string>
+    <string name="payments_export_csv_share_title">Partager les paiements Phoenix…</string>
     <string name="payments_export_csv_share_button">Partager le fichier</string>
     <string name="payments_export_csv_error">Échec de l\'export.</string>
-    <string name="payments_export_csv_no_data">Aucun paiements trouvés.</string>
+    <string name="payments_export_csv_no_data">Aucun paiement trouvé.</string>
 
     <string name="payments_export_database_header">Export de base de données</string>
     <string name="payments_export_database_instructions">Chiffre et exporte la base de données des paiements, ce qui permet de migrer votre historique de paiements depuis ce téléphone vers un autre.</string>
@@ -720,7 +851,7 @@
     <string name="cpfp_execute_button">Exécuter le paiement</string>
     <string name="cpfp_executing">Execution du paiement…</string>
     <string name="cpfp_success">Paiement effectué</string>
-    <string name="cpfp_failure_title">Payment échoué</string>
+    <string name="cpfp_failure_title">Paiement échoué</string>
     <string name="cpfp_error_title">Impossible de continuer</string>
 
     <!-- mempool -->
@@ -728,7 +859,7 @@
     <string name="mempool_unknown_feerate_title">Mempool indisponible</string>
     <string name="mempool_unknown_feerate_details">Phoenix n\'a pas pu vérifier l\'état actuel du mempool Bitcoin, et ne peut donc pas estimer la vélocité des transactions.\n\nVérifiez les frais manuellement via un explorateur, et utilisez une valeur pertinente.</string>
     <string name="mempool_fastest">≈ 10 minutes</string>
-    <string name="mempool_halfhour">≈ 30 minutes</string>`
+    <string name="mempool_halfhour">≈ 30 minutes</string>
     <string name="mempool_hour">≈ 1 heure</string>
     <string name="mempool_slow">Frais bas</string>
 
@@ -738,7 +869,7 @@
     <string name="splice_error_aborted_by_peer">Annulé par le pair : [%1$s]</string>
     <string name="splice_error_cannot_create_commit">Impossible de créer un nouveau commitment</string>
     <string name="splice_error_concurrent_remote">Il y a un autre splice en cours</string>
-    <string name="splice_error_channel_not_quiescent">Annulé suite à un erreur</string>
+    <string name="splice_error_channel_not_quiescent">Annulé suite à une erreur</string>
     <string name="splice_error_disconnected">Canal déconnecté</string>
     <string name="splice_error_funding_error">Échec de l\'apport de fonds [%1$s]</string>
     <string name="splice_error_insufficient_funds">Fonds insuffisants</string>
@@ -747,21 +878,23 @@
     <string name="splice_error_invalid_pubkey">Script de clé publique pour le splice-out invalide</string>
     <string name="splice_error_splice_in_progress">Un paiement splice est déjà en cours</string>
     <string name="splice_error_invalid_liquidity_ads">Demande de liquidité invalide : [%1$s]</string>
+    <string name="splice_error_invalid_channel_params">Paramètres de canal invalides : [%1$s]</string>
+    <string name="splice_error_unexpected">Erreur inattendue : [%1$s]</string>
 
     <!-- reset wallet -->
 
     <string name="reset_wallet_title">Suppression du wallet</string>
-    <string name="reset_wallet_instructions_header">Cet écran vous permet de supprimer ce portefeuille de votre téléphone.</string>
-    <string name="reset_wallet_instructions_details">Toutes les données de ce portefeuille seront supprimées. Cela inclut votre historique de paiements.</string>
+    <string name="reset_wallet_instructions_header">Cet écran vous permet de supprimer ce wallet de votre téléphone.</string>
+    <string name="reset_wallet_instructions_details">Toutes les données de ce wallet seront supprimées. Cela inclut votre historique de paiements.</string>
     <string name="reset_wallet_payments_history_button">Sauvegarder l\'historique des paiements</string>
     <string name="reset_wallet_review_button">Valider</string>
 
-    <string name="reset_wallet_confirm_title">cConfirmer la réinitialisation</string>
+    <string name="reset_wallet_confirm_title">Confirmer la réinitialisation</string>
     <string name="reset_wallet_confirm_header">Le wallet sera complètement supprimé de <b>cet appareil</b>.</string>
-    <string name="reset_wallet_confirm_details">La seed de ce portefeuille et son historique de paiements seront supprimés du disque. Vous serez invité à utiliser un autre portefeuille ou à en créer un nouveau.</string>
-    <string name="reset_wallet_confirm_details2">Les autres portefeuilles que vous avez déjà importés ne seront pas supprimés.</string>
+    <string name="reset_wallet_confirm_details">La seed de ce wallet et son historique de paiements seront supprimés du disque. Vous serez invité à utiliser un autre wallet ou à en créer un nouveau.</string>
+    <string name="reset_wallet_confirm_details2">Les autres wallets que vous avez déjà importés ne seront pas supprimés.</string>
     <string name="reset_wallet_confirm_seed_balance">Ne perdez pas vos fonds</string>
-    <string name="reset_wallet_confirm_seed_disclaimer">Je comprends que si je perds la phrase de sauvegarde après avoir supprimé le portefeuille, tous les fonds restants seront définitivement perdus.</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">Je comprends que si je perds la phrase de sauvegarde après avoir supprimé le wallet, tous les fonds restants seront définitivement perdus.</string>
     <string name="reset_wallet_confirm_button">Supprimer le wallet</string>
     <string name="reset_wallet_shutting_down">Extinction…</string>
     <string name="reset_wallet_deleting_prefs">Suppression des préférences…</string>
@@ -775,6 +908,7 @@
     <string name="swapin_signer_title">Signature de swap-in</string>
     <string name="swapin_signer_instructions">Cet outil de debug vous permet de signer des entrées de swap-in. N\'utilisez cet écran que si vous savez ce qu\'il fait.</string>
     <string name="swapin_signer_tx">Transaction non-signée</string>
+    <string name="swapin_signer_server_nonce">Nonce du serveur</string>
     <string name="swapin_signer_sign">Signer</string>
     <string name="swapin_signer_signing">Signature…</string>
     <string name="swapin_signer_signed_sig">Signature utilisateur</string>
@@ -785,8 +919,6 @@
     <!-- settings: contacts list -->
 
     <string name="settings_contacts_help">Cet écran de contacts vous permet d\'associer une requête de paiement Bolt12 à un nom.\n\nLes données de contacts sont stockées localement.</string>
-    <string name="contact_search_name">Chercher par nom…</string>
-    <string name="contact_none">Aucun contact trouvé…</string>
 
     <!-- experimental -->
 
@@ -802,8 +934,8 @@
 
     <string name="pincode_check_screenlock_title">Entrer le code PIN pour ouvrir l\'appli</string>
     <string name="pincode_check_spending_payment_title">Entrer le code PIN pour payer</string>
-    <string name="pincode_check_spending_displayseed_title">Entrer le code PIN pour voir la seed</string>]
-    <string name="pincode_check_disabling_title">Entrer le code PIN pour poursuivre</string>]
+    <string name="pincode_check_spending_displayseed_title">Entrer le code PIN pour voir la seed</string>
+    <string name="pincode_check_disabling_title">Entrer le code PIN pour poursuivre</string>
     <string name="pincode_new_screenlock_title">Créer le code PIN d\'accès à l\'appli</string>
     <string name="pincode_new_spending_title">Créer le code PIN de paiement</string>
     <string name="pincode_confirm_title">Confirmer le nouveau PIN</string>
@@ -813,7 +945,47 @@
     <string name="pincode_locked_label">Verrouillé pour %1$s</string>
 
     <string name="pincode_error_generic">Une erreur est survenue</string>
+    <string name="pincode_error_malformed">Code PIN malformé</string>
     <string name="pincode_error_confirm_do_not_match">PIN non correspondant !</string>
     <string name="pincode_error_write">Erreur lors de la sauvegarde du PIN</string>
+
+    <!-- nfc & hce labels -->
+
+    <string name="nfc_hce_service_desc">Service APDU permettant à Phoenix d\'émuler un tag NFC</string>
+    <string name="nfc_hce_aid_desc">AID du tag NFC émulé par Phoenix</string>
+
+    <string name="nfc_err_busy">Le NFC est occupé</string>
+    <string name="nfc_err_not_available">Le NFC n\'est pas disponible</string>
+    <string name="nfc_err_disabled">Le NFC est désactivé</string>
+    <string name="nfc_err_hce_not_supported">L\'émulation de tag n\'est pas supportée</string>
+
+    <string name="nfc_button">Nfc</string>
+    <string name="nfc_hce_emulation_title">Approchez du lecteur NFC</string>
+    <string name="nfc_reader_title">Prêt à scanner</string>
+    <string name="nfc_reader_desc">Approchez l\'appareil NFC pour le lire</string>
+
+    <!-- Currency converter -->
+
+    <string name="converter_title">Convertisseur de devises</string>
+    <string name="converter_done_button">Terminé</string>
+    <string name="converter_placeholder_label">Saisir un montant en %1$s</string>
+    <string name="converter_add_new_button">Ajouter une devise…</string>
+    <string name="converter_timestamp_refresh">Dernière mise à jour : %1$s</string>
+    <string name="unitdropdown_more">Autre…</string>
+    <string name="currencypicker_title">Sélectionner une devise</string>
+    <string name="currencypicker_no_match">Aucun résultat…</string>
+
+    <!-- user wallet -->
+
+    <string name="wallet_name_default">Wallet</string>
+    <string name="wallet_add_new">Ajouter un nouveau wallet</string>
+    <string name="wallet_lock">Verrouiller</string>
+
+    <string name="wallet_edit_name_placeholder">Entrez un nom</string>
+    <string name="wallet_edit_default_label">Wallet par défaut</string>
+    <string name="wallet_edit_default_description">Si un wallet par défaut est sélectionné, il sera automatiquement ouvert au lancement de l\'application.</string>
+    <string name="wallet_edit_secret_label">Wallet caché (WIP)</string>
+    <string name="wallet_edit_secret_description">Le wallet ne sera pas visible dans les écrans de sélection. Pour y accéder, vous devez saisir son code PIN.</string>
+    <string name="wallet_edit_pick_avatar">Choisir un avatar</string>
 
 </resources>

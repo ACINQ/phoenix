@@ -17,6 +17,7 @@ enum DeepLink: Equatable, CustomStringConvertible {
 	case liquiditySettings
 	case torSettings
 	case forceCloseChannels
+	case spendChannelAddress
 	case swapInWallet
 	case finalWallet
 	case appAccess
@@ -33,6 +34,7 @@ enum DeepLink: Equatable, CustomStringConvertible {
 			case .liquiditySettings  : "liquiditySettings"
 			case .torSettings        : "torSettings"
 			case .forceCloseChannels : "forceCloseChannels"
+			case .spendChannelAddress: "spendChannelAddress"
 			case .swapInWallet       : "swapInWallet"
 			case .finalWallet        : "finalWallet"
 			case .appAccess          : "appAccess"

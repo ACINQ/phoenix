@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -8,14 +9,8 @@ plugins {
     alias(libs.plugins.compose)
 }
 
-fun gitCommitHash(): String {
-    val stream = ByteArrayOutputStream()
-    project.exec {
-        commandLine = "git rev-parse --verify --short HEAD".split(" ")
-        standardOutput = stream
-    }
-    return String(stream.toByteArray()).split("\n").first()
-}
+fun gitCommitHash(): String = providers.exec { commandLine("git", "rev-parse", "--verify", "--short", "HEAD") }
+    .standardOutput.asText.get().trim()
 
 val chain: String by project
 
@@ -26,8 +21,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 114
-        versionName = "2.7.4"
+        versionCode = 115
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -66,11 +61,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + "-opt-in=androidx.constraintlayout.compose.ExperimentalMotionApi"
-    }
-
     buildFeatures {
         compose = true
         viewBinding = true
@@ -79,11 +69,15 @@ android {
     }
 
     androidResources {
-        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw"))
+        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw", "in"))
     }
 }
 
 kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("1.8")
+        freeCompilerArgs.add("-opt-in=androidx.constraintlayout.compose.ExperimentalMotionApi")
+    }
     target {
         compilerOptions {
             optIn.addAll("kotlin.RequiresOptIn")

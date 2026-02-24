@@ -262,14 +262,15 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Logs de aplicativos</string>
-    <string name="logs_exporting">Exportando registros…</string>
-    <string name="logs_failed">Erro: não foi possível exportar logs</string>
-    <string name="logs_view_button">Ver registros…</string>
-    <string name="logs_view_with">Ver registros com…</string>
-    <string name="logs_share_button">Compartilhar registros…</string>
-    <string name="logs_share_subject">Logs do aplicativo Phoenix</string>
-    <string name="logs_share_title">Compartilhe registros do Phoenix…</string>
+    <string name="troubleshooting_title">Diagnósticos e registros</string>
+    <string name="troubleshooting_diagnostics_copy_button">Copiar diagnósticos do aplicativo</string>
+    <string name="troubleshooting_logs_exporting">Exportando registros…</string>
+    <string name="troubleshooting_logs_failed">Erro: não foi possível exportar logs</string>
+    <string name="troubleshooting_logs_view_button">Ver registros…</string>
+    <string name="troubleshooting_logs_view_with">Ver registros com…</string>
+    <string name="troubleshooting_logs_share_button">Compartilhar registros…</string>
+    <string name="troubleshooting_logs_share_subject">Logs do aplicativo Phoenix</string>
+    <string name="troubleshooting_logs_share_title">Compartilhe registros do Phoenix…</string>
 
     <!-- payment details -->
 
@@ -601,7 +602,7 @@
     <string name="payments_export_csv_generate_button">Exportar</string>
     <string name="payments_export_csv_no_payments">Pagamentos ainda não efetuados</string>
     <string name="payments_export_csv_invalid_timestamps">Escolha uma data de início/término válida</string>
-    <string name="payments_export_csv_in_progress">Exportando pagamento #%1$d</string>
+    <string name="payments_export_csv_in_progress">Exportando pagamentos…</string>
     <string name="payments_export_csv_share_subject">Phoenix - pagamentos de %1$s a %2$s</string>
     <string name="payments_export_csv_share_title">Compartilhe pagamentos Phoenix…</string>
     <string name="payments_export_csv_share_button">Compartilhar arquivo</string>

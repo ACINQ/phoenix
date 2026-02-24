@@ -42,6 +42,7 @@ struct ConfigurationList: View {
 		// Advanced
 		case WalletInfo
 		case ChannelsConfiguration
+		case SpendChannelAddress
 		case LogsConfiguration
 		case Experimental
 		// Danger Zone
@@ -86,6 +87,7 @@ struct ConfigurationList: View {
 	@Namespace var linkID_PaymentsBackup
 	@Namespace var linkID_WalletInfo
 	@Namespace var linkID_ChannelsConfiguration
+	@Namespace var linkID_SpendChannelAddress
 	@Namespace var linkID_LogsConfiguration
 	@Namespace var linkID_Experimental
 	@Namespace var linkID_DrainWallet
@@ -491,6 +493,7 @@ struct ConfigurationList: View {
 		// Advanced
 			case .WalletInfo            : WalletInfoView(popTo: popTo)
 			case .ChannelsConfiguration : ChannelsConfigurationView()
+			case .SpendChannelAddress   : SpendChannelAddressView()
 			case .LogsConfiguration     : LogsConfigurationView()
 			case .Experimental          : Experimental()
 		// Danger Zone
@@ -593,6 +596,7 @@ struct ConfigurationList: View {
 		
 			case .WalletInfo            : return linkID_WalletInfo
 			case .ChannelsConfiguration : return linkID_ChannelsConfiguration
+			case .SpendChannelAddress   : return linkID_SpendChannelAddress
 			case .LogsConfiguration     : return linkID_LogsConfiguration
 			case .Experimental          : return linkID_Experimental
 			
@@ -637,6 +641,7 @@ struct ConfigurationList: View {
 					case .liquiditySettings  : newNavLinkTag = .ChannelManagement    ; delay *= 1
 					case .torSettings        : newNavLinkTag = .Tor                  ; delay *= 1
 					case .forceCloseChannels : newNavLinkTag = .ForceCloseChannels   ; delay *= 1
+					case .spendChannelAddress: newNavLinkTag = .SpendChannelAddress ; delay *= 1
 					case .swapInWallet       : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .WalletInfo           ; delay *= 2
 					case .appAccess          : newNavLinkTag = .AppAccess            ; delay *= 1
@@ -743,3 +748,4 @@ struct ConfigurationList: View {
 		}
 	}
 }
+

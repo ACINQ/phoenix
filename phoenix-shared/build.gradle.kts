@@ -14,15 +14,8 @@ plugins {
 
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
 
-/** Get the current git commit hash. */
-fun gitCommitHash(): String {
-    val stream = ByteArrayOutputStream()
-    project.exec {
-        commandLine = "git rev-parse --verify --long HEAD".split(" ")
-        standardOutput = stream
-    }
-    return String(stream.toByteArray()).split("\n").first()
-}
+fun gitCommitHash(): String = providers.exec { commandLine("git", "rev-parse", "--verify", "--short", "HEAD") }
+    .standardOutput.asText.get().trim()
 
 /**
  * Generates a `BuildVersions` file in phoenix-shared/build/generated-src containing the current git commit and the lightning-kmp version.

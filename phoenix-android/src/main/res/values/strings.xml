@@ -312,33 +312,34 @@
     <string name="spendchanneladdress_title">Spend channel address</string>
     <string name="spendchanneladdress_instructions">This screen is a debugging tool that helps recover funds that have been accidentally sent to a channel\'s outpoint.</string>
     <string name="spendchanneladdress_amount">Amount</string>
-    <string name="spendchanneladdress_tx_index">Tx index</string>
-    <string name="spendchanneladdress_channel_id">Channel id</string>
-    <string name="spendchanneladdress_channel_data">Raw channel data</string>
-    <string name="spendchanneladdress_remote_funding_pubkey">Remote funding pubkey</string>
-    <string name="spendchanneladdress_unsigned_tx">Unsigned tx</string>
-    <string name="spendchanneladdress_remote_nonce">Remote nonce</string>
+    <string name="spendchanneladdress_tx_index" translatable="false">Tx index</string>
+    <string name="spendchanneladdress_channel_id" translatable="false">Channel id</string>
+    <string name="spendchanneladdress_channel_data" translatable="false">Raw channel data</string>
+    <string name="spendchanneladdress_remote_funding_pubkey" translatable="false">Remote funding pubkey</string>
+    <string name="spendchanneladdress_unsigned_tx" translatable="false">Unsigned tx</string>
+    <string name="spendchanneladdress_remote_nonce" translatable="false">Remote nonce</string>
     <string name="spendchanneladdress_sign_button">Sign</string>
     <string name="spendchanneladdress_signing">Signing…</string>
 
-    <string name="spendchanneladdress_success_header">Signature successfully generated.</string>
-    <string name="spendchanneladdress_success_pubkey">Public key</string>
-    <string name="spendchanneladdress_success_signature">Signature</string>
-    <string name="spendchanneladdress_success_nonce">Nonce</string>
+    <string name="spendchanneladdress_success_header" translatable="false">Signature successfully generated.</string>
+    <string name="spendchanneladdress_success_pubkey" translatable="false">Public key</string>
+    <string name="spendchanneladdress_success_signature" translatable="false">Signature</string>
+    <string name="spendchanneladdress_success_nonce" translatable="false">Nonce</string>
 
     <string name="spendchanneladdress_error_generic">Failed to sign data</string>
     <string name="spendchanneladdress_error_amount">Invalid amount</string>
     <string name="spendchanneladdress_error_tx_index">Invalid tx index</string>
 
-    <string translatable="false" name="spendchanneladdress_error_channel_data">Invalid channel data</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_id">Invalid channel id</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_data">Invalid raw channel data</string>
     <string translatable="false" name="spendchanneladdress_error_channel_version">Unhandled channel version [%1$s]</string>
     <string translatable="false" name="spendchanneladdress_error_channel_state">Unhandled channel state [%1$s]</string>
-    <string translatable="false" name="spendchanneladdress_error_no_channel_matching">No match found in channel backup</string>
-    <string translatable="false" name="spendchanneladdress_error_remote_pubkey">Malformed remote funding pubkey [%1$s]</string>
-    <string translatable="false" name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
-    <string translatable="false" name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_no_channel_matching">No match found for channel in raw channel data</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_pubkey">Invalid remote funding pubkey [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_unsigned_tx">Invalid unsigned tx [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_funding_pubkey">Invalid remote funding pubkey [%1$s]</string>
     <string translatable="false" name="spendchanneladdress_error_remote_nonce">Malformed remote nonce</string>
-    <string translatable="false" name="spendchanneladdress_error_sig_failed">Failed to partially sign transaction</string>
+    <string translatable="false" name="spendchanneladdress_error_sig_failed">Failed to sign transaction</string>
 
     <!-- home: balance section & misc -->
 
@@ -374,14 +375,22 @@
 
     <!-- settings: logs -->
 
-    <string name="logs_title">Application logs</string>
-    <string name="logs_exporting">Exporting logs…</string>
-    <string name="logs_failed">Error: logs could not be exported</string>
-    <string name="logs_view_button">View logs…</string>
-    <string name="logs_view_with">View logs with…</string>
-    <string name="logs_share_button">Share logs…</string>
-    <string name="logs_share_subject">Phoenix App logs</string>
-    <string name="logs_share_title">Share Phoenix logs…</string>
+    <string name="troubleshooting_title">Diagnostics &amp; Logs</string>
+    <string name="troubleshooting_diagnostics_header">Wallet diagnostics</string>
+    <string name="troubleshooting_diagnostics_export_button">Share diagnostics…</string>
+    <string name="troubleshooting_diagnostics_share_subject">Phoenix App diagnostics</string>
+    <string name="troubleshooting_diagnostics_share_title">Share Phoenix diagnostics…</string>
+    <string name="troubleshooting_diagnostics_copy_button">Copy diagnostics</string>
+    <string name="troubleshooting_diagnostics_error">Error when generating diagnostics</string>
+
+    <string name="troubleshooting_logs_header">Logs</string>
+    <string name="troubleshooting_logs_exporting">Exporting data…</string>
+    <string name="troubleshooting_logs_failed">Error: logs could not be exported</string>
+    <string name="troubleshooting_logs_view_button">View logs…</string>
+    <string name="troubleshooting_logs_view_with">View logs with…</string>
+    <string name="troubleshooting_logs_share_button">Share logs…</string>
+    <string name="troubleshooting_logs_share_subject">Phoenix App logs</string>
+    <string name="troubleshooting_logs_share_title">Share Phoenix logs…</string>
 
     <!-- payment details -->
 
@@ -468,8 +477,8 @@
     <string name="paymentdetails_bitcoin_address_label">Bitcoin address</string>
 
     <string name="paymentdetails_splice_out_channel_label">Spliced channel</string>
-    <string name="paymentdetails_inputs_label">Local inputs</string>
-    <string name="paymentdetails_inputs_value">- #%1$s:</string>
+    <string name="paymentdetails_inputs_label" translatable="false">Local inputs</string>
+    <string name="paymentdetails_inputs_value" translatable="false">- #%1$s:</string>
 
     <string name="paymentdetails_liquidity_amount_label">Liquidity requested</string>
 
@@ -660,7 +669,7 @@
 
     <string name="lnurl_pay_error_header">Payment has failed.</string>
     <string name="lnurl_pay_error_invalid_chain">The invoice returned by <b>%1$s</b> does not use the same chain as your wallet.</string>
-    <string name="lnurl_pay_error_payment_pending">The invoice returned by <b>%1$s</b> is already in progress.</string>
+    <string name="lnurl_pay_error_payment_pending">The invoice returned by <b>%1$s</b> is already being paid.</string>
     <string name="lnurl_pay_error_already_paid">The invoice returned by <b>%1$s</b> has already been paid.</string>
     <string name="lnurl_pay_error_invalid_amount">The invoice returned by <b>%1$s</b> has an incorrect amount.</string>
     <string name="lnurl_pay_error_invalid_malformed">The invoice returned by <b>%1$s</b> is malformed.</string>

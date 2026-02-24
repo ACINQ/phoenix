@@ -6187,6 +6187,9 @@
         }
       }
     },
+    "An error occured" : {
+
+    },
     "An error occurred on a node in the payment route. The payment may succeed if you try again." : {
       "localizations" : {
         "ar" : {
@@ -12691,6 +12694,41 @@
         }
       }
     },
+    "Copy app diagnostics" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírování diagnostiky aplikace"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Diagnose kopieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar diagnóstico de la aplicación"
+          }
+        },
+        "es-419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar diagnóstico de la aplicación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier les diagnostics de l'app"
+          }
+        }
+      }
+    },
     "Copy certificate" : {
       "localizations" : {
         "ar" : {
@@ -12730,6 +12768,9 @@
           }
         }
       }
+    },
+    "Copy data" : {
+
     },
     "Copy Image" : {
       "localizations" : {
@@ -18328,6 +18369,9 @@
         }
       }
     },
+    "Export app diagnostics" : {
+
+    },
     "Export Payments" : {
       "comment" : "Navigation bar title",
       "localizations" : {
@@ -20754,6 +20798,7 @@
       }
     },
     "Here you can export the application logs, or share them." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20833,6 +20878,9 @@
           }
         }
       }
+    },
+    "Here you can shared the application logs and diagnostics for debugging purposes." : {
+
     },
     "hidden amount" : {
       "localizations" : {
@@ -27099,6 +27147,9 @@
         }
       }
     },
+    "Logs & Diagnostics" : {
+      "comment" : "Navigation bar title"
+    },
     "Long Description" : {
       "localizations" : {
         "ar" : {
@@ -28317,6 +28368,7 @@
       }
     },
     "Migration Notice" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -30210,6 +30262,9 @@
           }
         }
       }
+    },
+    "Nonce" : {
+
     },
     "none" : {
       "localizations" : {
@@ -34287,6 +34342,9 @@
           }
         }
       }
+    },
+    "Please fill all required fields" : {
+
     },
     "Please perform a backup before enabling any options here. If you lock yourself out of Phoenix without a backup of your recovery phrase, you will **lose your funds**!" : {
       "localizations" : {
@@ -40079,6 +40137,9 @@
         }
       }
     },
+    "Sign" : {
+
+    },
     "Sign into iCloud to backup your payments" : {
       "localizations" : {
         "ar" : {
@@ -40118,6 +40179,12 @@
           }
         }
       }
+    },
+    "Signature" : {
+
+    },
+    "Signing..." : {
+
     },
     "Since you've enabled Tor, you should use an onion address for this server." : {
       "localizations" : {
@@ -40440,6 +40507,9 @@
           }
         }
       }
+    },
+    "Spend from channel address" : {
+      "comment" : "Navigation bar title"
     },
     "Spend from final wallet" : {
       "localizations" : {
@@ -44562,6 +44632,7 @@
       }
     },
     "This is your new address. Do not reuse your old Bitcoin address from before migration." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44884,6 +44955,9 @@
           }
         }
       }
+    },
+    "This screen is a debugging tool that helps recover funds that have been accidentally sent to a channel's outpoint." : {
+
     },
     "This seed is invalid and cannot be imported.\n\nPlease try again" : {
       "localizations" : {
