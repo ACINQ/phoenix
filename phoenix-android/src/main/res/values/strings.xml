@@ -330,15 +330,16 @@
     <string name="spendchanneladdress_error_amount">Invalid amount</string>
     <string name="spendchanneladdress_error_tx_index">Invalid tx index</string>
 
-    <string translatable="false" name="spendchanneladdress_error_channel_data">Invalid channel data</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_id">Invalid channel id</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_data">Invalid raw channel data</string>
     <string translatable="false" name="spendchanneladdress_error_channel_version">Unhandled channel version [%1$s]</string>
     <string translatable="false" name="spendchanneladdress_error_channel_state">Unhandled channel state [%1$s]</string>
-    <string translatable="false" name="spendchanneladdress_error_no_channel_matching">No match found in channel backup</string>
-    <string translatable="false" name="spendchanneladdress_error_remote_pubkey">Malformed remote funding pubkey [%1$s]</string>
-    <string translatable="false" name="spendchanneladdress_error_unsigned_tx">Malformed unsigned tx [%1$s]</string>
-    <string translatable="false" name="spendchanneladdress_error_remote_funding_pubkey">Malformed remote funding pubkey [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_no_channel_matching">No match found for channel in raw channel data</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_pubkey">Invalid remote funding pubkey [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_unsigned_tx">Invalid unsigned tx [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_funding_pubkey">Invalid remote funding pubkey [%1$s]</string>
     <string translatable="false" name="spendchanneladdress_error_remote_nonce">Malformed remote nonce</string>
-    <string translatable="false" name="spendchanneladdress_error_sig_failed">Failed to partially sign transaction</string>
+    <string translatable="false" name="spendchanneladdress_error_sig_failed">Failed to sign transaction</string>
 
     <!-- home: balance section & misc -->
 

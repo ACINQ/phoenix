@@ -201,6 +201,7 @@ fun SpendFromChannelAddress(
                                         is SpendChannelAddressResult.Failure.RemoteFundingPubkeyMalformed -> stringResource(R.string.spendchanneladdress_error_remote_pubkey, details.details)
                                         is SpendChannelAddressResult.Failure.RemoteNonceMalformed -> stringResource(R.string.spendchanneladdress_error_remote_nonce)
                                         is SpendChannelAddressResult.Failure.TransactionMalformed -> stringResource(R.string.spendchanneladdress_error_unsigned_tx, details.details)
+                                        is SpendChannelAddressResult.Failure.InvalidChannelId -> stringResource(R.string.spendchanneladdress_error_channel_id)
                                         is SpendChannelAddressResult.Failure.InvalidChannelBackup -> stringResource(R.string.spendchanneladdress_error_channel_data)
                                         is SpendChannelAddressResult.Failure.UnhandledChannelBackupVersion -> stringResource(R.string.spendchanneladdress_error_channel_version, details.version.toString())
                                         is SpendChannelAddressResult.Failure.UnhandledChannelState -> stringResource(R.string.spendchanneladdress_error_channel_state, details.state)
@@ -240,9 +241,9 @@ fun SpendFromChannelAddress(
                     val context = LocalContext.current
                     Card {
                         Spacer(modifier = Modifier.height(8.dp))
-                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_pubkey), value = state.pubkey.toHex())
-                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_signature), value = state.partialSignature.toHex())
-                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_nonce), value = state.localNonce.toString())
+                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_pubkey), value = state.pubkey)
+                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_signature), value = state.partialSignature)
+                        SigLabelValue(label = stringResource(id = R.string.spendchanneladdress_success_nonce), value = state.localNonce)
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             text = stringResource(id = R.string.btn_copy),
@@ -252,8 +253,8 @@ fun SpendFromChannelAddress(
                                 copyToClipboard(
                                     context = context,
                                     data = """
-                                        pubkey=${state.pubkey.toHex()}
-                                        signature=${state.partialSignature.toHex()}
+                                        pubkey=${state.pubkey}
+                                        signature=${state.partialSignature}
                                         nonce=${state.localNonce}
                                     """.trimIndent(),
                                     dataLabel = "channel outpoint spending data"

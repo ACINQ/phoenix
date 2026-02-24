@@ -622,6 +622,7 @@ struct MainView_Big: View {
 				case .liquiditySettings  : showSettings()
 				case .torSettings        : showSettings()
 				case .forceCloseChannels : showSettings()
+				case .spendChannelAddress: showSettings()
 				case .swapInWallet       : showSettings()
 				case .finalWallet        : showSettings()
 				case .appAccess          : showSettings()
@@ -663,6 +664,10 @@ struct MainView_Big: View {
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.ForceCloseChannels)
 					
+				case .spendChannelAddress:
+					navCoordinator_settings.path.removeAll()
+					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.SpendChannelAddress)
+
 				case .swapInWallet:
 					navCoordinator_settings.path.removeAll()
 					navCoordinator_settings.path.append(ConfigurationList.NavLinkTag.WalletInfo)

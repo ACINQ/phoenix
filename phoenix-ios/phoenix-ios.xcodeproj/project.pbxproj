@@ -18,6 +18,7 @@
 		7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF87242A565B00829871 /* Preview Assets.xcassets */; };
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */; };
+		9663C9C82F3E314700B9052A /* SpendChannelAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9663C9C72F3E314700B9052A /* SpendChannelAddressView.swift */; };
 		C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */; };
 		C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */; };
 		C8D7A84CCF914B08BDB03BE6 /* ManualRestoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A44147508AA19378B739 /* ManualRestoreView.swift */; };
@@ -524,6 +525,7 @@
 		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9663C9C72F3E314700B9052A /* SpendChannelAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendChannelAddressView.swift; sourceTree = "<group>"; };
 		968B38392AC34C260030DBF4 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/liquidity.html; sourceTree = "<group>"; };
 		96DB8DAF2AC4A260007D3D54 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = cs; path = cs.lproj/liquidity.html; sourceTree = "<group>"; };
 		C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrumConfigurationView.swift; sourceTree = "<group>"; };
@@ -1858,6 +1860,7 @@
 			isa = PBXGroup;
 			children = (
 				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
+				9663C9C72F3E314700B9052A /* SpendChannelAddressView.swift */,
 				DCA5391B29F7202F001BD3D5 /* ChannelInfoPopup.swift */,
 			);
 			path = channels;
@@ -2153,6 +2156,7 @@
 				DC9E7EC32A12955300A5F1D0 /* LiquidityHTML.swift in Sources */,
 				DC5F96C72E09E6320052CDE6 /* Prefs+Keys.swift in Sources */,
 				DC78A5FD2DF88D37003A7DD8 /* DownloadMonitor.swift in Sources */,
+				9663C9C82F3E314700B9052A /* SpendChannelAddressView.swift in Sources */,
 				DC6F19BF2C46FB0F004EC469 /* NSItemProvider+Async.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				DC5F96AE2E032C500052CDE6 /* UserDefaults+Dump.swift in Sources */,
