@@ -9,7 +9,11 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .warning)
 #endif
 
 struct ChannelsConfigurationView: View {
-	
+
+	enum NavLinkTag: String, Codable {
+		case SpendChannelAddress
+	}
+
 	@State var sharing: String? = nil
 	@State var channels: [LocalChannelInfo] = []
 	
@@ -19,13 +23,18 @@ struct ChannelsConfigurationView: View {
 		value: { [$0.size.height] }
 	)
 	@State var capacityHeight: CGFloat? = nil
-	
+
+	// <iOS_16_workarounds>
+	@State var navLinkTag: NavLinkTag? = nil
+	// </iOS_16_workarounds>
+
 	@StateObject var toast = Toast()
-	
+
 	@ObservedObject var currencyPrefs = CurrencyPrefs.current
-	
+
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-	
+
+	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -40,6 +49,12 @@ struct ChannelsConfigurationView: View {
 			.navigationTitle(NSLocalizedString("Payment channels", comment: "Navigation bar title"))
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarItems(trailing: menuButton())
+			.navigationStackDestination(isPresented: navLinkTagBinding()) {
+				navLinkView()
+			}
+			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
+				navLinkView(tag)
+			}
 	}
 	
 	@ViewBuilder
@@ -217,7 +232,7 @@ struct ChannelsConfigurationView: View {
 			}
 
 			Button {
-				goToSpendChannel()
+				spendChannelAddress()
 			} label: {
 				Label {
 					Text(verbatim: "Spend from channel address")
@@ -228,12 +243,31 @@ struct ChannelsConfigurationView: View {
 		} label: {
 			Image(systemName: "ellipsis")
 		}
+		.frame(minHeight: 44)
+		.padding(.vertical, 8)
 	}
 	
 	// --------------------------------------------------
 	// MARK: View Helpers
 	// --------------------------------------------------
-	
+
+	@ViewBuilder
+	func navLinkView() -> some View {
+		if let tag = self.navLinkTag {
+			navLinkView(tag)
+		} else {
+			EmptyView()
+		}
+	}
+
+	@ViewBuilder
+	func navLinkView(_ tag: NavLinkTag) -> some View {
+		switch tag {
+		case .SpendChannelAddress:
+			SpendChannelAddressView()
+		}
+	}
+
 	func hasUsableChannels() -> Bool {
 		
 		return channels.contains { $0.isUsable }
@@ -302,19 +336,49 @@ struct ChannelsConfigurationView: View {
 			)
 		}
 	}
-	
-	func closeAllChannels() {
-		log.trace(#function)
-		deepLinkManager.broadcast(.drainWallet)
-	}
-	
-	func forceCloseAllChannels() {
-		log.trace(#function)
-		deepLinkManager.broadcast(.forceCloseChannels)
+
+	func navLinkTagBinding() -> Binding<Bool> {
+		return Binding<Bool>(
+			get: { navLinkTag != nil },
+			set: { if !$0 { navLinkTag = nil }}
+		)
 	}
 
-	func goToSpendChannel() {
+	func navigateTo(_ tag: NavLinkTag) {
+		log.trace("navigateTo(\(tag.rawValue))")
+		if #available(iOS 17, *) {
+			navCoordinator.path.append(tag)
+		} else {
+			navLinkTag = tag
+		}
+	}
+
+	func closeAllChannels() {
 		log.trace(#function)
-		deepLinkManager.broadcast(.spendChannelAddress)
+		if #available(iOS 17.0, *) {
+			deepLinkManager.broadcast(.drainWallet)
+		} else {
+			presentationMode.wrappedValue.dismiss()
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+				deepLinkManager.broadcast(.drainWallet)
+			}
+		}
+	}
+
+	func forceCloseAllChannels() {
+		log.trace(#function)
+		if #available(iOS 17.0, *) {
+			deepLinkManager.broadcast(.forceCloseChannels)
+		} else {
+			presentationMode.wrappedValue.dismiss()
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+				deepLinkManager.broadcast(.forceCloseChannels)
+			}
+		}
+	}
+
+	func spendChannelAddress() {
+		log.trace(#function)
+		navigateTo(.SpendChannelAddress)
 	}
 }
