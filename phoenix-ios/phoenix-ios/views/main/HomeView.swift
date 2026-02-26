@@ -857,7 +857,6 @@ struct HomeView : MVIView {
 			case .liquiditySettings  : break
 			case .torSettings        : break
 			case .forceCloseChannels : break
-			case .spendChannelAddress: break
 			case .swapInWallet       : break
 			case .finalWallet        : break
 			case .appAccess          : break

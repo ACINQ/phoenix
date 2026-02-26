@@ -18,7 +18,6 @@ struct MainView_Small: View {
 		case CurrencyConverter
 		case SwapInWalletDetails
 		case FinalWalletDetails
-		case SpendChannelAddress
 		case LiquidityAdsView
 		case LoginView(flow: SendManager.ParseResult_Lnurl_Auth)
 		case ValidateView(flow: SendManager.ParseResult)
@@ -32,7 +31,6 @@ struct MainView_Small: View {
 				case .CurrencyConverter   : return "CurrencyConverter"
 				case .SwapInWalletDetails : return "SwapInWalletDetails"
 				case .FinalWalletDetails  : return "FinalWalletDetails"
-				case .SpendChannelAddress : return "SpendChannelAddress"
 				case .LiquidityAdsView    : return "LiquidityAdsView"
 				case .LoginView(_)        : return "LoginView"
 				case .ValidateView(_)     : return "ValidateView"
@@ -519,9 +517,6 @@ struct MainView_Small: View {
 			
 		case .FinalWalletDetails:
 			FinalWalletDetails()
-			
-		case .SpendChannelAddress:
-			SpendChannelAddressView()
 
 		case .LiquidityAdsView:
 			LiquidityAdsView(location: .embedded)
@@ -671,10 +666,6 @@ struct MainView_Small: View {
 				case .forceCloseChannels:
 					navCoordinator.path.append(NavLinkTag.ConfigurationView)
 					navCoordinator.path.append(ConfigurationList.NavLinkTag.ForceCloseChannels)
-					
-				case .spendChannelAddress:
-					navCoordinator.path.append(NavLinkTag.ConfigurationView)
-					navCoordinator.path.append(ConfigurationList.NavLinkTag.SpendChannelAddress)
 
 				case .swapInWallet:
 					navCoordinator.path.append(NavLinkTag.ConfigurationView)
@@ -712,7 +703,6 @@ struct MainView_Small: View {
 					case .liquiditySettings  : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .torSettings        : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .forceCloseChannels : newNavLinkTag = .ConfigurationView ; delay *= 2
-					case .spendChannelAddress: newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .swapInWallet       : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .finalWallet        : newNavLinkTag = .ConfigurationView ; delay *= 2
 					case .appAccess          : newNavLinkTag = .ConfigurationView ; delay *= 2

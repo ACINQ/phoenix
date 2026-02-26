@@ -616,7 +616,6 @@ struct WalletInfoView: View {
 					case .liquiditySettings  : break
 					case .torSettings        : break
 					case .forceCloseChannels : break
-					case .spendChannelAddress: break
 					case .swapInWallet       : newNavLinkTag = NavLinkTag.SwapInWalletDetails
 					case .finalWallet        : newNavLinkTag = NavLinkTag.FinalWalletDetails
 					case .appAccess          : break

@@ -71,7 +71,7 @@ object SpendChannelAddressHelper {
         val loggerFactory = business.loggerFactory
         val log = loggerFactory.newLogger(this::class)
         val peer = business.peerManager.getPeer()
-        delay(1000)
+        delay(300)
         log.info { "signing channel outpoint spending: [ channel_id=$channelIdRaw, channel_data=${channelData.take(20)}..., remote_pubkey=$remoteFundingPubkeyRaw, unsigned_tx=$unsignedTxRaw, remote_nonce=$remoteNonceRaw ]" }
 
         val remoteNonce = try {
