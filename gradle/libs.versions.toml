@@ -1,15 +1,15 @@
 [versions]
-lightningkmp = "1.11.4"
+lightningkmp = "1.11.5-SNAPSHOT"
 secp256k1 = "0.22.0" # keep in check with lightning-kmp secp version
 
-kotlin = "2.2.10"
-ktor = "3.1.0"
+kotlin = "2.3.10"
+ktor = "3.4.0"
 sqldelight = "2.1.0"
 okio = "3.15.0"
 serialization = "1.9.0" # keep in check with lightning-kmp serialization version
 
 # iOS
-skie = "0.10.6"
+skie = "0.10.10"
 
 # Android
 androidx-junit = "1.1.3"

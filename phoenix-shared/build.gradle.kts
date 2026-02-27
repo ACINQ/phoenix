@@ -83,11 +83,6 @@ kotlin {
             dependencies {
                 // lightning-kmp
                 api("fr.acinq.lightning:lightning-kmp-core:${libs.versions.lightningkmp.get()}")
-                // ktor
-                implementation("io.ktor:ktor-client-core:${libs.versions.ktor.get()}")
-                implementation("io.ktor:ktor-client-json:${libs.versions.ktor.get()}")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:${libs.versions.ktor.get()}")
-                implementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
                 // serialization
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:${libs.versions.serialization.get()}")
                 // sqldelight
@@ -114,8 +109,6 @@ kotlin {
                 //noinspection UseTomlInstead
                 dependencies {
                     implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${libs.versions.secp256k1.get()}")
-                    implementation("io.ktor:ktor-network:${libs.versions.ktor.get()}")
-                    implementation("io.ktor:ktor-network-tls:${libs.versions.ktor.get()}")
                     implementation("io.ktor:ktor-client-android:${libs.versions.ktor.get()}")
                     implementation("app.cash.sqldelight:android-driver:${libs.versions.sqldelight.get()}")
                 }
@@ -142,7 +135,6 @@ kotlin {
         // -- ios sources
         val iosMain by creating {
             dependencies {
-                implementation("io.ktor:ktor-client-ios:${libs.versions.ktor.get()}")
                 implementation("app.cash.sqldelight:native-driver:${libs.versions.sqldelight.get()}")
             }
         }
