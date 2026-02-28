@@ -65,7 +65,7 @@ sealed class LightningInvoiceState {
         data class Bolt12(val offer: OfferTypes.Offer) : Done() {
             override val paymentData by lazy { offer.encode() }
             override val description: String? by lazy { offer.description }
-            override val amount: MilliSatoshi? by lazy { offer.amount }
+            override val amount: MilliSatoshi? by lazy { offer.amountMsat }
         }
     }
     data class Error(val e: Throwable) : LightningInvoiceState()

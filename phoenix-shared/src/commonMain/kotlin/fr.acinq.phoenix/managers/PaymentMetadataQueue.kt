@@ -57,7 +57,7 @@ class PaymentMetadataQueue(
     internal fun enrichPaymentMetadata(metadata: WalletPaymentMetadata?): WalletPaymentMetadata {
         val metadataOrDefault = metadata ?: WalletPaymentMetadata()
         return if (metadataOrDefault.originalFiat == null) {
-            val currentFiatRate = appConfigurationManager.preferredFiatCurrencies.value?.let { currencyManager.calculateOriginalFiat(it.primary) }
+            val currentFiatRate = appConfigurationManager.preferredFiatCurrencies.value?.let { currencyManager.getSnapshotRateForCurrency(it.primary) }
             metadataOrDefault.copy(originalFiat = currentFiatRate)
         } else metadataOrDefault
     }
