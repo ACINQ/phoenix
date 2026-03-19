@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.components.inputs
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -65,6 +66,7 @@ fun UnitDropdown(
     onUnitChange: (ComplexAmount?, CurrencyUnit) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    otherItems: (@Composable () -> Unit)? = null,
     internalPadding: PaddingValues = PaddingValues(8.dp),
     enabled: Boolean = true,
 ) {
@@ -108,7 +110,6 @@ fun UnitDropdown(
                                     }
                                 }
                                 is BitcoinUnit -> amount?.let { ComplexAmount(it, null) }
-                                else -> null
                             }
 
                             expanded = false
@@ -129,14 +130,19 @@ fun UnitDropdown(
                 Box(modifier = Modifier.padding(horizontal = 8.dp)) {
                     BorderButton(
                         text = stringResource(R.string.unitdropdown_more),
-                        icon = R.drawable.ic_settings,
+                        icon = R.drawable.ic_plus_circle,
                         onClick = { showAddCurrencyDialog = true ; expanded = false },
                         modifier = Modifier.fillMaxSize(),
                         borderColor = borderColor,
+                        space = 8.dp,
                         shape = RoundedCornerShape(12.dp),
+                        padding = PaddingValues(8.dp),
+                        horizontalArrangement = Arrangement.Start
                     )
                 }
             }
+
+            otherItems?.invoke()
         }
 
         if (showAddCurrencyDialog) {

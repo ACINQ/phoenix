@@ -19,23 +19,33 @@ package fr.acinq.phoenix.android.components.inputs
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,9 +72,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalBusiness
 import fr.acinq.phoenix.android.LocalExchangeRatesMap
 import fr.acinq.phoenix.android.LocalFiatCurrencies
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.buttons.BorderButton
+import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.converters.AmountConversionResult
 import fr.acinq.phoenix.android.utils.converters.AmountConverter
 import fr.acinq.phoenix.android.utils.converters.AmountConverter.toFiat
@@ -76,8 +90,9 @@ import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import kotlinx.coroutines.launch
 
-private enum class SlotsEnum { Input, Unit, DashedLine }
+private enum class SlotsEnum { Input, Unit, AllBalance, DashedLine }
 
 /**
  * This input is designed to be in the center stage of a screen. It uses a customised basic input
@@ -93,6 +108,8 @@ fun AmountHeroInput(
     dropdownModifier: Modifier = Modifier,
     inputTextSize: TextUnit = 16.sp,
     enabled: Boolean = true,
+    canTip: Boolean = false,
+    canSendLNBalance: Boolean = false,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -105,56 +122,59 @@ fun AmountHeroInput(
     var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnits.primary) }
     val units = remember(prefBitcoinUnits, prefFiatCurrencies) { prefBitcoinUnits.all + prefFiatCurrencies.primary + prefFiatCurrencies.others }
 
-    var inputValue by remember(initialAmount) {
-        mutableStateOf(TextFieldValue(
-            when (val u = unit) {
-                is FiatCurrency -> {
-                    val rate = rates[unit]
-                    if (rate != null) {
-                        initialAmount?.toFiat(rate.price).toPlainString(limitDecimal = true)
-                    } else "?!"
-                }
-                is BitcoinUnit -> {
-                    initialAmount?.toUnit(u).toPlainString()
-                }
-                else -> "?!"
-            }
-        ))
-    }
-    var inputAmount by remember { mutableStateOf(initialAmount) }
-    val convertedValue: String by remember(inputAmount, unit) {
-        val s = when (unit) {
+    fun convertAmountToTextValue(amount: MilliSatoshi?): TextFieldValue {
+        val newInputValue = when (val u = unit) {
             is FiatCurrency -> {
-                val inBtc = inputAmount?.toPrettyString(prefBitcoinUnits.primary, withUnit = true)
+                val rate = rates[unit]
+                if (rate != null) {
+                    amount?.toFiat(rate.price).toPlainString(limitDecimal = true)
+                } else "?!"
+            }
+            is BitcoinUnit -> {
+                amount?.toUnit(u).toPlainString()
+            }
+        }
+        return TextFieldValue(newInputValue)
+    }
+
+    // the raw string value that is edited by the user
+    var inputValue by remember { mutableStateOf(convertAmountToTextValue(initialAmount)) }
+
+    // [inputValue] converted to millisatoshi, which is easier for tips in some situation. Refreshed by the LaunchedEffect below.
+    var inputValueInMsat by remember { mutableStateOf(initialAmount) }
+
+    fun convertAmountToAlt(amount: MilliSatoshi?): String {
+        if (amount == null) return ""
+        return when (unit) {
+            is FiatCurrency -> {
+                val inBtc = amount.toPrettyString(prefBitcoinUnits.primary, withUnit = true)
                 val fiat = prefFiatCurrencies.primary
                 val inPrimary = if (unit != fiat) {
                     rates[fiat]?.price?.let { rate ->
-                        inputAmount?.toFiat(rate)?.toPrettyString(unit = fiat, withUnit = true)
+                        amount.toFiat(rate).toPrettyString(unit = fiat, withUnit = true)
                     }
                 } else null
 
-                inBtc?.let {
-                    inPrimary?.let {
-                        "$inBtc / $inPrimary"
-                    } ?: inBtc
-                }
+                inPrimary?.let {
+                    "$inBtc / $inPrimary"
+                } ?: inBtc
             }
             is BitcoinUnit -> {
                 val fiat = prefFiatCurrencies.primary
                 rates[fiat]?.price?.let { rate ->
-                    inputAmount?.toFiat(rate)?.toPrettyString(unit = fiat, withUnit = true)
+                    amount.toFiat(rate).toPrettyString(unit = fiat, withUnit = true)
                 }
             }
-            else -> null
-        }
-
-        mutableStateOf(s ?: "")
+        } ?: ""
     }
+
+    // this is [valueInMsat] converted to the desired alternative [unit] (e.g., fiat if we enter a BTC amount)
+    var inputValueConvertedToAlt: String by remember { mutableStateOf(convertAmountToAlt(initialAmount)) }
 
     var internalErrorMessage: String by remember { mutableStateOf(validationErrorMessage) }
     val errorMessage = validationErrorMessage.ifBlank { internalErrorMessage.ifBlank { null } }
 
-    fun updateFieldsForInputChange() {
+    LaunchedEffect(inputValue, unit) {
         internalErrorMessage = ""
         val res = AmountConverter.convertToComplexAmount(
             input = inputValue.text,
@@ -163,7 +183,8 @@ fun AmountHeroInput(
         )
         when (res) {
             is AmountConversionResult.Error -> {
-                inputAmount = null
+                inputValueInMsat = null
+                inputValueConvertedToAlt = ""
                 internalErrorMessage = when (res) {
                     is AmountConversionResult.Error.InvalidInput -> context.getString(R.string.validation_invalid_number)
                     is AmountConversionResult.Error.RateUnavailable -> context.getString(R.string.utils_no_conversion)
@@ -173,11 +194,13 @@ fun AmountHeroInput(
             }
 
             null -> {
-                inputAmount = null
+                inputValueInMsat = null
+                inputValueConvertedToAlt = ""
                 onAmountChange(null)
             }
             is ComplexAmount -> {
-                inputAmount = res.amount
+                inputValueInMsat = res.amount
+                inputValueConvertedToAlt = convertAmountToAlt(res.amount)
                 onAmountChange(res)
             }
         }
@@ -186,10 +209,7 @@ fun AmountHeroInput(
     val input: @Composable () -> Unit = {
         BasicTextField(
             value = inputValue,
-            onValueChange = { newValue ->
-                inputValue = newValue
-                updateFieldsForInputChange()
-            },
+            onValueChange = { inputValue = it },
             modifier = inputModifier
                 .clipScrollableContainer(Orientation.Horizontal)
                 .defaultMinSize(minWidth = 32.dp) // for good ux
@@ -214,7 +234,7 @@ fun AmountHeroInput(
 
     val unitDropdown: @Composable () -> Unit = {
         UnitDropdown(
-            amount = inputAmount,
+            amount = inputValueInMsat,
             unit = unit,
             units = units,
             onUnitChange = { newAmount, newUnit ->
@@ -232,12 +252,36 @@ fun AmountHeroInput(
                     }
                 }
                 unit = newUnit
-                updateFieldsForInputChange()
             },
             canAddMoreUnits = true,
             onDismiss = { },
             modifier = dropdownModifier,
             enabled = enabled,
+            otherItems = if (canSendLNBalance) {
+                {
+                    val peerManager = LocalBusiness.current?.peerManager
+                    val scope = rememberCoroutineScope()
+                    Spacer(Modifier.height(8.dp))
+                    Box(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        BorderButton(
+                            text = "Use all balance",
+                            icon = R.drawable.ic_arrow_to_end,
+                            onClick = {
+                                scope.launch {
+                                    val peer = peerManager?.getPeer()
+                                    inputValue = convertAmountToTextValue(peer?.maxSendableOverLightning())
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize(),
+                            borderColor = borderColor,
+                            space = 8.dp,
+                            shape = RoundedCornerShape(12.dp),
+                            padding = PaddingValues(8.dp),
+                            horizontalArrangement = Arrangement.Start
+                        )
+                    }
+                }
+            } else null
         )
     }
 
@@ -311,12 +355,48 @@ fun AmountHeroInput(
             )
         } else {
             Text(
-                text = convertedValue.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
+                text = inputValueConvertedToAlt.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center),
                 modifier = Modifier.sizeIn(minHeight = 28.dp)
             )
+        }
+
+        if (canTip && initialAmount != null) {
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Button(
+                    text = "5%",
+                    icon = R.drawable.ic_minus_circle,
+                    onClick = {
+                        val newAmount = inputValueInMsat?.let {
+                            it - initialAmount * 0.05
+                        }?.coerceAtLeast(initialAmount) ?: initialAmount
+                        inputValue = convertAmountToTextValue(newAmount)
+                    },
+                    enabled = inputValueInMsat?.let { it > initialAmount } ?: false,
+                    padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+                    space = 6.dp,
+                    textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                    shape = CircleShape,
+                )
+                Button(
+                    text = "5%",
+                    icon = R.drawable.ic_plus_circle,
+                    onClick = {
+                        val newAmount = inputValueInMsat?.let {
+                            it + initialAmount * 0.05
+                        }?.coerceAtMost(initialAmount * 2) ?: initialAmount
+                        inputValue = convertAmountToTextValue(newAmount)
+                    },
+                    enabled = inputValueInMsat?.let { it < initialAmount * 2 } ?: false,
+                    padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+                    space = 6.dp,
+                    textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
+                    shape = CircleShape,
+                )
+            }
         }
     }
 }

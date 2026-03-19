@@ -51,6 +51,7 @@ fun BorderButton(
     space: Dp = 12.dp,
     maxLines: Int = Int.MAX_VALUE,
     textStyle: TextStyle = MaterialTheme.typography.button,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     padding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     onClick: () -> Unit,
@@ -67,14 +68,10 @@ fun BorderButton(
         backgroundColor = backgroundColor,
         border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (enabled) borderColor else borderColor.copy(alpha = 0.35f)),
         textStyle = textStyle,
+        horizontalArrangement = horizontalArrangement,
         padding = padding,
         maxLines = maxLines,
         interactionSource = interactionSource,
         modifier = modifier
     )
 }
-
-
-
-
-

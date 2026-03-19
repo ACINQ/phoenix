@@ -996,7 +996,7 @@
     <string name="converter_placeholder_label">Masukkan jumlah dalam %1$s</string>
     <string name="converter_add_new_button">Tambahkan mata uang baru…</string>
     <string name="converter_timestamp_refresh">Terakhir diperbarui: %1$s</string>
-    <string name="unitdropdown_more">Lainnya…</string>
+    <string name="unitdropdown_more">Kelola mata uang…</string>
     <string name="currencypicker_title">Pilih mata uang</string>
     <string name="currencypicker_no_match">Tidak ditemukan kecocokan…</string>
 

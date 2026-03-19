@@ -1013,7 +1013,7 @@
     <string name="converter_placeholder_label">Enter amount in %1$s</string>
     <string name="converter_add_new_button">Add new currency…</string>
     <string name="converter_timestamp_refresh">Last refreshed: %1$s</string>
-    <string name="unitdropdown_more">Other…</string>
+    <string name="unitdropdown_more">Manage currencies…</string>
     <string name="currencypicker_title">Select a currency</string>
     <string name="currencypicker_no_match">No match found…</string>
 

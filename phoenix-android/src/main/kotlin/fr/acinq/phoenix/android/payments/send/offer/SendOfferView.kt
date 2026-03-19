@@ -46,6 +46,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.LocalBitcoinUnits
+import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
@@ -98,6 +99,7 @@ fun SendToOfferView(
 
     var message by remember { mutableStateOf("") }
     var showMessageDialog by remember { mutableStateOf(false) }
+    val isOverpaymentEnabled = LocalUserPrefs.current?.getIsOverpaymentEnabled?.collectAsState(initial = false)?.value ?: false
 
     SplashLayout(
         header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
@@ -111,6 +113,8 @@ fun SendToOfferView(
                 },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
+                canTip = requestedAmount != null && isOverpaymentEnabled,
+                canSendLNBalance = requestedAmount == null,
             )
         }
     ) {

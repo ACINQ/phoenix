@@ -16,16 +16,18 @@
 
 package fr.acinq.phoenix.android.payments.send.bolt11
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -39,12 +41,15 @@ import fr.acinq.phoenix.android.LocalUserPrefs
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.components.buttons.BackButton
 import fr.acinq.phoenix.android.components.buttons.SmartSpendButton
 import fr.acinq.phoenix.android.components.inputs.AmountHeroInput
 import fr.acinq.phoenix.android.components.buttons.BackButtonWithActiveWallet
+import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
+import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.layouts.SplashLayout
+import fr.acinq.phoenix.android.components.wallet.CompactWalletViewWithBalance
 import fr.acinq.phoenix.android.utils.converters.AmountFormatter.toPrettyString
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import kotlinx.coroutines.launch
@@ -88,53 +93,17 @@ fun SendToBolt11View(
     SplashLayout(
         header = { BackButtonWithActiveWallet(onBackClick = onBackClick, walletId = walletId) },
         topContent = {
-            var inputForcedAmount by remember { mutableStateOf(requestedAmount) }
             AmountHeroInput(
-                initialAmount = inputForcedAmount,
+                initialAmount = requestedAmount,
                 enabled = requestedAmount == null || isOverpaymentEnabled,
-                onAmountChange = { newAmount -> amount = newAmount?.amount },
+                onAmountChange = {
+                    amount = it?.amount
+                },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
+                canTip = requestedAmount != null && isOverpaymentEnabled,
+                canSendLNBalance = requestedAmount == null,
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            if (requestedAmount != null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(
-                        text = "5%",
-                        icon = R.drawable.ic_minus_circle,
-                        onClick = {
-                            val newAmount = amount?.let {
-                                it - requestedAmount * 0.05
-                            }?.coerceAtLeast(requestedAmount) ?: requestedAmount
-
-                            inputForcedAmount = newAmount
-                            amount = newAmount
-                        },
-                        enabled = amount?.let { it > requestedAmount } ?: false,
-                        padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
-                        space = 6.dp,
-                        textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-                        shape = CircleShape,
-                    )
-                    Button(
-                        text = "5%",
-                        icon = R.drawable.ic_plus_circle,
-                        onClick = {
-                            val newAmount = amount?.let {
-                                it + requestedAmount * 0.05
-                            }?.coerceAtMost(requestedAmount * 2) ?: requestedAmount
-
-                            inputForcedAmount = newAmount
-                            amount = newAmount
-                        },
-                        enabled = amount?.let { it < requestedAmount * 2 } ?: false,
-                        padding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
-                        space = 6.dp,
-                        textStyle = MaterialTheme.typography.caption.copy(fontSize = 14.sp),
-                        shape = CircleShape,
-                    )
-                }
-            }
         }
     ) {
         invoice.description?.takeIf { it.isNotBlank() }?.let {
