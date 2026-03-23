@@ -339,7 +339,7 @@
     <string name="home_balance_loading">Memuat…</string>
     <string name="home_onchain_incoming">+%1$s</string>
 
-    <string name="home_faq_button">Pertanyaan yang Sering Diajukan (FAQ)</string>
+    <string name="home_faq_button">FAQ</string>
     <string name="home_payments_none">Gunakan tombol Terima dan Kirim di bagian bawah layar ini untuk memulai!</string>
     <string name="home_payments_more_button">Tampilkan semua pembayaran…</string>
     <string name="home_connection_electrum_late">Tidak sinkron!</string>
