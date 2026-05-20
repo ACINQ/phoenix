@@ -79,6 +79,7 @@ val domains = listOf(
     "8333.mobi",
     "bipa.app",
     "ln.tips",
+    "bitcoin.co.ke",
 )
 
 @OptIn(ExperimentalMaterialApi::class)

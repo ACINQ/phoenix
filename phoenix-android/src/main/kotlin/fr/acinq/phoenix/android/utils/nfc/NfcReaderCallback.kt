@@ -20,6 +20,7 @@ import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
+import android.nfc.tech.Ndef
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.android.components.nfc.NfcState
 import fr.acinq.phoenix.android.components.nfc.NfcStateRepository
@@ -29,7 +30,11 @@ import org.slf4j.LoggerFactory
 /**
  * This class retrieves the first NDEF message in an NFC tag.
  *
- * Sends a sequence of APDU commands to the tag, mirroring what's done in [HceService].
+ * Two tag types are supported:
+ * - ISO-DEP tags (NFC Forum Type 4, e.g. NTAG424-DNA, Bolt Cards): communicates via a sequence
+ *   of APDU commands, mirroring what's done in [HceService].
+ * - Plain NDEF tags (NFC Forum Type 1/2, e.g. NTAG213/215/216): reads the NDEF message directly
+ *   using the Android [Ndef] API without APDU negotiation.
  */
 class NfcReaderCallback(val onFoundData: (String) -> Unit) : NfcAdapter.ReaderCallback {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -37,22 +42,35 @@ class NfcReaderCallback(val onFoundData: (String) -> Unit) : NfcAdapter.ReaderCa
     @OptIn(ExperimentalStdlibApi::class)
     override fun onTagDiscovered(tag: Tag?) {
         log.info("discovered tag=$tag")
-        val isoDep = IsoDep.get(tag)
-        if (isoDep == null) {
-            log.info("aborting tag discovery: tag does not support iso-dep")
-            return
-        }
 
         if (!NfcStateRepository.isReading()) {
             log.info("aborting tag discovery: nfc_state=${NfcStateRepository.state.value}")
-            isoDep.close()
             return
         }
 
+        // Prefer ISO-DEP (NFC Forum Type 4: NTAG424-DNA, Bolt Cards, …)
+        val isoDep = IsoDep.get(tag)
+        if (isoDep != null) {
+            readIsoDepTag(isoDep)
+            return
+        }
+
+        // Fallback: plain NDEF (NFC Forum Type 1/2: NTAG213, NTAG215, NTAG216, …)
+        val ndef = Ndef.get(tag)
+        if (ndef != null) {
+            readNdefTag(ndef)
+            return
+        }
+
+        log.info("aborting tag discovery: tag does not support iso-dep or plain ndef")
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun readIsoDepTag(isoDep: IsoDep) {
         try {
-            log.debug("connecting to tag={}", tag)
+            log.debug("connecting to iso-dep tag")
             isoDep.connect()
-            log.info("nfc reader connected, starting communication...")
+            log.info("iso-dep reader connected, starting communication...")
 
             val selectCommand = ApduCommands.SELECT_AID
             log.debug("SEND select aid: ${selectCommand.toByteArray().toHexString()}")
@@ -120,7 +138,7 @@ class NfcReaderCallback(val onFoundData: (String) -> Unit) : NfcAdapter.ReaderCa
             }
 
             val m = NdefMessage(result)
-            log.info("successfully read tag, found ndef_message=$m")
+            log.info("successfully read iso-dep tag, found ndef_message=$m")
             val d = m.records.mapNotNull {
                 NdefParser.parseNdefRecord(it)
             }
@@ -129,13 +147,40 @@ class NfcReaderCallback(val onFoundData: (String) -> Unit) : NfcAdapter.ReaderCa
             }
 
         } catch (e: Exception) {
-            log.error("failed to read tag: ", e)
+            log.error("failed to read iso-dep tag: ", e)
         } finally {
             isoDep.close()
             if (NfcStateRepository.isReading()) {
                 NfcStateRepository.updateState(NfcState.Inactive)
             }
-            log.info("terminated nfc reader callback")
+            log.info("terminated iso-dep reader callback")
+        }
+    }
+
+    private fun readNdefTag(ndef: Ndef) {
+        try {
+            log.debug("connecting to ndef tag type=${ndef.type}")
+            ndef.connect()
+            log.info("ndef reader connected, reading message...")
+
+            val message = ndef.ndefMessage
+            if (message == null) {
+                log.info("ndef tag contains no message")
+                return
+            }
+
+            log.info("successfully read ndef tag, found message=$message")
+            val data = message.records.mapNotNull { NdefParser.parseNdefRecord(it) }
+            data.firstOrNull()?.let { onFoundData(it) }
+
+        } catch (e: Exception) {
+            log.error("failed to read ndef tag: ", e)
+        } finally {
+            ndef.close()
+            if (NfcStateRepository.isReading()) {
+                NfcStateRepository.updateState(NfcState.Inactive)
+            }
+            log.info("terminated ndef reader callback")
         }
     }
 }

@@ -91,7 +91,9 @@ fun LnurlWithdrawView(
                 },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
-                enabled = !isAmountDisabled,
+                canEditAmount = !isAmountDisabled,
+                canTip = false,
+                canSendLNBalance = false,
             )
         }
     ) {

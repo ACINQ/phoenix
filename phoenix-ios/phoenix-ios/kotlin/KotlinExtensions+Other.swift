@@ -233,7 +233,8 @@ extension ContactAddress {
 			"ln.tips",
 			"getalby.com",
 			"walletofsatoshi.com",
-			"stacker.news"
+			"stacker.news",
+			"bitcoin.co.ke"
 		])
 		
 		if includeTestnet {

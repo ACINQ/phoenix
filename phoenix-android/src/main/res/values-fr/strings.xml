@@ -971,8 +971,8 @@
     <string name="converter_placeholder_label">Saisir un montant en %1$s</string>
     <string name="converter_add_new_button">Ajouter une devise…</string>
     <string name="converter_timestamp_refresh">Dernière mise à jour : %1$s</string>
-    <string name="unitdropdown_more">Autre…</string>
-    <string name="currencypicker_title">Sélectionner une devise</string>
+    <string name="unitdropdown_more">Gérer les devises…</string>
+    <string name="currencypicker_title">Sélectionnez une devise</string>
     <string name="currencypicker_no_match">Aucun résultat…</string>
 
     <!-- user wallet -->

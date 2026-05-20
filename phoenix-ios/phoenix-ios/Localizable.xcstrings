@@ -799,7 +799,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(Rayo11)"
+            "value" : "(Lightning Bolt11)"
           }
         },
         "fr" : {
@@ -840,7 +840,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(Rayo12)"
+            "value" : "(Lightning Bolt12)"
           }
         },
         "fr" : {
@@ -3981,7 +3981,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se genera una frase de respaldo que guarda toda la información necesaria para restaurar tus fondos de Bitcoin."
+            "value" : "Se genera una frase de recuperación que guarda toda la información necesaria para restaurar tus fondos de Bitcoin."
           }
         },
         "fr" : {
@@ -4021,7 +4021,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un bitcoin se puede dividir en unidades más pequeñas. La unidad más pequeña se llama un satoshi y hay 100 millones de satoshis en un solo bitcoin."
+            "value" : "Un Bitcoin se puede dividir en unidades más pequeñas. La unidad más pequeña se llama un satoshi y hay 100 millones de satoshis en un solo Bitcoin."
           }
         },
         "fr" : {
@@ -6986,7 +6986,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuidado: si la tasa de comisión en el pool de memoria de Bitcoin es alta, los pagos entrantes de Lightning que requieran una operación en la cadena podrían resultar caros."
+            "value" : "Cuidado: si el feerate de la mempool de Bitcoin es alto, los pagos entrantes de Lightning que requieran una operación en la cadena podrían resultar caros."
           }
         },
         "fr" : {
@@ -7026,7 +7026,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Atención! Algunos fondos caducarán pronto y ya no se podrán canjear."
+            "value" : "¡Atención! Algunos fondos caducarán pronto y ya no serán elegibles para un swap."
           }
         },
         "fr" : {
@@ -8356,7 +8356,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El pool de memoria de Bitcoin está lleno, por lo que las comisiones son elevadas."
+            "value" : "La mempool de Bitcoin está llena y las comisiones son elevadas."
           }
         },
         "fr" : {
@@ -9813,7 +9813,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Funcionamiento del canal (nuevo o empalmado)"
+            "value" : "Funcionamiento del canal (nuevo o splice-in)"
           }
         },
         "fr" : {
@@ -10053,7 +10053,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los canales con saldo inferior al límite de Bitcoin remanente (546 satoshis) no se pueden migrar. Los mineros de Bitcoin reciben este saldo."
+            "value" : "Los canales con saldo inferior al límite de polvo de Bitcoin (546 satoshi) no se pueden migrar. Los mineros de Bitcoin reciben este saldo."
           }
         },
         "fr" : {
@@ -11387,7 +11387,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empalme simultáneo en curso"
+            "value" : "Splice simultáneo en curso"
           }
         },
         "fr" : {
@@ -15701,7 +15701,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desconectado durante intento de empalme"
+            "value" : "Desconectado durante intento de splice-out"
           }
         },
         "fr" : {
@@ -17150,7 +17150,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para activar Tor ahora es necesario instalar una aplicación VPN Proxy Tor de terceros, como Orbot.\n\nEsto hace que los pagos en segundo plano sean mucho más fiables con Tor.\n\nAdemás, ahora Phoenix utiliza siempre direcciones cebolla para las conexiones Lightning y Electrum cuando Tor está activado."
+            "value" : "Para activar Tor ahora es necesario instalar una aplicación VPN Proxy Tor de terceros, como Orbot.\n\nEsto hace que los pagos en segundo plano sean mucho más fiables con Tor.\n\nAdemás, ahora Phoenix utiliza siempre direcciones onion para las conexiones Lightning y Electrum cuando Tor está activado."
           }
         },
         "fr" : {
@@ -19045,7 +19045,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La tasa de comisión es inferior al valor mínimo que permite el pool de memoria: %@"
+            "value" : "Feerate por debajo del mínimo permitido por la mempool: %@"
           }
         },
         "fr" : {
@@ -19125,7 +19125,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La tasa de comisión es inferior al valor mínimo que permite el pool de memoria."
+            "value" : "Feerate por debajo del mínimo permitido por la mempool."
           }
         },
         "fr" : {
@@ -22363,7 +22363,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si Face ID falla, puedes ingresar tu código de iOS para acceder a Phoenix."
+            "value" : "Si Face ID falla, puedes ingresar tu código de acceso de iOS para acceder a Phoenix."
           }
         },
         "fr" : {
@@ -22525,7 +22525,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si Touch ID falla, puedes ingresar tu código de iOS para acceder a Phoenix."
+            "value" : "Si Touch ID falla, puedes ingresar tu código de acceso de iOS para acceder a Phoenix."
           }
         },
         "fr" : {
@@ -25832,7 +25832,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dirección del rayo"
+            "value" : "Dirección Lightning"
           }
         },
         "fr" : {
@@ -25872,7 +25872,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Direcciones de rayos:"
+            "value" : "Direcciones Lightning:"
           }
         },
         "fr" : {
@@ -25913,7 +25913,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rayo11"
+            "value" : "Lightning Bolt11"
           }
         },
         "fr" : {
@@ -25954,7 +25954,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rayo12"
+            "value" : "Lightning Bolt12"
           }
         },
         "fr" : {
@@ -25994,7 +25994,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tasa por rayos"
+            "value" : "Comisión Lightning"
           }
         },
         "fr" : {
@@ -26491,7 +26491,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Código QR del rayo"
+            "value" : "Código QR de Lightning"
           }
         },
         "fr" : {
@@ -27260,7 +27260,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Baja comisión!"
+            "value" : "¡Feerate bajo!"
           }
         },
         "fr" : {
@@ -28233,7 +28233,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pool de memoria"
+            "value" : "Mempool"
           }
         },
         "fr" : {
@@ -29045,7 +29045,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "nombre, dirección del rayo, oferta..."
+            "value" : "nombre, dirección Lightning, oferta..."
           }
         },
         "fr" : {
@@ -30212,7 +30212,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No, no quiero utilizar una dirección cebolla"
+            "value" : "No, no quiero usar una dirección onion"
           }
         },
         "fr" : {
@@ -31711,7 +31711,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pago por empalme saliente"
+            "value" : "Pago on-chain saliente"
           }
         },
         "fr" : {
@@ -32923,7 +32923,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "imagen previa del pago"
+            "value" : "preimage del pago"
           }
         },
         "fr" : {
@@ -34696,7 +34696,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preimagen"
+            "value" : "Preimage"
           }
         },
         "fr" : {
@@ -35868,7 +35868,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Canjear"
+            "value" : "Reclamar"
           }
         },
         "fr" : {
@@ -36354,7 +36354,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Resolución de la dirección del rayo"
+            "value" : "Resolución de la dirección Lightning"
           }
         },
         "fr" : {
@@ -40700,7 +40700,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El empalme ya está en marcha"
+            "value" : "Splice ya en curso"
           }
         },
         "fr" : {
@@ -40740,7 +40740,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se ha abortado el empalme"
+            "value" : "El splice fue cancelado"
           }
         },
         "fr" : {
@@ -40781,7 +40781,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empalme de entrada"
+            "value" : "Splice-in"
           }
         },
         "fr" : {
@@ -40821,7 +40821,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error en la sesión de empalme"
+            "value" : "Error en la sesión de splice-out"
           }
         },
         "fr" : {
@@ -40861,7 +40861,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Empalmes"
+            "value" : "Splicing"
           }
         },
         "fr" : {
@@ -42032,7 +42032,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La frase de respaldo, conocida como semilla, es una lista de 12 palabras en inglés. Te permite recuperar el acceso completo a tus fondos en caso necesario."
+            "value" : "La frase de recuperación es una lista de 12 palabras en inglés. Te permite recuperar el acceso completo a tus fondos en caso necesario."
           }
         },
         "fr" : {
@@ -43463,6 +43463,7 @@
     },
     "The simulator cannot access the camera. Please use the clipboard." : {
       "comment" : "Warning for iOS Simulator (only for devs)",
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -44419,7 +44420,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta tasa de comisión es inferior a la que ya usan tus transacciones. Debería ser mayor para producir algún efecto."
+            "value" : "Este feerate es inferior al que ya usan tus transacciones. Debería ser mayor para producir algún efecto."
           }
         },
         "fr" : {
@@ -45914,7 +45915,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tor está activado. Este servidor debe utilizar una dirección cebolla."
+            "value" : "Tor está activado. Este servidor debe usar una dirección onion."
           }
         },
         "fr" : {
@@ -47172,7 +47173,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error de empalme desconocido."
+            "value" : "Error de splice-out desconocido."
           }
         },
         "fr" : {
@@ -48994,6 +48995,7 @@
       }
     },
     "Wallet creation options" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -49830,7 +49832,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se cambiará automáticamente a Rayo si la comisión es **inferior al %1$@** (%2$@) del importe."
+            "value" : "Se cambiará automáticamente a Lightning si la comisión es **inferior al %1$@** (%2$@) del importe."
           }
         },
         "fr" : {
@@ -49870,7 +49872,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se cambiará automáticamente a Rayo si la cuota es **menor que %@**."
+            "value" : "Se cambiará automáticamente a Lightning si la comisión es **menor que %@**."
           }
         },
         "fr" : {
@@ -50153,7 +50155,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Con Phoenix, recibir y enviar bitcoin es seguro, fácil y rápido."
+            "value" : "Con Phoenix, recibir y enviar Bitcoin es seguro, fácil y rápido."
           }
         },
         "fr" : {
@@ -50396,7 +50398,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vas a canjear fondos de"
+            "value" : "Vas a reclamar fondos de"
           }
         },
         "fr" : {
@@ -50436,7 +50438,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Estás solicitando una cantidad **inicial** de liquidez. La liquidez no es constante a lo largo del tiempo: a medida que recibas fondos durante el Rayo, la liquidez se consumirá y se convertirá en tu saldo.\n\nAl cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
+            "value" : "Estás solicitando una cantidad **inicial** de liquidez. La liquidez no es constante a lo largo del tiempo: a medida que recibas fondos por Lightning, la liquidez se consumirá y se convertirá en tu saldo.\n\nAl cabo de un año, la liquidez restante no utilizada será reclamada por el servicio."
           }
         },
         "fr" : {
@@ -52176,7 +52178,7 @@
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu frase de recuperación tiene 12 palabras, generadas utilizando la norma BIP39.\n\nSe recomienda el inglés. Si prefieres otro idioma, ofrecemos instrucciones de recuperación en nuestro sitio web.\n\nTu selección aquí **no** afecta a tu capacidad de enviar o recibir bitcoin dentro de Phoenix."
+            "value" : "Tu frase de recuperación tiene 12 palabras, generadas utilizando la norma BIP39.\n\nSe recomienda el inglés. Si prefieres otro idioma, ofrecemos instrucciones de recuperación en nuestro sitio web.\n\nTu selección aquí **no** afecta a tu capacidad de enviar o recibir Bitcoin dentro de Phoenix."
           }
         },
         "fr" : {

@@ -151,7 +151,7 @@ private fun ActiveWalletBalanceDialog(
 
             if (showInbound) {
                 Spacer(Modifier.height(8.dp))
-                Text(text = "Inbound liquidity", style = MaterialTheme.typography.subtitle2)
+                Text(text = stringResource(R.string.channelsview_inbound), style = MaterialTheme.typography.subtitle2)
                 Spacer(Modifier.height(4.dp))
                 Row {
                     PhoenixIcon(resourceId = R.drawable.ic_bucket)

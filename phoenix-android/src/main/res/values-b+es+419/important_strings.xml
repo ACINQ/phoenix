@@ -366,7 +366,7 @@
     <string name="liquiditypolicy_advanced_fees_prop_help">Comprueba la comisión en relación con el importe recibido. Esta opción es útil para realizar una prueba de cordura en el caso de pagos pequeños.</string>
     <string name="liquiditypolicy_advanced_overrides_title">Anulación de política</string>
     <string name="liquiditypolicy_advanced_pay_to_open_label">Omitir la comprobación de comisión absoluta para Lightning</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_help">Cuando se activa, los pagos entrantes de Lightning ignoran el límite absoluto de la comisión máxima. Solo se aplicará la comprobación porcentual.\n\nCuidado: si la tasa de comisión en el pool de memoria de Bitcoin es alta, los pagos entrantes de Lightning que requieran una operación en la cadena podrían resultar caros.</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">Cuando se activa, los pagos entrantes de Lightning ignoran el límite absoluto de la comisión máxima. Solo se aplicará la comprobación porcentual.\n\nCuidado: si el feerate de la mempool de Bitcoin es alto, los pagos entrantes de Lightning que requieran una operación en la cadena podrían resultar caros.</string>
     <string name="liquiditypolicy_save_button">Guardar política</string>
     <string name="liquiditypolicy_request_button">Solicitar liquidez entrante</string>
 
@@ -399,7 +399,7 @@
     <string name="liquidityads_disclaimer_body2">Al cabo de un año, la liquidez restante no utilizada será reclamada por el servicio.</string>
 
     <string name="liquidityads_request_button">Aceptar</string>
-    <string name="liquidityads_requesting_spinner">Procesando empalme…</string>
+    <string name="liquidityads_requesting_spinner">Procesando splice…</string>
 
     <string name="liquidityads_success">La liquidez se agregó correctamente.</string>
     <string name="liquidityads_success_amount">Importe añadido: %1$s</string>
@@ -415,8 +415,8 @@
     <!-- CPFP -->
 
     <string name="cpfp_title">Acelerar mis transacciones.</string>
-    <string name="cpfp_instructions">Puedes aumentar la tasa de comisión de todas tus transacciones no confirmadas a fin de que los mineros tengan un incentivo para favorecer tus pagos.</string>
-    <string name="cpfp_splice_error_actual_below_user">Esta tasa de comisión es inferior a la que ya usan tus transacciones no confirmadas. Usa una tasa de comisión más alta.</string>
+    <string name="cpfp_instructions">Puedes aumentar el feerate de todas tus transacciones no confirmadas a fin de que los mineros tengan un incentivo para favorecer tus pagos.</string>
+    <string name="cpfp_splice_error_actual_below_user">Este feerate es inferior al que ya usan tus transacciones no confirmadas. Usa un feerate más alto.</string>
 
     <!-- Lightning payment errors -->
 

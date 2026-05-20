@@ -972,7 +972,7 @@
     <string name="converter_done_button">Hotovo</string>
     <string name="converter_placeholder_label">Vložte částku v %1$s</string>
     <string name="converter_add_new_button">Přidat novou měnu…</string>
-    <string name="unitdropdown_more">Ostatní…</string>
+    <string name="unitdropdown_more">Správa měn…</string>
     <string name="currencypicker_title">Vyberte měnu</string>
     <string name="currencypicker_no_match">Nebyla nalezena žádná shoda…</string>
 

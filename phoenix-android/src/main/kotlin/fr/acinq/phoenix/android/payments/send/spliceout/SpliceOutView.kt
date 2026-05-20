@@ -125,7 +125,10 @@ fun SendSpliceOutView(
                     amount = newAmount
                 },
                 validationErrorMessage = amountErrorMessage,
-                inputTextSize = 42.sp
+                inputTextSize = 42.sp,
+                canEditAmount = true,
+                canTip = false,
+                canSendLNBalance = false,
             )
         }
     ) {

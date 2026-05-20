@@ -664,8 +664,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Status do pool de memória desconhecido</string>
-    <string name="mempool_unknown_feerate_details">O Phoenix não conseguiu obter o estado atual do pool de memória, portanto não pode calcular a velocidade da transação.\n\nVerifique o pool de memória manualmente em um navegador e use um valor apropriado </string>.
+    <string name="mempool_unknown_feerate_title">Status do mempool desconhecido</string>
+    <string name="mempool_unknown_feerate_details">O Phoenix não conseguiu obter o estado atual do mempool, portanto não pode calcular a velocidade da transação.\n\nVerifique o mempool manualmente em um navegador e use um valor apropriado </string>.
     <string name="mempool_fastest">≈ Próximo bloco</string>
     <string name="mempool_halfhour">≈ 30 minutos</string>
     <string name="mempool_hour">≈ 1 hora</string>

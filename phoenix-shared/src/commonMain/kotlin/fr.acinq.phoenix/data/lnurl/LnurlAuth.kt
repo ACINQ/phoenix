@@ -21,7 +21,7 @@ import fr.acinq.bitcoin.crypto.Digest
 import fr.acinq.bitcoin.crypto.Pack
 import fr.acinq.bitcoin.crypto.hmac
 import fr.acinq.lightning.crypto.LocalKeyManager
-import fr.acinq.lightning.logging.debug
+import fr.acinq.secp256k1.Secp256k1
 import io.ktor.http.*
 
 data class LnurlAuth(
@@ -72,7 +72,7 @@ data class LnurlAuth(
             challenge: String,
             key: PrivateKey
         ): Pair<PublicKey, ByteVector> {
-            return key.publicKey() to Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(challenge), privateKey = key))
+            return key.publicKey() to Secp256k1.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(challenge), privateKey = key).toByteArray()).byteVector()
         }
 
         /**

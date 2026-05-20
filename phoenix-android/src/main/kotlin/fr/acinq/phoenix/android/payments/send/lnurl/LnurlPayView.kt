@@ -110,7 +110,9 @@ fun LnurlPayView(
                 },
                 validationErrorMessage = amountErrorMessage,
                 inputTextSize = 42.sp,
-                enabled = payIntent.minSendable != payIntent.maxSendable
+                canEditAmount = payIntent.minSendable != payIntent.maxSendable,
+                canTip = false,
+                canSendLNBalance = false,
             )
         }
     ) {

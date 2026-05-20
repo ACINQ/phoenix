@@ -32,6 +32,7 @@ class ZxingQrCodeAnalyzer(
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private val reader = QRCodeReader()
+    private var yuvData = ByteArray(0)
 
     override fun getDefaultTargetResolution(): Size {
         return DEFAULT_RESOLUTION
@@ -46,29 +47,37 @@ class ZxingQrCodeAnalyzer(
         try {
             val buffer = image.planes[0].buffer.apply { rewind() }
             val rowStride: Int = image.planes[0].rowStride
-            val data = ByteArray(image.width * image.height)
+            val size = image.width * image.height
+            if (yuvData.size != size) yuvData = ByteArray(size)
 
             for (i in 0 until image.height) {
                 buffer.position(i * rowStride)
-                buffer.get(data, i * image.width, image.width)
+                buffer.get(yuvData, i * image.width, image.width)
             }
 
-            val source = PlanarYUVLuminanceSource(data, image.width, image.height, 0, 0, image.width, image.height, false)
+            val source = PlanarYUVLuminanceSource(yuvData, image.width, image.height, 0, 0, image.width, image.height, false)
 
             val bitmap = BinaryBitmap(HybridBinarizer(source))
-            val result = reader.decode(bitmap, mapOf(
+            val hints = mapOf(
                 DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE),
-                DecodeHintType.ALSO_INVERTED to true,
                 DecodeHintType.TRY_HARDER to true,
-                DecodeHintType.CHARACTER_SET to "ISO-8859-1"
-            ))
+                DecodeHintType.CHARACTER_SET to "ISO-8859-1",
+            )
+
+            val result = try {
+                reader.decode(bitmap, hints)
+            } catch (_: NotFoundException) {
+                reader.reset()
+                reader.decode(BinaryBitmap(HybridBinarizer(source.invert())), hints)
+            }
             onQrCodesDetected(result)
-        } catch (e: NotFoundException) {
+            reader.reset()
+        } catch (_: NotFoundException) {
             log.trace("no QR code found...")
         } catch (e: ChecksumException) {
             log.debug("QR code detected but checksum failed: ", e)
         } catch (e: FormatException) {
-            log.warn("QR code detected but content does not match expectations: ", e)
+            log.debug("QR code detected but content does not match expectations: ", e)
         } catch (e: Exception) {
             log.debug("error when decoding: ", e)
         }
@@ -76,6 +85,6 @@ class ZxingQrCodeAnalyzer(
     }
 
     companion object {
-        val DEFAULT_RESOLUTION = Size(1200, 1600)
+        val DEFAULT_RESOLUTION = Size(1000, 1000)
     }
 }

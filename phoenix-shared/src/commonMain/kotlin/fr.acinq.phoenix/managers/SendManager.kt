@@ -214,22 +214,24 @@ class SendManager(
             return BadRequestReason.ChainMismatch(expected = chain)
         }
 
-        if (invoice.isExpired(currentTimestampSeconds())) {
-            return BadRequestReason.Expired(invoice.timestampSeconds, invoice.expirySeconds ?: Bolt11Invoice.DEFAULT_EXPIRY_SECONDS.toLong())
-        }
-
         val db = databaseManager.databases.filterNotNull().first()
         val similarPayments = db.payments.listLightningOutgoingPayments(invoice.paymentHash)
         // we MUST raise an error if this payment hash has already been paid, or is being paid.
         // parallel pending payments on the same payment hash can trigger force-closes
         // FIXME: this check should be done in lightning-kmp, not in Phoenix
-        return when {
+        // Note: check payment history before expiry so that "already paid" takes priority over "expired".
+        when {
             similarPayments.any { it.status is LightningOutgoingPayment.Status.Succeeded || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Succeeded } } ->
-                BadRequestReason.AlreadyPaidInvoice
+                return BadRequestReason.AlreadyPaidInvoice
             similarPayments.any { it.status is LightningOutgoingPayment.Status.Pending || it.parts.any { part -> part.status is LightningOutgoingPayment.Part.Status.Pending } } ->
-                BadRequestReason.PaymentPending
-            else -> null
+                return BadRequestReason.PaymentPending
         }
+
+        if (invoice.isExpired(currentTimestampSeconds())) {
+            return BadRequestReason.Expired(invoice.timestampSeconds, invoice.expirySeconds ?: Bolt11Invoice.DEFAULT_EXPIRY_SECONDS.toLong())
+        }
+
+        return null
     }
 
     private fun processOffer(

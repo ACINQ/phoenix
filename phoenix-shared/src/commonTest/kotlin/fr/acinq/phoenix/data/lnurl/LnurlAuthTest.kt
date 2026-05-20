@@ -20,6 +20,7 @@ import fr.acinq.bitcoin.*
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.secp256k1.Hex
+import fr.acinq.secp256k1.Secp256k1
 import io.ktor.http.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -48,7 +49,7 @@ class LnurlAuthTest {
         val linkingKey = LnurlAuth.getAuthLinkingKey(keyManager, auth.initialUrl, LnurlAuth.Scheme.DEFAULT_SCHEME)
         assertEquals("03702494face111dcd61be4ab4a13fa4cd4ac720b2d3b47e95feee58484f573630", linkingKey.publicKey().toString())
 
-        val signedChallenge = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(auth.k1), privateKey = linkingKey)).toHex()
+        val signedChallenge = Secp256k1.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(auth.k1), privateKey = linkingKey).toByteArray()).toByteVector().toHex()
         val expectedSignature = "3044022078c05792b76a8772c790d4d9d73c793f6cd34ea5e1a1a70bb5cd600cbc3452b902204e1a63654dcc8fcbf07f3b56b4dd4a37ddbdd6bd90738091c891f65ac53bc7b0"
         assertEquals(expectedSignature, signedChallenge)
     }
@@ -62,7 +63,7 @@ class LnurlAuthTest {
         val linkingKey = LnurlAuth.getAuthLinkingKey(keyManager, auth.initialUrl, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
         assertEquals("024d82b199464c9568f5cce92cf7370a8154d9ec0571905b596a4e9dcae69136d8", linkingKey.publicKey().toString())
 
-        val signedChallenge = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(auth.k1), privateKey = linkingKey)).toHex()
+        val signedChallenge = Secp256k1.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(auth.k1), privateKey = linkingKey).toByteArray()).toByteVector().toHex()
         val expectedSignature = "3044022056299db29f515fa2941e5212bfc6de7bd64ca0edd6067e3575a4753ca00be1ec02200f63e9905eef29b1ba8b54c79cfcf41c1380bc6eeb8ca8e5c2748a79c962b663"
         assertEquals(expectedSignature, signedChallenge)
     }

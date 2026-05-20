@@ -140,18 +140,18 @@
     <string name="send_paymentmode_lightning_desc">Los pagos mediante Lightning son rápidos y más adecuados para importes bajos.</string>
 
     <string name="send_spliceout_address_label">Dirección</string>
-    <string name="send_spliceout_feerate_label">Tasa de comisión</string>
-    <string name="send_spliceout_feerate_waiting_for_value">Obteniendo la tasa de comisión actual…</string>
+    <string name="send_spliceout_feerate_label">Feerate</string>
+    <string name="send_spliceout_feerate_waiting_for_value">Obteniendo el feerate actual…</string>
 
-    <string name="send_spliceout_error_invalid_feerate">Ingresa una tasa de comisión válida.</string>
+    <string name="send_spliceout_error_invalid_feerate">Ingresa un feerate válida.</string>
     <string name="send_spliceout_error_cannot_afford_fees">El total supera el saldo</string>
     <string name="send_spliceout_error_failure">Error al procesar el pago</string>
 
     <string name="send_spliceout_prepare_button">Preparar transacción</string>
     <string name="send_spliceout_prepare_in_progress">Preparando transacción…</string>
-    <string name="send_spliceout_execute_in_progress">Ejecutando empalme…</string>
+    <string name="send_spliceout_execute_in_progress">Ejecutando splice…</string>
     <string name="send_spliceout_complete_recap_fee">Comisión de minería</string>
-    <string name="send_spliceout_complete_recap_fee_details">Usa una tasa de comisión efectiva de %1$s sat/vbyte.</string>
+    <string name="send_spliceout_complete_recap_fee_details">Usa un feerate efectiva de %1$s sat/vbyte.</string>
     <string name="send_spliceout_complete_recap_total">Total</string>
 
     <!-- scan -->
@@ -335,7 +335,7 @@
     <string name="paymentdetails_technical_title">Detalles técnicos</string>
     <string name="paymentdetails_payment_type_label">Tipo de pago</string>
     <string name="paymentdetails_type_outgoing_close">Pago por cierre de canal</string>
-    <string name="paymentdetails_type_outgoing_splice">Pago por empalme saliente</string>
+    <string name="paymentdetails_type_outgoing_splice">Pago por splice saliente</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">Acelerar transacciones en la cadena</string>
     <string name="paymentdetails_type_outgoing_bolt11">Pago saliente de Lightning (bolt11)</string>
     <string name="paymentdetails_type_outgoing_bolt12">Pago saliente de Lightning (bolt12)</string>
@@ -344,7 +344,7 @@
     <string name="paymentdetails_swapin_address_label">Dirección de depósito</string>
     <string name="paymentdetails_bitcoin_address_label">Dirección de Bitcoin</string>
 
-    <string name="paymentdetails_splice_out_channel_label">Canal empalmado</string>
+    <string name="paymentdetails_splice_out_channel_label">Canal spliced</string>
 
     <string name="paymentdetails_closing_type_label">Tipo de cierre</string>
     <string name="paymentdetails_closing_type_mutual">Muto</string>
@@ -357,7 +357,7 @@
     <string name="paymentdetails_bolt11_description_label">Descripción de la factura</string>
     <string name="paymentdetails_payment_hash_label">Hash de pago</string>
     <string name="paymentdetails_bolt11_label">Factura</string>
-    <string name="paymentdetails_preimage_label">Imagen previa</string>
+    <string name="paymentdetails_preimage_label">Preimage</string>
 
     <string name="paymentdetails_status_label">Estado del pago</string>
     <string name="paymentdetails_status_success">Correcto</string>
@@ -646,14 +646,14 @@
     <!-- settings: liquidity policy for channels creation -->
 
     <string name="liquiditypolicy_title">Gestión de canales</string>
-    <string name="liquiditypolicy_fees_estimation_loading">Obteniendo tasa de comisión…</string>
+    <string name="liquiditypolicy_fees_estimation_loading">Obteniendo feerate…</string>
     <string name="liquiditypolicy_fees_header">Mi configuración de comisiones</string>
     <string name="liquiditypolicy_advanced_title">Gestión avanzada de canales</string>
     <string name="liquiditypolicy_loading">Obteniendo política…</string>
 
     <!-- CPFP splices -->
 
-    <string name="cpfp_feerate_label">Tasa de comisión</string>
+    <string name="cpfp_feerate_label">Feerate</string>
     <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
 
     <string name="cpfp_prepare_button">Preparar pago</string>
@@ -667,8 +667,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Se desconoce el estado del pool de memoria</string>
-    <string name="mempool_unknown_feerate_details">Phoenix no pudo obtener el estado actual del pool de memoria, por lo que no puede calcular la velocidad de las transacciones.\n\nComprueba el pool de memoria manualmente en un explorador y usa un valor adecuado.</string>
+    <string name="mempool_unknown_feerate_title">Se desconoce el estado del mempool</string>
+    <string name="mempool_unknown_feerate_details">Phoenix no pudo obtener el estado actual del mempool, por lo que no puede calcular la velocidad de las transacciones.\n\nComprueba el mempool manualmente en un explorador y usa un valor adecuado.</string>
     <string name="mempool_fastest">≈ Próximo bloque</string>
     <string name="mempool_halfhour">≈ 30 minutos</string>
     <string name="mempool_hour">≈ 1 hora</string>
@@ -684,8 +684,8 @@
     <string name="splice_error_insufficient_funds">Fondos insuficientes</string>
     <string name="splice_error_cannot_start_session">No se puede iniciar la sesión de transacción con el par</string>
     <string name="splice_error_interactive_session">Error en la sesión de transacción interactiva [%1$s]</string>
-    <string name="splice_error_invalid_pubkey">El script de la clave pública de empalme no es válido</string>
-    <string name="splice_error_splice_in_progress">Ya está en marcha un pago por empalme</string>
+    <string name="splice_error_invalid_pubkey">El script de la clave pública de splice no es válido</string>
+    <string name="splice_error_splice_in_progress">Ya está en marcha un pago por splice</string>
 
     <!-- reset wallet -->
 

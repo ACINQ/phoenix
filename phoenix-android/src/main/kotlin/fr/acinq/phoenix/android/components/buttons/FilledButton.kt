@@ -106,6 +106,7 @@ fun TransparentFilledButton(
     space: Dp = 12.dp,
     shape: Shape = RoundedCornerShape(12.dp),
     padding: PaddingValues = PaddingValues(12.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     onClick: () -> Unit,
 ) {
     FilledButton(
@@ -115,6 +116,7 @@ fun TransparentFilledButton(
         iconTint = iconTint,
         modifier = modifier, text = text, icon = icon, maxLines = maxLines, enabled = enabled,
         enabledEffect = enabledEffect, space = space, padding = padding, onClick = onClick,
+        horizontalArrangement = horizontalArrangement,
     )
 }
 
