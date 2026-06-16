@@ -12,6 +12,7 @@ struct SwapInWalletDetails: View {
 	
 	enum NavLinkTag: String {
 		case SpendExpiredSwapIns
+		case SwapInSigner
 	}
 	
 	enum Location {
@@ -52,6 +53,7 @@ struct SwapInWalletDetails: View {
 		main()
 			.navigationTitle(NSLocalizedString("Swap-in wallet", comment: "Navigation Bar Title"))
 			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarItems(trailing: menuButton())
 			.navigationStackDestination(for: NavLinkTag.self) { tag in // iOS 17+
 				navLinkView(tag)
 			}
@@ -114,6 +116,17 @@ struct SwapInWalletDetails: View {
 		}
 	}
 	
+	@ViewBuilder
+	func menuButton() -> some View {
+		Menu {
+			navLink_plain(.SwapInSigner) {
+				Text("Swap-in signer")
+			}
+		} label: {
+			Image(systemName: "ellipsis")
+		}
+	}
+
 	@ViewBuilder
 	func content() -> some View {
 		
@@ -402,6 +415,7 @@ struct SwapInWalletDetails: View {
 		
 		switch tag {
 		case .SpendExpiredSwapIns: SpendOnChainFunds(source: .expiredSwapIns)
+		case .SwapInSigner: SwapInSignerView()
 		}
 	}
 	

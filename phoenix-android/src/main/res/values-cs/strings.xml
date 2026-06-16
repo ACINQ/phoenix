@@ -914,9 +914,6 @@
     <string name="swapin_signer_sign">Podepsat</string>
     <string name="swapin_signer_signing">Podepisování…</string>
     <string name="swapin_signer_signed_sig">Uživatelův podpis</string>
-    <string name="swapin_signer_invalid_tx_header">Neplatná nepodepsaná transakce</string>
-    <string name="swapin_signer_invalid_tx_details">Zkontrolujte, že vstup je celý a nechybí žádný znak.</string>
-    <string name="swapin_signer_error_header">Podepisování vstupu selhalo</string>
 
     <!-- settings: contacts list -->
 

@@ -778,18 +778,6 @@
     <string name="reset_wallet_success">Pochi imefutwa kwa mafanikio.</string>
     <string name="reset_wallet_failure_title">Kufuta kumeshindwa</string>
 
-    <!-- Swap input signer tool -->
-
-    <string name="swapin_signer_title">Signer wa kubadilishana</string>
-    <string name="swapin_signer_instructions">Zana hii ya upimaji inakuwezesha kusaini vipande vya kubadilishana. Tumia tu ikiwa unaelewa inavyofanya kazi.</string>
-    <string name="swapin_signer_tx">Tx isiyo sahihi</string>
-    <string name="swapin_signer_sign">Saini</string>
-    <string name="swapin_signer_signing">Ikisaini…</string>
-    <string name="swapin_signer_signed_sig">Saini ya mtumiaji</string>
-    <string name="swapin_signer_invalid_tx_header">Tx isiyo sahihi</string>
-    <string name="swapin_signer_invalid_tx_details">Angalia kwamba ingizo limekamilika na halikupungua tabia yoyote.</string>
-    <string name="swapin_signer_error_header">Imeshindwa kusaini ingizo</string>
-
     <!-- Settings: Contacts list -->
 
     <string name="settings_contacts_help">Skrini hii hukuruhusu kuunganisha msimbo wa BOLT12 kwa jina.\n\nData ya anwani huhifadhiwa ndani.</string>

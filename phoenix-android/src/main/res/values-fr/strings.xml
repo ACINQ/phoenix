@@ -912,9 +912,6 @@
     <string name="swapin_signer_sign">Signer</string>
     <string name="swapin_signer_signing">Signature…</string>
     <string name="swapin_signer_signed_sig">Signature utilisateur</string>
-    <string name="swapin_signer_invalid_tx_header">Transaction non-signée invalide</string>
-    <string name="swapin_signer_invalid_tx_details">Vérifiez que la valeur saisie n\'est pas tronquée.</string>
-    <string name="swapin_signer_error_header">Échec de la signature</string>
 
     <!-- settings: contacts list -->
 

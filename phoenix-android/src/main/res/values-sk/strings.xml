@@ -766,18 +766,6 @@
     <string name="reset_wallet_success">Peňaženka bola úspešne resetovaná</string>
     <string name="reset_wallet_failure_title">Reset zlyhal</string>
 
-    <!-- swap input signer tool -->
-
-    <string name="swapin_signer_title">Podpisovací nástroj Swap-in</string>
-    <string name="swapin_signer_instructions">Tento nástroj na ladenie vám umožňuje podpisovať vstupy Swap-in. Použite len v prípade, že rozumiete, čo to robí.</string>
-    <string name="swapin_signer_tx">Nepodpísaná tx</string>
-    <string name="swapin_signer_sign">Podpísať</string>
-    <string name="swapin_signer_signing">Podpisovanie…</string>
-    <string name="swapin_signer_signed_sig">Podpis užívateľa</string>
-    <string name="swapin_signer_invalid_tx_header">Neplatná nepodpísaná transakcia</string>
-    <string name="swapin_signer_invalid_tx_details">Skontrolujte, či je vstup kompletný a nechýba žiadny znak.</string>
-    <string name="swapin_signer_error_header">Nepodarilo sa podpísať vstup</string>
-
     <!-- settings: contacts list -->
     <string name="settings_contacts_help">Táto obrazovka umožňuje prepojiť kód BOLT12 s názvom.\n\nDáta kontaktov sú uložené lokálne.</string>
 

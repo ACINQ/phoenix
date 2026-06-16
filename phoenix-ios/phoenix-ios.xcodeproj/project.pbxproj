@@ -18,7 +18,9 @@
 		7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF87242A565B00829871 /* Preview Assets.xcassets */; };
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */; };
+		960318CE2FDAF55E00B0D96A /* SwapInSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960318CD2FDAF54A00B0D96A /* SwapInSigner.swift */; };
 		9663C9C82F3E314700B9052A /* SpendChannelAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9663C9C72F3E314700B9052A /* SpendChannelAddressView.swift */; };
+		96D1C4CE2FDC612000318BA1 /* TextInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D1C4CD2FDC611B00318BA1 /* TextInputField.swift */; };
 		C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */; };
 		C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */; };
 		C8D7A84CCF914B08BDB03BE6 /* ManualRestoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A44147508AA19378B739 /* ManualRestoreView.swift */; };
@@ -525,8 +527,10 @@
 		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		960318CD2FDAF54A00B0D96A /* SwapInSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInSigner.swift; sourceTree = "<group>"; };
 		9663C9C72F3E314700B9052A /* SpendChannelAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendChannelAddressView.swift; sourceTree = "<group>"; };
 		968B38392AC34C260030DBF4 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/liquidity.html; sourceTree = "<group>"; };
+		96D1C4CD2FDC611B00318BA1 /* TextInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputField.swift; sourceTree = "<group>"; };
 		96DB8DAF2AC4A260007D3D54 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = cs; path = cs.lproj/liquidity.html; sourceTree = "<group>"; };
 		C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrumConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7A209301A31C14A982ECD /* InitializationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitializationView.swift; sourceTree = "<group>"; };
@@ -978,6 +982,7 @@
 				DC39D4F02874DDF40030F18D /* View+If.swift */,
 				DC0E31BA26EFDED4002071C6 /* VSlider.swift */,
 				DC5F96EF2E1D61690052CDE6 /* WalletImage.swift */,
+				96D1C4CD2FDC611B00318BA1 /* TextInputField.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -1846,6 +1851,7 @@
 		DCFAEFC72A72F46D00330088 /* wallet */ = {
 			isa = PBXGroup;
 			children = (
+				960318CD2FDAF54A00B0D96A /* SwapInSigner.swift */,
 				DCB30E512A0A948000E7D7A2 /* WalletInfoView.swift */,
 				DCFAEFC82A72F48700330088 /* SwapInWalletDetails.swift */,
 				DC43096D2A7953F400E28995 /* FinalWalletDetails.swift */,
@@ -2218,6 +2224,7 @@
 				DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */,
 				DC5F96BD2E09D6CB0052CDE6 /* Keychain+Wallet.swift in Sources */,
 				DC2DC86A2906AC620079E570 /* FiatCurrencySelector.swift in Sources */,
+				960318CE2FDAF55E00B0D96A /* SwapInSigner.swift in Sources */,
 				DC4CBC9E2D68E6F300129BDB /* DisplayAmounts.swift in Sources */,
 				DC5F970E2E293DD20052CDE6 /* LockContainer.swift in Sources */,
 				DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */,
@@ -2239,6 +2246,7 @@
 				DC0C52662BF3C31700143831 /* WhichPinSheet.swift in Sources */,
 				DCD1208728663F4A00EB39C5 /* TransactionsView.swift in Sources */,
 				DC70A99C2BBB6093002DBFF8 /* InboundFeeWarning.swift in Sources */,
+				96D1C4CE2FDC612000318BA1 /* TextInputField.swift in Sources */,
 				DC8D94142CA7015F00EE844E /* ChannelFundingProblem.swift in Sources */,
 				DC46BAF326CACCF700E760A6 /* KotlinExtensions+Other.swift in Sources */,
 				DCB5D2DF280879460020B8F5 /* DeviceInfo.swift in Sources */,
