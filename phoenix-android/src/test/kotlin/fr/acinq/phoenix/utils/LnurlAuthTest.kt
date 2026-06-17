@@ -6,7 +6,9 @@ import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
+import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.data.lnurl.LnurlAuth
+import fr.acinq.secp256k1.Secp256k1
 import io.ktor.http.*
 import org.junit.Assert
 import org.junit.Test
@@ -28,10 +30,10 @@ class LnurlAuthTest {
 
         // key when using the legacy friendly scheme
         val legacyAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
-        val legacySignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = legacyAuthKey)).toHex()
+        val legacySignedK1 = Secp256k1.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = legacyAuthKey).toByteArray()).toByteVector().toHex()
         // key when using the default scheme
         val defaultAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.DEFAULT_SCHEME)
-        val defaultSignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = defaultAuthKey)).toHex()
+        val defaultSignedK1 = Secp256k1.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = defaultAuthKey).toByteArray()).toByteVector().toHex()
 
         val expectedLegacyPubkey = "024d82b199464c9568f5cce92cf7370a8154d9ec0571905b596a4e9dcae69136d8"
         val expectedNewPubkey = "03702494face111dcd61be4ab4a13fa4cd4ac720b2d3b47e95feee58484f573630"
@@ -61,10 +63,10 @@ class LnurlAuthTest {
 
         // key when using the legacy friendly scheme
         val legacyAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.ANDROID_LEGACY_SCHEME)
-        val legacySignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = legacyAuthKey)).toHex()
+        val legacySignedK1 = Secp256k1.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = legacyAuthKey).toByteArray()).toByteVector().toHex()
         // key when using the default scheme
         val defaultNewAuthKey = LnurlAuth.getAuthLinkingKey(kmpKeyManager, url, LnurlAuth.Scheme.DEFAULT_SCHEME)
-        val defaultNewSignedK1 = Crypto.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = defaultNewAuthKey)).toHex()
+        val defaultNewSignedK1 = Secp256k1.compact2der(Crypto.sign(data = ByteVector32.fromValidHex(k1), privateKey = defaultNewAuthKey).toByteArray()).toByteVector().toHex()
 
         val expectedPubkey = "02ebfff275eccdd929a3843eff9481a53b0445cdae9a931fd43baa91dcd35836e9"
         Assert.assertEquals(expectedPubkey, legacyAuthKey.publicKey().toString())
