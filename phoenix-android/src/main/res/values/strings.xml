@@ -947,17 +947,23 @@
     <string name="reset_wallet_failure_title">Reset failed</string>
 
     <!-- swap input signer tool -->
+    <!-- do not translate, debugging screen -->
 
-    <string name="swapin_signer_title">Swap-in signer</string>
-    <string name="swapin_signer_instructions">This debugging tool lets you sign swap-in inputs. Only use if you understand what it does.</string>
-    <string name="swapin_signer_tx">Unsigned tx</string>
-    <string name="swapin_signer_server_nonce">Server nonce</string>
-    <string name="swapin_signer_sign">Sign</string>
-    <string name="swapin_signer_signing">Signing…</string>
-    <string name="swapin_signer_signed_sig">User signature</string>
-    <string name="swapin_signer_invalid_tx_header">Invalid unsigned transaction</string>
-    <string name="swapin_signer_invalid_tx_details">Check that the input is complete and not missing any character.</string>
-    <string name="swapin_signer_error_header">Failed to sign input</string>
+    <string name="swapin_signer_title" translatable="false">Swap-in signer</string>
+    <string name="swapin_signer_instructions" translatable="false">This debugging tool lets you sign swap-in inputs. Only use if you understand what it does. Make sure the data entered is complete and not missing any character.</string>
+    <string name="swapin_signer_tx" translatable="false">Unsigned tx</string>
+    <string name="swapin_signer_server_nonce" translatable="false">Server nonce</string>
+    <string name="swapin_signer_sign" translatable="false">Sign</string>
+    <string name="swapin_signer_signing" translatable="false">Signing…</string>
+    <string name="swapin_signer_signed_sig" translatable="false">User signature</string>
+    <string name="swapin_signer_error_header" translatable="false">An error has occurred</string>
+    <string name="swapin_signer_error_details_swap_protocol" translatable="false">Swap-in protocol details could not be retrieved</string>
+    <string name="swapin_signer_error_details_parent_not_found" translatable="false">Parent transaction not found</string>
+    <string name="swapin_signer_error_details_signing_error" translatable="false">Failed to sign data</string>
+    <string name="swapin_signer_error_details_too_many_inputs" translatable="false">Transaction has too many inputs (%1$d)</string>
+    <string name="swapin_signer_error_details_tx_malformed" translatable="false">Invalid transaction input</string>
+    <string name="swapin_signer_error_details_address_index" translatable="false">Address index not found.</string>
+    <string name="swapin_signer_error_details_nonce_generation_failure" translatable="false">Nonce generation failure.</string>
 
     <!-- settings: contacts list -->
 

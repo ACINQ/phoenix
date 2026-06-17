@@ -301,7 +301,7 @@ fun TechnicalRowAmount(
         }
 
         if (rateThen != null) {
-            val fiatAmountThen = amount.toFiat(rateThen.price).toPrettyString(prefFiat, withUnit = true)
+            val fiatAmountThen = amount.toFiat(rateThen.price).toPrettyString(rateThen.fiatCurrency, withUnit = true)
             Spacer(modifier = Modifier.height(2.dp))
             Text(text = stringResource(id = R.string.paymentdetails_amount_rate_then, fiatAmountThen), style = MaterialTheme.typography.subtitle2)
         }

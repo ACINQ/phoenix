@@ -725,18 +725,6 @@
     <string name="reset_wallet_success">Ví đã được đặt lại thành công.</string>
     <string name="reset_wallet_failure_title">Đặt lại không thành công</string>
 
-    <!-- swap input signer tool -->
-
-    <string name="swapin_signer_title">Người ký Swap-in</string>
-    <string name="swapin_signer_instructions">Công cụ gỡ lỗi này cho phép bạn ký các swap-in đầu vào. Chỉ sử dụng nếu bạn hiểu hết công dụng của nó.</string>
-    <string name="swapin_signer_tx">Giao dịch chưa ký</string>
-    <string name="swapin_signer_sign">Ký</string>
-    <string name="swapin_signer_signing">Đang ký…</string>
-    <string name="swapin_signer_signed_sig">Chữ ký người dùng</string>
-    <string name="swapin_signer_invalid_tx_header">Giao dịch chưa ký không hợp lệ</string>
-    <string name="swapin_signer_invalid_tx_details">Kiểm tra thông tin nhập đã đầy đủ và không thiếu ký tự nào.</string>
-    <string name="swapin_signer_error_header">Đăng nhập đầu vào không thành công</string>
-
     <!-- PIN code dialog -->
 
     <string name="pincode_check_screenlock_title">Nhập mã PIN để mở ví</string>

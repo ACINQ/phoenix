@@ -54,6 +54,8 @@ import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.inputs.TextInput
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.utils.swapin.LegacySwapInSignerResult
+import fr.acinq.phoenix.utils.swapin.TaprootSwapInSignerResult
 
 
 @Composable
@@ -61,7 +63,7 @@ fun SwapInSignerView(
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
 ) {
-    val vm = viewModel<SwapInSignerViewModel>(factory = SwapInSignerViewModel.Factory(business.walletManager, business.electrumClient))
+    val vm = viewModel<SwapInSignerViewModel>(factory = SwapInSignerViewModel.Factory(business))
 
     DefaultScreenLayout(isScrollable = true) {
         DefaultScreenHeader(
@@ -180,8 +182,8 @@ private fun SignLegacySwapInView(
             }
             is LegacySwapInSignerState.Signed -> {
                 Spacer(modifier = Modifier.height(8.dp))
-                SigLabelValue(label = stringResource(id = R.string.walletinfo_swapin_user_pubkey), value = state.userKey)
-                SigLabelValue(label = stringResource(id = R.string.swapin_signer_signed_sig), value = state.userSig)
+                SigLabelValue(label = stringResource(id = R.string.walletinfo_swapin_user_pubkey), value = state.result.userPubkey)
+                SigLabelValue(label = stringResource(id = R.string.swapin_signer_signed_sig), value = state.result.userSignature)
                 Spacer(modifier = Modifier.height(16.dp))
                 BorderButton(
                     text = stringResource(id = R.string.btn_copy),
@@ -190,8 +192,9 @@ private fun SignLegacySwapInView(
                         copyToClipboard(
                             context = context,
                             data = """
-                                user_key=${state.userKey}
-                                user_sig=${state.userSig}
+                                tx_id=${state.result.txId}
+                                user_key=${state.result.userPubkey}
+                                user_sig=${state.result.userSignature}
                             """.trimIndent(),
                             dataLabel = "legacy swap sig data"
                         )
@@ -199,17 +202,16 @@ private fun SignLegacySwapInView(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            is LegacySwapInSignerState.Failed.Error -> {
+            is LegacySwapInSignerState.Failed -> {
                 ErrorMessage(
                     header = stringResource(id = R.string.swapin_signer_error_header),
-                    details = state.cause.message ?: state.cause::class.java.simpleName,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            is LegacySwapInSignerState.Failed.InvalidTxInput -> {
-                ErrorMessage(
-                    header = stringResource(id = R.string.swapin_signer_invalid_tx_header),
-                    details = stringResource(id = R.string.swapin_signer_invalid_tx_details),
+                    details = when (val failure = state.result) {
+                        is LegacySwapInSignerResult.Failure.ParentTxNotFound -> stringResource(id = R.string.swapin_signer_error_details_parent_not_found)
+                        is LegacySwapInSignerResult.Failure.SigningError -> stringResource(id = R.string.swapin_signer_error_details_signing_error)
+                        is LegacySwapInSignerResult.Failure.TooManyInputs -> stringResource(id = R.string.swapin_signer_error_details_too_many_inputs, failure.inputSize)
+                        is LegacySwapInSignerResult.Failure.TransactionMalformed -> stringResource(id = R.string.swapin_signer_error_details_tx_malformed)
+                    },
+                    alignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -284,10 +286,10 @@ private fun SignTaprootSwapInView(
                 ProgressView(text = stringResource(id = R.string.swapin_signer_signing))
             }
             is TaprootSwapInSignerState.Signed -> {
-                SigLabelValue(label = stringResource(id = R.string.walletinfo_swapin_user_pubkey), value = state.userKey)
-                SigLabelValue(label = "User refund key", value = state.userRefundKey)
-                SigLabelValue(label = "User nonce", value = state.userNonce)
-                SigLabelValue(label = stringResource(id = R.string.swapin_signer_signed_sig), value = state.userSig)
+                SigLabelValue(label = stringResource(id = R.string.walletinfo_swapin_user_pubkey), value = state.result.userPubkey)
+                SigLabelValue(label = "User refund key", value = state.result.userRefundKey)
+                SigLabelValue(label = "User nonce", value = state.result.userNonce)
+                SigLabelValue(label = stringResource(id = R.string.swapin_signer_signed_sig), value = state.result.userSignature)
                 Spacer(modifier = Modifier.height(16.dp))
                 BorderButton(
                     text = stringResource(id = R.string.btn_copy),
@@ -296,10 +298,11 @@ private fun SignTaprootSwapInView(
                         copyToClipboard(
                             context = context,
                             data = """
-                                user_key=${state.userKey}
-                                user_refund_key=${state.userRefundKey}
-                                user_nonce=${state.userNonce}
-                                user_sig=${state.userSig}
+                                tx_id=${state.result.txId}
+                                user_key=${state.result.userPubkey}
+                                user_sig=${state.result.userSignature}
+                                user_refund_key=${state.result.userRefundKey}
+                                user_nonce=${state.result.userNonce}
                             """.trimIndent(),
                             dataLabel = "taproot swap sig data"
                         )
@@ -307,30 +310,19 @@ private fun SignTaprootSwapInView(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            is TaprootSwapInSignerState.Failed.Error -> {
+            is TaprootSwapInSignerState.Failed -> {
                 ErrorMessage(
                     header = stringResource(id = R.string.swapin_signer_error_header),
-                    details = state.cause.message ?: state.cause::class.java.simpleName,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            is TaprootSwapInSignerState.Failed.InvalidTxInput -> {
-                ErrorMessage(
-                    header = stringResource(id = R.string.swapin_signer_invalid_tx_header),
-                    details = stringResource(id = R.string.swapin_signer_invalid_tx_details),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            is TaprootSwapInSignerState.Failed.AddressIndexNotFound -> {
-                ErrorMessage(
-                    header = "Invalid index",
-                    details = "The provided transaction does not match any relevant parents.",
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            is TaprootSwapInSignerState.Failed.NonceGenerationFailure -> {
-                ErrorMessage(
-                    header = "Failed to generate user nonce",
+                    details = when (val failure = state.result) {
+                        is TaprootSwapInSignerResult.Failure.ParentTxNotFound -> stringResource(id = R.string.swapin_signer_error_details_parent_not_found)
+                        is TaprootSwapInSignerResult.Failure.SigningError -> stringResource(id = R.string.swapin_signer_error_details_signing_error)
+                        is TaprootSwapInSignerResult.Failure.TooManyInputs -> stringResource(id = R.string.swapin_signer_error_details_too_many_inputs, failure.inputSize)
+                        is TaprootSwapInSignerResult.Failure.TransactionMalformed -> stringResource(id = R.string.swapin_signer_error_details_tx_malformed)
+                        is TaprootSwapInSignerResult.Failure.SwapProtocolError -> stringResource(id = R.string.swapin_signer_error_details_swap_protocol)
+                        is TaprootSwapInSignerResult.Failure.NonceGenerationFailure -> stringResource(id = R.string.swapin_signer_error_details_nonce_generation_failure)
+                        is TaprootSwapInSignerResult.Failure.AddressIndexNotFound -> stringResource(id = R.string.swapin_signer_error_details_address_index)
+                    },
+                    alignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

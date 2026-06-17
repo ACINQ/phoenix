@@ -747,9 +747,6 @@
     <string name="swapin_signer_sign">Unterschreibe</string>
     <string name="swapin_signer_signing">Unterschreiben..</string>
     <string name="swapin_signer_signed_sig">Benutzerunterschrift</string>
-    <string name="swapin_signer_invalid_tx_header">Ungültige Transaktion ohne Vorzeichen</string>
-    <string name="swapin_signer_invalid_tx_details">Prüfe, ob die Eingabe vollständig ist und kein Zeichen fehlt.</string>
-    <string name="swapin_signer_error_header">Eingabe fehlgeschlagen</string>
 
     <!-- PIN-Code-Dialog -->
 

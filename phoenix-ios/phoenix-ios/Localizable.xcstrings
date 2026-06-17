@@ -6187,6 +6187,9 @@
         }
       }
     },
+    "An error has occurred." : {
+
+    },
     "An error occured" : {
 
     },
@@ -35959,6 +35962,9 @@
         }
       }
     },
+    "Refund key" : {
+
+    },
     "Register" : {
       "comment" : "lnurl-auth: login button title",
       "localizations" : {
@@ -41476,6 +41482,9 @@
         }
       }
     },
+    "Swap-in signer" : {
+      "comment" : "Navigation bar title"
+    },
     "Swap-in wallet" : {
       "comment" : "Navigation Bar Title",
       "localizations" : {
@@ -44146,6 +44155,9 @@
         }
       }
     },
+    "This debugging tool lets you sign swap-in inputs. Only use if you understand what it does." : {
+
+    },
     "This doesn't appear to be a Lightning invoice" : {
       "comment" : "Error message - scanning lightning invoice",
       "localizations" : {
@@ -46495,6 +46507,9 @@
           }
         }
       }
+    },
+    "Tx id" : {
+
     },
     "tx index" : {
       "localizations" : {

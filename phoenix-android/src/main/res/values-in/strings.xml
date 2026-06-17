@@ -928,19 +928,6 @@
     <string name="reset_wallet_success">Dompet telah berhasil direset.</string>
     <string name="reset_wallet_failure_title">Reset gagal</string>
 
-    <!-- swap input signer tool -->
-
-    <string name="swapin_signer_title">Penandatangan pengganti</string>
-    <string name="swapin_signer_instructions">Alat penelusuran kesalahan (debugging) ini memungkinkan Anda menandatangani input swap-in. Gunakan hanya jika Anda memahami fungsinya</string>
-    <string name="swapin_signer_tx">tx belum ditandatangani</string>
-    <string name="swapin_signer_server_nonce">Nonce server</string>
-    <string name="swapin_signer_sign">tandatangan</string>
-    <string name="swapin_signer_signing">menandatangani…</string>
-    <string name="swapin_signer_signed_sig">Tanda tangan pengguna</string>
-    <string name="swapin_signer_invalid_tx_header">Transaksi tyang belum ditandatangani tidak valid</string>
-    <string name="swapin_signer_invalid_tx_details">Pastikan input sudah lengkap dan tidak ada karakter yang hilang.</string>
-    <string name="swapin_signer_error_header">Gagal menandatangani input</string>
-
     <!-- settings: contacts list -->
 
     <string name="settings_contacts_help">Layar ini memungkinkan Anda untuk menghubungkan kode Bolt12 atau alamat Lightning ke sebuah nama.\n\nData kontak ini khusus untuk Phoenix dan disimpan secara lokal.</string>
