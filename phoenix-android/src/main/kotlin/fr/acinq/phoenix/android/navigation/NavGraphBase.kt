@@ -65,18 +65,22 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
             onSeedNotFound = { navController.navigate(Screen.InitWalletGraph.route) },
             onManualRecoveryClick = { navController.navigate(Screen.StartupRecovery.route) },
             onWalletReady = {
-                val next = nextScreenLink?.takeUnless { it.isBlank() }?.toUri()
-                if (next == null) {
-                    log.debug("redirecting from startup to home")
-                    navController.popToHome()
-                } else if (!navController.graph.hasDeepLink(next)) {
-                    log.debug("redirecting from startup to home, ignoring invalid next=[$nextScreenLink]")
-                    navController.popToHome()
-                } else {
-                    log.debug("redirecting from startup to {}", next)
-                    navController.navigate(next, navOptions = navOptions {
-                        popUpTo(navController.graph.id) { inclusive = true }
-                    })
+                try {
+                    val next = nextScreenLink?.takeUnless { it.isBlank() }?.toUri()
+                    if (next == null) {
+                        log.debug("redirecting from startup to home")
+                        navController.popToHome()
+                    } else if (!navController.graph.hasDeepLink(next)) {
+                        log.debug("redirecting from startup to home, ignoring invalid next=[$nextScreenLink]")
+                        navController.popToHome()
+                    } else {
+                        log.debug("redirecting from startup to {}", next)
+                        navController.navigate(next, navOptions = navOptions {
+                            popUpTo(navController.graph.id) { inclusive = true }
+                        })
+                    }
+                } catch(e: Exception) {
+                    log.error("error in on-wallet-ready callback: ", e)
                 }
             },
             forceWalletId = nextWalletId

@@ -49,6 +49,7 @@ import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.settings.electrum.ElectrumServerDialog
+import fr.acinq.phoenix.android.utils.extensions.tryOrNull
 
 
 @Composable
@@ -57,7 +58,12 @@ fun InitNewWallet(
     onCreateWalletClick: () -> Unit,
     onRestoreWalletClick: () -> Unit,
 ) {
-    val initGraphEntry = remember(navController.previousBackStackEntry) { navController.getBackStackEntry(Screen.InitWalletGraph.route) }
+    val initGraphEntry = remember(navController.previousBackStackEntry) {
+        tryOrNull { navController.getBackStackEntry(Screen.InitWalletGraph.route) }
+    }
+    if (initGraphEntry == null) {
+        return
+    }
     val initViewModel = viewModel<InitViewModel>(factory = InitViewModel.Factory(application), viewModelStoreOwner = initGraphEntry)
 
     var showInitOptionsDialog by remember { mutableStateOf(false) }
