@@ -733,8 +733,8 @@
 
     <!-- Mempool -->
 
-    <string name="mempool_unknown_feerate_title">Hali isiyojulikana ya mempool</string>
-    <string name="mempool_unknown_feerate_details">Phoenix ilishindwa kupata hali ya sasa ya mempool na haiwezi kutathmini kasi ya miamala yako.\n\nAngalia mempool kwa mkaguzi, na tumia thamani inayofaa!</string>
+    <string name="mempool_unknown_feerate_title">Kasi ya muamala haijulikani</string>
+    <string name="mempool_unknown_feerate_details">Angalia kwa mkono kiwango cha sasa cha ada kwenye explorer na utumie thamani inayofaa.</string>
     <string name="mempool_fastest">≈ Dakika 10</string>
     <string name="mempool_halfhour">≈ Dakika 30</string>
     <string name="mempool_hour">≈ Saa 1</string>

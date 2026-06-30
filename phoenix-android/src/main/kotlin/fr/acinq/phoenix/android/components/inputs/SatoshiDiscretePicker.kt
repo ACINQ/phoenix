@@ -39,7 +39,7 @@ import kotlin.math.roundToInt
 
 /** A slider to pick a Satoshi value from an array of accepted values. */
 @Composable
-fun SatoshiSlider(
+fun SatoshiDiscretePicker(
     modifier: Modifier = Modifier,
     onAmountChange: (Satoshi) -> Unit,
     onErrorStateChange: (Boolean) -> Unit,

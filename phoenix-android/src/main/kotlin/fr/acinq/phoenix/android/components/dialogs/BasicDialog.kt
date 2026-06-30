@@ -51,6 +51,7 @@ fun Dialog(
     isScrollable: Boolean = true,
     externalPadding: PaddingValues = PaddingValues(16.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
+    titlePadding: PaddingValues = PaddingValues(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp),
     backgroundColor: Color = MaterialTheme.colors.surface,
     buttonsTopMargin: Dp = 20.dp,
     buttons: (@Composable RowScope.() -> Unit)? = { Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp), shape = RoundedCornerShape(16.dp)) },
@@ -60,7 +61,7 @@ fun Dialog(
         DialogBody(isScrollable, externalPadding, internalPadding, backgroundColor) {
             // optional title
             title?.run {
-                Text(text = title, modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp), style = MaterialTheme.typography.h4)
+                Text(text = title, modifier = Modifier.padding(titlePadding), style = MaterialTheme.typography.h4)
             }
             // content, must set the padding etc...
             content()

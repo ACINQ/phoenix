@@ -680,8 +680,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Trạng thái mempool không xác định</string>
-    <string name="mempool_unknown_feerate_details">Phoenix không thể truy xuất trạng thái hiện tại của mempool và không thể ước tính tốc độ cho các giao dịch của bạn.\n\nHãy tự kiểm tra mempool trên 1 trình quản lý dữ liệu và dùng một giá trị tương ứng!</string>
+    <string name="mempool_unknown_feerate_title">Tốc độ giao dịch không xác định</string>
+    <string name="mempool_unknown_feerate_details">Hãy kiểm tra thủ công mức phí hiện tại trên một trình khám phá (explorer) và sử dụng giá trị phù hợp.</string>
     <string name="mempool_fastest">≈ 10 phút</string>
     <string name="mempool_halfhour">≈ 30 phút</string>`
     <string name="mempool_hour">≈ 1 giờ</string>

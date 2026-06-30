@@ -36,7 +36,7 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import kotlin.math.log10
 import kotlin.math.pow
 
-/** A logarithmic slider to get a Satoshi value. Can be used to get a feerate for example. */
+/** A logarithmic slider that returns a Satoshi value in [onAmountChange]. */
 @Composable
 fun SatoshiLogSlider(
     modifier: Modifier = Modifier,
@@ -50,7 +50,7 @@ fun SatoshiLogSlider(
     val context = LocalContext.current
     val minAmountLog = remember { log10(minAmount.sat.toFloat()) }
     val maxAmountLog = remember { log10(maxAmount.sat.toFloat()) }
-    var amountLog by remember { mutableStateOf(log10(amount.sat.toFloat())) }
+    var amountLog by remember(amount) { mutableFloatStateOf(log10(amount.sat.toFloat())) }
 
     var errorMessage by remember { mutableStateOf("") }
 

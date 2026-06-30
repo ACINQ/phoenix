@@ -694,8 +694,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Mempool-Status unbekannt</string>
-    <string name="mempool_unknown_feerate_details">Phoenix konnte den aktuellen Zustand des Mempools nicht abrufen und kann die Geschwindigkeit Ihrer Transaktionen nicht einschätzen.\n\nÜberprüfen Sie den Mempool manuell mit einem Explorer und verwenden Sie eine angemessene Gebühr!</string>
+    <string name="mempool_unknown_feerate_title">Unbekannte Transaktionsgeschwindigkeit</string>
+    <string name="mempool_unknown_feerate_details">Überprüfe manuell die aktuelle Gebührenrate in einem Explorer und verwende einen passenden Wert.</string>
     <string name="mempool_fastest">≈ Nächster Block</string>
     <string name="mempool_halfhour">≈ 30 Minuten</string>`
     <string name="mempool_hour">≈ 1 Stunde</string>

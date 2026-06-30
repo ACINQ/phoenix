@@ -858,8 +858,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Neznámý stav mempoolu</string>
-    <string name="mempool_unknown_feerate_details">Phoenix se nepodařilo získat aktuální stav mempoolu a nemůže odhadnout rychlost vašich transakcí.\n\nZkontrolujte mempool ručně v průzkumníku a použijte adekvátní hodnotu!</string>
+    <string name="mempool_unknown_feerate_title">Neznámá rychlost transakce</string>
+    <string name="mempool_unknown_feerate_details">Zkontrolujte ručně aktuální sazbu poplatku v exploreru a použijte vhodnou hodnotu.</string>
     <string name="mempool_fastest">≈ Další blok</string>
     <string name="mempool_halfhour">≈ 30 minut</string>
     <string name="mempool_hour">≈ 1 hodina</string>

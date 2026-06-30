@@ -856,8 +856,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Mempool indisponible</string>
-    <string name="mempool_unknown_feerate_details">Phoenix n\'a pas pu vérifier l\'état actuel du mempool Bitcoin, et ne peut donc pas estimer la vélocité des transactions.\n\nVérifiez les frais manuellement via un explorateur, et utilisez une valeur pertinente.</string>
+    <string name="mempool_unknown_feerate_title">Vélocité de transaction inconnue</string>
+    <string name="mempool_unknown_feerate_details">Vérifiez manuellement le feerate actuel sur un explorateur et utilisez une valeur adéquate.</string>
     <string name="mempool_fastest">≈ 10 minutes</string>
     <string name="mempool_halfhour">≈ 30 minutes</string>
     <string name="mempool_hour">≈ 1 heure</string>

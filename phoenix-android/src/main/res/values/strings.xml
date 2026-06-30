@@ -899,8 +899,11 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Unknown mempool state</string>
-    <string name="mempool_unknown_feerate_details">Phoenix was unable to retrieve the current state of the mempool and cannot estimate the speed of your transactions.\n\nCheck the mempool manually on an explorer, and use an adequate value!</string>
+    <string name="feerate_slider_dialog_title">Manual feerate input</string>
+    <string name="feerate_slider_dialog_input_label">Feerate in sat/vbyte</string>
+    <string name="feerate_slider_dialog_input_placeholder">Enter feerate…</string>
+    <string name="mempool_unknown_feerate_title">Unknown transaction speed</string>
+    <string name="mempool_unknown_feerate_details">Check manually the current feerate on an explorer and use an adequate value.</string>
     <string name="mempool_fastest">≈ 10 minutes</string>
     <string name="mempool_halfhour">≈ 30 minutes</string>`
     <string name="mempool_hour">≈ 1 hour</string>

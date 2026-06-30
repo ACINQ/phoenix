@@ -66,7 +66,7 @@ import fr.acinq.phoenix.android.components.buttons.Checkbox
 import fr.acinq.phoenix.android.components.HSeparator
 import fr.acinq.phoenix.android.components.dialogs.IconPopup
 import fr.acinq.phoenix.android.components.ProgressView
-import fr.acinq.phoenix.android.components.inputs.SatoshiSlider
+import fr.acinq.phoenix.android.components.inputs.SatoshiDiscretePicker
 import fr.acinq.phoenix.android.components.layouts.SplashLabelRow
 import fr.acinq.phoenix.android.components.layouts.SplashLayout
 import fr.acinq.phoenix.android.components.buttons.TransparentFilledButton
@@ -189,7 +189,7 @@ private fun RequestLiquidityBottomSection(
                 amountTextStyle = MaterialTheme.typography.body2,
                 fiatTextStyle = MaterialTheme.typography.subtitle2,
             )
-            SatoshiSlider(
+            SatoshiDiscretePicker(
                 modifier = Modifier
                     .widthIn(max = 165.dp)
                     .offset(x = (-5).dp, y = (-8).dp),

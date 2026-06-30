@@ -881,8 +881,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Status mempool tidak diketahui</string>
-    <string name="mempool_unknown_feerate_details">Phoenix tidak dapat mengambil status mempool saat ini dan tidak dapat memperkirakan kecepatan transaksi Anda.\n\nPeriksa mempool secara manual di explorer, dan gunakan nilai yang sesuai!</string>
+    <string name="mempool_unknown_feerate_title">Kecepatan transaksi tidak diketahui</string>
+    <string name="mempool_unknown_feerate_details">Periksa secara manual tarif biaya saat ini di explorer dan gunakan nilai yang sesuai.</string>
     <string name="mempool_fastest">≈ 10 menit</string>
     <string name="mempool_halfhour">≈ 30 menit</string>
     <string name="mempool_hour">≈ 1 jam</string>
