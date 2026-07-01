@@ -28,21 +28,21 @@
     <string name="notif_headless_received">%1$s Reçu %2$s</string>
 
     <string name="notif_pending_settlement_title">Veuillez démarrer Phoenix</string>
-    <string name="notif_pending_settlement_message">Un paiement en attente doit être finalisé.</string>
+    <string name="notif_pending_settlement_message">Un paiement est en attente de finalisation.</string>
 
-    <string name="notif_inflight_payment_title">Un paiement est en cours</string>
-    <string name="notif_inflight_payment_message">Démarrez Phoenix pour que le paiement puisse à terme être finalisé.</string>
+    <string name="notif_inflight_payment_title">Paiement en transit</string>
+    <string name="notif_inflight_payment_message">Démarrez Phoenix pour que finaliser ce paiement.</string>
 
     <string name="notif_missed_title">Paiement entrant manqué</string>
     <string name="notif_missed_unavailable">Phoenix n\'a pas pu démarrer en arrière plan.</string>
 
     <string name="notif_rejected_deposit_title">Dépôt on-chain en attente (+%1$s)</string>
     <string name="notif_rejected_payment_title">Paiement entrant refusé (+%1$s)</string>
-    <string name="notif_rejected_policy_disabled">La gestion des canaux automatisée est désactivée. Cette configuration peut être changée.</string>
-    <string name="notif_rejected_policy_disabled_timeout">La gestion des canaux automatisée est désactivée. Le dépôt expirera le %1$s.</string>
-    <string name="notif_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s. Cette configuration peut être changée.</string>
+    <string name="notif_rejected_policy_disabled">La gestion automatisée des canaux est désactivée. Cela peut être ajusté dans les paramètres.</string>
+    <string name="notif_rejected_policy_disabled_timeout">La gestion automatisée des canaux est désactivée. Le dépôt expirera le %1$s.</string>
+    <string name="notif_rejected_over_absolute">Les frais étaient de %1$s, mais votre max est de %2$s. Cela peut être ajusté dans les paramètres.</string>
     <string name="notif_rejected_over_absolute_timeout">Les frais étaient de %1$s, mais votre max est de %2$s. Le dépôt expirera le %3$s.</string>
-    <string name="notif_rejected_over_relative">Les frais étaient de %1$s et dépassent %2$s%% du montant. Cette configuration peut être changée.</string>
+    <string name="notif_rejected_over_relative">Les frais étaient de %1$s et dépassent %2$s%% du montant. Cela peut être ajusté dans les paramètres.</string>
     <string name="notif_rejected_over_relative_timeout">Les frais étaient de %1$s et dépassent %2$s%% du montant. Le dépôt expirera le %3$s.</string>
     <string name="notif_rejected_amount_too_low">Le montant du paiement est trop faible.</string>
     <string name="notif_rejected_generic_error">Une erreur est survenue lors de l\'ajout de fonds. Veuillez réessayer plus tard.</string>
@@ -81,7 +81,7 @@
     <!-- home: swap help -->
 
     <string name="home_swapin_confirming_title">En confirmation</string>
-    <string name="home_swapin_confirming_desc">En attente de confirmation avant de pouvoir les échanger contre Lightning.</string>
+    <string name="home_swapin_confirming_desc">En attente de confirmation avant de pouvoir passer sur Lightning.</string>
 
     <string name="home_swapin_ready_title">En attente de swap</string>
     <string name="home_swapin_ready_desc_auto">Se déploieront sur Lightning lorsque les frais de minage seront inférieurs à %1$s.</string>
@@ -105,7 +105,7 @@
 
     <!-- home: bottom menu -->
 
-    <string name="menu_settings">Configuration</string>
+    <string name="menu_settings">Paramètres</string>
     <string name="menu_send">Envoyer</string>
     <string name="menu_receive">Recevoir</string>
 
@@ -160,8 +160,8 @@
     <string name="receive_lightning_warning_message_fee_expected">Une opération on-chain va être probablement nécessaire pour recevoir ce montant.\n\nLes frais seront d\'environ %1$s.</string>
     <string name="receive_lightning_warning_message_fee_expected_unknown">Une opération on-chain va être probablement nécessaire pour recevoir ce montant.</string>
 
-    <string name="receive_lightning_warning_message_above_limit">Des frais de %1$s sont estimés pour recevoir ce montant, et ces frais dépassent votre limite autorisée de %2$s.\n\nAugmentez cette limite dans les préférences de gestion des canaux.</string>
-    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, et ces frais dépassent votre limite autorisée de %2$s.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
+    <string name="receive_lightning_warning_message_above_limit">Des frais de %1$s sont estimés pour recevoir ce montant, et ces frais dépassent le max configuré de %2$s.\n\nAugmentez cette limite dans les préférences de gestion des canaux.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, et ces frais dépassent le max configuré de %2$s.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
     <string name="receive_lightning_warning_message_above_limit_percent">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite dans les préférences de gestion des canaux.</string>
     <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Des frais de %1$s sont estimés pour recevoir ce montant, ce qui représente plus de %2$s%% du montant.\n\nAugmentez cette limite, ou bien demandez de la liquidité supplémentaire.</string>
 
@@ -195,9 +195,9 @@
     <!-- closing channels -->
 
     <string name="mutualclose_input_label">Adresse Bitcoin</string>
-    <string name="mutualclose_input_instructions">Envoie tous les fonds du wallet vers une addresse Bitcoin. Tous vos canaux de paiement seront fermés.</string>
+    <string name="mutualclose_input_instructions">Ferme les canaux et envoie tous les fonds vers une addresse Bitcoin. Tous vos canaux de paiement seront fermés.</string>
     <string name="mutualclose_confirm_title">Confirmer la fermeture</string>
-    <string name="mutualclose_confirm_details">Tous vos fonds seront envoyés à:</string>
+    <string name="mutualclose_confirm_details">Tous les fonds seront envoyés à:</string>
     <string name="mutualclose_confirm_fee">Frais estimés à:</string>
     <string name="mutualclose_confirm_fee_unknown">Impossible d\'estimer le coût des frais.</string>
 
@@ -330,9 +330,9 @@
     <string name="walletinfo_onchain_swapin_policy_view">Cliquez pour configurer.</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details">Les fonds seront automatiquement basculés sur Lightning si les frais sont <b>inférieurs à %1$s</b> (configurable).</string>
     <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Les fonds qui ne sont pas sur Lightning <b>après %1$d mois</b> seront récupérables on-chain.</string>
-    <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestion des canaux automatisée <b>est désactivée</b>. Les fonds ne seront pas basculés sur Lightning et vont rester sur ce wallet.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">La gestion automatisée des canaux <b>est désactivée</b>. Les fonds ne seront pas basculés sur Lightning et vont rester sur ce wallet.</string>
     <string name="walletinfo_onchain_swapin_last_attempt">Dernière tentative (%1$s).</string>
-    <string name="walletinfo_onchain_swapin_last_attempt_disabled">La gestion des canaux automatisée était désactivée.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">La gestion automatisée des canaux était désactivée.</string>
     <string name="walletinfo_onchain_swapin_empty">Il n\'y a pas de fonds en attente de swap.</string>
 
     <string name="walletinfo_onchain_swapin_timeout_1day">Ce swap va expirer dans moins d\'une journée!</string>
@@ -426,8 +426,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Accélérer mes transactions.</string>
-    <string name="cpfp_instructions">Vous pouvez faire utiliser à vos transactions non confirmées un taux de frais effectif plus élevé afin d\'encourager les mineurs Bitcoin à les privilégier.</string>
+    <string name="cpfp_title">Accélérer mes transactions (CPFP).</string>
+    <string name="cpfp_instructions">Vous pouvez augmenter les frais effectifs de vos transactions non confirmées pour inciter les mineurs Bitcoin à les prioriser.</string>
     <string name="cpfp_splice_error_actual_below_user">Ces frais sont inférieurs à ceux que vos transactions non confirmées utilisent déjà. Utilisez une valeur plus élevée pour accélérer ces paiements.</string>
 
     <!-- Lightning payment errors -->
@@ -461,13 +461,13 @@
 
     <string name="spliceout_low_feerate_dialog_title">Frais faibles!</string>
     <string name="spliceout_low_feerate_dialog_body1">Les transactions utilisant des frais trop faibles peuvent rester en attente de confirmation pendant des jours, voire des semaines.</string>
-    <string name="spliceout_low_feerate_dialog_body2">Le choix des frais est de votre responsabilité. Une fois envoyé, ce paiement ne pourra pas être annulé, seulement accéléré en utilisant des frais plus élevés.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Le choix des frais relève de votre responsabilité. Une fois envoyé, ce paiement ne pourra pas être annulé, seulement accéléré en utilisant des frais plus élevés.</string>
     <string name="spliceout_low_feerate_dialog_body3">Êtes-vous sûr de vouloir continuer ?</string>
 
     <!-- spliceout: capacity disclaimer -->
 
     <string name="spliceout_capacity_disclaimer_title">Capacité impactée</string>
-    <string name="spliceout_capacity_disclaimer_body1">Les fonds envoyés proviennent de votre côté du canal, ce qui mécaniquement réduit le canal du même montant. La liquidité entrante reste inchangée.</string>
+    <string name="spliceout_capacity_disclaimer_body1">Les fonds envoyés proviennent de votre côté du canal, ce qui mécaniquement réduit la taille totale canal du même montant. La liquidité entrante reste inchangée.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">Ne plus afficher ce message.</string>
 
     <!-- Spend swap-in refund -->
@@ -475,7 +475,7 @@
     <string name="swapinrefund_title">Dépenser un swap-in expiré</string>
     <string name="swapinrefund_none_available_label">Aucun swap-in expiré.</string>
     <string name="swapinrefund_available_label">Fonds disponibles : <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Utilisez cet écran pour dépenser des dépôts on-chain qui n\'ont pas été basculés sur Lightning à temps. Notez que cela n\'affecte en rien vos canaux Lightning.</string>
+    <string name="swapinrefund_instructions_1">Utilisez cet écran pour dépenser des dépôts on-chain qui n\'ont pas été passés sur Lightning à temps. Notez que cela n\'affecte en rien vos canaux Lightning existants.</string>
     <string name="swapinrefund_instructions_2">Assurez vous que l\'adresse de destination est correcte et les frais raisonnables.</string>
     <string name="swapinrefund_estimate_button">Estimer les frais</string>
     <string name="swapinrefund_estimating">Estimation des frais…</string>
@@ -492,11 +492,11 @@
     <string name="finalwallet_refund_title">Dépenser depuis le wallet final</string>
     <string name="finalwallet_refund_available_none">Pas de fonds disponibles</string>
     <string name="finalwallet_refund_available">Montant disponible</string>
-    <string name="finalwallet_refund_instructions">Utilisez cet écran pour dépenser les fonds de votre portefeuille final. Ces fonds proviennent de canaux qui ont été fermés par le passé. Cela n\'affecte pas les canaux Lightning existants.</string>
+    <string name="finalwallet_refund_instructions">Utilisez cet écran pour dépenser les fonds de votre portefeuille final. Ces fonds proviennent des canaux qui ont été fermés par le passé. Cela n\'affecte pas les canaux Lightning existants.</string>
 
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Il s\'agit d\'une adresse humainement compréhensible associée à votre code de paiement Bolt12.</string>
-    <string name="bip353_subtitle2">Vous voulez une adresse plus jolie ? Utilisez des services tiers, ou hébergez vous-même l\'adresse!</string>
+    <string name="bip353_subtitle2">Vous voulez une adresse plus jolie ? Utilisez des services tiers, ou hébergez l\'adresse vous-même !</string>
 
 </resources>

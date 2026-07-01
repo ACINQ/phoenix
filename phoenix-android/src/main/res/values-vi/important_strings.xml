@@ -433,8 +433,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Tăng tốc giao dịch của tôi.</string>
-    <string name="cpfp_instructions">Bạn có thể trả phí cao hơn để các thợ đào ưu tiên các khoản thanh toán chưa được xác nhận của mình.</string>
+    <string name="cpfp_title">Tăng tốc giao dịch của tôi (CPFP).</string>
+    <string name="cpfp_instructions">Bạn có thể tăng phí thực tế của các giao dịch chưa được xác nhận để khuyến khích các thợ đào Bitcoin ưu tiên chúng.</string>
     <string name="cpfp_splice_error_actual_below_user">Mức phí này thấp hơn so với mức phí đang dùng cho các giao dịch chưa được xác nhận của bạn. Hãy sử dụng mức phí cao hơn.</string>
 
     <!-- Lightning payment errors -->

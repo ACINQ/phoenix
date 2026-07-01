@@ -429,8 +429,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Ongeza kasi ya miamala yangu.</string>
-    <string name="cpfp_instructions">Unaweza kufanya miamala yako yote isiyothibitishwa itumie kiwango cha ada cha juu zaidi ili kuwashawishi wachimbaji kupendelea malipo yako.</string>
+    <string name="cpfp_title">Ongeza kasi ya miamala yangu (CPFP).</string>
+    <string name="cpfp_instructions">Unaweza kuongeza ada halisi za miamala yako ambayo bado haijathibitishwa ili kuhimiza wachimbaji wa Bitcoin kuipa kipaumbele.</string>
     <string name="cpfp_splice_error_actual_below_user">Kiwango hiki cha ada ni chini ya kile ambacho miamala yako isiyothibitishwa tayari inatumia. Tumia kiwango cha ada cha juu zaidi.</string>
 
     <!-- Lightning payment errors -->

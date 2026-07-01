@@ -19,7 +19,7 @@
 
     <!-- system notification channels -->
 
-    <string name="notification_channels_watcher_title">Observation des canaux</string>
+    <string name="notification_channels_watcher_title">Surveillance des canaux</string>
     <string name="notification_channels_watcher_desc">Affiché lorsqu\'il faut lancer Phoenix.</string>
 
     <string name="notification_pending_settlement_title">Finalisation de paiement</string>
@@ -68,7 +68,7 @@
     <string name="startup_error_generic">Échec de la lecture des données du wallet</string>
     <string name="startup_error_try_again">Réessayer</string>
     <string name="startup_error_serialisation">Sérialisation de fichier non gérée</string>
-    <string name="startup_error_decryption_general">Erreur de déchiffrement:\n%1$s</string>
+    <string name="startup_error_decryption_general">Erreur de déchiffrement :\n%1$s</string>
     <string name="startup_error_recovery_button">Restaurer manuellement</string>
 
     <!-- Startup wallet recovery -->
@@ -127,7 +127,7 @@
     <string name="receive_label_bip21">URI Bitcoin</string>
 
     <string name="receive_bip353_title">Qu\'est-ce que c\'est ?</string>
-    <string name="receive_bip353_info">Cette adresse Lightning utilise le standard moderne Bip353 qui fonctionne avec les requêtes de paiement Bolt12.\n\nElle est plus privée que les adresses Lightning basées sur LNURL, et peut même être auto-hébergée.\n\nCependant, c\'est une technologie de pointe ; certains wallets ou services ne la comprennent pas encore et ne pourront pas vous payer.</string>
+    <string name="receive_bip353_info">Cette adresse Lightning utilise le standard moderne Bip353 qui fonctionne avec les requêtes de paiement Bolt12.\n\nElle est plus privée que les adresses Lightning basées sur LNURL, et peut même être auto-hébergée.\n\nCependant, c\'est une technologie nouvelle, certains wallets ou services ne la comprennent pas encore et ne pourront pas vous payer.</string>
     <string name="receive_bip353_link">En savoir plus.</string>
 
     <string name="receive_lightning_edit_title_bolt11">Personnaliser cette requête Bolt11</string>
@@ -167,7 +167,7 @@
     <string name="send_offer_failure_timeout">Les détails pour ce paiement n\'ont pas pu être récupérés en un temps raisonnable.\n\nLe destinataire est possiblement hors-ligne, ou indisponible.</string>
 
     <string name="send_paymentmode_onchain">Payer sur chaîne</string>
-    <string name="send_paymentmode_onchain_desc">Les transactions sur la chaîne Bitcoin sont généralement plus lentes et adaptées aux gros paiements.</string>
+    <string name="send_paymentmode_onchain_desc">Les transactions sur la chaîne Bitcoin sont généralement plus lentes et adaptées aux gros montants.</string>
     <string name="send_paymentmode_lightning">Payer via Lightning</string>
     <string name="send_paymentmode_lightning_desc">Les paiements Lightning sont rapides et adaptés aux petits montants.</string>
 
@@ -281,10 +281,10 @@
 
     <string name="channeldetails_commitments">Commitments actifs</string>
     <string name="channeldetails_inactive_commitments">Commitments inactifs</string>
-    <string name="channeldetails_commitment_funding_tx_id">Tx de financement:</string>
-    <string name="channeldetails_commitment_balance">Solde:</string>
-    <string name="channeldetails_commitment_funding_capacity">Capacité:</string>
-    <string name="channeldetails_commitment_linked_payments">Suscité par:</string>
+    <string name="channeldetails_commitment_funding_tx_id">Tx de financement :</string>
+    <string name="channeldetails_commitment_balance">Solde :</string>
+    <string name="channeldetails_commitment_funding_capacity">Capacité :</string>
+    <string name="channeldetails_commitment_linked_payments">Suscité par :</string>
 
     <string name="channeldetails_json">Afficher les données brutes</string>
     <string name="channeldetails_share">Partager</string>
@@ -314,7 +314,7 @@
     <string name="home_onchain_incoming">+%1$s</string>
 
     <string name="home_faq_button">FAQ</string>
-    <string name="home_payments_none">Utilisez les boutons Recevoir et Envoyer ci-dessous pour débuter !</string>
+    <string name="home_payments_none">Pour débuter, utilisez les boutons Recevoir et Envoyer ci-dessous !</string>
     <string name="home_payments_more_button">Montrer tous les paiements…</string>
     <string name="home_connection_electrum_late">Electrum en retard</string>
     <string name="home_connection_bad_cert">Certificat Electrum</string>
@@ -751,7 +751,7 @@
     <string name="paymentsettings_swap_format_taproot_desc">Format par défaut, avec une meilleure confidentialité, des frais plus bas et la rotation d\'adresse. Certains services/wallets ne pourront cependant pas accepter ce format.</string>
 
     <string name="paymentsettings_overpayment_title">Activer le surpaiement</string>
-    <string name="paymentsettings_overpayment_enabled">Vous pourrez surpayer des requêtes de paiement Lightning jusqu\'à deux fois le montant demandé. Utile pour des pourboires ou pour une meilleure confidentialité.</string>
+    <string name="paymentsettings_overpayment_enabled">Vous pourrez surpayer des requêtes de paiement Lightning jusqu\'à deux fois le montant demandé. Utile pour des pourboires ou pour une confidentialité améliorée.</string>
     <string name="paymentsettings_overpayment_disabled">Désactivé (défaut)</string>
 
     <!-- settings: currencies -->

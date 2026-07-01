@@ -426,8 +426,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Acelerar mis transacciones.</string>
-    <string name="cpfp_instructions">Puedes hacer que todas tus transacciones no confirmadas utilicen un feerate efectivo más alto para animar a los mineros a favorecer tus pagos.</string>
+    <string name="cpfp_title">Acelerar mis transacciones (CPFP).</string>
+    <string name="cpfp_instructions">Puedes aumentar las tarifas efectivas de tus transacciones no confirmadas para incentivar a los mineros de Bitcoin a priorizarlas.</string>
     <string name="cpfp_splice_error_actual_below_user">Este feerate está por debajo de lo que sus transacciones no confirmadas ya están utilizando. Utiliza uno superior para acelerar estos pagos.</string>
 
     <!-- Lightning payment errors -->

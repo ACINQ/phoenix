@@ -426,8 +426,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Urýchlenie mojich transakcií.</string>
-    <string name="cpfp_instructions">Všetky vaše nepotvrdené transakcie môžu zvýšiť poplatok, aby ťažiari uprednostnili vašu platbu.</string>
+    <string name="cpfp_title">Urýchlenie mojich transakcií (CPFP).</string>
+    <string name="cpfp_instructions">Môžete zvýšiť efektívne poplatky svojich nepotvrdených transakcií a motivovať tak bitcoinových ťažiarov, aby ich uprednostnili.</string>
     <string name="cpfp_splice_error_actual_below_user">Tento poplatok je nižší ako ten, ktorý už používajú vaše nepotvrdené transakcie. Zvoľte vyšší poplatok.</string>
 
     <!-- Lightning payment errors -->

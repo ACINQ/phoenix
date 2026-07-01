@@ -429,8 +429,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Percepat transaksi saya.</string>
-    <string name="cpfp_instructions">Anda dapat membuat semua transaksi yang belum dikonfirmasi menggunakan tarif biaya yang lebih tinggi untuk mendorong penambang agar lebih menyukai pembayaran Anda.</string>
+    <string name="cpfp_title">Percepat transaksi saya (CPFP).</string>
+    <string name="cpfp_instructions">Anda dapat meningkatkan biaya efektif transaksi yang belum dikonfirmasi untuk mendorong penambang Bitcoin memprioritaskannya.</string>
     <string name="cpfp_splice_error_actual_below_user">Tarif biaya ini lebih rendah daripada yang sudah digunakan oleh transaksi Anda yang belum dikonfirmasi. Gunakan tarif biaya yang lebih tinggi.</string>
 
     <!-- Lightning payment errors -->

@@ -423,8 +423,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Transaktionen beschleunigen</string>
-    <string name="cpfp_instructions">Sie können für all Ihre unbestätigten Transaktionen eine höhere effektive Gebührenrate festlegen, um die Miner zu motivieren, Ihre Zahlungen zu bevorzugen.</string>
+    <string name="cpfp_title">Transaktionen beschleunigen (CPFP).</string>
+    <string name="cpfp_instructions">Erhöhe die effektiven Gebühren deiner unbestätigten Transaktionen, um Bitcoin-Miner zu incentivieren, diese zu priorisieren.</string>
     <string name="cpfp_splice_error_actual_below_user">Diese Gebührenrate liegt unter der, die Ihre unbestätigten Transaktionen bereits verwenden. Verwenden Sie eine höhere, um diese Zahlungen zu beschleunigen.</string>
 
     <!-- Lightning payment errors -->
