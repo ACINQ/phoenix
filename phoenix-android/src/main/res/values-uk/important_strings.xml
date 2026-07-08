@@ -1,0 +1,504 @@
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ This file contains string resources related to important messages in the app, and should be translated as a priority.
+  ~ It should be kept as small as possible.
+  ~
+  ~ Most technical resource strings should stay in the default `strings.xml` file.
+-->
+<resources>
+
+    <!-- generic -->
+
+    <string name="utils_ack">Зрозуміло.</string>
+
+    <!-- system notifications -->
+
+    <string name="notif_headless_title_default">Phoenix працює у фоновому режимі</string>
+    <string name="notif_headless_received">%1$s Отримано %2$s</string>
+
+    <string name="notif_pending_settlement_title">Запустіть гаманець</string>
+    <string name="notif_pending_settlement_message">Очікується вхідне зарахування коштів.</string>
+
+    <string name="notif_inflight_payment_title">Очікується платіж</string>
+    <string name="notif_inflight_payment_message">Запустіть Phoenix, щоб платіж було завершено у відповідний момент.</string>
+
+    <string name="notif_missed_title">Пропущено вхідний платіж</string>
+    <string name="notif_missed_unavailable">Phoenix не вдалося запуститися у фоновому режимі.</string>
+
+    <string name="notif_rejected_deposit_title">Очікується депозит on-chain (+%1$s)</string>
+    <string name="notif_rejected_payment_title">Платіж відхилено (+%1$s)</string>
+    <string name="notif_rejected_policy_disabled">Автоматизоване керування каналами вимкнено. Торкніться для деталей.</string>
+    <string name="notif_rejected_policy_disabled_timeout">Автоматизоване керування каналами вимкнено. Цей депозит завершиться %1$s.</string>
+    <string name="notif_rejected_over_absolute">Комісія становила %1$s, але ваш максимум було встановлено на %2$s. Торкніться для деталей.</string>
+    <string name="notif_rejected_over_absolute_timeout">Комісія становила %1$s, але ваш максимум було встановлено на %2$s. Цей депозит завершиться %3$s.</string>
+    <string name="notif_rejected_over_relative">Комісія становила %1$s, тобто понад %2$s%% отриманої суми. Торкніться для деталей.</string>
+    <string name="notif_rejected_over_relative_timeout">Комісія становила %1$s, тобто понад %2$s%% отриманої суми. Цей депозит завершиться %3$s.</string>
+    <string name="notif_rejected_amount_too_low">Сума платежу занадто мала.</string>
+    <string name="notif_rejected_generic_error">Під час фінансування сталася помилка. Спробуйте пізніше.</string>
+
+    <string name="notif_watcher_revoked_commit_title">Запустіть Phoenix</string>
+    <string name="notif_watcher_revoked_commit_message">Деякі з ваших каналів могли закритися.</string>
+
+    <!-- settings list -->
+
+    <string name="settings_general_title">Загальні</string>
+    <string name="settings_fees_title">Комісії</string>
+    <string name="settings_security_title">Конфіденційність і безпека</string>
+    <string name="settings_advanced_title">Розширені</string>
+    <string name="settings_danger_title">Небезпечна зона</string>
+
+    <string name="settings_display_prefs">Відображення</string>
+    <string name="settings_wallet_info">Інформація про гаманець</string>
+    <string name="settings_liquidity_policy">Керування каналами</string>
+    <string name="settings_display_seed">Фраза відновлення</string>
+    <string name="settings_access_control">Контроль доступу</string>
+    <string name="settings_list_channels">Платіжні канали</string>
+    <string name="settings_logs">Журнали</string>
+    <string name="settings_electrum">Сервер Electrum</string>
+    <string name="settings_reset_wallet">Видалити гаманець</string>
+    <string name="settings_mutual_close">Закрити канали</string>
+    <string name="settings_force_close">Примусове закриття каналів</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">Про застосунок</string>
+    <string name="settings_payment_settings">Параметри платежів</string>
+    <string name="settings_payment_history">Історія платежів</string>
+    <string name="settings_notifications">Сповіщення</string>
+    <string name="settings_contacts">Контакти</string>
+    <string name="settings_converter">Конвертер валют</string>
+    <string name="settings_add_liquidity">Додати ліквідність</string>
+
+    <!-- home: swap help -->
+
+    <string name="home_swapin_confirming_title">Підтвердження</string>
+    <string name="home_swapin_confirming_desc">Очікування підтвердження, перш ніж кошти можна буде обміняти в Lightning.</string>
+
+    <string name="home_swapin_ready_title">Очікування обміну</string>
+    <string name="home_swapin_ready_desc_auto">Їх буде перенесено до Lightning, коли комісії за майнінг опустяться нижче %1$s.</string>
+    <string name="home_swapin_ready_desc_disabled">Вони залишаться on-chain, оскільки автоматизоване керування каналами вимкнено.</string>
+    <string name="home_swapin_ready_desc_generic">Їх буде перенесено до Lightning, коли умови це дозволять.</string>
+    <string name="home_swapin_ready_expiring">Увага! Деякі кошти незабаром завершаться та більше не будуть придатні для обміну.</string>
+
+    <string name="home_swapin_expired_title">Завершено</string>
+    <string name="home_swapin_expired_desc">Їх більше не можна обміняти після 4 місяців очікування. Ці кошти потрібно витратити вручну.</string>
+
+    <string name="home_final_title">Кінцевий гаманець</string>
+    <string name="home_final_desc">Ці кошти надійшли із закритих каналів Lightning. Їх потрібно витратити вручну.</string>
+    <string name="home_onchain_balance_only">Баланс on-chain</string>
+
+    <string name="home_background_restriction_title">Обмежена фонова обробка</string>
+    <string name="home_background_restriction_body_1">Phoenix може не мати змоги отримувати платежі, коли працює у фоновому режимі або коли закритий.</string>
+    <string name="home_background_restriction_body_2">Це відбувається тому, що:</string>
+    <string name="home_background_restriction_powersaver">Пристрій у режимі енергозбереження</string>
+    <string name="home_background_restriction_fcm">Сповіщення FCM недоступні</string>
+    <string name="home_background_restriction_fcm_details">Якщо ви використовуєте GrapheneOS або CalyxOS, установіть Google Play Services, щоб отримувати сповіщення FCM. Докладніше див. у FAQ.</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">Налаштування</string>
+    <string name="menu_send">Надіслати</string>
+    <string name="menu_receive">Отримати</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">Створити новий гаманець</string>
+    <string name="initwallet_restore">Відновити мій гаманець</string>
+
+    <string name="restore_disclaimer_message_1_title">Phoenix працює лише з Lightning</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix показуватиме лише кошти, якими вже керує Phoenix. Кошти, повʼязані з seed, згенерованим іншим застосунком, тут не зʼявляться (зокрема кошти on-chain).</string>
+    <string name="restore_disclaimer_message_2_title">Обережно з паралельним використанням того самого seed</string>
+    <string name="restore_disclaimer_message_2_body">Не використовуйте той самий seed одночасно на різних пристроях. Це може спричинити конфлікти між двома екземплярами Phoenix і призвести до закриття каналів Lightning.</string>
+
+    <string name="restore_instructions">Seed вашого гаманця — це список із 12 англійських слів. Введіть кожне слово цього списку в поле нижче.</string>
+    <string name="restore_input_label">Введіть слово #%1$s</string>
+    <string name="restore_input_invalid">Це слово недійсне.</string>
+    <string name="restore_seed_valid">Цей seed дійсний</string>
+    <string name="restore_seed_valid_details">Ви можете продовжити та відновити свій гаманець</string>
+    <string name="restore_seed_invalid">Цей seed недійсний</string>
+    <string name="restore_seed_invalid_details">Переконайтеся, що ви ввели правильні слова в правильному порядку.</string>
+
+    <string name="restore_payments_button">Імпортувати історію платежів</string>
+    <string name="restore_payments_button_details">Необовʼязково. Скористайтеся цією кнопкою, щоб відновити файл бази даних платежів з іншого пристрою.</string>
+    <string name="restore_payments_success">Історію платежів буде відновлено</string>
+    <string name="restore_payments_success_button">Використати інший файл</string>
+    <string name="restore_payments_error_header">Не вдалося відновити платежі</string>
+    <string name="restore_payments_error_button">Спробувати ще раз</string>
+    <string name="restore_payments_error_encryption">Файл не вдається розшифрувати. Переконайтеся, що ви використовуєте файл бази даних Phoenix (не CSV) і що він відповідає гаманцю, який ви відновлюєте.</string>
+    <string name="restore_payments_error_open">Цей файл не вдається відкрити. Спробуйте ще раз.</string>
+    <string name="restore_payments_error_writing">Цей файл не було записано в теку даних застосунку. Спробуйте ще раз.</string>
+    <string name="restore_import_button">Відновити гаманець</string>
+
+    <!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">Потрібне оновлення</string>
+    <string name="upgraderequired_message">Ця версія Phoenix (v%1$s) несумісна з вашим гаманцем. Оновіть застосунок або скористайтеся сумісною версією.</string>
+    <string name="upgraderequired_button">Оновити в Google Play</string>
+
+    <!-- receive view: warning about fee/liquidity -->
+
+    <string name="receive_lightning_warning_title_surefail">Платіж не вдасться</string>
+    <string name="receive_lightning_warning_title_fee_expected">Очікується комісія on-chain</string>
+    <string name="receive_lightning_warning_hint_show_details">Торкніться, щоб дізнатися більше</string>
+
+    <string name="receive_lightning_sheet_dismiss">Закрити</string>
+    <string name="receive_lightning_sheet_button_enable">Увімкнути автоматизовані канали</string>
+    <string name="receive_lightning_sheet_button_configure">Налаштувати ліміт комісії</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">Щоб отримати цю суму, імовірно, знадобиться операція on-chain.\n\nКомісія оцінюється приблизно в %1$s.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">Щоб отримати цю суму, імовірно, знадобиться операція on-chain.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">Щоб отримати цю суму, очікується комісія %1$s, що перевищує ваш ліміт %2$s.\n\nЗбільште цей ліміт у налаштуваннях керування каналами.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">Щоб отримати цю суму, очікується комісія %1$s, що перевищує ваш ліміт %2$s.\n\nЗбільште цей ліміт у налаштуваннях керування каналами або запросіть додаткову ліквідність.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">Щоб отримати цю суму, очікується комісія %1$s, що становить понад %2$s%% суми.\n\nЗбільште цей ліміт у налаштуваннях керування каналами.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">Щоб отримати цю суму, очікується комісія %1$s, що становить понад %2$s%% суми.\n\nЗбільште цей ліміт у налаштуваннях керування каналами або запросіть додаткову ліквідність.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">Вхідної ліквідності недостатньо для цієї суми, а автоматизоване керування каналами вимкнено.</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor активний</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix може мати проблеми з отриманням платежів. Переконайтеся, що застосунок залишається відкритим на передньому плані та що зʼєднання стабільне.</string>
+
+    <!-- send errors -->
+
+    <string name="send_error_invoice_expired">Термін дії цього рахунку минув.</string>
+    <string name="send_error_payment_pending">Цей платіж уже обробляється. Зачекайте, доки його буде завершено.</string>
+    <string name="send_error_already_paid">Цей рахунок уже оплачено.</string>
+    <string name="send_error_invalid_chain">Цей платіж не використовує той самий блокчейн, що й ваш гаманець.</string>
+    <string name="send_error_lnurl_invalid">Не вдалося обробити це посилання LNURL. Переконайтеся, що воно дійсне.</string>
+    <string name="send_error_lnurl_unsupported">Цей тип LNURL поки що не підтримується.</string>
+    <string name="send_error_invalid_generic">Цей запит на платіж не підтримується.</string>
+    <string name="send_error_bip353_connect">Не вдалося отримати дані для цієї адреси. Можливо, у вас проблема зі зʼєднанням.</string>
+    <string name="send_error_bip353_name_not_found">Імʼя «%1$s» не знайдено на «%2$s».</string>
+    <string name="send_error_bip353_invalid_uri">Ця адреса використовує недійсний ресурс Bip21.</string>
+    <string name="send_error_bip353_invalid_offer">Ця адреса використовує недійсну пропозицію Bolt12.</string>
+    <string name="send_error_bip353_dnssec">Ця адреса розміщена на незахищеному DNS. DNSSEC має бути увімкнено.</string>
+
+    <!-- validation -->
+
+    <string name="validation_below_min">Має бути щонайменше %1$s</string>
+    <string name="validation_above_max">Не має перевищувати %1$s</string>
+
+    <!-- closing channels -->
+
+    <string name="mutualclose_input_label">Адреса Bitcoin</string>
+    <string name="mutualclose_input_instructions">Надішліть усі кошти на адресу Bitcoin. Усі платіжні канали буде закрито.</string>
+    <string name="mutualclose_confirm_title">Підтвердити закриття</string>
+    <string name="mutualclose_confirm_details">Усі кошти буде надіслано на:</string>
+    <string name="mutualclose_confirm_fee">Орієнтовні комісії майнерам:</string>
+    <string name="mutualclose_confirm_fee_unknown">Не вдалося оцінити вартість комісій.</string>
+
+    <string name="forceclose_title">Примусове закриття каналів</string>
+    <string name="forceclose_instructions">Цей екран дозволяє вам односторонньо закрити ваші канали.\n\nЦе не чарівна кнопка: це захід безпеки, який слід <b>використовувати лише в екстремальних ситуаціях</b>. Наприклад, якщо ваш peer (ACINQ) назавжди зник, унеможлививши витрачання ваших коштів. У всіх інших випадках, <b>якщо у вас проблеми з Phoenix, зверніться до підтримки</b>.\n\nПримусове закриття каналів коштуватиме вам грошей (через комісії on-chain) і заблокує ваші кошти на кілька днів.\n\n<b>Не видаляйте застосунок, доки канали повністю не закриються, інакше ви втратите гроші.</b>\n\n<b>Не використовуйте цю функцію, якщо ви не повністю розумієте, що вона робить.</b></string>
+    <string name="forceclose_address_label">Кошти зрештою буде надіслано до кінцевого гаманця:</string>
+
+    <string name="forceclose_confirm_title">Підтвердити примусове закриття</string>
+    <string name="forceclose_confirm_details">Усі кошти буде надіслано до вашого кінцевого гаманця після значної затримки.</string>
+    <string name="forceclose_button">Примусово закрити всі мої канали</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_backup_seed_message">Зробіть резервну копію гаманця, щоб не втратити свої bitcoin.</string>
+    <string name="inappnotif_backup_seed_action">Резервна копія гаманця</string>
+
+    <string name="inappnotif_notification_permission_message_short">Увімкніть сповіщення Android</string>
+    <string name="inappnotif_notification_permission_message">Сповіщення вимкнено в налаштуваннях Android. Phoenix не зможе попереджати вас, коли обробляється платіж.</string>
+    <string name="inappnotif_notification_permission_enable">Увімкнути</string>
+
+    <string name="inappnotif_swapin_timeout_message">Термін дії депозиту незабаром завершиться.</string>
+    <string name="inappnotif_swapin_timeout_action">Переглянути деталі</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix регулярно перевіряє блокчейн у фоновому режимі, але за останні кілька днів не змогла цього зробити.\n\nПереконайтеся, що Android не блокує Phoenix і що вона може підключитися до Electrum.</string>
+    <string name="inappnotif_watchtower_late_action">Закрити</string>
+
+    <string name="inappnotif_upgrade_message">Доступне оновлення</string>
+    <string name="inappnotif_upgrade_critical_message">Доступне критичне оновлення. Оновіть Phoenix якомога швидше.</string>
+    <string name="inappnotif_upgrade_button">Оновити в Google Play</string>
+
+    <string name="inappnotif_mempool_full_message">Комісії on-chain високі.</string>
+    <string name="inappnotif_mempool_full_action">Подивіться, як це впливає на Phoenix</string>
+
+    <string name="inappnotif_tor_disconnected_message">Не вдалося отримати доступ до мережі Tor. Phoenix не працюватиме належним чином.</string>
+    <string name="inappnotif_tor_disconnected_action">Виправити</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">Очікуються кошти on-chain (+%1$s)</string>
+    <string name="inappnotif_payments_rejection_overview_one">Нещодавно відхилено вхідний платіж</string>
+    <string name="inappnotif_payments_rejection_overview_many">%1$d вхідних платежів нещодавно відхилено</string>
+    <string name="inappnotif_payment_rejected_title">Платіж відхилено (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_disabled">Автоматизоване керування каналами вимкнено.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">Комісія становила %1$s, але ваш максимум було встановлено на %2$s.</string>
+    <string name="inappnotif_payment_rejected_over_relative">Комісія становила %1$s, тобто понад %2$s%% суми.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">Торкніться, щоб налаштувати.</string>
+    <string name="inappnotif_payment_rejected_view_wallet">Переглянути деталі</string>
+
+    <string name="inappnotif_watchtower_nominal_title">Звіт watchtower</string>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d канал було успішно перевірено %2$s. Проблем не виявлено.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d каналів було успішно перевірено %2$s. Проблем не виявлено.</string>
+    <string name="inappnotif_watchtower_revokedfound_title">Попередження watchtower</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Відкликані commitment виявлено %1$s для каналів: %2$s. Ці канали можуть закритися.</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_instructions">Фраза відновлення (яку іноді називають seed) — це список із 12 англійських слів. Вона дозволяє за потреби повністю відновити доступ до ваших коштів.\n\n<b>Лише ви володієте цим seed. Тримайте його в секреті.</b>\n\n<b>Не діліться цим seed ні з ким</b>.\nОстерігайтеся фішингу. Розробники Phoenix ніколи не запитуватимуть ваш seed.\n\n<b>Не втрачайте цей seed</b>.\nЗбережіть його в безпечному місці (не на цьому телефоні). Якщо ви втратите свій seed і телефон, ви втратите свої кошти.</string>
+    <string name="displayseed_authenticate_button">Показати seed</string>
+    <string name="displayseed_dialog_header">ТРИМАЙТЕ ЦЕЙ SEED У БЕЗПЕЦІ.\nНЕ ДІЛІТЬСЯ НИМ.</string>
+    <string name="displayseed_backup_notice_header">Ви не зробили резервну копію своєї фрази відновлення!</string>
+    <string name="displayseed_backup_notice_details">Якщо ви її не збережете та втратите доступ до Phoenix, ви втратите свої кошти!</string>
+    <string name="displayseed_backup_checkbox">Я зберіг свою фразу відновлення в безпечному місці.</string>
+    <string name="displayseed_loss_disclaimer_checkbox">Я розумію, що якщо я втрачу телефон і фразу відновлення, я втрачу кошти свого гаманця.</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_funding_fees_label">Комісії майнерам</string>
+    <string name="paymentdetails_funding_fees_desc">Комісії, сплачені майнерам мережі Bitcoin за обробку транзакції on-chain.</string>
+    <string name="paymentdetails_service_fees_label">Сервісні комісії</string>
+    <string name="paymentdetails_service_fees_desc">Комісії, сплачені за створення нового платіжного каналу. Це не завжди потрібно.</string>
+
+    <string name="paymentdetails_liquidity_purchase_label">Ліквідність</string>
+    <string name="paymentdetails_liquidity_service_fee_label">Сервісні комісії</string>
+    <string name="paymentdetails_liquidity_service_fee_help">Комісії, сплачені за послугу ліквідності.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">Комісії майнерам</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">Комісії, сплачені майнерам мережі Bitcoin за обробку транзакції on-chain.</string>
+    <string name="paymentdetails_liquidity_caused_by_label">Спричинено</string>
+    <string name="paymentdetails_liquidity_caused_by_help">Ця ліквідність була потрібна для отримання платежу.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">Дізнайтеся, як оптимізувати</string>
+
+    <!-- lnurl -->
+
+    <string name="lnurl_auth_instructions">Ви можете анонімно увійти та авторизувати дію на:</string>
+    <string name="lnurl_withdraw_header">Ви можете вивести кошти з\n<b>%1$s</b>.</string>
+    <string name="lnurl_withdraw_success">Запит на виведення надіслано до <b>%1$s</b>.\n\nМоже знадобитися кілька хвилин, перш ніж вони надішлють кошти. Тим часом тримайте застосунок онлайн.</string>
+
+    <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">Увімкнення Tor</string>
+    <string name="tor_dialog_enable_details_1">Для цього потрібно встановити сторонній застосунок Tor Proxy VPN, наприклад Orbot.</string>
+    <string name="tor_dialog_enable_details_2">Tor може покращити конфіденційність, але може спричинити проблеми з продуктивністю та втрачені платежі.</string>
+    <string name="tor_dialog_disable_title">Вимкнення Tor</string>
+    <string name="tor_dialog_disable_details_1">Якщо ви вимкнете цей параметр, вашу IP-адресу може бути розкрито різним постачальникам послуг.</string>
+    <string name="tor_dialog_disable_details_2">Ви впевнені, що хочете продовжити?</string>
+    <string name="tor_dialog_processing">Обробка змін…</string>
+
+    <string name="tor_disconnected_dialog_title">Немає доступу до мережі Tor</string>
+    <string name="tor_disconnected_dialog_action">Виправити</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix потребує доступу до Tor, щоб працювати належним чином.</string>
+    <string name="tor_disconnected_dialog_details_2">Переконайтеся, що ваш застосунок Tor Proxy VPN активний і підключений до Tor.</string>
+    <string name="tor_disconnected_dialog_details_3">Якщо у вас немає застосунку Tor VPN, установіть його. Ми рекомендуємо Orbot.</string>
+    <string name="tor_disconnected_dialog_open_settings">Відкрити налаштування Tor</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Відкрити сторінку Orbot</string>
+
+    <!-- about -->
+
+    <string name="about_general_content">Phoenix — це гаманець Bitcoin, який використовує мережу Lightning для надсилання та отримання платежів.\n\nЦе безкоштовне програмне забезпечення з відкритим кодом, розроблене <a href="https://phoenix.acinq.co">ACINQ</a> за <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">ліцензією Apache 2.0</a>.</string>
+    <string name="about_seed_title">Захист вашого ключа</string>
+    <string name="about_seed_content">Цей гаманець є самокастодіальним: <b>ви одноосібно зберігаєте 12-слівний seed key гаманця</b>.\n\nЦей ключ дає доступ до ваших грошей. Не розкривайте його нікому й остерігайтеся фішингу.</string>
+    <string name="about_rates_title">Курси обміну</string>
+    <string name="about_rates_content">Курси обміну Bitcoin/fiat отримуються з різних сторонніх API:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nЦі курси можуть бути неточними. Завжди перевіряйте фактичну суму в Bitcoin, перш ніж надсилати платіж.</string>
+
+    <!-- introduction screens -->
+
+    <string name="intro_welcome_title">Ласкаво просимо!</string>
+    <string name="intro_welcome_sub1">З Phoenix надсилати й отримувати bitcoin просто та безпечно.</string>
+    <string name="intro_welcome_next_button">Далі</string>
+
+    <string name="intro_channels_title">Bitcoin із суперсилою</string>
+    <string name="intro_channels_sub1">Phoenix використовує платіжні канали, щоб зробити Bitcoin швидким і приватним.</string>
+    <string name="intro_channels_next_button">Далі</string>
+
+    <string name="intro_selfcustody_title">Ваш ключ, ваші bitcoin</string>
+    <string name="intro_selfcustody_sub1">Phoenix є самокастодіальним. Ви контролюєте.</string>
+    <string name="intro_selfcustody_sub2">Ви можете відновити свій гаманець будь-коли за допомогою вашого секретного ключа. Тримайте його в безпеці!</string>
+    <string name="intro_selfcustody_next_button">Почати</string>
+
+    <!-- wallet info -->
+
+    <string name="walletinfo_onchain_swapin">Гаманець swap-in</string>
+    <string name="walletinfo_onchain_swapin_help">Гаманець swap-in керує коштами on-chain, внесеними до Phoenix.\n\nВін автоматично обмінює їх на Lightning, коли це можливо, відповідно до налаштувань керування каналами.</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">Дізнайтеся, як це працює</string>
+    <string name="walletinfo_onchain_swapin_policy_view">Торкніться, щоб налаштувати</string>
+    <string name="walletinfo_onchain_swapin_empty">Немає обмінів у процесі.</string>
+
+    <string name="walletinfo_onchain_swapin_policy_auto_details">Кошти on-chain автоматично обмінюються на Lightning, якщо комісія, сплачена майнерам, <b>менша за %1$s</b> (налаштовується).</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout">Кошти, не обміняні <b>протягом %1$d місяців</b>, можна відновити on-chain.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">Автоматизоване керування каналами <b>вимкнено</b>. Обмін не виконуватиметься, кошти залишаться on-chain.</string>
+
+    <string name="walletinfo_onchain_swapin_last_attempt">Спроба обміну не вдалася %1$s</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">Керування каналами було вимкнено.</string>
+    <string name="walletinfo_onchain_swapin_timeout_1day">Термін дії цього обміну завершиться за день!</string>
+    <string name="walletinfo_onchain_swapin_timeout">Термін дії цього обміну завершиться за %1$s днів.</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">Завершено</string>
+    <string name="walletinfo_onchain_swapin_locked_description">Ці кошти будуть доступні починаючи з %1$s днів.</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">Скасовані кошти</string>
+    <string name="walletinfo_onchain_swapin_refund_description">Ці кошти не було обміняно вчасно. Торкніться, щоб витратити.</string>
+
+    <string name="walletinfo_onchain_final_about">Кінцевий гаманець — це місце, куди надсилаються кошти, коли канали Lightning закриваються або в разі проблем. Зазвичай він має бути порожнім.</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_instructions">Вхідні платежі іноді потребують транзакцій on-chain. Це відбувається не завжди, а лише за потреби.</string>
+    <string name="liquiditypolicy_fees_estimation">Комісії наразі оцінюються приблизно в <b>%1$s</b> (≈%2$s).</string>
+    <string name="liquiditypolicy_disable_label">Автоматизоване керування каналами</string>
+    <string name="liquiditypolicy_disable_desc">Вхідні платежі, що потребують операцій on-chain, будуть відхилені.</string>
+
+    <string name="liquiditypolicy_fees_base_label">Макс. сума комісій</string>
+    <string name="liquiditypolicy_fees_base_help">Платежі, комісії за якими перевищують це значення, будуть відхилені.</string>
+    <string name="liquiditypolicy_fees_base_too_low">Це значення занадто мале.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">Менше за очікувану комісію. Деякі платежі може бути відхилено.</string>
+
+    <string name="liquiditypolicy_advanced_menu">Розширені параметри</string>
+    <string name="liquiditypolicy_advanced_disable">Керування каналами вимкнено. Його можна ввімкнути на екрані керування каналами.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">Увага!</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">Цей екран для досвідчених користувачів. Не змінюйте ці налаштування, якщо не розумієте їхнього призначення.</string>
+
+    <string name="liquiditypolicy_advanced_verifications_title">Додаткові перевірки</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">Перевірка відсотка</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">Перевіряє комісію відносно отриманої суми. Корисно як перевірка безпеки для малих платежів.</string>
+    <string name="liquiditypolicy_advanced_overrides_title">Перевизначення політики</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">Пропустити перевірку абсолютної комісії для Lightning</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">Коли активно, вхідні платежі Lightning ігнорують максимальний абсолютний ліміт комісій. Застосовуватиметься лише перевірка відсотка.\n\nУвага: якщо feerate mempool Bitcoin високий, вхідні платежі LN, що потребують операції on-chain, можуть бути дорогими.</string>
+    <string name="liquiditypolicy_save_button">Зберегти політику</string>
+    <string name="liquiditypolicy_request_button">Запросити вхідну ліквідність</string>
+
+    <string name="liquiditypolicy_help">
+      Phoenix дозволяє вам отримувати платежі в блокчейні Bitcoin (L1) і на рівні Lightning мережі Bitcoin (L2).
+      \n\n
+      - рівень блокчейну (L1) повільніший і зазвичай значно дорожчий (потребує комісій майнерам)
+      \n
+      - рівень Lightning (L2) набагато швидший і зазвичай значно дешевший (особливо для малих платежів)
+      \n\n
+      Коли ви отримуєте платіж на L1, Phoenix автоматично перенесе кошти на L2 <b>ЯКЩО</b> комісії майнерам відповідають вашій налаштованій політиці комісій.
+      \n\n
+      Платежі, які ви отримуєте на L2, можна отримати миттєво та без комісій. Однак іноді для керування платіжним каналом L2 також потрібна операція L1. Це можна зробити автоматично <b>ЯКЩО</b> комісії майнерам відповідають вашій налаштованій політиці комісій.
+    </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">Немає каналів!</string>
+    <string name="liquidityads_no_channels_details">Щоб скористатися цією функцією, спершу потрібно мати кошти в гаманці.</string>
+    <string name="liquidityads_header">Сплануйте свою ліквідність</string>
+    <string name="liquidityads_instructions">Вхідна ліквідність дозволяє уникнути комісій on-chain за майбутні платежі, отримані через Lightning.\n\nЗапросивши більше ліквідності зараз, ви можете заощадити на комісіях пізніше.</string>
+    <string name="liquidityads_faq_link">Докладніше</string>
+    <string name="liquidityads_current_liquidity">Поточна ліквідність</string>
+
+    <string name="liquidityads_amount_label">Запросити ліквідність</string>
+    <string name="liquidityads_estimate_button">Оцінити вартість ліквідності</string>
+    <string name="liquidityads_estimating_spinner">Оцінювання вартості…</string>
+    <string name="liquidityads_estimate_details_miner_fees">Комісія майнерам</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">Внесок у комісії за майнінг для базової транзакції on-chain.</string>
+    <string name="liquidityads_estimate_details_service_fees">Сервісна комісія</string>
+    <string name="liquidityads_estimate_details_service_fees_help">Ця комісія йде сервісу, що надає ліквідність.</string>
+    <string name="liquidityads_estimate_details_duration">Тривалість</string>
+    <string name="liquidityads_estimate_details_duration_value">1 рік</string>
+    <string name="liquidityads_estimate_details_duration_help">У міру отримання коштів ліквідність споживатиметься та ставатиме вашим балансом. Через рік решта невикористаної ліквідності буде відновлена сервісом.</string>
+    <string name="liquidityads_estimate_above_25">Загальна комісія перевищує 25% від запитаної суми ліквідності.</string>
+    <string name="liquidityads_over_balance">Загальні комісії перевищують ваш баланс.</string>
+
+    <string name="liquidityads_review_button">Переглянути</string>
+    <string name="liquidityads_disclaimer_body1">Ви запитуєте <b>початкову</b> суму ліквідності. Ліквідність не є сталою в часі: у міру отримання коштів через Lightning вона споживатиметься та ставатиме вашим балансом.</string>
+    <string name="liquidityads_disclaimer_body2">Через рік решта невикористаної ліквідності буде відновлена сервісом.</string>
+
+    <string name="liquidityads_request_button">Прийняти</string>
+    <string name="liquidityads_requesting_spinner">Обробка splice…</string>
+
+    <string name="liquidityads_success">Ліквідність успішно додано!</string>
+    <string name="liquidityads_success_amount">Додана сума: %1$s</string>
+
+    <string name="liquidityads_error_header">Запит на ліквідність не вдався</string>
+    <string name="liquidityads_error_channels_unavailable">Канали недоступні. Спробуйте пізніше.</string>
+    <string name="liquidityads_error_invalid_funding_amount">Запитана сума недійсна.</string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">Не підтверджено — торкніться, щоб прискорити</string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">Прискорити мої транзакції (CPFP).</string>
+    <string name="cpfp_instructions">Ви можете збільшити ефективні комісії ваших непідтверджених транзакцій, щоб стимулювати майнерів Bitcoin надати їм пріоритет.</string>
+    <string name="cpfp_splice_error_actual_below_user">Цей feerate менший за той, що вже використовують ваші непідтверджені транзакції. Використайте вищий feerate.</string>
+
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_failuremessage_channel_closing">Канали закриваються.</string>
+    <string name="outgoing_failuremessage_channel_splicing">Канали вже обробляють splice. Спробуйте пізніше.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">Комісія недостатня.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">Цей платіж перевищує ваш баланс.</string>
+    <string name="outgoing_failuremessage_too_big">Сума платежу занадто велика — спробуйте розділити її на кілька частин.</string>
+    <string name="outgoing_failuremessage_too_small">Сума платежу занадто мала.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">Термін дії цього платежу задалеко в майбутньому.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">Платіж відхилено отримувачем. Можливо, цей рахунок уже оплачено.</string>
+    <string name="outgoing_failuremessage_recipient_offline">Отримувач офлайн.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">Платіж не вдалося переслати отримувачу (імовірно, недостатньо вхідної ліквідності).</string>
+    <string name="outgoing_failuremessage_temporary_failure">На одному з вузлів на шляху платежу сталася помилка. Платіж може вдатися, якщо ви спробуєте ще раз.</string>
+    <string name="outgoing_failuremessage_too_many_pending">У вас забагато платежів в очікуванні. Спробуйте ще раз після їх завершення.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">ID платежу недійсний. Спробуйте ще раз.</string>
+    <string name="outgoing_failuremessage_alreadypaid">Цей рахунок уже оплачено.</string>
+    <string name="outgoing_failuremessage_not_connected">Ваш канал ще не підключений. Зачекайте стабільного зʼєднання та спробуйте ще раз.</string>
+    <string name="outgoing_failuremessage_channel_opening">Ваш канал ще відкривається. Зачекайте та спробуйте ще раз.</string>
+    <string name="outgoing_failuremessage_unsupported_features">Цей рахунок використовує функції, що не підтримуються. Переконайтеся, що у вас найновіша версія Phoenix.</string>
+    <string name="outgoing_failuremessage_invalid_amount">Сума платежу недійсна.</string>
+    <string name="outgoing_failuremessage_no_available_channels">Платіж не вдалося надіслати через наявні канали.</string>
+    <string name="outgoing_failuremessage_noroutefound">Отримувач недосяжний або не має достатньо вхідної ліквідності.</string>
+    <string name="outgoing_failuremessage_unknown">Сталася невідома помилка, і платіж не вдався.</string>
+    <string name="outgoing_failuremessage_restarted">Гаманець було перезапущено під час обробки платежу.</string>
+
+    <!-- spliceout: low feerate disclaimer -->
+
+    <string name="spliceout_low_feerate_dialog_title">Низький feerate!</string>
+    <string name="spliceout_low_feerate_dialog_body1">Транзакції з недостатнім feerate можуть очікувати підтвердження днями або тижнями.</string>
+    <string name="spliceout_low_feerate_dialog_body2">Вибір feerate — ваша відповідальність. Після надсилання цю транзакцію не можна скасувати, лише прискорити вищими комісіями.</string>
+    <string name="spliceout_low_feerate_dialog_body3">Ви впевнені, що хочете продовжити?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">Зменшений розмір каналу</string>
+    <string name="spliceout_capacity_disclaimer_body1">Кошти, надіслані on-chain, беруться з вашої частини каналу, зменшуючи розмір каналу на ту саму суму. Ваша вхідна ліквідність залишається незмінною.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">Більше не показувати це повідомлення.</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">Витратити скасовані swap-in</string>
+    <string name="swapinrefund_none_available_label">Немає скасованих swap-in.</string>
+    <string name="swapinrefund_available_label">Доступно: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Скористайтеся цим екраном, щоб витратити депозити on-chain, не обміняні вчасно. Це не впливає на ваші канали Lightning.</string>
+    <string name="swapinrefund_instructions_2">Переконайтеся, що адреса призначення дійсна, і використовуйте розумний feerate.</string>
+    <string name="swapinrefund_estimate_button">Оцінити комісії</string>
+    <string name="swapinrefund_estimating">Оцінювання комісій…</string>
+    <string name="swapinrefund_send_button">Транслювати</string>
+    <string name="swapinrefund_sending">Трансляція…</string>
+    <string name="swapinrefund_failed">Помилка транзакції.</string>
+    <string name="swapinrefund_failed_address">Ця адреса недійсна.</string>
+    <string name="swapinrefund_failed_cannot_create">Не вдалося створити транзакцію повернення.</string>
+    <string name="swapinrefund_success">Транзакцію опубліковано.</string>
+    <string name="swapinrefund_success_details">Ви можете знайти транзакцію нижче. Вона не зʼявиться в історії платежів, тому за потреби скопіюйте її ID зараз.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">Витратити кошти з кінцевого гаманця</string>
+    <string name="finalwallet_refund_available_none">Немає доступних коштів</string>
+    <string name="finalwallet_refund_available">Доступна сума</string>
+    <string name="finalwallet_refund_instructions">Скористайтеся цим екраном, щоб витратити кошти з вашого кінцевого гаманця. Ці кошти надійшли з каналів, закритих у минулому. Це не впливає на ваші наявні канали Lightning.</string>
+
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Це зручна для читання адреса для вашого запиту на платіж Bolt12.</string>
+    <string name="bip353_subtitle2">Хочете гарнішу адресу? Скористайтеся сторонніми сервісами або розмістіть адресу самостійно!</string>
+
+</resources>
