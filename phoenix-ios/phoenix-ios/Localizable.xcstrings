@@ -1244,7 +1244,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(숨겨진 지갑에 접근하는 유일한 방법은 잠금 PIN을 입력하는 것입니다)"
+            "value" : "(숨김 지갑은 잠금 PIN을 입력해야만 접근할 수 있습니다)"
           }
         }
       }
@@ -3398,7 +3398,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "진행 중인 송금 1건"
+            "value" : "진행 중인 발신 결제 1건"
           }
         }
       }
@@ -3491,7 +3491,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "최근 거부된 수신 결제 1건"
+            "value" : "최근 수신 결제 1건 거부됨"
           }
         }
       }
@@ -5700,7 +5700,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "쉽고 빠른 결제를 위해 연락처를 추가하세요"
+            "value" : "쉽고 빠른 결제를 위해 연락처를 추가하세요."
           }
         }
       }
@@ -6300,7 +6300,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "암호 대체 허용"
+            "value" : "암호 대체 수단 허용"
           }
         }
       }
@@ -10216,7 +10216,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "브로드캐스트"
+            "value" : "브로드캐스트됨"
           }
         }
       }
@@ -22931,7 +22931,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "채널을 강제 종료하면 온체인 수수료를 충당하기 위한 비용이 발생하며, 자금이 며칠 동안 잠기게 됩니다. **채널이 완전히 종료될 때까지 앱을 삭제하지 마세요. 삭제하면 자금을 잃게 됩니다.**"
+            "value" : "채널을 강제 종료하면 온체인 수수료가 발생하며, 자금이 며칠 동안 잠기게 됩니다. **채널이 완전히 종료될 때까지 앱을 삭제하지 마세요. 삭제하면 자금을 잃게 됩니다.**"
           }
         }
       }
@@ -26274,7 +26274,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "지갑 데이터를 삭제할 예정이라면, 채널 종료 거래가 블록체인에서 확인된 후까지 기다리는 것을 권장합니다."
+            "value" : "지갑 데이터를 삭제할 예정이라면, 채널 종료 거래가 블록체인에서 확인될 때까지 기다리는 것을 권장합니다."
           }
         }
       }
@@ -31350,7 +31350,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "낮은 수수료율!"
+            "value" : "수수료율이 낮습니다!"
           }
         }
       }
@@ -38969,7 +38969,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Phoenix는 결제 채널을 사용해 비트코인을 빠르고 사적으로 만듭니다."
+            "value" : "Phoenix는 결제 채널을 사용해 비트코인을 빠르고 프라이빗하게 만듭니다."
           }
         }
       }
@@ -39766,7 +39766,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "숨겨진 수신 금액 추가"
+            "value" : "숨겨진 수신 금액 있음"
           }
         }
       }
@@ -40275,7 +40275,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "간단 팁"
+            "value" : "팁을 빠르게 설정합니다"
           }
         }
       }
@@ -40832,7 +40832,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "받음"
+            "value" : "수신 완료"
           }
         }
       }
@@ -44087,7 +44087,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "서비스가 라이트닝 주소를 지원하지 않거나 이 사용자를 알지 못합니다"
+            "value" : "서비스가 라이트닝 주소를 지원하지 않거나 이 사용자를 찾을 수 없습니다"
           }
         }
       }
@@ -45300,7 +45300,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "최근 표시:"
+            "value" : "표시 개수:"
           }
         }
       }
@@ -46697,7 +46697,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사용 = 물을 붓는 것\n받기 = 물을 더 채우는 것"
+            "value" : "사용 = 물을 덜어내는 것\n받기 = 물을 더 채우는 것"
           }
         }
       }
@@ -46743,7 +46743,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사용 제한"
+            "value" : "결제 제한"
           }
         }
       }
@@ -46789,7 +46789,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사용 PIN"
+            "value" : "결제 PIN"
           }
         }
       }
@@ -47714,7 +47714,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swap-in 주소"
+            "value" : "swap-in 주소"
           }
         }
       }
@@ -47725,7 +47725,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swap-in 서명자"
+            "value" : "swap-in 서명자"
           }
         }
       }
@@ -47772,7 +47772,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Swap-in 지갑"
+            "value" : "swap-in 지갑"
           }
         }
       }
@@ -48471,7 +48471,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "채널 종료 거래들은 거래 목록에 있습니다."
+            "value" : "채널 종료 거래는 거래 목록에 있습니다."
           }
         }
       }
@@ -48807,7 +48807,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "수수료는 **%1$@**로, 금액의 **%2$@**를 초과합니다."
+            "value" : "수수료는 **%1$@**(으)로, 금액의 **%2$@**를 초과합니다."
           }
         }
       }
@@ -48911,7 +48911,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "수수료는 %1$@로, 금액의 %2$@를 초과합니다."
+            "value" : "수수료는 %1$@(으)로, 금액의 %2$@를 초과합니다."
           }
         }
       }
@@ -49383,7 +49383,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "결제 금액이 너무 큽니다. 여러 번으로 나누어 보세요."
+            "value" : "결제 금액이 너무 큽니다. 여러 번에 나누어 결제해 보세요."
           }
         }
       }
@@ -52243,7 +52243,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "팁 시각"
+            "value" : "최신 블록 시각"
           }
         }
       }
@@ -52661,7 +52661,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "온체인 결제를 더 빠르게 하려면"
+            "value" : "온체인 결제를 더 빠르게"
           }
         }
       }
@@ -53361,7 +53361,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "인증서를 신뢰하고 공개키 고정"
+            "value" : "인증서 신뢰 및 공개키 고정"
           }
         }
       }
@@ -55088,7 +55088,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "이 화면에서 제때 swap되지 않은 온체인 자금을 사용합니다. Swap-in 요청은 이미 만료되었습니다."
+            "value" : "이 화면에서 제때 swap되지 않은 온체인 자금을 사용합니다. swap-in 요청은 이미 만료되었습니다."
           }
         }
       }
@@ -55273,7 +55273,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "버전 %d는 지원하지 않습니다"
+            "value" : "버전 %d은(는) 지원되지 않습니다"
           }
         }
       }
@@ -57073,7 +57073,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "워치타워를 완료하지 못했습니다"
+            "value" : "워치타워 작업을 완료하지 못했습니다"
           }
         }
       }
@@ -57679,7 +57679,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "설정된 비례 수수료를 고려하면 기본 수수료는 최소 %@ 이상을 권장합니다."
+            "value" : "설정된 비례 수수료를 고려하면 기본 수수료는 %@ 이상을 권장합니다."
           }
         }
       }
@@ -59163,7 +59163,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "결제를 여러 건 받기 전에 버킷 크기를 늘려 두면 수수료를 줄일 수 있습니다."
+            "value" : "결제를 여러 건 받기 전에 양동이 크기를 늘려 두면 수수료를 줄일 수 있습니다."
           }
         }
       }
@@ -59448,7 +59448,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "비트코인 채굴자에게 %1$@ (≈ %2$@)를 지불합니다."
+            "value" : "비트코인 채굴자에게 %1$@ (≈ %2$@)을(를) 지불하게 됩니다."
           }
         }
       }
@@ -59494,7 +59494,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "라이트닝 인보이스를 요청 금액의 최대 2배까지 더 지불할 수 있습니다. 직접 팁을 주거나 프라이버시를 지킬 때 유용합니다."
+            "value" : "라이트닝 인보이스를 요청 금액의 최대 2배까지 초과 결제할 수 있습니다. 수동 팁 지급이나 프라이버시 보호 수단으로 유용합니다."
           }
         }
       }
@@ -59541,7 +59541,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "이미 결제한 인보이스입니다. 다시 결제하면 자금을 잃을 수 있습니다."
+            "value" : "이미 결제한 인보이스입니다. 다시 결제하면 자금을 도난당할 수 있습니다."
           }
         }
       }

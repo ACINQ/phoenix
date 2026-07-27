@@ -397,7 +397,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "부탄 눌트룸"
+            "value" : "부탄 눌트럼"
           }
         }
       }
@@ -929,7 +929,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "과테말라 케찰"
+            "value" : "과테말라 케트살"
           }
         }
       }
@@ -2482,7 +2482,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "우즈베키스탄 솜"
+            "value" : "우즈베키스탄 숨"
           }
         }
       }
@@ -2550,7 +2550,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CFA 프랑 BEAC"
+            "value" : "중앙아프리카 CFA 프랑"
           }
         }
       }
@@ -2607,7 +2607,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CFA 프랑 BCEAO"
+            "value" : "서아프리카 CFA 프랑"
           }
         }
       }

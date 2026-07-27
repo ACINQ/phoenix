@@ -243,7 +243,7 @@
     <string name="inappnotif_payment_rejected_over_absolute">수수료가 %1$s(으)로, 설정된 최대 수수료 %2$s을(를) 초과했습니다.</string>
     <string name="inappnotif_payment_rejected_over_relative">수수료가 %1$s(으)로, 금액의 %2$s%%를 초과했습니다.</string>
     <string name="inappnotif_payment_rejected_tweak_setting">탭하여 설정을 변경하세요.</string>
-    <string name="inappnotif_payment_rejected_view_wallet">상세정보 보기</string>
+    <string name="inappnotif_payment_rejected_view_wallet">자세히 보기</string>
 
     <string name="inappnotif_watchtower_nominal_title">워치타워 보고서</string>
     <string name="inappnotif_watchtower_nominal_description_one">%2$s에 채널 %1$d개를 성공적으로 확인했습니다. 문제가 발견되지 않았습니다.</string>
@@ -462,7 +462,7 @@
     <!-- spliceout: low feerate disclaimer -->
 
     <string name="spliceout_low_feerate_dialog_title">낮은 수수료율!</string>
-    <string name="spliceout_low_feerate_dialog_body1">수수료율이 부족한 거래는 확인되지 않은 채 며칠에서 몇 주까지 지연될 수 있습니다.</string>
+    <string name="spliceout_low_feerate_dialog_body1">수수료율이 충분하지 않은 거래는 확인되지 않은 채 며칠에서 몇 주까지 지연될 수 있습니다.</string>
     <string name="spliceout_low_feerate_dialog_body2">수수료율 선택은 본인의 책임입니다. 한번 전송된 거래는 취소할 수 없으며, 더 높은 수수료로 가속하는 것만 가능합니다.</string>
     <string name="spliceout_low_feerate_dialog_body3">정말 진행하시겠습니까?</string>
 

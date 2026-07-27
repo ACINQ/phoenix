@@ -140,7 +140,7 @@
     <string name="receive_label_bip21">비트코인 URI</string>
 
     <string name="receive_bip353_title">이것은 무엇인가요?</string>
-    <string name="receive_bip353_info">이 라이트닝 주소는 Bolt12 결제 요청과 함께 작동하는 최신 Bip353 표준을 사용합니다.\n\nLNURL 기반 라이트닝 주소보다 프라이버시가 뛰어나며, 직접 호스팅할 수도 있습니다.\n\n다만 아직 최첨단 기술이므로, 일부 지갑이나 서비스는 이를 인식하지 못해 결제를 보낼 수 없습니다.</string>
+    <string name="receive_bip353_info">이 라이트닝 주소는 Bolt12 결제 요청과 호환되는 최신 Bip353 표준을 사용합니다.\n\nLNURL 기반 라이트닝 주소보다 프라이버시가 뛰어나며, 직접 호스팅할 수도 있습니다.\n\n다만 아직 최첨단 기술이므로, 일부 지갑이나 서비스는 이를 인식하지 못해 결제를 보낼 수 없습니다.</string>
     <string name="receive_bip353_link">자세히 알아보기.</string>
 
     <string name="receive_lightning_edit_title_bolt11">이 Bolt11 인보이스 맞춤 설정</string>
@@ -178,7 +178,7 @@
     <string name="send_offer_payer_note_dialog_placeholder">메시지 입력…</string>
     <string name="send_offer_fetching">결제 정보를 가져오는 중…</string>
     <string name="send_offer_failure_title">결제에 실패했습니다</string>
-    <string name="send_offer_failure_timeout">적절한 시간 내에 결제 정보를 가져오지 못했습니다.\n\n받는 사람이 오프라인이거나 연결할 수 없는 상태일 수 있습니다.</string>
+    <string name="send_offer_failure_timeout">일정 시간 내에 결제 정보를 가져오지 못했습니다.\n\n받는 사람이 오프라인이거나 연결할 수 없는 상태일 수 있습니다.</string>
 
     <string name="send_paymentmode_onchain">온체인으로 결제</string>
     <string name="send_paymentmode_onchain_desc">온체인 거래는 일반적으로 더 느리며, 큰 금액의 결제에 적합합니다.</string>
@@ -356,7 +356,7 @@
     <string name="home_connection_connecting">연결 중…</string>
     <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">유동성 요청</string>
-    <string name="home_inflight_payments">현재 지갑에 %1$d건의 결제가 대기 중입니다.\n\n이 결제들이 문제없이 정상적으로 처리되도록 앱을 계속 열어 두세요.</string>
+    <string name="home_inflight_payments">현재 지갑에 %1$d건의 결제가 대기 중입니다.\n\n이 결제가 문제없이 처리되도록 앱을 계속 열어 두세요.</string>
 
     <!-- in-app notifications -->
 
@@ -371,12 +371,12 @@
     <string name="displayseed_loading">시드 잠금 해제 중…</string>
     <string name="displayseed_error_details">시드 잠금을 해제할 수 없습니다</string>
     <string name="displayseed_derivation_path">표준 BIP84 파생 경로를 사용하는 BIP39 시드</string>
-    <string name="displayseed_loading_prefs">설정을 불러오는 중…</string>
+    <string name="displayseed_loading_prefs">설정 불러오는 중…</string>
     <string name="displayseed_backup_title">백업 확인</string>
 
     <!-- settings: logs -->
 
-    <string name="troubleshooting_title">진단 &amp; 로그</string>
+    <string name="troubleshooting_title">진단 및 로그</string>
     <string name="troubleshooting_diagnostics_header">지갑 진단</string>
     <string name="troubleshooting_diagnostics_export_button">진단 정보 공유…</string>
     <string name="troubleshooting_diagnostics_share_subject">Phoenix 앱 진단 정보</string>
@@ -388,7 +388,7 @@
     <string name="troubleshooting_logs_exporting">데이터 내보내는 중…</string>
     <string name="troubleshooting_logs_failed">오류: 로그를 내보내지 못했습니다</string>
     <string name="troubleshooting_logs_view_button">로그 보기…</string>
-    <string name="troubleshooting_logs_view_with">다음으로 로그 보기…</string>
+    <string name="troubleshooting_logs_view_with">다음 앱으로 로그 보기…</string>
     <string name="troubleshooting_logs_share_button">로그 공유…</string>
     <string name="troubleshooting_logs_share_subject">Phoenix 앱 로그</string>
     <string name="troubleshooting_logs_share_title">Phoenix 로그 공유…</string>
@@ -398,7 +398,7 @@
     <string name="paymentdetails_loading">결제 상세정보를 불러오는 중…</string>
     <string name="paymentdetails_error">결제 상세정보를 찾을 수 없습니다</string>
 
-    <string name="paymentdetails_status_inbound_liquidity_success"><b>유동성 추가됨</b> %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>유동성 추가 완료</b> %1$s</string>
     <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>채널 관리</b> %1$s</string>
     <string name="paymentdetails_status_channelclose_confirmed"><b>완료</b> %1$s</string>
     <string name="paymentdetails_status_sent_successful"><b>전송 완료</b> %1$s</string>
@@ -435,7 +435,7 @@
     <string name="paymentdetails_fees_label">수수료</string>
     <string name="paymentdetails_error_label">오류</string>
     <string name="paymentdetails_no_description">설명 없음</string>
-    <string name="paymentdetails_info_uniclose">이 결제는 채널에서 발생한 충돌에 따라 이루어졌습니다.</string>
+    <string name="paymentdetails_info_uniclose">이 결제는 채널 충돌로 인해 발생했습니다.</string>
 
     <string name="paymentdetails_desc_splice_out">온체인 결제</string>
     <string name="paymentdetails_desc_closing_channel">채널 종료</string>
@@ -740,7 +740,7 @@
 
     <string name="conndialog_title">연결 상태</string>
     <string name="conndialog_summary_not_ok">일부 연결이 아직 이루어지지 않았습니다. 연결될 때까지 앱이 올바르게 작동하지 않습니다.</string>
-    <string name="conndialog_network">기기가 인터넷에 연결되어 있지 않습니다. 앱이 제대로 작동하지 않습니다.\n\n기기의 설정을 확인해 주세요.</string>
+    <string name="conndialog_network">기기가 인터넷에 연결되어 있지 않습니다. 앱이 제대로 작동하지 않습니다.\n\n기기 설정을 확인해 주세요.</string>
     <string name="conndialog_electrum">Electrum</string>
     <string name="conndialog_lightning">피어</string>
     <string name="conndialog_accessibility_desc">%1$s 연결 관리</string>
@@ -970,7 +970,7 @@
 
     <!-- settings: contacts list -->
 
-    <string name="settings_contacts_help">이 화면에서 Bolt12 코드나 라이트닝 주소를 이름에 연결할 수 있습니다.\n\n이 연락처 데이터는 Phoenix 전용이며 로컬에 저장됩니다.</string>
+    <string name="settings_contacts_help">이 화면에서 Bolt12 코드나 라이트닝 주소에 이름을 연결할 수 있습니다.\n\n이 연락처 데이터는 Phoenix 전용이며 로컬에 저장됩니다.</string>
 
     <!-- experimental -->
 
