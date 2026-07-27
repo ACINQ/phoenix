@@ -38827,6 +38827,12 @@
             "state" : "translated",
             "value" : "Phoenix ne supporte pas encore ce type de LNURL"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix는 아직 이 유형의 LNURL을 지원하지 않습니다"
+          }
         }
       }
     },
@@ -38866,6 +38872,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous seul avez le contrôle de votre fonds."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix는 셀프 커스터디 지갑입니다. 통제권은 본인에게 있습니다."
           }
         }
       }
@@ -38907,6 +38919,12 @@
             "state" : "translated",
             "value" : "Phoenix a besoin d\\'accéder à Tor pour fonctionner correctement."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix가 정상적으로 작동하려면 Tor에 접근할 수 있어야 합니다."
+          }
         }
       }
     },
@@ -38946,6 +38964,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phoenix utilise les canaux de paiement Lightning pour rendre les paiements instantanés et privés."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix는 결제 채널을 사용해 비트코인을 빠르고 사적으로 만듭니다."
           }
         }
       }
@@ -38987,6 +39011,12 @@
             "state" : "translated",
             "value" : "Phoenix v2 est arrivé !"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix v2가 출시되었습니다!"
+          }
         }
       }
     },
@@ -39026,6 +39056,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version de Phoenix : %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix 버전: %@"
           }
         }
       }
@@ -39068,6 +39104,12 @@
             "state" : "translated",
             "value" : "Les paiements utilisent d'abord des frais minimaux avant d'augmenter graduellement jusqu'à ce maximum."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix는 가능한 최소 수수료로 결제를 시도합니다."
+          }
         }
       }
     },
@@ -39105,6 +39147,12 @@
           }
         },
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN"
@@ -39149,6 +39197,12 @@
             "state" : "translated",
             "value" : "Le PIN ne correspond pas !"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN이 일치하지 않습니다!"
+          }
         }
       }
     },
@@ -39189,6 +39243,12 @@
             "state" : "translated",
             "value" : "Planifiez votre liquidité à l'avance afin éviter des frais on-chain dans le futur"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미리 준비해 나중에 비용을 절약하세요"
+          }
         }
       }
     },
@@ -39228,6 +39288,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez vérifier votre connexion."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연결 상태를 확인해 주세요."
           }
         }
       }
@@ -39270,6 +39336,12 @@
             "state" : "translated",
             "value" : "Veuillez activer Face ID"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID를 활성화해 주세요"
+          }
         }
       }
     },
@@ -39311,6 +39383,12 @@
             "state" : "translated",
             "value" : "Veuillez activer TouchID"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touch ID를 활성화해 주세요"
+          }
         }
       }
     },
@@ -39350,6 +39428,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez vous assurer que l'adresse est correcte."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주소가 정확한지 확인하세요"
           }
         }
       }
@@ -39391,11 +39475,24 @@
             "state" : "translated",
             "value" : "Veuillez saisir un montant valide."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "유효한 금액을 입력해 주세요."
+          }
         }
       }
     },
     "Please fill all required fields" : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "필수 항목을 모두 입력해 주세요"
+          }
+        }
+      }
     },
     "Please perform a backup before enabling any options here. If you lock yourself out of Phoenix without a backup of your recovery phrase, you will **lose your funds**!" : {
       "localizations" : {
@@ -39433,6 +39530,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez effectuer une sauvegarde avant d'activer l'une ou l'autre des options proposées ici. Si vous vous enfermez dehors sans avoir sauvegardé votre phrase de récupération, vous **perdrez vos fonds** !"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여기 있는 옵션을 켜기 전에 먼저 백업하세요. 복구 문구를 백업하지 않은 채 Phoenix에 접근할 수 없게 되면 **자금을 잃게 됩니다**!"
           }
         }
       }
@@ -39473,6 +39576,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez redémarrer Phoenix"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix를 다시 시작해 주세요"
           }
         }
       }
@@ -39515,6 +39624,12 @@
             "state" : "translated",
             "value" : "Veuillez vous authentifier dans iCloud"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud에 로그인해 주세요"
+          }
         }
       }
     },
@@ -39554,6 +39669,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veuillez vous authentifier dans iCloud."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud에 로그인해 주세요."
           }
         }
       }
@@ -39595,6 +39716,12 @@
             "state" : "translated",
             "value" : "Veuillez réessayer"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도해 주세요"
+          }
         }
       }
     },
@@ -39634,6 +39761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "plus un montant entrant masqué"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "숨겨진 수신 금액 추가"
           }
         }
       }
@@ -39675,6 +39808,12 @@
             "state" : "translated",
             "value" : "Dérogations"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "정책 재정의"
+          }
         }
       }
     },
@@ -39714,6 +39853,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Port"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "포트"
           }
         }
       }
@@ -39755,6 +39900,12 @@
             "state" : "translated",
             "value" : "Préimage"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preimage"
+          }
         }
       }
     },
@@ -39794,6 +39945,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Préparer la transaction"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "거래 준비"
           }
         }
       }
@@ -39836,6 +39993,12 @@
             "state" : "translated",
             "value" : "Condidentialité"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인정보"
+          }
         }
       }
     },
@@ -39875,6 +40038,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vie privée et Sécurité"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인정보 및 보안"
           }
         }
       }
@@ -39917,6 +40086,12 @@
             "state" : "translated",
             "value" : "Les frais proportionnels doivent être d’au moins %@."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비례 수수료는 최소 %@ 이상이어야 합니다."
+          }
         }
       }
     },
@@ -39957,6 +40132,12 @@
             "state" : "translated",
             "value" : "Clé publique"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공개키"
+          }
         }
       }
     },
@@ -39996,6 +40177,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type d'achat"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 유형"
           }
         }
       }
@@ -40038,6 +40225,12 @@
             "state" : "translated",
             "value" : "QR code"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR 코드"
+          }
         }
       }
     },
@@ -40077,6 +40270,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Raccourci pour les pourboires"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "간단 팁"
           }
         }
       }
@@ -40119,6 +40318,12 @@
             "state" : "translated",
             "value" : "Serveur aléatoire"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "임의 서버"
+          }
         }
       }
     },
@@ -40159,6 +40364,12 @@
             "state" : "translated",
             "value" : "Délai aléatoire dans le transfert"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업로드 지연 시간 무작위화"
+          }
         }
       }
     },
@@ -40198,6 +40409,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Délai aléatoire dans le transfert"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무작위 업로드 지연"
           }
         }
       }
@@ -40241,6 +40458,12 @@
             "state" : "translated",
             "value" : "plage"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "범위"
+          }
         }
       }
     },
@@ -40280,6 +40503,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taux mis à jour : %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "환율 최종 갱신: %@"
           }
         }
       }
@@ -40322,6 +40551,12 @@
             "state" : "translated",
             "value" : "Données brutes"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원시 데이터"
+          }
         }
       }
     },
@@ -40361,6 +40596,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prêt à swap sur Lightning"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "swap 준비 완료"
           }
         }
       }
@@ -40403,6 +40644,12 @@
             "state" : "translated",
             "value" : "Recevoir"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받기"
+          }
         }
       }
     },
@@ -40442,6 +40689,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recevoir des paiements"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제 받기"
           }
         }
       }
@@ -40483,6 +40736,12 @@
             "state" : "translated",
             "value" : "Réception silencieuse"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "조용히 받기"
+          }
         }
       }
     },
@@ -40523,6 +40782,12 @@
             "state" : "translated",
             "value" : "Recevoir :"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받기:"
+          }
         }
       }
     },
@@ -40562,6 +40827,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reçu"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받음"
           }
         }
       }
@@ -40604,6 +40875,12 @@
             "state" : "translated",
             "value" : "Paiement reçu"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제를 받았습니다"
+          }
         }
       }
     },
@@ -40643,6 +40920,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reçu via"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수신 경로"
           }
         }
       }
@@ -40684,6 +40967,12 @@
             "state" : "translated",
             "value" : "Recevoir en arrière-plan.."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "백그라운드에서 받는 중…"
+          }
         }
       }
     },
@@ -40723,6 +41012,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Activité récente"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 활동"
           }
         }
       }
@@ -40764,6 +41059,12 @@
             "state" : "translated",
             "value" : "Le destinataire de ce paiement n\\'est pas joignable, ou bien ne dispose pas de suffisamment de liquidité entrante."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수신자에게 연결할 수 없거나, 수신 유동성이 충분하지 않습니다."
+          }
         }
       }
     },
@@ -40803,6 +41104,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phrase de sauvegarde"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복구 문구"
           }
         }
       }
@@ -40844,6 +41151,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clé de sauvegarde"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복구 문구"
           }
         }
       }
@@ -40887,6 +41200,12 @@
             "state" : "translated",
             "value" : "Clé de sauvegarde"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복구 시드"
+          }
         }
       }
     },
@@ -40926,6 +41245,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retirer les fonds"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받기"
           }
         }
       }
@@ -40967,6 +41292,12 @@
             "state" : "translated",
             "value" : "Rafraîchir"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "새로고침"
+          }
         }
       }
     },
@@ -41007,11 +41338,24 @@
             "state" : "translated",
             "value" : "Rafraîchissement des taux…"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "환율 갱신 중..."
+          }
         }
       }
     },
     "Refund key" : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "환불 키"
+          }
+        }
+      }
     },
     "Register" : {
       "comment" : "lnurl-auth: login button title",
@@ -41050,6 +41394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "S’inscrire"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록"
           }
         }
       }
@@ -41092,6 +41442,12 @@
             "state" : "translated",
             "value" : "Enregistré"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "등록됨"
+          }
         }
       }
     },
@@ -41132,6 +41488,12 @@
             "state" : "translated",
             "value" : "Remote"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원격"
+          }
         }
       }
     },
@@ -41171,6 +41533,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
           }
         }
       }
@@ -41213,6 +41581,12 @@
             "state" : "translated",
             "value" : "Demande d’adresse de swap-in"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-in 주소 요청 중..."
+          }
         }
       }
     },
@@ -41252,6 +41626,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réinitialiser les préférences utilisateur"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용자 설정 초기화"
           }
         }
       }
@@ -41294,6 +41674,12 @@
             "state" : "translated",
             "value" : "Réinitialiser le wallet"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지갑 초기화"
+          }
         }
       }
     },
@@ -41333,6 +41719,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réinitialisation des préférences utilisateur..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용자 설정을 초기화하는 중…"
           }
         }
       }
@@ -41375,6 +41767,12 @@
             "state" : "translated",
             "value" : "Réinitialisation du wallet"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지갑 초기화 중"
+          }
         }
       }
     },
@@ -41416,6 +41814,12 @@
             "state" : "translated",
             "value" : "Résolution de l'adresse Lightning"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트닝 주소 확인 중"
+          }
         }
       }
     },
@@ -41455,6 +41859,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Redémarrage nécessaire"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재시작 필요"
           }
         }
       }
@@ -41497,6 +41907,12 @@
             "state" : "translated",
             "value" : "Restaurer mon wallet"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "내 지갑 복구"
+          }
         }
       }
     },
@@ -41536,6 +41952,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "rétablissement des connexions"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연결 복구 중"
           }
         }
       }
@@ -41577,6 +41999,12 @@
             "state" : "translated",
             "value" : "Réessayer"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 시도"
+          }
         }
       }
     },
@@ -41616,6 +42044,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réessai dans %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 후 다시 시도"
           }
         }
       }
@@ -41657,6 +42091,12 @@
             "state" : "translated",
             "value" : "Réutilisable"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재사용 가능"
+          }
         }
       }
     },
@@ -41696,6 +42136,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Valider"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "검토"
           }
         }
       }
@@ -41737,6 +42183,12 @@
             "state" : "translated",
             "value" : "Examiner la transaction"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "거래 검토"
+          }
         }
       }
     },
@@ -41776,6 +42228,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Revocation"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "폐기됨"
           }
         }
       }
@@ -41818,6 +42276,12 @@
             "state" : "translated",
             "value" : "Commitments révoqués détectés sur %lld canaux !"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld개 채널에서 폐기된 커밋이 발견되었습니다!"
+          }
         }
       }
     },
@@ -41854,6 +42318,12 @@
           }
         },
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sat"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "sat"
@@ -41898,6 +42368,12 @@
             "state" : "translated",
             "value" : "Il est recommandé d'utiliser l'unité  'satoshi' car il est plus facile de raisonner avec des nombres entiers que des fractions."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "소수점 값보다 정수를 다루기가 더 쉽기 때문에 사토시 단위가 선호되는 경우가 많습니다."
+          }
         }
       }
     },
@@ -41938,6 +42414,12 @@
             "state" : "translated",
             "value" : "Sauver"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장"
+          }
         }
       }
     },
@@ -41977,6 +42459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrer les modifications"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "변경 사항 저장"
           }
         }
       }
@@ -42019,6 +42507,12 @@
             "state" : "translated",
             "value" : "Sauvegardez la dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre clé et votre téléphone, vous perdez vos fonds."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 휴대폰이 아닌 안전한 곳에 보관하세요. 시드와 휴대폰을 모두 잃어버리면 자금을 되찾을 수 없습니다."
+          }
         }
       }
     },
@@ -42058,6 +42552,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scanner une adresse Bitcoin"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비트코인 주소 스캔"
           }
         }
       }
@@ -42100,6 +42600,12 @@
             "state" : "translated",
             "value" : "scanner un code qr"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR 코드 스캔"
+          }
         }
       }
     },
@@ -42139,6 +42645,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scanner le code QR"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR 코드 스캔"
           }
         }
       }
@@ -42180,6 +42692,12 @@
             "state" : "translated",
             "value" : "Scannez le code QR"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR 코드 스캔"
+          }
         }
       }
     },
@@ -42219,6 +42737,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recherche"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "검색"
           }
         }
       }
@@ -42261,6 +42785,12 @@
             "state" : "translated",
             "value" : "Sécurité"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보안"
+          }
         }
       }
     },
@@ -42300,6 +42830,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La clé de sauvegarde n'est pas stockée dans iCloud."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시드 백업이 iCloud에 저장되어 있지 않습니다."
           }
         }
       }
@@ -42341,6 +42877,12 @@
             "state" : "translated",
             "value" : "Sélectionner les frais pour voir le montant final."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수수료를 선택하면 금액이 표시됩니다."
+          }
         }
       }
     },
@@ -42380,6 +42922,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionnez un emoji"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이모지 선택"
           }
         }
       }
@@ -42421,6 +42969,12 @@
             "state" : "translated",
             "value" : "Sélectionner l'image"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지 선택"
+          }
         }
       }
     },
@@ -42460,6 +43014,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "choisissez les frais de minage quand vous payez sur la chaîne"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "온체인 전송 시 채굴 수수료 선택"
           }
         }
       }
@@ -42501,6 +43061,12 @@
             "state" : "translated",
             "value" : "Sélectionnez une photo"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 선택"
+          }
         }
       }
     },
@@ -42540,6 +43106,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionnez l'emoji portefeuille"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지갑 이모지 선택"
           }
         }
       }
@@ -42581,6 +43153,12 @@
             "state" : "translated",
             "value" : "Envoyer"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보내기"
+          }
         }
       }
     },
@@ -42620,6 +43198,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyez tous vos fonds vers une adresse Bitcoin"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 자금을 비트코인 지갑으로 보냅니다."
           }
         }
       }
@@ -42662,6 +43246,12 @@
             "state" : "translated",
             "value" : "Envoyer des fonds"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자금 보내기"
+          }
         }
       }
     },
@@ -42701,6 +43291,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyer de l'argent"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "송금하기"
           }
         }
       }
@@ -42742,6 +43338,12 @@
             "state" : "translated",
             "value" : "Envoyer le paiement"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "송금하기"
+          }
         }
       }
     },
@@ -42781,6 +43383,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyer à"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받는 곳"
           }
         }
       }
@@ -42822,6 +43430,12 @@
             "state" : "translated",
             "value" : "Envoi des fonds..."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자금 보내는 중…"
+          }
         }
       }
     },
@@ -42862,6 +43476,12 @@
             "state" : "translated",
             "value" : "Envoi…"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보내는 중…"
+          }
         }
       }
     },
@@ -42901,6 +43521,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyé"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전송 완료"
           }
         }
       }
@@ -42943,6 +43569,12 @@
             "state" : "translated",
             "value" : "ENVOYÉ"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전송 완료"
+          }
         }
       }
     },
@@ -42982,6 +43614,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyé par"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보낸 사람"
           }
         }
       }
@@ -43023,6 +43661,12 @@
             "state" : "translated",
             "value" : "Envoyé à"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받는 사람"
+          }
         }
       }
     },
@@ -43062,6 +43706,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Serveur"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버"
           }
         }
       }
@@ -43103,6 +43753,12 @@
             "state" : "translated",
             "value" : "Le certificat est approuvé."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버 인증서를 신뢰할 수 있습니다."
+          }
         }
       }
     },
@@ -43142,6 +43798,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le serveur utilise un certificat non reconnu."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버 인증서를 신뢰할 수 없습니다."
           }
         }
       }
@@ -43184,6 +43846,12 @@
             "state" : "translated",
             "value" : "Le serveur retourne une erreur :"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버가 오류를 반환했습니다: %@"
+          }
         }
       }
     },
@@ -43224,6 +43892,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le serveur retourne un code HTTP %d"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버가 HTTP 상태 코드 %d을(를) 반환했습니다"
           }
         }
       }
@@ -43266,6 +43940,12 @@
             "state" : "translated",
             "value" : "Le serveur retourne une réponse invalide"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서버가 읽을 수 없는 응답을 반환했습니다"
+          }
         }
       }
     },
@@ -43306,6 +43986,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Service"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스"
           }
         }
       }
@@ -43349,6 +44035,12 @@
             "state" : "translated",
             "value" : "Le service est hors-ligne, ou leur serveur inaccessible"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스가 오프라인 상태이거나 서버가 다운된 것 같습니다"
+          }
         }
       }
     },
@@ -43391,6 +44083,12 @@
             "state" : "translated",
             "value" : "Le service ne supporte pas les adresses Lightning, ou bien ne connaît pas cet utilisateur"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스가 라이트닝 주소를 지원하지 않거나 이 사용자를 알지 못합니다"
+          }
         }
       }
     },
@@ -43430,6 +44128,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frais de service"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스 수수료"
           }
         }
       }
@@ -43471,6 +44175,12 @@
             "state" : "translated",
             "value" : "Frais de service"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스 수수료"
+          }
         }
       }
     },
@@ -43511,6 +44221,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frais de service"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스 수수료"
           }
         }
       }
@@ -43554,6 +44270,12 @@
             "state" : "translated",
             "value" : "Le service retourne une réponse invalide"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스가 읽을 수 없는 응답을 반환했습니다"
+          }
         }
       }
     },
@@ -43594,6 +44316,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Définir le code PIN de verrouillage"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠금 PIN 설정"
           }
         }
       }
@@ -43637,6 +44365,12 @@
             "state" : "translated",
             "value" : "Définir le code PIN"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN 설정"
+          }
         }
       }
     },
@@ -43677,6 +44411,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Définir le code PIN de dépense"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지출 PIN 설정"
           }
         }
       }
@@ -43719,6 +44459,12 @@
             "state" : "translated",
             "value" : "Configuration"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정"
+          }
         }
       }
     },
@@ -43759,6 +44505,12 @@
             "state" : "translated",
             "value" : "Empreinte SHA1 :"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SHA1 지문:"
+          }
         }
       }
     },
@@ -43798,6 +44550,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Empreinte SHA256 :"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SHA256 지문:"
           }
         }
       }
@@ -43840,6 +44598,12 @@
             "state" : "translated",
             "value" : "partager"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공유"
+          }
         }
       }
     },
@@ -43879,6 +44643,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partager"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공유"
           }
         }
       }
@@ -43920,6 +44690,12 @@
             "state" : "translated",
             "value" : "Partager l’image"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미지 공유"
+          }
         }
       }
     },
@@ -43959,6 +44735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Options sur actions"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공유 옵션"
           }
         }
       }
@@ -44000,6 +44782,12 @@
             "state" : "translated",
             "value" : "Partager les logs"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그 공유"
+          }
         }
       }
     },
@@ -44039,6 +44827,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Description courte"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "간단한 설명"
           }
         }
       }
@@ -44081,6 +44875,12 @@
             "state" : "translated",
             "value" : "Montrer une adresse Bitcoin"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비트코인 주소 표시"
+          }
         }
       }
     },
@@ -44122,6 +44922,12 @@
             "state" : "translated",
             "value" : "Montrer une requête de paiement Lightning"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트닝 인보이스 표시"
+          }
         }
       }
     },
@@ -44161,6 +44967,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les options avancées"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "고급 옵션 표시"
           }
         }
       }
@@ -44203,6 +45015,12 @@
             "state" : "translated",
             "value" : "Montrer le paiement le plus récent"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 결제 1건 표시"
+          }
         }
       }
     },
@@ -44243,6 +45061,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les 3 derniers paiements"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 결제 3건 표시"
           }
         }
       }
@@ -44285,6 +45109,12 @@
             "state" : "translated",
             "value" : "Montrer les 5 derniers paiements"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 결제 5건 표시"
+          }
         }
       }
     },
@@ -44325,6 +45155,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les 10 derniers paiements"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 결제 10건 표시"
           }
         }
       }
@@ -44367,6 +45203,12 @@
             "state" : "translated",
             "value" : "Montrer les 15 derniers paiements"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 결제 15건 표시"
+          }
         }
       }
     },
@@ -44408,6 +45250,12 @@
             "state" : "translated",
             "value" : "Montrer les 20 derniers paiements"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 결제 20건 표시"
+          }
         }
       }
     },
@@ -44447,6 +45295,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer le plus récent :"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 표시:"
           }
         }
       }
@@ -44489,6 +45343,12 @@
             "state" : "translated",
             "value" : "Afficher une facture unique"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일회용 인보이스 표시"
+          }
         }
       }
     },
@@ -44528,6 +45388,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer uniquement les paiements en cours"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "진행 중인 결제만 표시"
           }
         }
       }
@@ -44569,6 +45435,12 @@
             "state" : "translated",
             "value" : "Montrer uniquement :"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표시 대상:"
+          }
         }
       }
     },
@@ -44608,6 +45480,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer le montant fiduciaire d'origine"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원래 법정화폐 금액 표시"
           }
         }
       }
@@ -44649,6 +45527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les paiements faits dans la dernière minute"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 1분 이내 결제 표시"
           }
         }
       }
@@ -44692,6 +45576,12 @@
             "state" : "translated",
             "value" : "Montrer les paiements faits dans la dernière minute."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 1분 이내의 결제를 표시합니다."
+          }
         }
       }
     },
@@ -44732,6 +45622,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les deux dernières heures"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 2시간 이내 결제 표시"
           }
         }
       }
@@ -44775,6 +45671,12 @@
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les deux dernières heures."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 2시간 이내의 결제를 표시합니다."
+          }
         }
       }
     },
@@ -44815,6 +45717,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les trois derniers jours"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 3일 이내 결제 표시"
           }
         }
       }
@@ -44858,6 +45766,12 @@
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les trois derniers jours."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 3일 이내의 결제를 표시합니다."
+          }
         }
       }
     },
@@ -44898,6 +45812,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les septs derniers jours"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 7일 이내 결제 표시"
           }
         }
       }
@@ -44941,6 +45861,12 @@
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les sept derniers jours."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 7일 이내의 결제를 표시합니다."
+          }
         }
       }
     },
@@ -44981,6 +45907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les dix dernières minutes"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 10분 이내 결제 표시"
           }
         }
       }
@@ -45024,6 +45956,12 @@
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les dix dernières minutes."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 10분 이내의 결제를 표시합니다."
+          }
         }
       }
     },
@@ -45064,6 +46002,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les 24 dernières heures"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 24시간 이내 결제 표시"
           }
         }
       }
@@ -45107,6 +46051,12 @@
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les 24 dernières heures."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 24시간 이내의 결제를 표시합니다."
+          }
         }
       }
     },
@@ -45146,6 +46096,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Montrer les paiements faits dans les dernières :"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표시 기간:"
           }
         }
       }
@@ -45188,11 +46144,24 @@
             "state" : "translated",
             "value" : "Afficher les QR réutilisables"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재사용 QR 표시"
+          }
         }
       }
     },
     "Sign" : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서명"
+          }
+        }
+      }
     },
     "Sign into iCloud to backup your payments" : {
       "localizations" : {
@@ -45231,14 +46200,34 @@
             "state" : "translated",
             "value" : "S’authentifier sur iCloud pour sauvegarder vos paiements"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제 내역을 백업하려면 iCloud에 로그인하세요"
+          }
         }
       }
     },
     "Signature" : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서명"
+          }
+        }
+      }
     },
     "Signing..." : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서명 중..."
+          }
+        }
+      }
     },
     "Since you've enabled Tor, you should use an onion address for this server." : {
       "localizations" : {
@@ -45276,6 +46265,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Puisque vous avez activé Tor, vous devez utiliser une adresse en oignon pour ce serveur."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tor를 활성화했으므로 이 서버에는 onion 주소를 사용해야 합니다."
           }
         }
       }
@@ -45317,6 +46312,12 @@
             "state" : "translated",
             "value" : "Usage unique"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일회용"
+          }
         }
       }
     },
@@ -45356,6 +46357,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Passer"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "건너뛰기"
           }
         }
       }
@@ -45397,6 +46404,12 @@
             "state" : "translated",
             "value" : "Déroger au max pour les paiements Lightning"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트닝 절대 수수료 확인 건너뛰기"
+          }
         }
       }
     },
@@ -45436,6 +46449,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ignorer pour l'instant"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "나중에 하기"
           }
         }
       }
@@ -45478,6 +46497,12 @@
             "state" : "translated",
             "value" : "Cette requête ne semble pas correcte…"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 인보이스에 문제가 있습니다..."
+          }
         }
       }
     },
@@ -45519,6 +46544,12 @@
             "state" : "translated",
             "value" : "Dépenser"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용"
+          }
         }
       }
     },
@@ -45559,11 +46590,25 @@
             "state" : "translated",
             "value" : "Dépensez les swap-ins périmés"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "만료된 swap-in 사용"
+          }
         }
       }
     },
     "Spend from channel address" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "채널 주소에서 사용"
+          }
+        }
+      }
     },
     "Spend from final wallet" : {
       "localizations" : {
@@ -45601,6 +46646,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dépenser à partir du portefeuille final"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최종 지갑에서 사용"
           }
         }
       }
@@ -45642,6 +46693,12 @@
             "state" : "translated",
             "value" : "Dépenser = verser de l'eau\nRecevoir = ajouter de l'eau"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용 = 물을 붓는 것\n받기 = 물을 더 채우는 것"
+          }
         }
       }
     },
@@ -45681,6 +46738,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contrôle des dépenses"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용 제한"
           }
         }
       }
@@ -45722,6 +46785,12 @@
             "state" : "translated",
             "value" : "Spending PIN"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용 PIN"
+          }
         }
       }
     },
@@ -45762,6 +46831,12 @@
             "state" : "translated",
             "value" : "Un splice est déjà en cours"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이미 splice가 진행 중입니다"
+          }
         }
       }
     },
@@ -45801,6 +46876,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le splice a été interrompu"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "splice가 중단되었습니다"
           }
         }
       }
@@ -45843,6 +46924,12 @@
             "state" : "translated",
             "value" : "Splice-in"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Splice-In"
+          }
         }
       }
     },
@@ -45882,6 +46969,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur de session splice-out"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "splice-out 세션 오류"
           }
         }
       }
@@ -45923,6 +47016,12 @@
             "state" : "translated",
             "value" : "Splicing"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "splice 진행 중"
+          }
         }
       }
     },
@@ -45962,6 +47061,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Standard"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표준"
           }
         }
       }
@@ -46003,6 +47108,12 @@
             "state" : "translated",
             "value" : "Date de début"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작일"
+          }
         }
       }
     },
@@ -46042,6 +47153,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recommencer"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "처음부터 다시"
           }
         }
       }
@@ -46083,6 +47200,12 @@
             "state" : "translated",
             "value" : "état"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "상태"
+          }
         }
       }
     },
@@ -46122,6 +47245,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Statut"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "상태"
           }
         }
       }
@@ -46163,6 +47292,12 @@
             "state" : "translated",
             "value" : "Étape #%lld"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld단계"
+          }
         }
       }
     },
@@ -46202,6 +47337,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sujet :"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제목:"
           }
         }
       }
@@ -46243,6 +47384,12 @@
             "state" : "translated",
             "value" : "Succès"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "성공"
+          }
         }
       }
     },
@@ -46282,6 +47429,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suggestions"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제안"
           }
         }
       }
@@ -46324,6 +47477,12 @@
             "state" : "translated",
             "value" : "En résumé"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "요약"
+          }
         }
       }
     },
@@ -46365,6 +47524,12 @@
             "state" : "translated",
             "value" : "Support"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "고객 지원"
+          }
         }
       }
     },
@@ -46404,6 +47569,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresses de swap"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "swap 주소"
           }
         }
       }
@@ -46446,6 +47617,12 @@
             "state" : "translated",
             "value" : "Frais de swap"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "swap 수수료"
+          }
         }
       }
     },
@@ -46487,6 +47664,12 @@
             "state" : "translated",
             "value" : "Swap-in"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-In"
+          }
         }
       }
     },
@@ -46527,11 +47710,25 @@
             "state" : "translated",
             "value" : "Adresses de swap"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-in 주소"
+          }
         }
       }
     },
     "Swap-in signer" : {
-      "comment" : "Navigation bar title"
+      "comment" : "Navigation bar title",
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-in 서명자"
+          }
+        }
+      }
     },
     "Swap-in wallet" : {
       "comment" : "Navigation Bar Title",
@@ -46570,6 +47767,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Swap-in wallet"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-in 지갑"
           }
         }
       }
@@ -46612,6 +47815,12 @@
             "state" : "translated",
             "value" : "Swap-out"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-Out"
+          }
         }
       }
     },
@@ -46651,6 +47860,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Passer à un autre portefeuille"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다른 지갑으로 전환"
           }
         }
       }
@@ -46693,6 +47908,12 @@
             "state" : "translated",
             "value" : "Système"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템"
+          }
         }
       }
     },
@@ -46732,6 +47953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prendre une photo"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 촬영"
           }
         }
       }
@@ -46773,6 +48000,12 @@
             "state" : "translated",
             "value" : "Appuyez pour plus d'infos"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자세히 보려면 탭하세요"
+          }
         }
       }
     },
@@ -46809,6 +48042,12 @@
           }
         },
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taproot"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taproot"
@@ -46854,6 +48093,12 @@
             "state" : "translated",
             "value" : "Taproot (recommandé)"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taproot (권장)"
+          }
         }
       }
     },
@@ -46893,6 +48138,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clé publique du destinataire"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "대상 공개키"
           }
         }
       }
@@ -46934,6 +48185,12 @@
             "state" : "translated",
             "value" : "Fermer l’application"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앱 종료"
+          }
         }
       }
     },
@@ -46974,6 +48231,12 @@
             "state" : "translated",
             "value" : "L'**historique des paiements** et les **contacts** de ce portefeuille seront supprimés de votre compte iCloud."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 지갑의 **결제 내역**과 **연락처**가 iCloud 계정에서 삭제됩니다."
+          }
         }
       }
     },
@@ -47013,6 +48276,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La **sauvegarde de votre clé** sera supprimée de votre compte iCloud."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 지갑의 **시드 백업**이 iCloud 계정에서 삭제됩니다."
           }
         }
       }
@@ -47056,6 +48325,12 @@
             "state" : "translated",
             "value" : "L’adresse est pour %1$@, mais vous êtes sur %2$@"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 주소는 %@용이지만, 현재 %@에 연결되어 있습니다"
+          }
         }
       }
     },
@@ -47097,6 +48372,12 @@
             "state" : "translated",
             "value" : "La clé de sauvegarde, aussi connu sous le nom de graine ou \"seed\", est une liste de 12 mots en anglais. Elle vous permet de récupérer l'accès complet à vos fonds si besoin."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시드라고도 부르는 백업 문구는 12개의 영어 단어 목록입니다. 필요할 때 자금에 대한 접근 권한을 완전히 복구할 수 있습니다."
+          }
         }
       }
     },
@@ -47137,6 +48418,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La transaction de fermeture est visible dans la liste des transactions."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "채널 종료 거래는 거래 목록에 있습니다."
           }
         }
       }
@@ -47180,6 +48467,12 @@
             "state" : "translated",
             "value" : "La transaction de fermeture sera visible dans votre historique de paiement."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "채널 종료 거래들은 거래 목록에 있습니다."
+          }
         }
       }
     },
@@ -47219,6 +48512,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les données stockées dans le cloud sont chiffrées, et ne peuvent être lues sans votre clé secrète."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "클라우드에 저장된 데이터는 암호화되어 있으며, 본인의 시드로만 복호화할 수 있습니다."
           }
         }
       }
@@ -47260,6 +48559,12 @@
             "state" : "translated",
             "value" : "La valeur fiduciaire sera affichée au prix courant, basé sur les taux de change publics entre monnaie fiduciaire/bitcoin."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표시되는 법정화폐 가치는 현재 법정화폐/비트코인 환율을 기준으로 한 현재 가격입니다."
+          }
         }
       }
     },
@@ -47300,6 +48605,12 @@
             "state" : "translated",
             "value" : "La valeur fiduciaire sera affichée au prix de change au moment où le paiement a été fait."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표시되는 법정화폐 가치는 결제 당시에 지불한 가격입니다."
+          }
         }
       }
     },
@@ -47339,6 +48650,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "L\\'échéance de ce paiement est trop lointaine."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 결제의 만료 시점이 너무 멀리 설정되어 있습니다."
           }
         }
       }
@@ -47381,6 +48698,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les frais sont de **%1$@%%** avec un minimum de **%2$@**."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수수료는 **%@%%**이며, 최소 수수료는 **%@**입니다."
           }
         }
       }
@@ -47428,6 +48751,12 @@
             "state" : "translated",
             "value" : "Les frais étaient de **%1$@** mais vos frais maximum étaient de **%2$@**."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수수료는 **%1$@**였지만, 설정된 최대 수수료는 **%2$@**였습니다."
+          }
         }
       }
     },
@@ -47473,6 +48802,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les frais étaient de **%1$@** ce qui est plus que **%2$@** du montant."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수수료는 **%1$@**로, 금액의 **%2$@**를 초과합니다."
           }
         }
       }
@@ -47520,6 +48855,12 @@
             "state" : "translated",
             "value" : "Les frais étaient de %1$@ mais vos frais maximum étaient de %2$@."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수수료는 %1$@였지만, 설정된 최대 수수료는 %2$@였습니다."
+          }
         }
       }
     },
@@ -47566,6 +48907,12 @@
             "state" : "translated",
             "value" : "Les frais étaient de %1$@ ce qui est plus que %2$@ du montant."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수수료는 %1$@로, 금액의 %2$@를 초과합니다."
+          }
         }
       }
     },
@@ -47605,6 +48952,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le wallet final est là où les fonds sont envoyés par défaut lorsque vos canaux Lightning sont fermés."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최종 지갑은 라이트닝 채널이 종료될 때 자금이 기본으로 전송되는 곳입니다."
           }
         }
       }
@@ -47646,6 +48999,12 @@
             "state" : "translated",
             "value" : "Les actions suivantes seront appliquées :"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음 단계가 진행됩니다:"
+          }
         }
       }
     },
@@ -47685,6 +49044,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "L\\'identifiant du paiement n\\'est pas valide. Réessayez."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제 ID가 유효하지 않습니다. 다시 시도하세요."
           }
         }
       }
@@ -47728,6 +49093,12 @@
             "state" : "translated",
             "value" : "Cette requête de paiement ne définit pas de montant. Cela peut être dangereux : un noeud malicieux pourrait intercepter le paiement. Pour assurer la sécurité du paiement, **demandez au destinataire du paiement de spécifier un montant** dans sa requête."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인보이스에 금액이 없습니다. 이는 위험할 수 있습니다. 악의적인 노드가 결제를 가로챌 수 있습니다. 안전하게 하려면 **결제 요청에 금액을 지정해 달라고 수취인에게 요청하세요**."
+          }
         }
       }
     },
@@ -47770,6 +49141,12 @@
             "state" : "translated",
             "value" : "Cette requête est valable pour la chaîne (requestChain), mais vous êtes sur la chaîne (reason.myChain.name)."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 인보이스는 (requestChain)용이지만, 현재 (reason.myChain.name)에 연결되어 있습니다"
+          }
         }
       }
     },
@@ -47811,6 +49188,12 @@
             "state" : "translated",
             "value" : "Cette requête de paiement vous est destinée. Vous allez vous payer vous-même."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "본인이 발행한 인보이스입니다. 자신에게 결제하려 하고 있습니다."
+          }
         }
       }
     },
@@ -47851,6 +49234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cette requête n'est pas pour %@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 인보이스는 %@용이 아닙니다"
           }
         }
       }
@@ -47898,6 +49287,12 @@
             "state" : "translated",
             "value" : "La migration va coûter %1$@ (≈ %2$@)"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이그레이션 비용은 %1$@ (≈ %2$@)입니다"
+          }
         }
       }
     },
@@ -47937,6 +49332,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le montant du paiement n\\'est pas valide."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제 금액이 유효하지 않습니다."
           }
         }
       }
@@ -47978,6 +49379,12 @@
             "state" : "translated",
             "value" : "Le montant du paiement est trop élevé - essayez de le diviser en plusieurs parties."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제 금액이 너무 큽니다. 여러 번으로 나누어 보세요."
+          }
         }
       }
     },
@@ -48017,6 +49424,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le montant du paiement est trop faible."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제 금액이 너무 적습니다."
           }
         }
       }
@@ -48058,6 +49471,12 @@
             "state" : "translated",
             "value" : "Le paiement n\\'a pas pu être transmis au destinataire. Il est probable qu\\'il n\\'ait pas suffisamment de liquidité entrante."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수신자에게 결제를 전달하지 못했습니다(수신 유동성이 부족할 수 있습니다)."
+          }
         }
       }
     },
@@ -48097,6 +49516,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le paiement n\\'a pas pu être envoyé via les canaux disponibles."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기존 채널로는 결제를 보낼 수 없었습니다."
           }
         }
       }
@@ -48138,6 +49563,12 @@
             "state" : "translated",
             "value" : "Le paiement a été rejeté par le destinataire. Il se peut que ce paiement ait déjà été payée."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수신자가 결제를 거부했습니다. 이 인보이스는 이미 결제되었을 수 있습니다."
+          }
         }
       }
     },
@@ -48177,6 +49608,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La facture reçue est déjà en cours."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "받은 인보이스가 이미 처리 중입니다."
           }
         }
       }
@@ -48218,6 +49655,12 @@
             "state" : "translated",
             "value" : "Le destinataire est hors ligne."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수신자가 오프라인입니다."
+          }
         }
       }
     },
@@ -48258,6 +49701,12 @@
             "state" : "translated",
             "value" : "La clé de sauvegarde (parfois appelée “seed”) est une phrase de douze mots. Elle vous permet de récupérer vos fonds en cas de besoin."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복구 문구(시드라고도 부릅니다)는 12개 단어의 목록입니다. 필요할 때 자금에 대한 접근 권한을 완전히 복구할 수 있습니다."
+          }
         }
       }
     },
@@ -48297,6 +49746,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La demande a dépassé le temps imparti. Veuillez vérifier votre connexion internet et réessayer."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "요청 시간이 초과되었습니다. 인터넷 연결을 확인하고 다시 시도해 주세요."
           }
         }
       }
@@ -48339,6 +49794,12 @@
             "state" : "translated",
             "value" : "Le QR code scanné n’est pas une adresse Bitcoin."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스캔한 QR 코드는 비트코인 주소가 아닙니다"
+          }
         }
       }
     },
@@ -48380,6 +49841,12 @@
             "state" : "translated",
             "value" : "Le service (%@) semble être hors ligne ou son serveur est en panne"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스(%@)가 오프라인이거나 서버가 중단된 것으로 보입니다"
+          }
         }
       }
     },
@@ -48420,6 +49887,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le service (%@) ne supporte pas les adresses Lightning, ou ne connaît pas cet utilisateur"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스(%@)가 라이트닝 주소를 지원하지 않거나, 이 사용자를 알지 못합니다"
           }
         }
       }
@@ -48468,6 +49941,12 @@
             "state" : "translated",
             "value" : "Le service (%1$@) a renvoyé un code d'erreur : %2$d"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스(%1$@)가 오류 코드를 반환했습니다: %2$d"
+          }
         }
       }
     },
@@ -48515,6 +49994,12 @@
             "state" : "translated",
             "value" : "Le service (%1$@) a renvoyé un message d'erreur : %2$@"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "서비스(%1$@)가 오류 메시지를 반환했습니다: %2$@"
+          }
         }
       }
     },
@@ -48557,6 +50042,12 @@
             "state" : "translated",
             "value" : "Le simulateur ne peut pas accéder à la caméra. Veuillez utiliser le presse-papiers."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시뮬레이터에서는 카메라를 사용할 수 없습니다. 클립보드를 이용해 주세요."
+          }
         }
       }
     },
@@ -48596,6 +50087,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ce wallet est une passerelle vers Lightning. Les fonds déposés sur ce portefeuille seront automatiquement basculés  (\"swap-in\") sur Lightning en fonction de vos paramètres de gestion."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swap-in 지갑은 라이트닝으로 가는 다리입니다. 이 지갑의 자금은 유동성 정책 설정에 따라 자동으로 라이트닝으로 옮겨집니다."
           }
         }
       }
@@ -48637,6 +50134,12 @@
             "state" : "translated",
             "value" : "Le total des frais est supérieur à votre solde"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "총 수수료가 잔액을 초과합니다"
+          }
         }
       }
     },
@@ -48676,6 +50179,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La transaction pourrait prendre plus de 30 minutes pour confirmer sur la chaîne"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "비트코인 블록체인에서 이 거래가 확인되기까지 30분 이상 걸릴 수 있습니다"
           }
         }
       }
@@ -48717,6 +50226,12 @@
             "state" : "translated",
             "value" : "Le portefeuille a été redémarré pendant le traitement du paiement."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제가 처리되는 중에 지갑이 다시 시작되었습니다."
+          }
         }
       }
     },
@@ -48756,6 +50271,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le portefeuille sera complètement effacé de **cet appareil**."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지갑이 **이 기기**에서 완전히 삭제됩니다."
           }
         }
       }
@@ -48797,6 +50318,12 @@
             "state" : "translated",
             "value" : "Une routine de tour de contrôle est régulièrement exécutée en arrière plan pour vérifier que vos canaux de paiement sont en sécurité."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "워치타워는 며칠에 한 번씩 백그라운드에서 실행되어 자금이 안전한지 감시합니다."
+          }
         }
       }
     },
@@ -48836,6 +50363,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Thème"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "테마"
           }
         }
       }
@@ -48877,6 +50410,12 @@
             "state" : "translated",
             "value" : "Ces fonds proviennent de canaux Lightning fermés. Ils doivent être dépensés manuellement."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 자금은 종료된 라이트닝 채널에서 나온 것입니다. 직접 사용해야 합니다."
+          }
         }
       }
     },
@@ -48916,6 +50455,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ces fonds n\\'ont pas été swappés à temps. Cliquez ici pour dépenser ces fonds."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 자금은 제때 swap되지 않았습니다. 사용하려면 탭하세요."
           }
         }
       }
@@ -48957,6 +50502,12 @@
             "state" : "translated",
             "value" : "Ces fonds seront disponibles à partir de %lld jours."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 자금은 %lld일 후부터 사용할 수 있습니다."
+          }
         }
       }
     },
@@ -48997,6 +50548,12 @@
             "state" : "translated",
             "value" : "Ces fonds seront disponibles à partir d'un jour."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 자금은 1일 후부터 사용할 수 있습니다."
+          }
         }
       }
     },
@@ -49036,6 +50593,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cette adresse est dérivée de votre clé et vous appartient."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 주소는 본인의 시드에서 파생된 것으로, 본인 소유입니다."
           }
         }
       }
@@ -49078,6 +50641,12 @@
             "state" : "translated",
             "value" : "Cette adresse est hébergée sur un DNS non sécurisé. DNSSEC doit être activé."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 주소는 안전하지 않은 DNS에 있습니다. DNSSEC를 활성화해야 합니다."
+          }
         }
       }
     },
@@ -49118,6 +50687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cette adresse utilise une offre Bolt12 invalide."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 주소는 유효하지 않은 Bolt12 오퍼를 사용합니다."
           }
         }
       }
@@ -49160,6 +50735,12 @@
             "state" : "translated",
             "value" : "Il semble que ce lien soit pour un site web (et non une requête de paiement)"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이것은 라이트닝 인보이스가 아니라 웹사이트로 보입니다:"
+          }
         }
       }
     },
@@ -49200,11 +50781,24 @@
             "state" : "translated",
             "value" : "Il s'agit apparemment d'un site web :"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이것은 웹사이트로 보입니다:"
+          }
         }
       }
     },
     "This debugging tool lets you sign swap-in inputs. Only use if you understand what it does." : {
-
+      "localizations" : {
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 디버깅 도구로 swap-in 입력에 서명할 수 있습니다. 기능을 이해한 경우에만 사용하세요."
+          }
+        }
+      }
     },
     "This doesn't appear to be a Lightning invoice" : {
       "comment" : "Error message - scanning lightning invoice",
@@ -49243,6 +50837,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cela ne semble pas être une requête Lightning"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트닝 인보이스가 아닌 것으로 보입니다"
           }
         }
       }
@@ -49285,6 +50885,12 @@
             "state" : "translated",
             "value" : "Cette fonctionnalité n’est pas une solution miracle. Elle n’est disponible qu’en tant que mesure de sécurité, **à n’utiliser qu’en dernier recours.** Par exemple, si votre contrepartie (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d’accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, **si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support.**"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 기능은 \"모든 것을 해결하는 마법 버튼\"이 아닙니다. 안전장치로 마련된 것이며 **극단적인 상황에서만 사용해야 합니다**. 예를 들어 피어(ACINQ)가 영구적으로 사라져 자금을 사용할 수 없게 된 경우입니다. 그 외의 모든 경우에는 **Phoenix에 문제가 있다면 고객 지원에 문의하세요**."
+          }
         }
       }
     },
@@ -49326,6 +50932,12 @@
             "state" : "translated",
             "value" : "Ces frais s’appliquent quand vous recevez un paiement Lightning et qu’un nouveau canal doit être créé."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 수수료는 라이트닝으로 결제를 받을 때 새 채널을 만들어야 하는 경우에 발생합니다."
+          }
         }
       }
     },
@@ -49365,6 +50977,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ces frais vont au service qui fournit la liquidité."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 수수료는 유동성을 제공하는 서비스에 지급됩니다."
           }
         }
       }
@@ -49407,6 +51025,12 @@
             "state" : "translated",
             "value" : "Ces frais sont dynamiques, et peuvent changer selon les conditions du réseau Bitcoin."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 수수료는 변동제이며, 비트코인 네트워크 상황에 따라 달라질 수 있습니다."
+          }
         }
       }
     },
@@ -49448,6 +51072,12 @@
             "state" : "translated",
             "value" : "Ces frais s’appliquent quand un nouveau canal doit être créé. Les paiements qui passent par des canaux existants ne paient pas ces frais. Ces frais sont dynamiques et peuvent changer selon les conditions du réseau Bitcoin."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 수수료는 새 채널을 만들어야 할 때만 발생합니다. 기존 채널을 사용하는 결제에는 이 수수료가 붙지 않습니다. 수수료는 변동제이며 비트코인 네트워크 상황에 따라 달라질 수 있습니다."
+          }
         }
       }
     },
@@ -49487,6 +51117,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ces frais sont en deçà de ce que vos transactions utilisent déjà. Ils doivent être plus élevés pour avoir un quelconque effet."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 수수료율은 현재 거래에 이미 적용된 값보다 낮습니다. 효과가 있으려면 더 높아야 합니다."
           }
         }
       }
@@ -49528,6 +51164,12 @@
             "state" : "translated",
             "value" : "Ce paiement a déjà été réglé."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 인보이스는 이미 결제되었습니다."
+          }
         }
       }
     },
@@ -49568,6 +51210,12 @@
             "state" : "translated",
             "value" : "Cette facture utilise des fonctionnalités non prises en charge. Assurez-vous que vous disposez de la dernière version de Phoenix."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 인보이스는 지원하지 않는 기능을 사용합니다. Phoenix를 최신 버전으로 업데이트했는지 확인하세요."
+          }
         }
       }
     },
@@ -49607,6 +51255,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il s\\'agit d\\'une adresse humainement compréhensible associée à votre code de paiement Bolt12."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bolt12 결제 요청을 사람이 읽기 쉬운 형태로 만든 주소입니다."
           }
         }
       }
@@ -49649,6 +51303,12 @@
             "state" : "translated",
             "value" : "Ceci est une adresse de swap. Elle n’est pas contrôlée par votre portefeuille. Les dépôts on-chain seront convertis en canaux de paiement Lightning."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 주소는 swap 주소입니다. 본인 지갑이 통제하지 않습니다. 이 주소로 보낸 온체인 입금은 라이트닝 채널로 전환됩니다."
+          }
         }
       }
     },
@@ -49688,6 +51348,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il ne s'agit pas d'une demande de retrait. Voulez-vous plutôt **envoyer de l'argent** à quelqu'un ?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "출금 요청이 아닙니다. 누군가에게 **자금을 보내려는** 것인가요?"
           }
         }
       }
@@ -49730,6 +51396,12 @@
             "state" : "translated",
             "value" : "Il s'agit de votre nouvelle adresse. Ne réutilisez pas vos anciennes adresses Bitcoin d'avant la migration !"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "새 주소입니다. 마이그레이션 이전에 쓰던 예전 비트코인 주소는 다시 사용하지 마세요."
+          }
         }
       }
     },
@@ -49769,6 +51441,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cette liquidité était nécessaire pour recevoir un paiement"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "결제를 받으려면 이 유동성이 필요했습니다"
           }
         }
       }
@@ -49811,6 +51489,12 @@
             "state" : "translated",
             "value" : "Cela signifie que vous ne pourrez pas recevoir des paiements quand Phoenix est en arrière-plan. Pour recevoir des paiements, Phoenix devra être allumé et en premier plan."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 경우 Phoenix가 백그라운드에 있을 때는 결제를 받을 수 없습니다. 결제를 받으려면 Phoenix가 열려 있고 화면에 표시되어 있어야 합니다."
+          }
         }
       }
     },
@@ -49851,6 +51535,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cela signifie que vous ne serez pas notifié si vous recevez un paiement lorsque Phoenix est en arrière-plan."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 경우 Phoenix가 백그라운드에 있는 동안 결제를 받아도 알림을 받지 못합니다."
           }
         }
       }
