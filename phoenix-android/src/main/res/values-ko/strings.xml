@@ -44,7 +44,7 @@
     <string name="autocreate_error_already_exists">이미 가져온 시드입니다.</string>
     <string name="autocreate_error_cannot_load_existing">지금은 지갑을 저장할 수 없습니다. 나중에 다시 시도해 주세요.</string>
 
-    <string name="restore_title">내 지갑 복원</string>
+    <string name="restore_title">내 지갑 복구</string>
     <string name="restore_disclaimer_next">다음</string>
     <string name="restore_in_progress">지갑 복원 중…</string>
     <string name="initwallet_electrum_option">사용자 지정 Electrum 서버 사용</string>
@@ -89,7 +89,7 @@
     <string name="startup_recovery_instructions">이 화면에서는 12단어 복구 문구를 입력해 지갑 하나를 수동으로 복구할 수 있습니다.\n\n단어는 올바른 순서로, 공백 하나로 구분해 입력해야 합니다.</string>
     <string name="startup_recovery_input_label">%1$d번째 단어 입력</string>
     <string name="startup_recovery_input_label_error">12단어를 초과할 수 없습니다!</string>
-    <string name="startup_recovery_invalid">유효하지 않은 시드</string>
+    <string name="startup_recovery_invalid">유효하지 않은 시드입니다</string>
 
     <string name="startup_recovery_import_button">시드 가져오기</string>
     <string name="startup_recovery_reset_button">다시 시도</string>
@@ -108,7 +108,7 @@
     <string name="paymentline_desc_pending_offchain">결제 대기 중</string>
     <string name="paymentline_desc_success_onchain">결제 확인됨</string>
     <string name="paymentline_desc_success_offchain">결제 완료</string>
-    <string name="paymentline_desc_failed">결제 실패</string>
+    <string name="paymentline_desc_failed">결제에 실패했습니다</string>
 
     <!-- Receive screen -->
 
@@ -198,7 +198,7 @@
     <string name="send_spliceout_execute_in_progress">splice 실행 중…</string>
     <string name="send_spliceout_complete_recap_fee">채굴 수수료</string>
     <string name="send_spliceout_complete_recap_fee_details">실효 수수료율 %1$s sat/vbyte가 적용됩니다.</string>
-    <string name="send_spliceout_complete_recap_total">총액</string>
+    <string name="send_spliceout_complete_recap_total">합계</string>
 
     <!-- scan -->
 
@@ -352,7 +352,7 @@
     <string name="home_payments_more_button">모든 결제 보기…</string>
     <string name="home_connection_electrum_late">동기화 불일치!</string>
     <string name="home_connection_bad_cert">인증서</string>
-    <string name="home_connection_onion">유효하지 않은 주소</string>
+    <string name="home_connection_onion">잘못된 주소</string>
     <string name="home_connection_connecting">연결 중…</string>
     <string name="home_connection_tor_active">Tor</string>
     <string name="home_request_liquidity">유동성 요청</string>
@@ -466,10 +466,10 @@
     <string name="paymentdetails_type_incoming_legacy_swapin">수신 온체인 결제 (레거시 swap-in)</string>
     <string name="paymentdetails_type_incoming_bolt11">수신 라이트닝 결제 (bolt11)</string>
     <string name="paymentdetails_type_incoming_bolt12">수신 라이트닝 결제 (bolt12)</string>
-    <string name="paymentdetails_type_outgoing_bolt11">송신 라이트닝 결제 (bolt11)</string>
-    <string name="paymentdetails_type_outgoing_bolt12">송신 라이트닝 결제 (bolt12)</string>
-    <string name="paymentdetails_type_outgoing_splice">송신 온체인 결제</string>
-    <string name="paymentdetails_type_outgoing_swapout">송신 온체인 결제 (레거시 swap)</string>
+    <string name="paymentdetails_type_outgoing_bolt11">발신 라이트닝 결제 (bolt11)</string>
+    <string name="paymentdetails_type_outgoing_bolt12">발신 라이트닝 결제 (bolt12)</string>
+    <string name="paymentdetails_type_outgoing_splice">발신 온체인 결제</string>
+    <string name="paymentdetails_type_outgoing_swapout">발신 온체인 결제 (레거시 swap)</string>
     <string name="paymentdetails_type_outgoing_splice_cpfp">온체인 거래 가속화</string>
     <string name="paymentdetails_type_outgoing_liquidity_manual">수신 유동성 요청 (수동)</string>
     <string name="paymentdetails_type_outgoing_liquidity_auto">수신 유동성 요청 (자동)</string>
@@ -484,7 +484,7 @@
     <string name="paymentdetails_liquidity_amount_label">요청한 유동성</string>
 
     <string name="paymentdetails_closing_type_label">종료 유형</string>
-    <string name="paymentdetails_closing_type_mutual">상호 합의</string>
+    <string name="paymentdetails_closing_type_mutual">상호 종료</string>
     <string name="paymentdetails_closing_type_local">로컬</string>
     <string name="paymentdetails_closing_type_remote">원격</string>
     <string name="paymentdetails_closing_type_revoked">폐기됨</string>
@@ -492,7 +492,7 @@
 
     <string name="paymentdetails_pubkey_label">대상 공개키</string>
     <string name="paymentdetails_payment_hash_label">결제 해시</string>
-    <string name="paymentdetails_preimage_label">프리이미지</string>
+    <string name="paymentdetails_preimage_label">Preimage</string>
     <string name="paymentdetails_preimage_help">수신자가 결제를 성공적으로 받았음을 증명하는 암호학적 증거입니다.</string>
     <string name="paymentdetails_bolt11_label">Bolt11 인보이스</string>
     <string name="paymentdetails_bolt12_label">Bolt12 인보이스</string>
@@ -500,7 +500,7 @@
     <string name="paymentdetails_bolt12_description_label">오퍼 설명</string>
     <string name="paymentdetails_offer_label">오퍼</string>
     <string name="paymentdetails_offer_metadata_label">메타데이터</string>
-    <string name="paymentdetails_payerkey_label">지불자 키</string>
+    <string name="paymentdetails_payerkey_label">결제자 키</string>
     <string name="paymentdetails_payerkey_is_mine">내 오퍼 키</string>
     <string name="paymentdetails_liquidity_purchase_type">구매 유형</string>
 
@@ -514,12 +514,12 @@
     <string name="paymentdetails_part_label">부분</string>
     <string name="paymentdetails_part_hops_label">홉</string>
 
-    <string name="paymentdetails_received_with_label">수신 방식</string>
+    <string name="paymentdetails_received_with_label">수신 경로</string>
     <string name="paymentdetails_received_with_legacy_onchain">채널 작업 (신규 또는 splice-in)</string>
     <string name="paymentdetails_received_with_lightning">라이트닝 결제</string>
     <string name="paymentdetails_received_with_fee_credit">수수료 크레딧</string>
     <string name="paymentdetails_channel_id_label">채널 ID</string>
-    <string name="paymentdetails_tx_id_label">트랜잭션</string>
+    <string name="paymentdetails_tx_id_label">거래</string>
 
     <string name="paymentdetails_created_at_label">생성 시각</string>
     <string name="paymentdetails_completed_at_label">완료 시각</string>
@@ -639,7 +639,7 @@
 
     <!-- lnurl-withdraw -->
 
-    <string name="lnurl_withdraw_confirm_button">인출</string>
+    <string name="lnurl_withdraw_confirm_button">받기</string>
     <string name="lnurl_withdraw_wait">자금 요청 중…</string>
     <string name="lnurl_withdraw_amount_below_min">금액은 %1$s 이상이어야 합니다.</string>
     <string name="lnurl_withdraw_amount_above_max">금액은 %1$s을(를) 초과할 수 없습니다.</string>
@@ -757,7 +757,7 @@
     <string name="about_title">Phoenix 정보</string>
     <string name="about_version">Phoenix 버전: <b>%1$s</b></string>
     <string name="about_faq_link">궁금한 점이 있으신가요? FAQ를 확인하세요</string>
-    <string name="about_support_link">지원</string>
+    <string name="about_support_link">고객 지원</string>
     <string name="about_privacy_link">개인정보 처리방침</string>
     <string name="about_terms_link">이용약관</string>
 
@@ -766,7 +766,7 @@
     <string name="paymentsettings_title">결제 옵션</string>
 
     <string name="paymentsettings_category_incoming">수신 결제</string>
-    <string name="paymentsettings_category_outgoing">송신 결제</string>
+    <string name="paymentsettings_category_outgoing">발신 결제</string>
     <string name="paymentsettings_category_lnurl">LNURL</string>
 
     <string name="paymentsettings_defaultdesc_title">인보이스 설명</string>
@@ -819,7 +819,7 @@
     <string name="payments_export_title">결제 내역 내보내기</string>
     <string name="payments_export_csv_header">CSV 내보내기</string>
     <string name="payments_export_csv_instructions">성공한 로컬 결제 내역을 CSV 형식으로 내보냅니다. 회계 용도로 유용합니다.</string>
-    <string name="payments_export_csv_start_label">시작 날짜</string>
+    <string name="payments_export_csv_start_label">시작일</string>
     <string name="payments_export_csv_end_label">종료 날짜</string>
     <string name="payments_export_csv_context_label">출처/목적지 포함</string>
     <string name="payments_export_csv_description_label">설명 포함</string>
@@ -842,7 +842,7 @@
 
     <!-- components -->
 
-    <string name="component_calendar_inclusive">(해당일 포함)</string>
+    <string name="component_calendar_inclusive">(포함)</string>
 
     <!-- settings: wallet info -->
 
@@ -873,7 +873,7 @@
     <string name="walletinfo_legacy_nodeid">레거시 노드 ID</string>
 
     <string name="walletinfo_onchain_final">최종 지갑</string>
-    <string name="walletinfo_onchain_final_spend_button">사용하기</string>
+    <string name="walletinfo_onchain_final_spend_button">사용</string>
 
     <!-- settings: liquidity policy for channels creation -->
 

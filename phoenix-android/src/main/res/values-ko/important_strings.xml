@@ -116,7 +116,7 @@
     <!-- init wallet / automated wallet creation -->
 
     <string name="initwallet_create">새 지갑 만들기</string>
-    <string name="initwallet_restore">내 지갑 복원하기</string>
+    <string name="initwallet_restore">내 지갑 복구</string>
 
     <string name="restore_disclaimer_message_1_title">Phoenix는 라이트닝 전용입니다</string>
     <string name="restore_disclaimer_message_1_body">Phoenix는 이미 Phoenix에서 관리한 자금만 표시합니다. 다른 애플리케이션에서 생성한 시드에 연결된 자금은 여기에 표시되지 않습니다(온체인 자금 포함).</string>
@@ -170,7 +170,7 @@
 
     <!-- receive: Tor warning -->
 
-    <string name="receive_tor_warning_title">Tor가 활성화되어 있습니다</string>
+    <string name="receive_tor_warning_title">Tor 사용 중</string>
     <string name="receive_tor_warning_dialog_content_1">Phoenix가 결제를 수신하는 데 문제가 생길 수 있습니다. 앱을 화면에 띄운 상태로 유지하고 연결이 안정적인지 확인하세요.</string>
 
     <!-- send errors -->
@@ -248,7 +248,7 @@
     <string name="inappnotif_watchtower_nominal_title">워치타워 보고서</string>
     <string name="inappnotif_watchtower_nominal_description_one">%2$s에 채널 %1$d개를 성공적으로 확인했습니다. 문제가 발견되지 않았습니다.</string>
     <string name="inappnotif_watchtower_nominal_description_many">%2$s에 채널 %1$d개를 성공적으로 확인했습니다. 문제가 발견되지 않았습니다.</string>
-    <string name="inappnotif_watchtower_revokedfound_title">워치타워 경고</string>
+    <string name="inappnotif_watchtower_revokedfound_title">워치타워 알림</string>
     <string name="inappnotif_watchtower_revokedfound_description">%1$s에 다음 채널에서 폐기된 커밋먼트가 발견되었습니다: %2$s. 해당 채널은 종료될 수 있습니다.</string>
 
     <!-- settings: display seed -->
@@ -256,7 +256,7 @@
     <string name="displayseed_instructions">복구 문구(시드라고도 합니다)는 12개의 영어 단어 목록입니다. 필요할 때 자금에 대한 완전한 접근 권한을 복구할 수 있게 해줍니다.\n\n<b>이 시드는 오직 본인만 갖고 있습니다. 비밀로 유지하세요.</b>\n\n<b>이 시드를 누구와도 공유하지 마세요</b>.\n피싱에 주의하세요. Phoenix 개발자는 절대 시드를 요구하지 않습니다.\n\n<b>이 시드를 잃어버리지 마세요</b>.\n안전한 곳에 보관하세요(이 휴대폰이 아닌 곳에). 시드와 휴대폰을 모두 잃어버리면 자금을 되찾을 수 없습니다.</string>
     <string name="displayseed_authenticate_button">시드 표시</string>
     <string name="displayseed_dialog_header">이 시드를 안전하게 보관하세요.\n절대 공유하지 마세요.</string>
-    <string name="displayseed_backup_notice_header">복구 문구를 백업하지 않았습니다!</string>
+    <string name="displayseed_backup_notice_header">복구 문구를 아직 백업하지 않았습니다!</string>
     <string name="displayseed_backup_notice_details">백업하지 않은 채 Phoenix에 접근할 수 없게 되면 자금을 잃게 됩니다!</string>
     <string name="displayseed_backup_checkbox">복구 문구를 안전한 곳에 보관했습니다.</string>
     <string name="displayseed_loss_disclaimer_checkbox">휴대폰과 복구 문구를 모두 잃어버리면 지갑의 자금을 잃게 된다는 것을 이해합니다.</string>
@@ -270,7 +270,7 @@
 
     <string name="paymentdetails_liquidity_purchase_label">유동성</string>
     <string name="paymentdetails_liquidity_service_fee_label">서비스 수수료</string>
-    <string name="paymentdetails_liquidity_service_fee_help">유동성 서비스에 대해 지불하는 수수료입니다.</string>
+    <string name="paymentdetails_liquidity_service_fee_help">유동성 서비스에 지불한 수수료입니다.</string>
     <string name="paymentdetails_liquidity_miner_fee_label">채굴 수수료</string>
     <string name="paymentdetails_liquidity_miner_fee_help">온체인 거래를 처리하기 위해 비트코인 네트워크 채굴자에게 지불하는 수수료입니다.</string>
     <string name="paymentdetails_liquidity_caused_by_label">발생 원인</string>
@@ -290,7 +290,7 @@
     <string name="tor_dialog_enable_details_2">Tor는 프라이버시를 강화할 수 있지만, 성능 문제나 결제 누락이 발생할 수 있습니다.</string>
     <string name="tor_dialog_disable_title">Tor 비활성화</string>
     <string name="tor_dialog_disable_details_1">이 옵션을 비활성화하면 IP 주소가 여러 서비스 제공자에게 노출될 수 있습니다.</string>
-    <string name="tor_dialog_disable_details_2">정말 계속하시겠습니까?</string>
+    <string name="tor_dialog_disable_details_2">계속 진행하시겠습니까?</string>
     <string name="tor_dialog_processing">변경 사항 처리 중…</string>
 
     <string name="tor_disconnected_dialog_title">Tor 네트워크에 접속할 수 없음</string>
@@ -320,7 +320,7 @@
     <string name="intro_channels_next_button">다음</string>
 
     <string name="intro_selfcustody_title">당신의 키, 당신의 비트코인</string>
-    <string name="intro_selfcustody_sub1">Phoenix는 셀프 커스터디 지갑입니다. 통제권은 당신에게 있습니다.</string>
+    <string name="intro_selfcustody_sub1">Phoenix는 셀프 커스터디 지갑입니다. 통제권은 본인에게 있습니다.</string>
     <string name="intro_selfcustody_sub2">비밀 키만 있으면 언제든지 지갑을 복원할 수 있습니다. 안전하게 보관하세요!</string>
     <string name="intro_selfcustody_next_button">시작하기</string>
 
@@ -370,7 +370,7 @@
     <string name="liquiditypolicy_advanced_fees_prop_label">비율 검사</string>
     <string name="liquiditypolicy_advanced_fees_prop_help">수신 금액 대비 수수료를 검사합니다. 소액 결제에 대한 안전장치로 유용한 옵션입니다.</string>
     <string name="liquiditypolicy_advanced_overrides_title">정책 예외</string>
-    <string name="liquiditypolicy_advanced_pay_to_open_label">라이트닝의 절대 수수료 검사 건너뛰기</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">라이트닝 절대 수수료 확인 건너뛰기</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">활성화하면 수신 라이트닝 결제가 절대 최대 수수료 한도를 무시합니다. 비율 검사만 적용됩니다.\n\n주의: 비트코인 멤풀 수수료율이 높으면 온체인 작업이 필요한 수신 라이트닝 결제에 큰 비용이 들 수 있습니다.</string>
     <string name="liquiditypolicy_save_button">정책 저장</string>
     <string name="liquiditypolicy_request_button">수신 유동성 요청</string>
@@ -396,8 +396,8 @@
     <string name="liquidityads_faq_link">자세히 알아보기</string>
     <string name="liquidityads_current_liquidity">현재 유동성</string>
 
-    <string name="liquidityads_amount_label">요청할 유동성</string>
-    <string name="liquidityads_estimate_button">유동성 비용 추산</string>
+    <string name="liquidityads_amount_label">유동성 요청</string>
+    <string name="liquidityads_estimate_button">유동성 비용 추정</string>
     <string name="liquidityads_estimating_spinner">비용 추산 중…</string>
     <string name="liquidityads_estimate_details_miner_fees">채굴 수수료</string>
     <string name="liquidityads_estimate_details_miner_fees_help">기반이 되는 온체인 거래에 대한 채굴 수수료 부담분입니다.</string>
@@ -438,12 +438,12 @@
     <string name="outgoing_failuremessage_channel_closing">채널이 종료되는 중입니다.</string>
     <string name="outgoing_failuremessage_channel_splicing">채널이 이미 splice를 처리하고 있습니다. 나중에 다시 시도하세요.</string>
     <string name="outgoing_failuremessage_not_enough_fee">수수료가 부족합니다.</string>
-    <string name="outgoing_failuremessage_not_enough_balance">결제 금액이 잔액을 초과합니다.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">이 결제는 잔액을 초과합니다.</string>
     <string name="outgoing_failuremessage_too_big">결제 금액이 너무 큽니다. 여러 번에 나누어 시도해 보세요.</string>
-    <string name="outgoing_failuremessage_too_small">결제 금액이 너무 작습니다.</string>
+    <string name="outgoing_failuremessage_too_small">결제 금액이 너무 적습니다.</string>
     <string name="outgoing_failuremessage_expiry_too_big">이 결제의 만료 시점이 너무 멀리 설정되어 있습니다.</string>
     <string name="outgoing_failuremessage_rejected_by_recipient">수신자가 결제를 거부했습니다. 이 인보이스는 이미 결제되었을 수 있습니다.</string>
-    <string name="outgoing_failuremessage_recipient_offline">수신자가 오프라인 상태입니다.</string>
+    <string name="outgoing_failuremessage_recipient_offline">수신자가 오프라인입니다.</string>
     <string name="outgoing_failuremessage_not_enough_liquidity">결제를 수신자에게 전달할 수 없었습니다 (수신 유동성이 부족했을 가능성이 큽니다).</string>
     <string name="outgoing_failuremessage_temporary_failure">결제 경로의 한 노드에서 오류가 발생했습니다. 다시 시도하면 성공할 수 있습니다.</string>
     <string name="outgoing_failuremessage_too_many_pending">대기 중인 결제가 너무 많습니다. 결제가 정산된 후 다시 시도하세요.</string>
@@ -461,14 +461,14 @@
 
     <!-- spliceout: low feerate disclaimer -->
 
-    <string name="spliceout_low_feerate_dialog_title">낮은 수수료율!</string>
+    <string name="spliceout_low_feerate_dialog_title">수수료율이 낮습니다!</string>
     <string name="spliceout_low_feerate_dialog_body1">수수료율이 충분하지 않은 거래는 확인되지 않은 채 며칠에서 몇 주까지 지연될 수 있습니다.</string>
     <string name="spliceout_low_feerate_dialog_body2">수수료율 선택은 본인의 책임입니다. 한번 전송된 거래는 취소할 수 없으며, 더 높은 수수료로 가속하는 것만 가능합니다.</string>
-    <string name="spliceout_low_feerate_dialog_body3">정말 진행하시겠습니까?</string>
+    <string name="spliceout_low_feerate_dialog_body3">계속 진행하시겠습니까?</string>
 
     <!-- spliceout: capacity disclaimer -->
 
-    <string name="spliceout_capacity_disclaimer_title">채널 크기에 미치는 영향</string>
+    <string name="spliceout_capacity_disclaimer_title">채널 크기에 영향 있음</string>
     <string name="spliceout_capacity_disclaimer_body1">온체인으로 보내는 자금은 채널의 내 쪽 잔액에서 차감되어, 그만큼 채널 크기가 줄어듭니다. 수신 유동성은 변하지 않습니다.</string>
     <string name="spliceout_capacity_disclaimer_checkbox">이 메시지를 다시 표시하지 않음</string>
 

@@ -9102,7 +9102,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "알 수 없는 출처의 메시지에 주의하세요."
+            "value" : "알 수 없는 출처의 메시지에 주의하세요"
           }
         }
       }
@@ -9798,7 +9798,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "비트코인을 더 강력하게"
+            "value" : "한층 강력해진 비트코인"
           }
         }
       }
@@ -10723,7 +10723,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "원인"
+            "value" : "발생 원인"
           }
         }
       }
@@ -11282,7 +11282,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "채널 작업(신규 또는 splice-in)"
+            "value" : "채널 작업 (신규 또는 splice-in)"
           }
         }
       }
@@ -18238,7 +18238,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "디스플레이 옵션"
+            "value" : "표시 옵션"
           }
         }
       }
@@ -18744,7 +18744,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "내 지갑 비우기"
+            "value" : "지갑 비우기"
           }
         }
       }
@@ -30691,7 +30691,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "요청된 유동성"
+            "value" : "요청한 유동성"
           }
         }
       }
@@ -35538,7 +35538,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "온체인 수수료 발생 예상"
+            "value" : "온체인 수수료 예상"
           }
         }
       }
@@ -37906,7 +37906,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "결제 받음"
+            "value" : "결제 수신됨"
           }
         }
       }
@@ -47574,7 +47574,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "swap 주소"
+            "value" : "Swap 주소"
           }
         }
       }
@@ -47714,7 +47714,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "swap-in 주소"
+            "value" : "Swap-in 주소"
           }
         }
       }
@@ -47772,7 +47772,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "swap-in 지갑"
+            "value" : "Swap-in 지갑"
           }
         }
       }
