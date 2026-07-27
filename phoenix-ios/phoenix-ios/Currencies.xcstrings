@@ -9,6 +9,12 @@
             "state" : "translated",
             "value" : "Dírham de los Emiratos Árabes Unidos"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아랍에미리트 디르함"
+          }
         }
       }
     },
@@ -19,6 +25,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afgani de Afganistán"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아프가니스탄 아프가니"
           }
         }
       }
@@ -31,6 +43,12 @@
             "state" : "translated",
             "value" : "Lek albanés"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "알바니아 레크"
+          }
         }
       }
     },
@@ -41,6 +59,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dram armenio"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아르메니아 드람"
           }
         }
       }
@@ -53,6 +77,12 @@
             "state" : "translated",
             "value" : "Kwanza angoleño"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앙골라 콴자"
+          }
         }
       }
     },
@@ -63,6 +93,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Peso argentino"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아르헨티나 페소"
           }
         }
       }
@@ -75,6 +111,12 @@
             "state" : "translated",
             "value" : "Dolar Australiano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "호주 달러"
+          }
         }
       }
     },
@@ -85,6 +127,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Florín de Aruba"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아루바 플로린"
           }
         }
       }
@@ -97,6 +145,12 @@
             "state" : "translated",
             "value" : "Manat azerbaiyano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아제르바이잔 마나트"
+          }
         }
       }
     },
@@ -107,6 +161,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Marco bosnioherzegovino de Bosnia-Herzegovina"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보스니아 헤르체고비나 태환 마르크"
           }
         }
       }
@@ -119,6 +179,12 @@
             "state" : "translated",
             "value" : "Dólar de Barbados"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "바베이도스 달러"
+          }
         }
       }
     },
@@ -129,6 +195,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Taka bangladesí"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "방글라데시 타카"
           }
         }
       }
@@ -141,6 +213,12 @@
             "state" : "translated",
             "value" : "Lev búlgaro"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "불가리아 레프"
+          }
         }
       }
     },
@@ -152,6 +230,12 @@
             "state" : "translated",
             "value" : "Dinar bahreiní"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "바레인 디나르"
+          }
         }
       }
     },
@@ -162,6 +246,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Franco burundés"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "부룬디 프랑"
           }
         }
       }
@@ -179,6 +269,12 @@
             "state" : "translated",
             "value" : "marché libre"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "암시장"
+          }
         }
       }
     },
@@ -195,6 +291,12 @@
             "state" : "translated",
             "value" : "marché libre"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "블루 마켓"
+          }
         }
       }
     },
@@ -205,6 +307,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de las Bermudas"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버뮤다 달러"
           }
         }
       }
@@ -217,6 +325,12 @@
             "state" : "translated",
             "value" : "Dólar de Brunei"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "브루나이 달러"
+          }
         }
       }
     },
@@ -227,6 +341,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Boliviano de Bolivia"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "볼리비아 볼리비아노"
           }
         }
       }
@@ -239,6 +359,12 @@
             "state" : "translated",
             "value" : "Real brasileño"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "브라질 헤알"
+          }
         }
       }
     },
@@ -249,6 +375,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de las Bahamas"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "바하마 달러"
           }
         }
       }
@@ -261,6 +393,12 @@
             "state" : "translated",
             "value" : "Ngultrum butanés"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "부탄 눌트룸"
+          }
         }
       }
     },
@@ -271,6 +409,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pula de Botsuana"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보츠와나 풀라"
           }
         }
       }
@@ -283,6 +427,12 @@
             "state" : "translated",
             "value" : "Dólar beliceño"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "벨리즈 달러"
+          }
         }
       }
     },
@@ -293,6 +443,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar canadiense"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캐나다 달러"
           }
         }
       }
@@ -305,6 +461,12 @@
             "state" : "translated",
             "value" : "Franco congoleño"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "콩고 프랑"
+          }
         }
       }
     },
@@ -315,6 +477,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Franco suizo"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스위스 프랑"
           }
         }
       }
@@ -327,6 +495,12 @@
             "state" : "translated",
             "value" : "Peso Chileno"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "칠레 페소"
+          }
         }
       }
     },
@@ -337,6 +511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yuan Chino"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "중국 위안 (역외)"
           }
         }
       }
@@ -349,6 +529,12 @@
             "state" : "translated",
             "value" : "Yuan Chino"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "중국 위안 (역내)"
+          }
         }
       }
     },
@@ -359,6 +545,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Peso colombiano"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "콜롬비아 페소"
           }
         }
       }
@@ -371,6 +563,12 @@
             "state" : "translated",
             "value" : "Colón costarricense"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코스타리카 콜론"
+          }
         }
       }
     },
@@ -381,6 +579,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Peso cubano"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "쿠바 페소"
           }
         }
       }
@@ -393,6 +597,12 @@
             "state" : "translated",
             "value" : "Escudo caboverdiano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카보베르데 에스쿠도"
+          }
         }
       }
     },
@@ -403,6 +613,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Corona checa"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "체코 코루나"
           }
         }
       }
@@ -415,6 +631,12 @@
             "state" : "translated",
             "value" : "Franco de Yibuti"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지부티 프랑"
+          }
         }
       }
     },
@@ -425,6 +647,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Corona Danesa"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "덴마크 크로네"
           }
         }
       }
@@ -437,6 +665,12 @@
             "state" : "translated",
             "value" : "Peso dominicano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "도미니카 페소"
+          }
         }
       }
     },
@@ -447,6 +681,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dinar argelino"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "알제리 디나르"
           }
         }
       }
@@ -459,6 +699,12 @@
             "state" : "translated",
             "value" : "Libra egipcia"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이집트 파운드"
+          }
         }
       }
     },
@@ -469,6 +715,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nafka de Eritrea"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "에리트레아 나크파"
           }
         }
       }
@@ -481,6 +733,12 @@
             "state" : "translated",
             "value" : "Birr etíope"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "에티오피아 비르"
+          }
         }
       }
     },
@@ -491,6 +749,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Euro"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "유로"
           }
         }
       }
@@ -503,6 +767,12 @@
             "state" : "translated",
             "value" : "Dólar fiyiano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "피지 달러"
+          }
         }
       }
     },
@@ -513,6 +783,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Libra de las Islas Malvinas"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "포클랜드 제도 파운드"
           }
         }
       }
@@ -530,6 +806,12 @@
             "state" : "translated",
             "value" : "marché libre"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자유 시장"
+          }
         }
       }
     },
@@ -540,6 +822,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Libra esterlina"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영국 파운드"
           }
         }
       }
@@ -552,6 +840,12 @@
             "state" : "translated",
             "value" : "Lari georgiano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "조지아 라리"
+          }
         }
       }
     },
@@ -562,6 +856,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cedi de Ghana"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가나 세디"
           }
         }
       }
@@ -574,6 +874,12 @@
             "state" : "translated",
             "value" : "Libra gibraltareña"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지브롤터 파운드"
+          }
         }
       }
     },
@@ -584,6 +890,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dalasi de Gambia"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "감비아 달라시"
           }
         }
       }
@@ -596,6 +908,12 @@
             "state" : "translated",
             "value" : "Franco guineano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기니 프랑"
+          }
         }
       }
     },
@@ -606,6 +924,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quetzal guatemalteco"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "과테말라 케찰"
           }
         }
       }
@@ -618,6 +942,12 @@
             "state" : "translated",
             "value" : "Dólar de Guyana"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가이아나 달러"
+          }
         }
       }
     },
@@ -628,6 +958,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de Hong Kong"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "홍콩 달러"
           }
         }
       }
@@ -640,6 +976,12 @@
             "state" : "translated",
             "value" : "Lempira hondureña"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "온두라스 렘피라"
+          }
         }
       }
     },
@@ -650,6 +992,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kuna croata"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "크로아티아 쿠나"
           }
         }
       }
@@ -662,6 +1010,12 @@
             "state" : "translated",
             "value" : "Gourde haitiano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아이티 구르드"
+          }
         }
       }
     },
@@ -672,6 +1026,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Florín húngaro"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "헝가리 포린트"
           }
         }
       }
@@ -684,6 +1044,12 @@
             "state" : "translated",
             "value" : "Rupia de Indonesia"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인도네시아 루피아"
+          }
         }
       }
     },
@@ -694,6 +1060,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nuevo sheqel israelí"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이스라엘 신 셰켈"
           }
         }
       }
@@ -706,6 +1078,12 @@
             "state" : "translated",
             "value" : "Rupia india"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인도 루피"
+          }
         }
       }
     },
@@ -716,6 +1094,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dinar iraquí"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이라크 디나르"
           }
         }
       }
@@ -728,6 +1112,12 @@
             "state" : "translated",
             "value" : "Rial iraní"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이란 리알"
+          }
         }
       }
     },
@@ -738,6 +1128,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Corona islandesa"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아이슬란드 크로나"
           }
         }
       }
@@ -750,6 +1146,12 @@
             "state" : "translated",
             "value" : "Libra de Jersey"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저지 파운드"
+          }
         }
       }
     },
@@ -760,6 +1162,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar jamaiquino"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자메이카 달러"
           }
         }
       }
@@ -772,6 +1180,12 @@
             "state" : "translated",
             "value" : "Dinar jordano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "요르단 디나르"
+          }
         }
       }
     },
@@ -782,6 +1196,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yen japonés"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일본 엔"
           }
         }
       }
@@ -794,6 +1214,12 @@
             "state" : "translated",
             "value" : "Chelín keniano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "케냐 실링"
+          }
         }
       }
     },
@@ -804,6 +1230,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Som kirguís"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "키르기스스탄 솜"
           }
         }
       }
@@ -816,6 +1248,12 @@
             "state" : "translated",
             "value" : "Riel camboyano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캄보디아 리엘"
+          }
         }
       }
     },
@@ -826,6 +1264,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Franco comorano"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코모로 프랑"
           }
         }
       }
@@ -838,6 +1282,12 @@
             "state" : "translated",
             "value" : "Won norcoreano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "북한 원"
+          }
         }
       }
     },
@@ -848,6 +1298,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Won surcoreano"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "대한민국 원"
           }
         }
       }
@@ -860,6 +1316,12 @@
             "state" : "translated",
             "value" : "Dinar kuwaití"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "쿠웨이트 디나르"
+          }
         }
       }
     },
@@ -870,6 +1332,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de las Islas Caimán"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "케이맨 제도 달러"
           }
         }
       }
@@ -882,6 +1350,12 @@
             "state" : "translated",
             "value" : "Tenge de Kazajstaán"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카자흐스탄 텡게"
+          }
         }
       }
     },
@@ -892,6 +1366,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kip de Laos"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라오스 킵"
           }
         }
       }
@@ -904,6 +1384,12 @@
             "state" : "translated",
             "value" : "Libra libanesa"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "레바논 파운드"
+          }
         }
       }
     },
@@ -914,6 +1400,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rupia de Sri Lanka"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스리랑카 루피"
           }
         }
       }
@@ -926,6 +1418,12 @@
             "state" : "translated",
             "value" : "Dólar liberiano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이베리아 달러"
+          }
         }
       }
     },
@@ -936,6 +1434,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loti de Lesoto"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "레소토 로티"
           }
         }
       }
@@ -948,6 +1452,12 @@
             "state" : "translated",
             "value" : "Dinar libio"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "리비아 디나르"
+          }
         }
       }
     },
@@ -958,6 +1468,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dirham marroqu"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모로코 디르함"
           }
         }
       }
@@ -970,6 +1486,12 @@
             "state" : "translated",
             "value" : "Leu moldavo"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "몰도바 레우"
+          }
         }
       }
     },
@@ -980,6 +1502,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ariary malgache"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마다가스카르 아리아리"
           }
         }
       }
@@ -992,6 +1520,12 @@
             "state" : "translated",
             "value" : "Denar macedonio"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "북마케도니아 데나르"
+          }
         }
       }
     },
@@ -1002,6 +1536,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kyat de Myanmar"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미얀마 짯"
           }
         }
       }
@@ -1014,6 +1554,12 @@
             "state" : "translated",
             "value" : "Tugrik mongol"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "몽골 투그릭"
+          }
         }
       }
     },
@@ -1024,6 +1570,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pataca de Macao"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마카오 파타카"
           }
         }
       }
@@ -1037,6 +1589,12 @@
             "state" : "translated",
             "value" : "Lira maltesa"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "몰타 리라"
+          }
         }
       }
     },
@@ -1047,6 +1605,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rupia de Republica de Mauricio"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모리셔스 루피"
           }
         }
       }
@@ -1059,6 +1623,12 @@
             "state" : "translated",
             "value" : "Rufiyaa de Maldivas"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "몰디브 루피야"
+          }
         }
       }
     },
@@ -1069,6 +1639,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kwacha malauí"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "말라위 콰차"
           }
         }
       }
@@ -1081,6 +1657,12 @@
             "state" : "translated",
             "value" : "Peso mexicano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "멕시코 페소"
+          }
         }
       }
     },
@@ -1091,6 +1673,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ringgit malayo"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "말레이시아 링깃"
           }
         }
       }
@@ -1103,6 +1691,12 @@
             "state" : "translated",
             "value" : "Metical mozambiqueño"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모잠비크 메티칼"
+          }
         }
       }
     },
@@ -1113,6 +1707,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de Namibia"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "나미비아 달러"
           }
         }
       }
@@ -1125,6 +1725,12 @@
             "state" : "translated",
             "value" : "Naira nigeriano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "나이지리아 나이라"
+          }
         }
       }
     },
@@ -1135,6 +1741,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Córdoba nicaragüense"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "니카라과 코르도바"
           }
         }
       }
@@ -1147,6 +1759,12 @@
             "state" : "translated",
             "value" : "Corona noruega"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "노르웨이 크로네"
+          }
         }
       }
     },
@@ -1158,6 +1776,12 @@
             "state" : "translated",
             "value" : "Rupia nepalí"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "네팔 루피"
+          }
         }
       }
     },
@@ -1168,6 +1792,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de Nueva Zelanda"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뉴질랜드 달러"
           }
         }
       }
@@ -1185,6 +1815,12 @@
             "state" : "translated",
             "value" : "taux officiel"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "공식 환율"
+          }
         }
       }
     },
@@ -1195,6 +1831,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rial omaní"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오만 리알"
           }
         }
       }
@@ -1207,6 +1849,12 @@
             "state" : "translated",
             "value" : "Balboa panameño"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파나마 발보아"
+          }
         }
       }
     },
@@ -1217,6 +1865,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sol peruano"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "페루 솔"
           }
         }
       }
@@ -1229,6 +1883,12 @@
             "state" : "translated",
             "value" : "Kina de Papúa Nueva Guinea"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파푸아뉴기니 키나"
+          }
         }
       }
     },
@@ -1239,6 +1899,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Peso filipino"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "필리핀 페소"
           }
         }
       }
@@ -1251,6 +1917,12 @@
             "state" : "translated",
             "value" : "Rupia pakistaní"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파키스탄 루피"
+          }
         }
       }
     },
@@ -1261,6 +1933,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zloty polaco"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "폴란드 즈워티"
           }
         }
       }
@@ -1273,6 +1951,12 @@
             "state" : "translated",
             "value" : "Guaraní paraguayo"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파라과이 과라니"
+          }
         }
       }
     },
@@ -1283,6 +1967,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rial de Qatar"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카타르 리얄"
           }
         }
       }
@@ -1295,6 +1985,12 @@
             "state" : "translated",
             "value" : "Leu romano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "루마니아 레우"
+          }
         }
       }
     },
@@ -1305,6 +2001,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dinar serbio"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세르비아 디나르"
           }
         }
       }
@@ -1317,6 +2019,12 @@
             "state" : "translated",
             "value" : "Rublo ruso"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "러시아 루블"
+          }
         }
       }
     },
@@ -1327,6 +2035,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Franco ruandés"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "르완다 프랑"
           }
         }
       }
@@ -1339,6 +2053,12 @@
             "state" : "translated",
             "value" : "Riyal saudí"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사우디 리얄"
+          }
         }
       }
     },
@@ -1349,6 +2069,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de las Islas Salomón"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "솔로몬 제도 달러"
           }
         }
       }
@@ -1361,6 +2087,12 @@
             "state" : "translated",
             "value" : "Seychellois Rupee"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세이셸 루피"
+          }
         }
       }
     },
@@ -1371,6 +2103,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Libra sudanesa"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수단 파운드"
           }
         }
       }
@@ -1383,6 +2121,12 @@
             "state" : "translated",
             "value" : "Corona sueca"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "스웨덴 크로나"
+          }
         }
       }
     },
@@ -1393,6 +2137,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de Singapur"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "싱가포르 달러"
           }
         }
       }
@@ -1405,6 +2155,12 @@
             "state" : "translated",
             "value" : "Libra de Santa Elena"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "세인트헬레나 파운드"
+          }
         }
       }
     },
@@ -1415,6 +2171,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Leone de Sierra Leona"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시에라리온 레온"
           }
         }
       }
@@ -1427,6 +2189,12 @@
             "state" : "translated",
             "value" : "Chelín somalí"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "소말리아 실링"
+          }
         }
       }
     },
@@ -1437,6 +2205,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar surinamés"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수리남 달러"
           }
         }
       }
@@ -1449,6 +2223,12 @@
             "state" : "translated",
             "value" : "Libra siria"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시리아 파운드"
+          }
         }
       }
     },
@@ -1459,6 +2239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lilangeni de Suazilandia"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "에스와티니 릴랑게니"
           }
         }
       }
@@ -1471,6 +2257,12 @@
             "state" : "translated",
             "value" : "Baht tailandés"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "태국 바트"
+          }
         }
       }
     },
@@ -1481,6 +2273,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Somoni de Tayikistán"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "타지키스탄 소모니"
           }
         }
       }
@@ -1493,6 +2291,12 @@
             "state" : "translated",
             "value" : "Manat de Turkmenistán"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "투르크메니스탄 마나트"
+          }
         }
       }
     },
@@ -1503,6 +2307,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dinar tunecino"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "튀니지 디나르"
           }
         }
       }
@@ -1515,6 +2325,12 @@
             "state" : "translated",
             "value" : "Paʻanga de Tonga"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "통가 파앙가"
+          }
         }
       }
     },
@@ -1525,6 +2341,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lira turca"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "튀르키예 리라"
           }
         }
       }
@@ -1537,6 +2359,12 @@
             "state" : "translated",
             "value" : "Dólar de Trinidad y Tobago"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "트리니다드 토바고 달러"
+          }
         }
       }
     },
@@ -1547,6 +2375,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar taiwanés"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "대만 달러"
           }
         }
       }
@@ -1559,6 +2393,12 @@
             "state" : "translated",
             "value" : "Chelín de Tanzania"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "탄자니아 실링"
+          }
         }
       }
     },
@@ -1569,6 +2409,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hryvnia ucraniano"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "우크라이나 흐리우냐"
           }
         }
       }
@@ -1581,6 +2427,12 @@
             "state" : "translated",
             "value" : "Chelín ugandés"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "우간다 실링"
+          }
         }
       }
     },
@@ -1591,6 +2443,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar de los Estados Unidos"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미국 달러"
           }
         }
       }
@@ -1603,6 +2461,12 @@
             "state" : "translated",
             "value" : "Peso uruguayo"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "우루과이 페소"
+          }
         }
       }
     },
@@ -1613,6 +2477,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Som uzbeko"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "우즈베키스탄 솜"
           }
         }
       }
@@ -1625,6 +2495,12 @@
             "state" : "translated",
             "value" : "Dong vietnamita"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "베트남 동"
+          }
         }
       }
     },
@@ -1635,6 +2511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vatu de Vanuatu"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "바누아투 바투"
           }
         }
       }
@@ -1647,6 +2529,12 @@
             "state" : "translated",
             "value" : "Tala de Samoa"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사모아 탈라"
+          }
         }
       }
     },
@@ -1658,6 +2546,12 @@
             "state" : "translated",
             "value" : "Franco CFA de África Central"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CFA 프랑 BEAC"
+          }
         }
       }
     },
@@ -1668,6 +2562,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dólar del Caribe Oriental"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동카리브 달러"
           }
         }
       }
@@ -1686,6 +2586,12 @@
             "state" : "translated",
             "value" : "Florin caraïbe"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카리브 길더"
+          }
         }
       }
     },
@@ -1696,6 +2602,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Franco CFA de África Occidental"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CFA 프랑 BCEAO"
           }
         }
       }
@@ -1708,6 +2620,12 @@
             "state" : "translated",
             "value" : "Franco CFP"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CFP 프랑"
+          }
         }
       }
     },
@@ -1718,6 +2636,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rial yemení"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "예멘 리알"
           }
         }
       }
@@ -1730,6 +2654,12 @@
             "state" : "translated",
             "value" : "Rand sudafricano"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "남아프리카공화국 랜드"
+          }
         }
       }
     },
@@ -1740,6 +2670,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kwacha zambiano"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠비아 콰차"
           }
         }
       }
