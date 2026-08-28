@@ -1,0 +1,1044 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="app_name">Phoenix 测试网</string>
+
+    <!-- system notification channels -->
+
+    <string name="notification_channels_watcher_title">通道监视器</string>
+    <string name="notification_channels_watcher_desc">需要启动 Phoenix 时弹出提示。</string>
+
+    <string name="notification_pending_settlement_title">支付结算中</string>
+    <string name="notification_pending_settlement_desc">Phoenix 需要启动以处理待结算支付时提醒你。</string>
+
+    <string name="notification_missed_payment_title">支付已拒绝</string>
+    <string name="notification_missed_payment_desc">因流动性不足，Phoenix 无法接收支付时弹出。</string>
+
+    <string name="notification_received_payment_title">收到支付</string>
+    <string name="notification_received_payment_desc">应用在后台运行时收到支付弹出此通知。</string>
+
+    <string name="notification_headless_title">后台运行中</string>
+    <string name="notification_headless_desc">Phoenix 在后台运行时提示。</string>
+
+    <string name="notification_swap_timeout_title">交换超时</string>
+    <string name="notification_swap_timeout_desc">交换即将超时时提醒你。</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="autocreate_generating">正在创建钱包…</string>
+    <string name="autocreate_error">钱包创建失败</string>
+    <string name="autocreate_error_already_exists">该助记词已被导入</string>
+    <string name="autocreate_error_cannot_load_existing">暂时无法写入钱包，请稍后重试。</string>
+
+    <string name="restore_title">恢复我的钱包</string>
+    <string name="restore_disclaimer_next">下一步</string>
+    <string name="restore_in_progress">正在恢复钱包…</string>
+    <string name="initwallet_electrum_option">使用自定义 Electrum 服务器</string>
+
+    <!-- utils: placeholders -->
+
+    <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
+    <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
+    <string name="lipsum_long" translatable="false">
+    Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
+    \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
+    \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
+    \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
+    </string>
+
+    <!-- Lock prompt -->
+
+    <string name="lockprompt_title">解锁以继续</string>
+    <string name="lockprompt_pin_button">PIN 码</string>
+    <string name="lockprompt_biometrics_button">系统锁屏验证</string>
+
+    <!-- Startup -->
+
+    <string name="startup_init">正在初始化…</string>
+    <string name="startup_preparing">正在准备钱包…</string>
+    <string name="startup_loading_seed">正在解密…</string>
+    <string name="startup_starting">正在启动钱包…</string>
+    <string name="startup_started">正在打开钱包…</string>
+    <string name="startup_selector_title">选择钱包</string>
+
+    <string name="startup_error_start_business">无法启动钱包</string>
+    <string name="startup_error_generic">读取钱包数据失败。</string>
+    <string name="startup_error_try_again">重试</string>
+    <string name="startup_error_serialisation">文件序列化异常</string>
+    <string name="startup_error_decryption_general">解密失败：\n%1$s</string>
+    <string name="startup_error_decryption_keystore" translatable="false">Android keystore failure:\n%1$s</string>
+    <string name="startup_error_recovery_button">手动恢复</string>
+
+    <!-- Startup wallet recovery -->
+
+    <string name="startup_recovery_title">钱包恢复</string>
+    <string name="startup_recovery_instructions">此页面可通过输入12词恢复短语手动恢复单个钱包。\n\n单词顺序必须正确，使用单个空格隔开。</string>
+    <string name="startup_recovery_input_label">输入第 %1$d 个单词</string>
+    <string name="startup_recovery_input_label_error">不能超过12个单词！</string>
+    <string name="startup_recovery_invalid">该助记词无效</string>
+
+    <string name="startup_recovery_import_button">导入助记词</string>
+    <string name="startup_recovery_reset_button">重新输入</string>
+    <string name="startup_recovery_checking">校验助记词…</string>
+
+    <string name="startup_recovery_error_default">发生错误。</string>
+    <string name="startup_recovery_error_incorrect_seed">该助记词与现有钱包数据不匹配。</string>
+    <string name="startup_recovery_error_keystore_error" translatable="false">Failed to perform keystore operations.</string>
+    <string name="startup_recovery_success_match">正在恢复钱包…</string>
+
+    <!-- Payment line -->
+
+    <string name="paymentline_prefix_sent">-</string>
+    <string name="paymentline_prefix_received">+</string>
+    <string name="paymentline_desc_pending_onchain">等待确认</string>
+    <string name="paymentline_desc_pending_offchain">支付处理中</string>
+    <string name="paymentline_desc_success_onchain">支付已确认</string>
+    <string name="paymentline_desc_success_offchain">支付已完成</string>
+    <string name="paymentline_desc_failed">支付失败</string>
+
+    <!-- Receive screen -->
+
+    <string name="receive_help_qr">收款二维码（发票/地址）</string>
+
+    <string name="receive_bitcoin_address_label">地址</string>
+    <string name="receive_bitcoin_generating">正在同步地址…</string>
+    <string name="receive_bitcoin_share_title">比特币地址</string>
+    <string name="receive_bitcoin_share_subject">将此比特币地址分享给…</string>
+
+    <string name="receive_lightning_generating">正在生成…</string>
+    <string name="receive_lightning_switch_bolt11">一次性</string>
+    <string name="receive_lightning_switch_bolt11_desc">Bolt11</string>
+    <string name="receive_lightning_switch_bolt12">可复用</string>
+    <string name="receive_lightning_switch_bolt12_desc">Bolt12</string>
+    <string name="receive_lightning_amount_label">金额</string>
+    <string name="receive_lightning_desc_label">描述</string>
+    <string name="receive_lightning_error">生成发票失败</string>
+    <string name="receive_lightning_share_subject">闪电网络支付</string>
+    <string name="receive_lightning_share_title">将此闪电网络收款码分享给…</string>
+
+    <string name="receive_label_bitcoin">比特币地址</string>
+    <string name="receive_label_bitcoin_help">该二维码为传统比特币地址。\n\n几乎所有比特币服务和钱包都可识别，但支付到账速度较慢。</string>
+    <string name="receive_label_bip353">闪电地址</string>
+    <string name="receive_label_lightning">闪电网络</string>
+    <string name="receive_label_lightning_help">该二维码是闪电网络发票。\n\n闪电支付速度快、手续费通常更低，但部分钱包与服务暂不支持。\n\n遇到不支持的情况，向左滑动获取普通比特币地址。</string>
+    <string name="receive_label_bolt11">闪电网络 Bolt11</string>
+    <string name="receive_label_bolt12">闪电网络 Bolt12</string>
+    <string name="receive_label_bip21">比特币 URI</string>
+
+    <string name="receive_bip353_title">这是什么？</string>
+    <string name="receive_bip353_info">该闪电地址采用现代 Bip353 标准，兼容 Bolt12 支付请求。\n\n相比基于 LNURL 的闪电地址隐私性更好，也支持自建部署。\n\n但该技术尚处于前沿阶段；部分钱包或服务尚不识别，无法向你付款。</string>
+    <string name="receive_bip353_link">了解更多。</string>
+
+    <string name="receive_lightning_edit_title_bolt11">自定义 Bolt11 发票</string>
+    <string name="receive_lightning_edit_title_bolt12">自定义 Bolt12 发票</string>
+    <string name="receive_lightning_edit_amount_label">金额（选填）</string>
+    <string name="receive_lightning_edit_amount_placeholder">收款金额</string>
+    <string name="receive_lightning_edit_desc_label">描述（选填）</string>
+    <string name="receive_lightning_edit_desc_placeholder">输入该发票的描述信息</string>
+    <string name="receive_lightning_edit_generate_button">生成</string>
+
+    <!-- send -->
+
+    <string name="send_balance_prefix">余额</string>
+    <string name="send_balance_use_all">使用全部余额</string>
+    <string name="send_error_amount_too_large">金额过大。</string>
+    <string name="send_error_amount_negative">金额不能为负数。</string>
+    <string name="send_error_amount_invalid">该金额格式无效。</string>
+    <string name="send_error_amount_over_balance">金额超出你的余额。</string>
+    <string name="send_error_amount_overpaying">支付不能超过 %1$s。</string>
+    <string name="send_error_amount_below_requested">金额低于请求金额 %1$s。</string>
+    <string name="send_destination_label">收款地址</string>
+    <string name="send_description_label">描述</string>
+    <string name="send_trampoline_fee_label">手续费</string>
+    <string name="send_trampoline_fee_no_amount">无</string>
+    <string name="send_trampoline_fee_loading">正在加载手续费…</string>
+    <string name="send_connecting_button">等待通道就绪…</string>
+    <string name="send_pay_button">支付</string>
+    <string name="send_confirm_pay_button">确认并支付</string>
+    <string name="send_pay_retry_button">重试</string>
+
+    <string name="send_offer_payer_note_label">消息</string>
+    <string name="send_offer_payer_note_placeholder">点击添加消息…</string>
+    <string name="send_offer_payer_note_dialog_title">附加自定义消息</string>
+    <string name="send_offer_payer_note_dialog_subtitle">接收方将看到此消息</string>
+    <string name="send_offer_payer_note_dialog_placeholder">输入消息…</string>
+    <string name="send_offer_fetching">正在获取支付信息…</string>
+    <string name="send_offer_failure_title">支付失败</string>
+    <string name="send_offer_failure_timeout">无法在合理时间内获取支付详情。\n\n接收方可能离线或无法连接。</string>
+
+    <string name="send_paymentmode_onchain">链上支付</string>
+    <string name="send_paymentmode_onchain_desc">链上交易通常速度较慢，适合大额支付。</string>
+    <string name="send_paymentmode_lightning">闪电网络支付</string>
+    <string name="send_paymentmode_lightning_desc">闪电支付速度快，适合小额支付。</string>
+
+    <string name="send_spliceout_address_label">地址</string>
+    <string name="send_spliceout_feerate_label">费率</string>
+    <string name="send_spliceout_feerate_waiting_for_value">正在获取当前费率…</string>
+
+    <string name="send_spliceout_error_invalid_feerate">请输入有效的费率。</string>
+    <string name="send_spliceout_error_cannot_afford_fees">总额超出你的余额</string>
+    <string name="send_spliceout_error_failure">支付失败</string>
+
+    <string name="send_spliceout_prepare_button">准备交易</string>
+    <string name="send_spliceout_prepare_in_progress">正在准备交易…</string>
+    <string name="send_spliceout_execute_in_progress">正在执行 splice…</string>
+    <string name="send_spliceout_complete_recap_fee">矿工手续费</string>
+    <string name="send_spliceout_complete_recap_fee_details">实际费率为 %1$s sat/vbyte。</string>
+    <string name="send_spliceout_complete_recap_total">总计</string>
+
+    <!-- scan -->
+
+    <string name="scan_request_camera_access">点击授予相机权限</string>
+    <string name="scan_request_camera_access_denied">相机权限已被拒绝</string>
+    <string name="scan_help">缩放或点击二维码进行对焦</string>
+
+    <!-- prepare send payment -->
+
+    <string name="preparesend_title">发送</string>
+    <string name="preparesend_contacts_none">暂无联系人…</string>
+    <string name="preparesend_contacts_no_matches">未找到匹配结果…</string>
+    <string name="preparesend_manual_input_hint" translatable="false">satoshi@domain, bc1q..., lnbc...</string>
+
+    <string name="preparesend_paste_button">粘贴</string>
+    <string name="preparesend_scan_button">扫描二维码</string>
+    <string name="preparesend_imagepicker_button">选择图片</string>
+    <string name="preparesend_imagepicker_error">无法处理该图片。</string>
+    <string name="preparesend_imagepicker_not_found">图片内未识别到二维码。</string>
+    <string name="preparesend_parsing">正在解析输入…</string>
+    <string name="preparesend_lnurl_fetching">正在从服务获取数据…</string>
+    <string name="preparesend_bip353_resolving">通过 DNS 解析支付请求…</string>
+
+    <string name="preparesend_funds_final_wallet">你的最终钱包有链上资金，但闪电网络余额为0。</string>
+    <string name="preparesend_funds_final_wallet_button">查看最终钱包</string>
+
+    <!-- utils: misc strings -->
+
+    <string name="utils_rounded">≈</string>
+    <string name="utils_converted_amount">≈ %1$s</string>
+    <string name="utils_unknown_amount" translatable="false">!?</string>
+    <string name="utils_no_conversion">无法获取汇率</string>
+
+    <string name="utils_date_just_now">刚刚</string>
+    <string name="utils_unknown">无</string>
+    <string name="utils_processing_data">正在处理数据…</string>
+    <string name="utils_loading_data">正在加载数据…</string>
+    <string name="utils_loading_prefs">正在加载偏好设置…</string>
+    <string name="utils_copied">已复制到剪贴板！</string>
+
+    <string name="utils_bip353_with_prefix" translatable="false">₿%1$s</string>
+
+    <string name="accessibility_link">在浏览器打开链接</string>
+    <string name="accessibility_explorer_link">在区块链浏览器查看交易</string>
+    <string name="accessibility_address_explorer_link">在区块链浏览器查看地址</string>
+    <string name="validation_empty">该字段不能为空</string>
+    <string name="validation_invalid_amount">请输入有效金额</string>
+    <string name="validation_invalid_number">请输入有效数字</string>
+    <string name="validation_no_decimal">该字段必须为整数</string>
+
+    <string name="btn_back">返回</string>
+    <string name="btn_next">下一步</string>
+    <string name="btn_copy">复制</string>
+    <string name="btn_share">分享</string>
+    <string name="btn_ok">确定</string>
+    <string name="btn_save">保存</string>
+    <string name="btn_delete">删除</string>
+    <string name="btn_confirm">确认</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_close">关闭</string>
+
+    <!-- mutual close -->
+
+    <string name="mutualclose_title">清空我的钱包</string>
+    <string name="mutualclose_loading">加载中…</string>
+    <string name="mutualclose_checking_balance">正在校验余额…</string>
+    <string name="mutualclose_balance">余额：<b>%1$s</b>（≈ %2$s）</string>
+    <string name="mutualclose_no_channels">钱包没有可关闭的通道。</string>
+    <string name="mutualclose_button">查看关闭详情</string>
+    <string name="mutualclose_error_chain_mismatch">该地址所属区块链不匹配</string>
+    <string name="mutualclose_error_chain_reqparams">该地址使用了不支持的特性</string>
+    <string name="mutualclose_error_chain_generic">该地址不受支持</string>
+    <string name="mutualclose_done">关闭已发起。关闭交易可在交易记录中查看。</string>
+
+    <string name="forceclose_no_channels">没有可关闭的通道。</string>
+
+    <!-- channels view -->
+
+    <string name="channelsview_title">支付通道</string>
+    <string name="channelsview_menu_spend_channel_balance">使用通道地址余额</string>
+    <string name="channelsview_header">概览</string>
+    <string name="channelsview_balance">余额</string>
+    <string name="channelsview_balance_about"><b>余额</b>是你所有活跃通道的合计余额，可用于闪电网络支付。</string>
+    <string name="channelsview_inbound">入站流动性</string>
+    <string name="channelsview_inbound_about"><b>入站流动性</b>代表通道可接收闪电支付的额度，无需走链上、无需支付手续费。</string>
+    <string name="channelsview_loading_channels">正在加载通道数据…</string>
+    <string name="channelsview_no_channels">你还没有任何通道。\n\n需要时会自动创建新的支付通道。</string>
+
+    <!-- channels details -->
+
+    <string name="channeldetails_title">通道详情</string>
+    <string name="channeldetails_not_found">不存在该ID对应的活跃通道。</string>
+    <string name="channeldetails_channel_id">通道ID</string>
+    <string name="channeldetails_state">状态</string>
+    <string name="channeldetails_spendable">余额</string>
+    <string name="channeldetails_receivable">入站流动性</string>
+
+    <string name="channeldetails_commitments">有效承诺</string>
+    <string name="channeldetails_inactive_commitments">无效承诺</string>
+    <string name="channeldetails_commitment_funding_tx_id">资金交易：</string>
+    <string name="channeldetails_commitment_balance">余额：</string>
+    <string name="channeldetails_commitment_funding_capacity">容量：</string>
+    <string name="channeldetails_commitment_linked_payments">触发来源：</string>
+
+    <string name="channeldetails_json">查看原始数据</string>
+    <string name="channeldetails_share">分享</string>
+    <string name="channeldetails_share_subject">通道数据</string>
+    <string name="channeldetails_share_title">分享通道数据</string>
+
+    <!-- spend from channel address -->
+
+    <string name="spendchanneladdress_title">使用通道地址余额</string>
+    <string name="spendchanneladdress_instructions">该页面为调试工具，用于恢复误转入通道输出点的资金。</string>
+    <string name="spendchanneladdress_amount">金额</string>
+    <string name="spendchanneladdress_tx_index" translatable="false">Tx index</string>
+    <string name="spendchanneladdress_channel_id" translatable="false">Channel id</string>
+    <string name="spendchanneladdress_channel_data" translatable="false">Raw channel data</string>
+    <string name="spendchanneladdress_remote_funding_pubkey" translatable="false">Remote funding pubkey</string>
+    <string name="spendchanneladdress_unsigned_tx" translatable="false">Unsigned tx</string>
+    <string name="spendchanneladdress_remote_nonce" translatable="false">Remote nonce</string>
+    <string name="spendchanneladdress_sign_button">签名</string>
+    <string name="spendchanneladdress_signing">正在签名…</string>
+
+    <string name="spendchanneladdress_success_header" translatable="false">Signature successfully generated.</string>
+    <string name="spendchanneladdress_success_pubkey" translatable="false">Public key</string>
+    <string name="spendchanneladdress_success_signature" translatable="false">Signature</string>
+    <string name="spendchanneladdress_success_nonce" translatable="false">Nonce</string>
+
+    <string name="spendchanneladdress_error_generic">数据签名失败</string>
+    <string name="spendchanneladdress_error_amount">金额无效</string>
+    <string name="spendchanneladdress_error_tx_index">Tx index无效</string>
+
+    <string translatable="false" name="spendchanneladdress_error_channel_id">Invalid channel id</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_data">Invalid raw channel data</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_version">Unhandled channel version [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_channel_state">Unhandled channel state [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_no_channel_matching">No match found for channel in raw channel data</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_pubkey">Invalid remote funding pubkey [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_unsigned_tx">Invalid unsigned tx [%1$s]</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_funding_pubkey">Invalid remote funding pubkey</string>
+    <string translatable="false" name="spendchanneladdress_error_remote_nonce">Malformed remote nonce</string>
+    <string translatable="false" name="spendchanneladdress_error_sig_failed">Failed to sign transaction</string>
+
+    <!-- home: balance section & misc -->
+
+    <string name="home_balance_loading">加载中…</string>
+    <string name="home_onchain_incoming">+%1$s</string>
+
+    <string name="home_faq_button">常见问题</string>
+    <string name="home_payments_none">使用页面下方收款、付款按钮开始使用！</string>
+    <string name="home_payments_more_button">查看全部交易…</string>
+    <string name="home_connection_electrum_late">同步异常！</string>
+    <string name="home_connection_bad_cert">证书异常</string>
+    <string name="home_connection_onion">地址无效</string>
+    <string name="home_connection_connecting">正在连接…</string>
+    <string name="home_connection_tor_active">Tor</string>
+    <string name="home_request_liquidity">申请流动性</string>
+    <string name="home_inflight_payments">当前钱包有 %1$d 笔交易正在处理。\n\n请保持应用开启，保证交易正常结算。</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_title">通知</string>
+    <string name="inappnotif_notices_title">重要消息</string>
+    <string name="inappnotif_payments_title">最近动态</string>
+    <string name="inappnotif_empty">暂无通知</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_title">恢复短语</string>
+    <string name="displayseed_loading">正在解密助记词…</string>
+    <string name="displayseed_error_details">无法解锁助记词</string>
+    <string name="displayseed_derivation_path">BIP39 助记词，标准 BIP84 推导路径</string>
+    <string name="displayseed_loading_prefs">正在加载偏好设置…</string>
+    <string name="displayseed_backup_title">备份确认</string>
+
+    <!-- settings: logs -->
+
+    <string name="troubleshooting_title">诊断与日志</string>
+    <string name="troubleshooting_diagnostics_header">钱包诊断</string>
+    <string name="troubleshooting_diagnostics_export_button">分享诊断信息…</string>
+    <string name="troubleshooting_diagnostics_share_subject">Phoenix 应用诊断信息</string>
+    <string name="troubleshooting_diagnostics_share_title">分享 Phoenix 诊断信息…</string>
+    <string name="troubleshooting_diagnostics_copy_button">复制诊断信息</string>
+    <string name="troubleshooting_diagnostics_error">生成诊断信息出错</string>
+
+    <string name="troubleshooting_logs_header">日志</string>
+    <string name="troubleshooting_logs_exporting">正在导出数据…</string>
+    <string name="troubleshooting_logs_failed">错误：日志导出失败</string>
+    <string name="troubleshooting_logs_view_button">查看日志…</string>
+    <string name="troubleshooting_logs_view_with">使用以下应用查看日志…</string>
+    <string name="troubleshooting_logs_share_button">分享日志…</string>
+    <string name="troubleshooting_logs_share_subject">Phoenix 应用日志</string>
+    <string name="troubleshooting_logs_share_title">分享 Phoenix 日志…</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_loading">正在加载交易详情…</string>
+    <string name="paymentdetails_error">未找到该交易详情</string>
+
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>已增加流动性</b> %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>通道管理</b> %1$s</string>
+    <string name="paymentdetails_status_channelclose_confirmed"><b>已完成</b> %1$s</string>
+    <string name="paymentdetails_status_sent_successful"><b>已发送</b> %1$s</string>
+    <string name="paymentdetails_status_sent_pending">处理中…</string>
+    <string name="paymentdetails_status_sent_failed"><b>失败</b>\n资金未转出。</string>
+
+    <string name="paymentdetails_status_received_pending">尚未收到。</string>
+    <string name="paymentdetails_status_received_paytoopen_pending">等待通道开启</string>
+    <string name="paymentdetails_status_received_successful"><b>已接收</b> %1$s</string>
+
+    <string name="paymentdetails_status_unconfirmed">等待确认</string>
+    <string name="paymentdetails_status_unconfirmed_fetching">正在获取状态…</string>
+    <string name="paymentdetails_status_unconfirmed_zero">0 次确认</string>
+    <string name="paymentdetails_status_unconfirmed_zero_bump">点击加速交易</string>
+    <string name="paymentdetails_status_unconfirmed_default">%1$d 次确认</string>
+    <string name="paymentdetails_status_confirmed">链上已确认</string>
+
+    <string name="paymentdetails_offer_note_label">消息</string>
+    <string name="paymentdetails_offer_sender_label">发送方</string>
+    <string name="paymentdetails_offer_sender_unknown">未知</string>
+    <string name="paymentdetails_offer_sender_unknown_details">请谨慎对待来自未知发送方的消息</string>
+
+    <string name="paymentdetails_lnurlpay_service">服务提供方</string>
+    <string name="paymentdetails_lnurlpay_action_message_label">消息</string>
+    <string name="paymentdetails_lnurlpay_action_url_label">链接</string>
+    <string name="paymentdetails_lnurlpay_action_url_button">打开链接</string>
+    <string name="paymentdetails_lnurlpay_action_aes_label">消息</string>
+    <string name="paymentdetails_lnurlpay_action_aes_decrypting">正在解密消息…</string>
+
+    <string name="paymentdetails_desc_label">描述</string>
+    <string name="paymentdetails_note_label">备注</string>
+    <string name="paymentdetails_destination_label">发送至</string>
+    <string name="paymentdetails_destination_cpfp_value">比特币矿工</string>
+    <string name="paymentdetails_fees_label">手续费</string>
+    <string name="paymentdetails_error_label">错误</string>
+    <string name="paymentdetails_no_description">无描述</string>
+    <string name="paymentdetails_info_uniclose">本次支付因通道冲突触发。</string>
+
+    <string name="paymentdetails_desc_splice_out">链上支付</string>
+    <string name="paymentdetails_desc_closing_channel">关闭通道</string>
+    <string name="paymentdetails_desc_legacy_migration">从旧版应用迁移</string>
+    <string name="paymentdetails_desc_cpfp">加速交易</string>
+    <string name="paymentdetails_desc_liquidity_manual">手动增加流动性（+%1$s）</string>
+    <string name="paymentdetails_desc_liquidity_automated">通道自动管理</string>
+    <string name="paymentdetails_desc_swapout">交换转出至 %1$s</string>
+    <string name="paymentdetails_desc_swapin">链上充值</string>
+
+    <string name="paymentdetails_desc_to">至 %1$s</string>
+    <string name="paymentdetails_desc_from">来自 %1$s</string>
+
+    <string name="paymentdetails_edit_dialog_title">为该交易添加自定义描述</string>
+    <string name="paymentdetails_edit_dialog_input_label">描述</string>
+    <string name="paymentdetails_attach_desc_button">添加备注</string>
+    <string name="paymentdetails_edit_desc_button">编辑备注</string>
+    <string name="paymentdetails_details_button">技术详情</string>
+
+    <!-- payment details: technicals data -->
+
+    <string name="paymentdetails_technical_title">技术详情</string>
+    <string name="paymentdetails_payment_type_label">支付类型</string>
+    <string name="paymentdetails_type_outgoing_close">通道关闭</string>
+    <string name="paymentdetails_type_incoming_onchain_splice">链上入账（splice）</string>
+    <string name="paymentdetails_type_incoming_onchain_newchannel">链上入账（新建通道）</string>
+    <string name="paymentdetails_type_incoming_legacy_paytopen">闪电入账（旧版 pay‑to‑open）</string>
+    <string name="paymentdetails_type_incoming_legacy_swapin">链上入账（旧版 swap‑in）</string>
+    <string name="paymentdetails_type_incoming_bolt11">闪电入账（bolt11）</string>
+    <string name="paymentdetails_type_incoming_bolt12">闪电入账（bolt12）</string>
+    <string name="paymentdetails_type_outgoing_bolt11">闪电支付（bolt11）</string>
+    <string name="paymentdetails_type_outgoing_bolt12">闪电支付（bolt12）</string>
+    <string name="paymentdetails_type_outgoing_splice">链上支付</string>
+    <string name="paymentdetails_type_outgoing_swapout">链上转出（旧版 swap）</string>
+    <string name="paymentdetails_type_outgoing_splice_cpfp">链上交易加速</string>
+    <string name="paymentdetails_type_outgoing_liquidity_manual">手动申请入站流动性</string>
+    <string name="paymentdetails_type_outgoing_liquidity_auto">自动申请入站流动性</string>
+
+    <string name="paymentdetails_swapin_address_label">充值地址</string>
+    <string name="paymentdetails_bitcoin_address_label">比特币地址</string>
+
+    <string name="paymentdetails_splice_out_channel_label">执行 splice 的通道</string>
+    <string name="paymentdetails_inputs_label" translatable="false">Local inputs</string>
+    <string name="paymentdetails_inputs_value" translatable="false">- #%1$s:</string>
+
+    <string name="paymentdetails_liquidity_amount_label">申请的流动性</string>
+
+    <string name="paymentdetails_closing_type_label">关闭类型</string>
+    <string name="paymentdetails_closing_type_mutual">协商关闭</string>
+    <string name="paymentdetails_closing_type_local">本地强制关闭</string>
+    <string name="paymentdetails_closing_type_remote">对端强制关闭</string>
+    <string name="paymentdetails_closing_type_revoked">已撤销</string>
+    <string name="paymentdetails_closing_type_other">其他</string>
+
+    <string name="paymentdetails_pubkey_label">目标公钥</string>
+    <string name="paymentdetails_payment_hash_label">支付哈希</string>
+    <string name="paymentdetails_preimage_label">原像</string>
+    <string name="paymentdetails_preimage_help">密码学凭证，证明接收方已成功收到支付。</string>
+    <string name="paymentdetails_bolt11_label">Bolt11 发票</string>
+    <string name="paymentdetails_bolt12_label">Bolt12 发票</string>
+    <string name="paymentdetails_bolt11_description_label">发票描述</string>
+    <string name="paymentdetails_bolt12_description_label">Offer 描述</string>
+    <string name="paymentdetails_offer_label">Offer</string>
+    <string name="paymentdetails_offer_metadata_label">元数据</string>
+    <string name="paymentdetails_payerkey_label">付款方密钥</string>
+    <string name="paymentdetails_payerkey_is_mine">你的 Offer 密钥</string>
+    <string name="paymentdetails_liquidity_purchase_type">购买类型</string>
+
+    <string name="paymentdetails_status_label">支付状态</string>
+    <string name="paymentdetails_status_success">成功</string>
+    <string name="paymentdetails_status_confirming">确认中</string>
+    <string name="paymentdetails_status_pending">待处理</string>
+    <string name="paymentdetails_status_failed">失败</string>
+
+    <string name="paymentdetails_parts_label">支付分片（%1$d）</string>
+    <string name="paymentdetails_part_label">分片</string>
+    <string name="paymentdetails_part_hops_label">路由跳数</string>
+
+    <string name="paymentdetails_received_with_label">接收方式</string>
+    <string name="paymentdetails_received_with_legacy_onchain">通道操作（新建或 splice‑in）</string>
+    <string name="paymentdetails_received_with_lightning">闪电网络支付</string>
+    <string name="paymentdetails_received_with_fee_credit">手续费抵扣</string>
+    <string name="paymentdetails_channel_id_label">通道ID</string>
+    <string name="paymentdetails_tx_id_label">交易</string>
+
+    <string name="paymentdetails_created_at_label">创建时间</string>
+    <string name="paymentdetails_completed_at_label">完成时间</string>
+    <string name="paymentdetails_elapsed_label">耗时</string>
+    <string name="paymentdetails_elapsed">%1$s 毫秒</string>
+
+    <string name="paymentdetails_invoice_requested_label">请求金额</string>
+    <string name="paymentdetails_amount_sent_label">发送金额（含手续费）</string>
+    <string name="paymentdetails_amount_received_label">实际接收金额</string>
+    <string name="paymentdetails_amount_fee_credit_label">累计手续费抵扣</string>
+    <string name="paymentdetails_amount_added_to_fee_credit_label">新增手续费抵扣额度</string>
+    <string name="paymentdetails_amount_rate_now">≈ %1$s（当前）</string>
+    <string name="paymentdetails_amount_rate_then">≈ %1$s（交易时刻）</string>
+
+    <!-- offer contact -->
+
+    <string name="contact_add_contact_button">添加联系人</string>
+    <string name="contact_pay_button">发起支付</string>
+
+    <string name="contact_attach_offer_new">新建联系人…</string>
+
+    <string name="contact_error_name_empty">名称不能为空</string>
+    <string name="contact_error_offer_invalid">Bolt12 代码无效</string>
+    <string name="contact_error_offer_known">该代码已绑定至“%1$s”</string>
+    <string name="contact_error_address_invalid">闪电地址无效</string>
+    <string name="contact_error_address_known">该闪电地址已绑定至“%1$s”</string>
+    <string name="contact_error_invalid">该代码或地址无效</string>
+
+    <string name="contact_codedialog_title_generic">为该联系人添加地址</string>
+    <string name="contact_codedialog_title_offer">编辑 Bolt12 代码</string>
+    <string name="contact_codedialog_title_address">编辑该联系人的闪电地址。</string>
+
+    <string name="contact_codedialog_label_label">标签（选填）</string>
+    <string name="contact_codedialog_label_generic">Bolt12 代码或闪电地址</string>
+    <string name="contact_codedialog_label_address">闪电地址</string>
+    <string name="contact_codedialog_label_offer">Bolt12 Offer 代码</string>
+
+    <string name="contact_delete_code_confirm">确定删除该地址？</string>
+    <string name="contact_delete_contact_confirm">确定删除该联系人？</string>
+
+    <string name="contact_add_title">为 Bolt12 代码设置名称</string>
+    <string name="contact_name_label">名称</string>
+    <string name="contact_name_hint">输入名称</string>
+    <string name="contact_offer_key_title">使用你的 Bolt12 密钥付款</string>
+    <string name="contact_offer_key_enabled">对方拿到你的 Bolt12 付款码后，可以识别出付款来自于你。</string>
+    <string name="contact_offer_key_disabled">向该联系人付款时使用一次性身份标识。</string>
+    <string name="contact_codes_list">地址列表</string>
+    <string name="contact_codes_add_new">添加 Bolt12 代码或闪电地址…</string>
+    <string name="contact_codes_add_new_short">新增…</string>
+
+    <string name="contact_search_name">按名称搜索</string>
+    <string name="contact_none">未找到联系人…</string>
+
+    <string name="contact_photo_open_camera">拍照</string>
+    <string name="contact_photo_open_gallery">从相册选择</string>
+    <string name="contact_photo_remove">删除头像</string>
+
+    <!-- settings: access control -->
+
+    <string name="accessctrl_title">访问控制</string>
+
+    <string name="accessctrl_auth_error_header">系统身份验证不可用</string>
+    <string name="accessctrl_auth_error_no_hw">设备无可用的身份验证硬件。</string>
+    <string name="accessctrl_auth_error_hw_unavailable">生物识别硬件暂不可用，请稍后重试。</string>
+    <string name="accessctrl_auth_error_none_enrolled">请先在安卓系统设置中录入 PIN/图案/指纹。</string>
+    <string name="accessctrl_auth_error_update_required">硬件存在安全风险，需要更新安卓系统安全补丁。</string>
+    <string name="accessctrl_auth_error_unsupported">该安卓版本不支持。</string>
+    <string name="accessctrl_auth_error_lockout">尝试次数过多，请稍后重试。</string>
+    <string name="accessctrl_auth_error_vendor">硬件厂商未知错误</string>
+    <string name="accessctrl_auth_error_timeout">身份验证超时</string>
+    <string name="accessctrl_auth_error_cancelled">身份验证已取消</string>
+    <string name="accessctrl_auth_error_too_old">该安卓版本不兼容。</string>
+    <string name="accessctrl_auth_error_unhandled">未知错误码：%1$d</string>
+
+    <string name="accessctrl_screenlock_header">应用访问</string>
+    <string name="accessctrl_screenlock_biometrics_label">系统身份验证</string>
+    <string name="accessctrl_screenlock_biometrics_desc">使用安卓系统凭证保护应用入口</string>
+    <string name="accessctrl_screenlock_pin_label">应用锁定PIN</string>
+    <string name="accessctrl_screenlock_pin_desc">使用6位PIN码保护应用入口</string>
+
+    <string name="accessctrl_autolock_label">自动锁定超时</string>
+    <string name="accessctrl_autolock_desc">闲置 %1$s 分钟后锁定</string>
+    <string name="accessctrl_autolock_desc_never">永不锁定</string>
+
+    <string name="accessctrl_spendlock_header">支付操作</string>
+    <string name="accessctrl_spendlock_pin_label">支付PIN码</string>
+    <string name="accessctrl_spendlock_pin_desc">开启后，进行资金支付需要验证PIN码。</string>
+
+    <string name="accessctrl_misc_header">其他设置</string>
+    <string name="accessctrl_shuffle_pin">PIN键盘乱序</string>
+
+    <!-- lnurl-auth -->
+
+    <string name="lnurl_auth_legacy_notice">旧版模式</string>
+    <string name="lnurl_auth_help">点击查看详情</string>
+    <string name="lnurl_auth_help_dialog_title">工作原理？</string>
+    <string name="lnurl_auth_help_dialog_general_details">Phoenix 使用专属于 <b>%1$s</b> 的密钥完成身份认证，该密钥即为你在该服务的账号密码。</string>
+    <string name="lnurl_auth_help_dialog_privacy_title">隐私说明</string>
+    <string name="lnurl_auth_help_dialog_privacy_details">该服务无法访问你的钱包，看不到你的余额、交易和密钥。</string>
+    <string name="lnurl_auth_help_dialog_compat_title">旧版模式</string>
+    <string name="lnurl_auth_help_dialog_compat_details">针对该服务，Phoenix 使用非标准协议以兼容旧版应用。该账号无法迁移到其他钱包。</string>
+    <string name="lnurl_auth_help_dialog_compat_button">切换协议</string>
+    <string name="lnurl_auth_button">登录</string>
+    <string name="lnurl_auth_try_again_button">重试</string>
+    <string name="lnurl_auth_in_progress">正在登录\n<b>%1$s</b></string>
+    <string name="lnurl_auth_success">身份认证成功。</string>
+    <string name="lnurl_auth_failure">身份认证失败：</string>
+    <string name="lnurl_auth_error_network">网络错误，请检查网络连接后重试。</string>
+    <string name="lnurl_auth_error_other">发生未知错误，请重试。</string>
+
+    <!-- lnurl-auth settings: scheme types -->
+
+    <string name="lnurl_auth_scheme_default">默认</string>
+    <string name="lnurl_auth_scheme_default_desc">使用符合 LNURL 规范的标准协议。新钱包推荐使用，Phoenix iOS 也使用该协议。</string>
+    <string name="lnurl_auth_scheme_legacy">安卓旧版</string>
+    <string name="lnurl_auth_scheme_legacy_desc">使用旧协议，用于登录旧版安卓 Phoenix 创建的账号。</string>
+
+    <!-- lnurl-withdraw -->
+
+    <string name="lnurl_withdraw_confirm_button">提取</string>
+    <string name="lnurl_withdraw_wait">正在请求资金…</string>
+    <string name="lnurl_withdraw_amount_below_min">金额不能小于 %1$s。</string>
+    <string name="lnurl_withdraw_amount_above_max">金额不能大于 %1$s。</string>
+    <string name="lnurl_withdraw_error_header">提取失败：</string>
+
+    <!-- lnurl: common remote error messages -->
+
+    <string name="lnurl_error_remote_details">服务 <b>%1$s</b> 返回错误。如果问题持续，请联系该服务客服。\n\n服务返回信息：\"<i>%2$s</i>\"</string>
+    <string name="lnurl_error_remote_code">服务 <b>%1$s</b> 返回HTTP错误（%2$s）。必要时联系其客服。</string>
+    <string name="lnurl_error_remote_unreadable">服务 <b>%1$s</b> 返回格式错误的消息。</string>
+    <string name="lnurl_error_remote_connection">无法连接服务 <b>%1$s</b>。</string>
+    <string name="lnurl_error_remote_is_website">这看起来是普通网页，并非闪电发票：\n\n<i>%1$s</i></string>
+    <string name="lnurl_error_remote_unknown_lnaddress">服务 %1$s 不支持闪电地址，或找不到该用户。</string>
+
+    <!-- lnurl-pay -->
+
+    <string name="lnurl_pay_domain">服务方</string>
+    <string name="lnurl_pay_meta_description">描述</string>
+    <string name="lnurl_pay_comment_add_button">添加消息</string>
+    <string name="lnurl_pay_comment_label">我的消息</string>
+    <string name="lnurl_pay_comment_instructions">你可以附加消息，该消息会发送给收款方。</string>
+    <string name="lnurl_pay_pay_button">支付</string>
+    <string name="lnurl_pay_requesting_invoice">正在请求发票…</string>
+    <string name="lnurl_pay_paying_invoice">正在支付发票…</string>
+
+    <string name="lnurl_pay_amount_below_min">金额不能小于 %1$s</string>
+    <string name="lnurl_pay_amount_above_max">金额不能大于 %1$s</string>
+
+    <string name="lnurl_pay_error_header">支付失败。</string>
+    <string name="lnurl_pay_error_invalid_chain"><b>%1$s</b> 返回的发票与你的钱包所在链不匹配。</string>
+    <string name="lnurl_pay_error_payment_pending"><b>%1$s</b> 返回的发票正在被支付中。</string>
+    <string name="lnurl_pay_error_already_paid"><b>%1$s</b> 返回的发票已经支付完成。</string>
+    <string name="lnurl_pay_error_invalid_amount"><b>%1$s</b> 返回的发票金额不正确。</string>
+    <string name="lnurl_pay_error_invalid_malformed"><b>%1$s</b> 返回的发票格式错误。</string>
+
+    <!-- settings: display preferences -->
+
+    <string name="prefs_display_title">显示选项</string>
+    <string name="prefs_filter_name">按名称筛选</string>
+    <string name="prefs_display_coin_label">比特币单位</string>
+    <string name="prefs_display_coin_sat_label">Satoshi（聪）</string>
+    <string name="prefs_display_coin_sat_desc">1 sat = 0.00000001 btc</string>
+    <string name="prefs_display_coin_bit_label">Bit（微比特）</string>
+    <string name="prefs_display_coin_bit_desc">1 bit = 0.000001 btc</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin（毫比特）</string>
+    <string name="prefs_display_coin_mbtc_desc">1 mbtc = 0.001 btc</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin（比特币）</string>
+    <string name="prefs_display_fiat_label">法币货币</string>
+    <string name="prefs_display_theme_label">应用主题</string>
+    <string name="prefs_display_theme_dark_label">深色主题</string>
+    <string name="prefs_display_theme_light_label">浅色主题</string>
+    <string name="prefs_display_theme_system_label">跟随系统</string>
+    <string name="prefs_locale_label">应用语言</string>
+
+    <!-- settings: electrum server -->
+
+    <string name="electrum_title">Electrum 服务器</string>
+    <string name="electrum_about">为保障支付通道安全，Phoenix 通过 Electrum 服务器监控比特币区块链。\n\n默认使用随机服务器，你也可以配置 Phoenix 仅连接你自己的服务器。</string>
+    <string name="electrum_block_height_label">区块高度</string>
+    <string name="electrum_connection_dialog_tls_port">使用 TLS 端口（默认 50002）。</string>
+    <string name="electrum_connection_dialog_onion_port">洋葱服务请使用普通 TCP 端口，不要用 TLS 端口。</string>
+    <string name="electrum_connection_dialog_tor_enabled_warning">已启用 Tor，建议该服务器使用洋葱地址。</string>
+    <string name="electrum_connection_dialog_tor_enabled_ignore_box">不，我不想使用洋葱地址</string>
+
+    <string name="electrum_connection_closed_with_random">已断开 Electrum 连接</string>
+    <string name="electrum_connection_closed_with_custom">已断开与 %1$s 的连接</string>
+    <string name="electrum_connection_connecting_to_random">正在连接（随机）%1$s</string>
+    <string name="electrum_connection_connecting_to_custom">正在连接 %1$s</string>
+    <string name="electrum_connection_connected">已连接至 %1$s</string>
+
+    <string name="electrum_description_custom">你正在使用自定义服务器</string>
+    <string name="electrum_description_bad_certificate">该服务器提供了未知证书，连接已被拒绝。</string>
+    <string name="electrum_description_not_onion">已启用 Tor，该服务器应使用洋葱地址。</string>
+
+    <string name="electrum_dialog_checkbox">使用自定义服务器</string>
+    <string name="electrum_dialog_input">服务器地址（主机:端口）</string>
+    <string name="electrum_dialog_invalid_input">该地址无效。</string>
+    <string name="electrum_dialog_cert_check_button">连接</string>
+    <string name="electrum_dialog_cert_checking">正在校验证书…</string>
+    <string name="electrum_dialog_cert_failure">连接失败</string>
+    <string name="electrum_dialog_cert_unresolved">无法解析该地址。</string>
+    <string name="electrum_dialog_cert_header">不受信任的证书</string>
+    <string name="electrum_dialog_cert_sha1">SHA1 指纹</string>
+    <string name="electrum_dialog_cert_sha256">SHA256 指纹</string>
+    <string name="electrum_dialog_cert_issuer">颁发者</string>
+    <string name="electrum_dialog_cert_subject">主体</string>
+    <string name="electrum_dialog_cert_expiration">有效期至</string>
+    <string name="electrum_dialog_cert_copy">复制证书</string>
+    <string name="electrum_dialog_cert_accept">信任此证书</string>
+
+    <!-- settings: Tor -->
+
+    <string name="tor_settings_title">Tor</string>
+    <string name="tor_settings_switch_label">启用 Tor</string>
+    <string name="tor_settings_instructions_title">工作原理</string>
+
+    <!-- home: connectivity dialog -->
+
+    <string name="conndialog_title">连接状态</string>
+    <string name="conndialog_summary_not_ok">部分连接尚未建立，应用在此之前无法正常工作。</string>
+    <string name="conndialog_network">设备无网络连接，应用无法正常工作。\n\n请检查设备网络设置。</string>
+    <string name="conndialog_electrum">Electrum</string>
+    <string name="conndialog_lightning">对端节点</string>
+    <string name="conndialog_accessibility_desc">管理 %1$s 的连接</string>
+    <string name="conndialog_connecting">正在连接…</string>
+    <string name="conndialog_connected">已连接</string>
+    <string name="conndialog_closed">已断开</string>
+    <string name="conndialog_closed_bad_cert">证书无效！</string>
+    <string name="conndialog_electrum_not_onion">地址无效！</string>
+    <string name="conndialog_tor_disclaimer_title">已启用 Tor！</string>
+    <string name="conndialog_tor_disclaimer_body">请确保 Tor VPN 已启动并正常运行。</string>
+
+    <!-- settings: about -->
+
+    <string name="about_title">关于 Phoenix</string>
+    <string name="about_version">Phoenix 版本：<b>%1$s</b></string>
+    <string name="about_faq_link">有疑问？查看常见问题</string>
+    <string name="about_support_link">支持</string>
+    <string name="about_privacy_link">隐私</string>
+    <string name="about_terms_link">条款</string>
+
+    <!-- settings: options for payments -->
+
+    <string name="paymentsettings_title">支付选项</string>
+
+    <string name="paymentsettings_category_incoming">收款设置</string>
+    <string name="paymentsettings_category_outgoing">付款设置</string>
+    <string name="paymentsettings_category_lnurl">LNURL</string>
+
+    <string name="paymentsettings_defaultdesc_title">发票描述</string>
+    <string name="paymentsettings_defaultdesc_none">未设置描述…</string>
+    <string name="paymentsettings_defaultdesc_dialog_title">默认描述</string>
+    <string name="paymentsettings_defaultdesc_dialog_description">你创建的发票将默认使用此描述，可在创建时单独修改。</string>
+    <string name="paymentsettings_defaultdesc_dialog_label">发票描述</string>
+
+    <string name="paymentsettings_expiry_title">发票有效期</string>
+    <string name="paymentsettings_expiry_dialog_title">发票有效期</string>
+    <string name="paymentsettings_expiry_dialog_description">你创建的发票超过此时间后失效。默认值为1周。</string>
+    <string name="paymentsettings_expiry_one_hour">1小时</string>
+    <string name="paymentsettings_expiry_one_day">1天</string>
+    <string name="paymentsettings_expiry_one_week">1周（默认）</string>
+    <string name="paymentsettings_expiry_two_weeks">2周</string>
+    <string name="paymentsettings_expiry_three_weeks">3周</string>
+    <string name="paymentsettings_expiry_value">%1$s 秒</string>
+
+    <string name="paymentsettings_lnurlauth_scheme_title">LNURL 认证协议</string>
+
+    <string name="paymentsettings_swap_format_title">比特币地址格式</string>
+    <string name="paymentsettings_swap_format_legacy_title">Legacy（传统）</string>
+    <string name="paymentsettings_swap_format_legacy_desc">效率和隐私性较差，地址不会轮换。但几乎所有服务和钱包都兼容。</string>
+    <string name="paymentsettings_swap_format_taproot_title">Taproot（推荐）</string>
+    <string name="paymentsettings_swap_format_taproot_desc">默认格式，隐私性更好、手续费更低、支持地址轮换。但部分服务或钱包可能不识别。</string>
+
+    <string name="paymentsettings_overpayment_title">启用超额支付</string>
+    <string name="paymentsettings_overpayment_enabled">你可以超额支付闪电发票，最高为请求金额的2倍。适用于手动打赏或增强隐私。</string>
+    <string name="paymentsettings_overpayment_disabled">已禁用（默认）</string>
+
+    <!-- settings: currencies -->
+
+    <string name="currency_ars_official">阿根廷比索（官方汇率）</string>
+    <string name="currency_ars_bm">阿根廷比索</string>
+    <string name="currency_cup_official">古巴比索（官方汇率）</string>
+    <string name="currency_cup_fm">古巴比索</string>
+    <string name="currency_lbp_official">黎巴嫩镑（官方汇率）</string>
+    <string name="currency_lbp_bm">黎巴嫩镑</string>
+
+    <!-- payments history -->
+
+    <string name="payments_history_title">本地交易记录</string>
+    <string name="payments_history_export_button">导出</string>
+    <string name="payments_history_empty">暂无交易…</string>
+    <string name="payments_history_today">今天</string>
+    <string name="payments_history_yesterday">昨天</string>
+    <string name="payments_history_thisweek">本周早些时候</string>
+    <string name="payments_history_lastweek">上周</string>
+
+    <string name="payments_export_title">导出交易</string>
+    <string name="payments_export_csv_header">CSV 导出</string>
+    <string name="payments_export_csv_instructions">将本地成功交易导出为 CSV 格式，便于记账。</string>
+    <string name="payments_export_csv_start_label">开始日期</string>
+    <string name="payments_export_csv_end_label">结束日期</string>
+    <string name="payments_export_csv_context_label">包含来源/目的地</string>
+    <string name="payments_export_csv_description_label">包含描述</string>
+    <string name="payments_export_csv_generate_button">导出</string>
+    <string name="payments_export_csv_no_payments">暂无成功交易</string>
+    <string name="payments_export_csv_invalid_timestamps">请选择有效的开始/结束日期</string>
+    <string name="payments_export_csv_in_progress">正在导出交易…</string>
+    <string name="payments_export_csv_copy_button">复制数据到剪贴板…</string>
+    <string name="payments_export_csv_share_subject">Phoenix - 交易记录 %1$s 至 %2$s</string>
+    <string name="payments_export_csv_share_title">分享 Phoenix 交易…</string>
+    <string name="payments_export_csv_share_button">分享文件</string>
+    <string name="payments_export_csv_error">导出失败</string>
+    <string name="payments_export_csv_no_data">未找到交易。</string>
+
+    <string name="payments_export_database_header">数据库导出</string>
+    <string name="payments_export_database_instructions">加密并导出交易数据库，可用于将交易历史从本设备迁移到其他设备。</string>
+    <string name="payments_export_database_button">导出数据库</string>
+    <string name="payments_export_database_failed">导出失败</string>
+    <string name="payments_export_database_success">文件已保存至设备公共文件夹。</string>
+
+    <!-- components -->
+
+    <string name="component_calendar_inclusive">（含当日）</string>
+
+    <!-- settings: wallet info -->
+
+    <string name="walletinfo_title">钱包信息</string>
+    <string name="walletinfo_descriptor_legacy">旧版描述符</string>
+    <string name="walletinfo_descriptor">描述符</string>
+    <string name="walletinfo_swapin_user_pubkey">用户公钥</string>
+    <string name="walletinfo_swapin_addresses">交换地址</string>
+    <string name="walletinfo_xpub">主公钥</string>
+    <string name="walletinfo_path">（路径：%1$s）</string>
+
+    <string name="walletinfo_swappable_title">可用于交换</string>
+    <string name="walletinfo_confirming_title">等待 %1$d 次确认</string>
+    <string name="walletinfo_confirming_more">+%1$d 更多…</string>
+    <string name="walletinfo_confirmed_title">已确认余额</string>
+    <string name="walletinfo_unconfirmed_title">未确认余额</string>
+    <string name="walletinfo_incoming_balance">+%1$s 待入账</string>
+    <string name="walletinfo_loading_data">正在加载钱包数据…</string>
+
+    <string name="swapinaddresses_title">Swap-in 地址</string>
+    <string name="swapinaddresses_sync">正在同步…</string>
+    <string name="swapinaddresses_taproot">Taproot</string>
+    <string name="swapinaddresses_legacy">Legacy</string>
+
+    <string name="walletinfo_lightning">闪电网络</string>
+    <string name="walletinfo_nodeid">节点ID</string>
+    <string name="walletinfo_legacy_nodeid_toggle">显示旧版节点ID</string>
+    <string name="walletinfo_legacy_nodeid">旧版节点ID</string>
+
+    <string name="walletinfo_onchain_final">最终钱包</string>
+    <string name="walletinfo_onchain_final_spend_button">支付</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_title">通道管理</string>
+    <string name="liquiditypolicy_fees_estimation_loading">正在获取费率…</string>
+    <string name="liquiditypolicy_fees_header">我的手续费设置</string>
+    <string name="liquiditypolicy_advanced_title">高级通道管理</string>
+    <string name="liquiditypolicy_loading">正在获取策略…</string>
+
+    <!-- CPFP splices -->
+
+    <string name="cpfp_feerate_label">费率</string>
+    <string name="cpfp_feerate_value">%1$s sat/vbyte</string>
+
+    <string name="cpfp_prepare_button">准备支付</string>
+    <string name="cpfp_estimating">正在估算手续费…</string>
+    <string name="cpfp_estimation">你将向比特币矿工支付 <b>%1$s</b></string>
+    <string name="cpfp_execute_button">执行支付</string>
+    <string name="cpfp_executing">正在执行支付…</string>
+    <string name="cpfp_success">支付完成</string>
+    <string name="cpfp_failure_title">支付失败</string>
+    <string name="cpfp_error_title">无法继续</string>
+
+    <!-- mempool -->
+
+    <string name="feerate_slider_dialog_title">手动输入费率</string>
+    <string name="feerate_slider_dialog_input_label">费率（sat/vbyte）</string>
+    <string name="feerate_slider_dialog_input_placeholder">输入费率…</string>
+    <string name="mempool_unknown_feerate_title">交易速度未知</string>
+    <string name="mempool_unknown_feerate_details">请在区块链浏览器上手动查看当前费率，并使用合适的数值。</string>
+    <string name="mempool_fastest">≈ 10分钟</string>
+    <string name="mempool_halfhour">≈ 30分钟</string>
+    <string name="mempool_hour">≈ 1小时</string>
+    <string name="mempool_slow">低费率</string>
+
+    <!-- splice errors -->
+
+    <string name="splice_error_nochannels">你没有任何通道</string>
+    <string name="splice_error_aborted_by_peer">被对端中止 [%1$s]</string>
+    <string name="splice_error_cannot_create_commit">无法创建新的承诺交易</string>
+    <string name="splice_error_concurrent_remote">已有另一个 splice 正在进行</string>
+    <string name="splice_error_channel_not_quiescent">因错误中止</string>
+    <string name="splice_error_disconnected">通道已断开</string>
+    <string name="splice_error_funding_error">资金交易失败 [%1$s]</string>
+    <string name="splice_error_insufficient_funds">资金不足</string>
+    <string name="splice_error_cannot_start_session">无法与对端启动交易会话</string>
+    <string name="splice_error_interactive_session">交互式交易会话失败 [%1$s]</string>
+    <string name="splice_error_invalid_pubkey">splice-out 公钥脚本无效</string>
+    <string name="splice_error_splice_in_progress">已有 splice 支付正在进行</string>
+    <string name="splice_error_invalid_liquidity_ads">流动性广告请求无效：[%1$s]</string>
+    <string name="splice_error_invalid_channel_params">通道参数无效：[%1$s]</string>
+    <string name="splice_error_unexpected">未知错误：[%1$s]</string>
+
+    <!-- reset wallet -->
+
+    <string name="reset_wallet_title">删除钱包</string>
+    <string name="reset_wallet_instructions_header">此页面可从设备上删除该钱包。</string>
+    <string name="reset_wallet_instructions_details">该钱包的所有数据将被删除，包括交易历史。</string>
+    <string name="reset_wallet_payments_history_button">保存交易历史</string>
+    <string name="reset_wallet_review_button">查看详情</string>
+
+    <string name="reset_wallet_confirm_title">确认删除钱包</string>
+    <string name="reset_wallet_confirm_header">该钱包将从<b>本设备</b>完全删除。</string>
+    <string name="reset_wallet_confirm_details">该钱包的助记词和交易历史将从磁盘删除。之后你可以选择使用其他钱包或创建新钱包。</string>
+    <string name="reset_wallet_confirm_details2">你已导入的其他钱包不会被删除。</string>
+    <string name="reset_wallet_confirm_seed_balance">不要丢失你的资金</string>
+    <string name="reset_wallet_confirm_seed_disclaimer">我理解：删除钱包后如果丢失恢复短语，剩余资金将永久无法找回。</string>
+    <string name="reset_wallet_confirm_button">删除钱包</string>
+    <string name="reset_wallet_shutting_down">正在关闭…</string>
+    <string name="reset_wallet_deleting_prefs">正在删除偏好设置…</string>
+    <string name="reset_wallet_deleting_seed">正在删除助记词…</string>
+    <string name="reset_wallet_deleting_db">正在删除数据库…</string>
+    <string name="reset_wallet_success">钱包已成功重置。</string>
+    <string name="reset_wallet_failure_title">重置失败</string>
+
+    <!-- swap input signer tool -->
+    <!-- do not translate, debugging screen -->
+
+    <string name="swapin_signer_title" translatable="false">Swap-in signer</string>
+    <string name="swapin_signer_instructions" translatable="false">This debugging tool lets you sign swap-in inputs. Only use if you understand what it does. Make sure the data entered is complete and not missing any character.</string>
+    <string name="swapin_signer_tx" translatable="false">Unsigned tx</string>
+    <string name="swapin_signer_server_nonce" translatable="false">Server nonce</string>
+    <string name="swapin_signer_sign" translatable="false">Sign</string>
+    <string name="swapin_signer_signing" translatable="false">Signing…</string>
+    <string name="swapin_signer_signed_sig" translatable="false">User signature</string>
+    <string name="swapin_signer_error_header" translatable="false">An error has occurred</string>
+    <string name="swapin_signer_error_details_swap_protocol" translatable="false">Swap-in protocol details could not be retrieved</string>
+    <string name="swapin_signer_error_details_parent_not_found" translatable="false">Parent transaction not found</string>
+    <string name="swapin_signer_error_details_signing_error" translatable="false">Failed to sign data</string>
+    <string name="swapin_signer_error_details_too_many_inputs" translatable="false">Transaction has too many inputs (%1$d)</string>
+    <string name="swapin_signer_error_details_tx_malformed" translatable="false">Invalid transaction input</string>
+    <string name="swapin_signer_error_details_address_index" translatable="false">Address index not found.</string>
+    <string name="swapin_signer_error_details_nonce_generation_failure" translatable="false">Nonce generation failure.</string>
+
+    <!-- settings: contacts list -->
+
+    <string name="settings_contacts_help">此页面可将 Bolt12 代码或闪电地址关联到一个名称。\n\n这些联系人数据为 Phoenix 独有，存储在本地。</string>
+
+    <!-- experimental -->
+
+    <string name="experimental_title">实验性功能</string>
+
+    <string name="bip353_header">Bip353 DNS 地址</string>
+    <string name="bip353_empty">暂无地址…</string>
+    <string name="bip353_claim_button">申领我的地址</string>
+    <string name="bip353_claiming">正在申领地址…</string>
+    <string name="bip353_error">地址申领失败</string>
+
+    <!-- PIN code dialog -->
+
+    <string name="pincode_check_screenlock_title">输入锁定PIN</string>
+    <string name="pincode_check_spending_payment_title">输入支付PIN</string>
+    <string name="pincode_check_spending_displayseed_title">输入支付PIN以查看助记词</string>
+    <string name="pincode_check_disabling_title">输入PIN以继续</string>
+    <string name="pincode_new_screenlock_title">创建锁定PIN</string>
+    <string name="pincode_new_spending_title">创建支付PIN</string>
+    <string name="pincode_confirm_title">确认PIN</string>
+
+    <string name="pincode_checking_label">正在校验PIN…</string>
+    <string name="pincode_failure_label">错误</string>
+    <string name="pincode_locked_label">已锁定 %1$s</string>
+
+    <string name="pincode_error_generic">发生错误</string>
+    <string name="pincode_error_malformed">PIN格式错误</string>
+    <string name="pincode_error_confirm_do_not_match">两次输入的PIN不一致！</string>
+    <string name="pincode_error_write">保存PIN时出错</string>
+
+    <!-- nfc & hce labels -->
+
+    <string name="nfc_hce_service_desc">Phoenix 模拟 NFC 标签的 APDU 服务</string>
+    <string name="nfc_hce_aid_desc">Phoenix 模拟的 NFC 标签 AID</string>
+
+    <string name="nfc_err_busy">NFC 正在使用中</string>
+    <string name="nfc_err_not_available">NFC 不可用</string>
+    <string name="nfc_err_disabled">NFC 已关闭</string>
+    <string name="nfc_err_hce_not_supported">不支持标签模拟</string>
+
+    <string name="nfc_button">NFC</string>
+    <string name="nfc_hce_emulation_title">靠近 NFC 读卡器</string>
+    <string name="nfc_reader_title">准备扫描</string>
+    <string name="nfc_reader_desc">靠近 NFC 设备以读取</string>
+
+    <!-- Currency converter -->
+
+    <string name="converter_title">货币转换器</string>
+    <string name="converter_done_button">完成</string>
+    <string name="converter_placeholder_label">输入 %1$s 金额</string>
+    <string name="converter_add_new_button">添加新货币…</string>
+    <string name="converter_timestamp_refresh">上次更新：%1$s</string>
+    <string name="unitdropdown_more">管理货币…</string>
+    <string name="currencypicker_title">选择货币</string>
+    <string name="currencypicker_no_match">未找到匹配项…</string>
+
+    <!-- user wallet -->
+
+    <string name="wallet_name_default">钱包</string>
+    <string name="wallet_add_new">添加新钱包</string>
+    <string name="wallet_lock">锁定</string>
+
+
+    <string name="wallet_edit_name_placeholder">输入名称</string>
+    <string name="wallet_edit_default_label">默认钱包</string>
+    <string name="wallet_edit_default_description">如设置了默认钱包，应用启动时将自动打开。</string>
+    <string name="wallet_edit_secret_label">隐藏钱包（开发中）</string>
+    <string name="wallet_edit_secret_description">该钱包不会出现在选择列表中，需输入锁定PIN才能访问。</string>
+    <string name="wallet_edit_pick_avatar">选择头像</string>
+
+</resources>
