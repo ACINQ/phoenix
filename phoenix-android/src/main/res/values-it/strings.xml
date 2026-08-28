@@ -23,19 +23,19 @@
     <string name="notification_channels_watcher_desc">Appare quando è necessario avviare Phoenix.</string>
 
     <string name="notification_pending_settlement_title">Finalizzazione pagamento</string>
-    <string name="notification_pending_settlement_desc">Ti avvisa quando Phoenix deve essere avviato per finalizzare un pagamento.</string>
+    <string name="notification_pending_settlement_desc">La avvisa quando Phoenix deve essere avviato per finalizzare un pagamento.</string>
 
     <string name="notification_missed_payment_title">Pagamento rifiutato</string>
     <string name="notification_missed_payment_desc">Appare quando Phoenix non riesce a ricevere un pagamento per un problema di liquidità.</string>
 
     <string name="notification_received_payment_title">Pagamento ricevuto</string>
-    <string name="notification_received_payment_desc">Appare quando riceve un pagamento mentre l\'app è in secondo piano.</string>
+    <string name="notification_received_payment_desc">Appare quando lei riceve un pagamento mentre l\'app è in secondo piano.</string>
 
     <string name="notification_headless_title">In esecuzione in secondo piano</string>
-    <string name="notification_headless_desc">Ti avvisa quando Phoenix è in esecuzione in secondo piano.</string>
+    <string name="notification_headless_desc">La avvisa quando Phoenix è in esecuzione in secondo piano.</string>
 
     <string name="notification_swap_timeout_title">Timeout swap</string>
-    <string name="notification_swap_timeout_desc">Ti avvisa quando uno swap sta per scadere.</string>
+    <string name="notification_swap_timeout_desc">La avvisa quando uno swap sta per scadere.</string>
 
     <!-- init wallet / automated wallet creation -->
 
@@ -51,7 +51,7 @@
 
     <!-- Lock prompt -->
 
-    <string name="lockprompt_title">Sblocca per continuare</string>
+    <string name="lockprompt_title">Sblocchi per continuare</string>
     <string name="lockprompt_pin_button">Codice PIN</string>
     <string name="lockprompt_biometrics_button">Blocco sistema</string>
 
@@ -62,7 +62,7 @@
     <string name="startup_loading_seed">Decifratura…</string>
     <string name="startup_starting">Avvio wallet…</string>
     <string name="startup_started">Apertura wallet…</string>
-    <string name="startup_selector_title">Seleziona un wallet</string>
+    <string name="startup_selector_title">Selezioni un wallet</string>
 
     <string name="startup_error_start_business">Impossibile avviare il wallet</string>
     <string name="startup_error_generic">Impossibile leggere i dati del wallet.</string>
@@ -121,7 +121,7 @@
     <string name="receive_label_bitcoin_help">Questo codice QR è un classico indirizzo Bitcoin.\n\nPuò essere letto da quasi tutti i servizi/wallet Bitcoin, ma i pagamenti arriveranno più lentamente.</string>
     <string name="receive_label_bip353">Indirizzo Lightning</string>
     <string name="receive_label_lightning">Lightning</string>
-    <string name="receive_label_lightning_help">Questo codice QR è una fattura Lightning.\n\nI pagamenti Lightning sono molto veloci e di solito più economici, ma alcuni wallet e servizi potrebbero non supportarli ancora.\n\nIn tal caso, scorri verso sinistra per ottenere un indirizzo Bitcoin classico.</string>
+    <string name="receive_label_lightning_help">Questo codice QR è una fattura Lightning.\n\nI pagamenti Lightning sono molto veloci e di solito più economici, ma alcuni wallet e servizi potrebbero non supportarli ancora.\n\nIn tal caso, scorra verso sinistra per ottenere un indirizzo Bitcoin classico.</string>
     <string name="receive_label_bolt11">Lightning Bolt11</string>
     <string name="receive_label_bolt12">Lightning Bolt12</string>
     <string name="receive_label_bip21">URI Bitcoin</string>
@@ -248,7 +248,7 @@
     <string name="mutualclose_title">Svuota il mio wallet</string>
     <string name="mutualclose_loading">Caricamento…</string>
     <string name="mutualclose_checking_balance">Verifica saldo…</string>
-    <string name="mutualclose_balance">Saldo: &lt;b&gt;%1$s&lt;/b&gt; (≈ %2$s)</string>
+    <string name="mutualclose_balance">Saldo: <b>%1$s</b> (≈ %2$s)</string>
     <string name="mutualclose_no_channels">Il wallet non ha canali idonei alla chiusura.</string>
     <string name="mutualclose_button">Rivedi chiusura</string>
     <string name="mutualclose_error_chain_mismatch">Questo indirizzo usa una blockchain diversa</string>
@@ -264,9 +264,9 @@
     <string name="channelsview_menu_spend_channel_balance">Spendi indirizzo canale</string>
     <string name="channelsview_header">Panoramica</string>
     <string name="channelsview_balance">Saldo</string>
-    <string name="channelsview_balance_about">&lt;b&gt;Saldo&lt;/b&gt; è il saldo aggregato dei suoi canali attivi. È ciò che può spendere tramite Lightning.</string>
+    <string name="channelsview_balance_about"><b>Saldo</b> è il saldo aggregato dei suoi canali attivi. È ciò che può spendere tramite Lightning.</string>
     <string name="channelsview_inbound">Liquidità in entrata</string>
-    <string name="channelsview_inbound_about">&lt;b&gt;Liquidità in entrata&lt;/b&gt; è ciò che i suoi canali possono ricevere tramite Lightning senza dover andare on-chain e pagare commissioni.</string>
+    <string name="channelsview_inbound_about"><b>Liquidità in entrata</b> è ciò che i suoi canali possono ricevere tramite Lightning senza dover andare on-chain e pagare commissioni.</string>
     <string name="channelsview_loading_channels">Caricamento dati canali…</string>
     <string name="channelsview_no_channels">Non ha ancora nessun canale.\n\nUn nuovo canale di pagamento verrà creato automaticamente quando necessario.</string>
 
@@ -309,7 +309,7 @@
     <string name="home_onchain_incoming">+%1$s</string>
 
     <string name="home_faq_button">FAQ</string>
-    <string name="home_payments_none">Usa i pulsanti Ricevi e Invia in basso per iniziare!</string>
+    <string name="home_payments_none">Usi i pulsanti Ricevi e Invia in basso per iniziare!</string>
     <string name="home_payments_more_button">Mostra tutti i pagamenti…</string>
     <string name="home_connection_electrum_late">Desync!</string>
     <string name="home_connection_bad_cert">Certificato</string>
@@ -359,16 +359,16 @@
     <string name="paymentdetails_loading">Caricamento dettagli pagamento…</string>
     <string name="paymentdetails_error">Impossibile trovare i dettagli del pagamento</string>
 
-    <string name="paymentdetails_status_inbound_liquidity_success">&lt;b&gt;LIQUIDITÀ AGGIUNTA&lt;/b&gt; %1$s</string>
-    <string name="paymentdetails_status_inbound_liquidity_auto_success">&lt;b&gt;GESTIONE CANALE&lt;/b&gt; %1$s</string>
-    <string name="paymentdetails_status_channelclose_confirmed">&lt;b&gt;COMPLETO&lt;/b&gt; %1$s</string>
-    <string name="paymentdetails_status_sent_successful">&lt;b&gt;INVIATO&lt;/b&gt; %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_success"><b>LIQUIDITÀ AGGIUNTA</b> %1$s</string>
+    <string name="paymentdetails_status_inbound_liquidity_auto_success"><b>GESTIONE CANALE</b> %1$s</string>
+    <string name="paymentdetails_status_channelclose_confirmed"><b>COMPLETO</b> %1$s</string>
+    <string name="paymentdetails_status_sent_successful"><b>INVIATO</b> %1$s</string>
     <string name="paymentdetails_status_sent_pending">In sospeso…</string>
-    <string name="paymentdetails_status_sent_failed">&lt;b&gt;FALLITO&lt;/b&gt;\nNessun importo è stato inviato.</string>
+    <string name="paymentdetails_status_sent_failed"><b>FALLITO</b>\nNessun importo è stato inviato.</string>
 
     <string name="paymentdetails_status_received_pending">Non ancora ricevuto.</string>
     <string name="paymentdetails_status_received_paytoopen_pending">In attesa dell\'apertura del canale</string>
-    <string name="paymentdetails_status_received_successful">&lt;b&gt;RICEVUTO&lt;/b&gt; %1$s</string>
+    <string name="paymentdetails_status_received_successful"><b>RICEVUTO</b> %1$s</string>
 
     <string name="paymentdetails_status_unconfirmed">In attesa di conferme</string>
     <string name="paymentdetails_status_unconfirmed_fetching">Recupero stato…</string>
@@ -380,7 +380,7 @@
     <string name="paymentdetails_offer_note_label">Messaggio</string>
     <string name="paymentdetails_offer_sender_label">Inviato da</string>
     <string name="paymentdetails_offer_sender_unknown">Sconosciuto</string>
-    <string name="paymentdetails_offer_sender_unknown_details">Fai attenzione ai messaggi da fonti sconosciute</string>
+    <string name="paymentdetails_offer_sender_unknown_details">Presti attenzione ai messaggi da fonti sconosciute</string>
 
     <string name="paymentdetails_lnurlpay_service">Servito da</string>
     <string name="paymentdetails_lnurlpay_action_message_label">Messaggio</string>
@@ -543,10 +543,10 @@
     <string name="accessctrl_auth_error_header">Autenticazione di sistema non disponibile</string>
     <string name="accessctrl_auth_error_no_hw">Nessun hardware di autenticazione adeguato su questo dispositivo.</string>
     <string name="accessctrl_auth_error_hw_unavailable">L\'hardware biometrico non è disponibile. Riprovi più tardi.</string>
-    <string name="accessctrl_auth_error_none_enrolled">Registra prima un PIN/Schema/Impronta digitale in Android.</string>
+    <string name="accessctrl_auth_error_none_enrolled">Registri prima un PIN/Schema/Impronta digitale in Android.</string>
     <string name="accessctrl_auth_error_update_required">L\'hardware non è sicuro. È richiesto un aggiornamento di sicurezza Android.</string>
     <string name="accessctrl_auth_error_unsupported">Non supportato da questa versione di Android.</string>
-    <string name="accessctrl_auth_error_lockout">Troppi tentativi, riprova più tardi.</string>
+    <string name="accessctrl_auth_error_lockout">Troppi tentativi, riprovi più tardi.</string>
     <string name="accessctrl_auth_error_vendor">Errore hardware del fornitore non gestito</string>
     <string name="accessctrl_auth_error_timeout">Tentativo di autenticazione scaduto</string>
     <string name="accessctrl_auth_error_cancelled">L\'autenticazione è stata annullata</string>
@@ -575,7 +575,7 @@
     <string name="lnurl_auth_legacy_notice">Modalità legacy</string>
     <string name="lnurl_auth_help">Tocchi qui per maggiori informazioni</string>
     <string name="lnurl_auth_help_dialog_title">Come funziona?</string>
-    <string name="lnurl_auth_help_dialog_general_details">Phoenix si autentica con una chiave univoca per &lt;b&gt;%1$s&lt;/b&gt;. Questa chiave univoca diventa la sua password per il suo account lì.</string>
+    <string name="lnurl_auth_help_dialog_general_details">Phoenix si autentica con una chiave univoca per <b>%1$s</b>. Questa chiave univoca diventa la sua password per il suo account lì.</string>
     <string name="lnurl_auth_help_dialog_privacy_title">Privacy</string>
     <string name="lnurl_auth_help_dialog_privacy_details">Il servizio non avrà in nessun caso accesso al suo wallet. Non potrà vedere il suo saldo, i pagamenti o le chiavi.</string>
     <string name="lnurl_auth_help_dialog_compat_title">Modalità legacy</string>
@@ -583,7 +583,7 @@
     <string name="lnurl_auth_help_dialog_compat_button">Cambia schema</string>
     <string name="lnurl_auth_button">Accedi</string>
     <string name="lnurl_auth_try_again_button">Riprova</string>
-    <string name="lnurl_auth_in_progress">Accesso a\n&lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="lnurl_auth_in_progress">Accesso a\n<b>%1$s</b></string>
     <string name="lnurl_auth_success">Autenticazione riuscita.</string>
     <string name="lnurl_auth_failure">Autenticazione fallita:</string>
     <string name="lnurl_auth_error_network">Errore di rete. Controlli la connessione internet e riprovi.</string>
@@ -606,11 +606,11 @@
 
     <!-- lnurl: common remote error messages -->
 
-    <string name="lnurl_error_remote_details">Il servizio &lt;b&gt;%1$s&lt;/b&gt; ha restituito un errore. Contatta il loro helpdesk se il problema persiste.\n\nDettagli messaggio del servizio: \"&lt;i&gt;%2$s&lt;/i&gt;\"</string>
-    <string name="lnurl_error_remote_code">Il servizio &lt;b&gt;%1$s&lt;/b&gt; ha restituito un errore HTTP (%2$s). Contatta il loro helpdesk se necessario.</string>
-    <string name="lnurl_error_remote_unreadable">Il servizio &lt;b&gt;%1$s&lt;/b&gt; ha restituito un messaggio malformato.</string>
-    <string name="lnurl_error_remote_connection">Impossibile connettersi al servizio &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="lnurl_error_remote_is_website">Questo sembra essere un sito web (non una fattura Lightning):\n\n&lt;i&gt;%1$s&lt;/i&gt;</string>
+    <string name="lnurl_error_remote_details">Il servizio <b>%1$s</b> ha restituito un errore. Contatta il loro helpdesk se il problema persiste.\n\nDettagli messaggio del servizio: \"<i>%2$s</i>\"</string>
+    <string name="lnurl_error_remote_code">Il servizio <b>%1$s</b> ha restituito un errore HTTP (%2$s). Contatta il loro helpdesk se necessario.</string>
+    <string name="lnurl_error_remote_unreadable">Il servizio <b>%1$s</b> ha restituito un messaggio malformato.</string>
+    <string name="lnurl_error_remote_connection">Impossibile connettersi al servizio <b>%1$s</b>.</string>
+    <string name="lnurl_error_remote_is_website">Questo sembra essere un sito web (non una fattura Lightning):\n\n<i>%1$s</i></string>
     <string name="lnurl_error_remote_unknown_lnaddress">Il servizio %1$s non supporta gli indirizzi Lightning, o non conosce questo utente.</string>
 
     <!-- lnurl-pay -->
@@ -628,11 +628,11 @@
     <string name="lnurl_pay_amount_above_max">L\'importo deve essere al massimo %1$s</string>
 
     <string name="lnurl_pay_error_header">Il pagamento è fallito.</string>
-    <string name="lnurl_pay_error_invalid_chain">La fattura restituita da &lt;b&gt;%1$s&lt;/b&gt; non usa la stessa chain del suo wallet.</string>
-    <string name="lnurl_pay_error_payment_pending">La fattura restituita da &lt;b&gt;%1$s&lt;/b&gt; è già in corso di pagamento.</string>
-    <string name="lnurl_pay_error_already_paid">La fattura restituita da &lt;b&gt;%1$s&lt;/b&gt; è già stata pagata.</string>
-    <string name="lnurl_pay_error_invalid_amount">La fattura restituita da &lt;b&gt;%1$s&lt;/b&gt; ha un importo errato.</string>
-    <string name="lnurl_pay_error_invalid_malformed">La fattura restituita da &lt;b&gt;%1$s&lt;/b&gt; è malformata.</string>
+    <string name="lnurl_pay_error_invalid_chain">La fattura restituita da <b>%1$s</b> non usa la stessa chain del suo wallet.</string>
+    <string name="lnurl_pay_error_payment_pending">La fattura restituita da <b>%1$s</b> è già in corso di pagamento.</string>
+    <string name="lnurl_pay_error_already_paid">La fattura restituita da <b>%1$s</b> è già stata pagata.</string>
+    <string name="lnurl_pay_error_invalid_amount">La fattura restituita da <b>%1$s</b> ha un importo errato.</string>
+    <string name="lnurl_pay_error_invalid_malformed">La fattura restituita da <b>%1$s</b> è malformata.</string>
 
     <!-- settings: display preferences -->
 
@@ -687,7 +687,7 @@
     <string name="electrum_dialog_cert_subject">Oggetto</string>
     <string name="electrum_dialog_cert_expiration">Valido fino al</string>
     <string name="electrum_dialog_cert_copy">Copia certificato</string>
-    <string name="electrum_dialog_cert_accept">Fidati del certificato</string>
+    <string name="electrum_dialog_cert_accept">Si fidi del certificato</string>
 
     <!-- settings: Tor -->
 
@@ -714,7 +714,7 @@
     <!-- settings: about -->
 
     <string name="about_title">Informazioni su Phoenix</string>
-    <string name="about_version">Versione Phoenix: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="about_version">Versione Phoenix: <b>%1$s</b></string>
     <string name="about_faq_link">Ha domande? Consulti le FAQ</string>
     <string name="about_support_link">Supporto</string>
     <string name="about_privacy_link">Privacy</string>
@@ -736,7 +736,7 @@
 
     <string name="paymentsettings_expiry_title">Scadenza fattura</string>
     <string name="paymentsettings_expiry_dialog_title">Scadenza fattura</string>
-    <string name="paymentsettings_expiry_dialog_description">Le fatture che crei diventano obsolete dopo questo periodo. Il valore predefinito è 1 settimana.</string>
+    <string name="paymentsettings_expiry_dialog_description">Le fatture che crea diventano obsolete dopo questo periodo. Il valore predefinito è 1 settimana.</string>
     <string name="paymentsettings_expiry_one_hour">1 ora</string>
     <string name="paymentsettings_expiry_one_day">1 giorno</string>
     <string name="paymentsettings_expiry_one_week">1 settimana (predefinito)</string>
@@ -772,7 +772,7 @@
     <string name="payments_history_empty">Nessun pagamento ancora…</string>
     <string name="payments_history_today">Oggi</string>
     <string name="payments_history_yesterday">Ieri</string>
-    <string name="payments_history_thisweek">Prima questa settimana</string>
+    <string name="payments_history_thisweek">All\'inizio di questa settimana</string>
     <string name="payments_history_lastweek">Settimana scorsa</string>
 
     <string name="payments_export_title">Esporta pagamenti</string>
@@ -849,7 +849,7 @@
 
     <string name="cpfp_prepare_button">Prepara pagamento</string>
     <string name="cpfp_estimating">Stima commissioni…</string>
-    <string name="cpfp_estimation">Pagherai &lt;b&gt;%1$s&lt;/b&gt; ai miner Bitcoin</string>
+    <string name="cpfp_estimation">Pagherà <b>%1$s</b> ai miner Bitcoin</string>
     <string name="cpfp_execute_button">Esegui pagamento</string>
     <string name="cpfp_executing">Esecuzione pagamento…</string>
     <string name="cpfp_success">Pagamento completato</string>
@@ -895,8 +895,8 @@
     <string name="reset_wallet_review_button">Rivedi</string>
 
     <string name="reset_wallet_confirm_title">Conferma eliminazione wallet</string>
-    <string name="reset_wallet_confirm_header">Il wallet verrà completamente eliminato da &lt;b&gt;questo dispositivo&lt;/b&gt;.</string>
-    <string name="reset_wallet_confirm_details">Il seed di questo wallet e la sua cronologia dei pagamenti verranno eliminati dal disco. Ti verrà chiesto di usare un altro wallet o di crearne uno nuovo.</string>
+    <string name="reset_wallet_confirm_header">Il wallet verrà completamente eliminato da <b>questo dispositivo</b>.</string>
+    <string name="reset_wallet_confirm_details">Il seed di questo wallet e la sua cronologia dei pagamenti verranno eliminati dal disco. Le verrà chiesto di usare un altro wallet o di crearne uno nuovo.</string>
     <string name="reset_wallet_confirm_details2">Gli altri wallet che ha già importato non verranno eliminati.</string>
     <string name="reset_wallet_confirm_seed_balance">Non perda i suoi fondi</string>
     <string name="reset_wallet_confirm_seed_disclaimer">Ho capito che se perdo la frase di recupero dopo aver eliminato il wallet, eventuali fondi rimanenti andranno persi definitivamente.</string>
@@ -952,9 +952,9 @@
     <string name="nfc_err_hce_not_supported">Emulazione tag non supportata</string>
 
     <string name="nfc_button">Nfc</string>
-    <string name="nfc_hce_emulation_title">Avvicina al lettore NFC</string>
+    <string name="nfc_hce_emulation_title">Avvicini al lettore NFC</string>
     <string name="nfc_reader_title">Pronto per la scansione</string>
-    <string name="nfc_reader_desc">Avvicina il dispositivo NFC per leggerlo</string>
+    <string name="nfc_reader_desc">Avvicini il dispositivo NFC per leggerlo</string>
 
     <!-- Currency converter -->
 
@@ -964,7 +964,7 @@
     <string name="converter_add_new_button">Aggiungi nuova valuta…</string>
     <string name="converter_timestamp_refresh">Ultimo aggiornamento: %1$s</string>
     <string name="unitdropdown_more">Gestisci valute…</string>
-    <string name="currencypicker_title">Seleziona una valuta</string>
+    <string name="currencypicker_title">Selezioni una valuta</string>
     <string name="currencypicker_no_match">Nessun risultato…</string>
 
     <!-- user wallet -->
@@ -977,7 +977,7 @@
     <string name="wallet_edit_default_label">Wallet predefinito</string>
     <string name="wallet_edit_default_description">Se viene selezionato un wallet predefinito, verrà aperto automaticamente all\'avvio dell\'app.</string>
     <string name="wallet_edit_secret_label">Wallet nascosto (WIP)</string>
-    <string name="wallet_edit_secret_description">Il wallet non sarà visibile nelle schermate di selezione. Per accedervi, devi inserire il PIN di blocco.</string>
-    <string name="wallet_edit_pick_avatar">Scegli un avatar</string>
+    <string name="wallet_edit_secret_description">Il wallet non sarà visibile nelle schermate di selezione. Per accedervi, deve inserire il PIN di blocco.</string>
+    <string name="wallet_edit_pick_avatar">Scelga un avatar</string>
 
 </resources>

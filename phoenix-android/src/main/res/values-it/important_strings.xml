@@ -31,11 +31,11 @@
     <string name="notif_headless_title_default">Phoenix è in esecuzione in secondo piano</string>
     <string name="notif_headless_received">%1$s Ricevuto %2$s</string>
 
-    <string name="notif_pending_settlement_title">Avvia il wallet</string>
+    <string name="notif_pending_settlement_title">Avvii il wallet</string>
     <string name="notif_pending_settlement_message">È in sospeso una liquidazione in arrivo.</string>
 
     <string name="notif_inflight_payment_title">Un pagamento è in sospeso</string>
-    <string name="notif_inflight_payment_message">Avvia Phoenix affinché il pagamento venga finalizzato al momento opportuno.</string>
+    <string name="notif_inflight_payment_message">Avvii Phoenix affinché il pagamento venga finalizzato al momento opportuno.</string>
 
     <string name="notif_missed_title">Pagamento in arrivo perso</string>
     <string name="notif_missed_unavailable">Phoenix non è riuscita ad avviarsi in secondo piano.</string>
@@ -51,7 +51,7 @@
     <string name="notif_rejected_amount_too_low">L\'importo del pagamento è troppo basso.</string>
     <string name="notif_rejected_generic_error">Si è verificato un errore durante il finanziamento. Riprovi più tardi.</string>
 
-    <string name="notif_watcher_revoked_commit_title">Avvia Phoenix</string>
+    <string name="notif_watcher_revoked_commit_title">Avvii Phoenix</string>
     <string name="notif_watcher_revoked_commit_message">Alcuni dei suoi canali potrebbero essersi chiusi.</string>
 
     <!-- settings list -->
@@ -182,7 +182,7 @@
     <string name="send_error_lnurl_invalid">Impossibile elaborare questo link LNURL. Si assicuri che sia valido.</string>
     <string name="send_error_lnurl_unsupported">Questo tipo di LNURL non è ancora supportato.</string>
     <string name="send_error_invalid_generic">Questa richiesta di pagamento non è supportata.</string>
-    <string name="send_error_bip353_connect">Impossibile recuperare i dati per questo indirizzo. Potresti avere un problema di connettività.</string>
+    <string name="send_error_bip353_connect">Impossibile recuperare i dati per questo indirizzo. Potrebbe esserci un problema di connettività.</string>
     <string name="send_error_bip353_name_not_found">Il nome \"%1$s\" non è stato trovato su \"%2$s\".</string>
     <string name="send_error_bip353_invalid_uri">Questo indirizzo usa una risorsa Bip21 non valida.</string>
     <string name="send_error_bip353_invalid_offer">Questo indirizzo usa un\'offerta Bolt12 non valida.</string>
@@ -196,7 +196,7 @@
     <!-- closing channels -->
 
     <string name="mutualclose_input_label">Indirizzo Bitcoin</string>
-    <string name="mutualclose_input_instructions">Invia tutti i fondi a un indirizzo Bitcoin. Tutti i canali di pagamento verranno chiusi.</string>
+    <string name="mutualclose_input_instructions">Invii tutti i fondi a un indirizzo Bitcoin. Tutti i canali di pagamento verranno chiusi.</string>
     <string name="mutualclose_confirm_title">Conferma chiusura</string>
     <string name="mutualclose_confirm_details">Tutti i fondi saranno inviati a:</string>
     <string name="mutualclose_confirm_fee">Commissioni miner stimate:</string>
@@ -215,8 +215,8 @@
     <string name="inappnotif_backup_seed_message">Esegua il backup del wallet per non perdere i suoi bitcoin.</string>
     <string name="inappnotif_backup_seed_action">Backup del wallet</string>
 
-    <string name="inappnotif_notification_permission_message_short">Abilita le notifiche Android</string>
-    <string name="inappnotif_notification_permission_message">Le notifiche sono disabilitate nelle impostazioni Android. Phoenix non potrà avvisarti quando un pagamento è in elaborazione.</string>
+    <string name="inappnotif_notification_permission_message_short">Abiliti le notifiche Android</string>
+    <string name="inappnotif_notification_permission_message">Le notifiche sono disabilitate nelle impostazioni Android. Phoenix non potrà avvisarla quando un pagamento è in elaborazione.</string>
     <string name="inappnotif_notification_permission_enable">Abilita</string>
 
     <string name="inappnotif_swapin_timeout_message">Un deposito scadrà presto.</string>
@@ -226,7 +226,7 @@
     <string name="inappnotif_watchtower_late_action">Chiudi</string>
 
     <string name="inappnotif_upgrade_message">È disponibile un aggiornamento</string>
-    <string name="inappnotif_upgrade_critical_message">È disponibile un aggiornamento critico. Aggiorna Phoenix il prima possibile.</string>
+    <string name="inappnotif_upgrade_critical_message">È disponibile un aggiornamento critico. Aggiorni Phoenix il prima possibile.</string>
     <string name="inappnotif_upgrade_button">Aggiorna su Google Play</string>
 
     <string name="inappnotif_mempool_full_message">Le commissioni on-chain sono elevate.</string>
@@ -249,7 +249,7 @@
     <string name="inappnotif_watchtower_nominal_description_one">%1$d canale è stato verificato con successo il %2$s. Nessun problema trovato.</string>
     <string name="inappnotif_watchtower_nominal_description_many">%1$d canali sono stati verificati con successo il %2$s. Nessun problema trovato.</string>
     <string name="inappnotif_watchtower_revokedfound_title">Avviso watchtower</string>
-    <string name="inappnotif_watchtower_revokedfound_description">Commitment revocati trovati il %1$s per i canali: %2$s. Questi canali potrebbero chiudersi.</string>
+    <string name="inappnotif_watchtower_revokedfound_description">Commitment revocati trovati il %1$s per i canali: %2$s. Questi canali potrebbero essere chiusi.</string>
 
     <!-- settings: display seed -->
 
@@ -257,7 +257,7 @@
     <string name="displayseed_authenticate_button">Mostra seed</string>
     <string name="displayseed_dialog_header">TENGA QUESTO SEED AL SICURO.\nNON LO CONDIVIDA.</string>
     <string name="displayseed_backup_notice_header">Non ha eseguito il backup della sua frase di recupero!</string>
-    <string name="displayseed_backup_notice_details">Se non la salvi e perdi l\'accesso a Phoenix, perderà i suoi fondi!</string>
+    <string name="displayseed_backup_notice_details">Se non la salva e perde l\'accesso a Phoenix, perderà i suoi fondi!</string>
     <string name="displayseed_backup_checkbox">Ho salvato la mia frase di recupero in un posto sicuro.</string>
     <string name="displayseed_loss_disclaimer_checkbox">Ho capito che se perdo il telefono e la frase di recupero, perderò i fondi del mio wallet.</string>
 
@@ -289,7 +289,7 @@
     <string name="tor_dialog_enable_details_1">Questo richiede l\'installazione di un\'app VPN Tor Proxy di terze parti come Orbot.</string>
     <string name="tor_dialog_enable_details_2">Tor può migliorare la privacy, ma potrebbe causare problemi di prestazioni e pagamenti persi.</string>
     <string name="tor_dialog_disable_title">Disabilitazione Tor</string>
-    <string name="tor_dialog_disable_details_1">Se disabiliti questa opzione, il suo indirizzo IP potrebbe essere rivelato a vari fornitori di servizi.</string>
+    <string name="tor_dialog_disable_details_1">Se disabilita questa opzione, il suo indirizzo IP potrebbe essere rivelato a vari fornitori di servizi.</string>
     <string name="tor_dialog_disable_details_2">È sicuro di voler procedere?</string>
     <string name="tor_dialog_processing">Elaborazione modifiche…</string>
 
@@ -311,7 +311,7 @@
 
     <!-- introduction screens -->
 
-    <string name="intro_welcome_title">Benvenuto!</string>
+    <string name="intro_welcome_title">Le diamo il benvenuto!</string>
     <string name="intro_welcome_sub1">Con Phoenix, inviare e ricevere bitcoin è semplice e sicuro.</string>
     <string name="intro_welcome_next_button">Avanti</string>
 
@@ -338,7 +338,7 @@
 
     <string name="walletinfo_onchain_swapin_last_attempt">Un tentativo di swap è fallito %1$s</string>
     <string name="walletinfo_onchain_swapin_last_attempt_disabled">La gestione dei canali era disattivata.</string>
-    <string name="walletinfo_onchain_swapin_timeout_1day">Questo swap scadrà in un giorno!</string>
+    <string name="walletinfo_onchain_swapin_timeout_1day">Questo swap scadrà tra un giorno!</string>
     <string name="walletinfo_onchain_swapin_timeout">Questo swap scadrà tra %1$s giorni.</string>
 
     <string name="walletinfo_onchain_swapin_locked_title">Scaduto</string>
@@ -382,16 +382,16 @@
       \n
       - il layer Lightning (L2) è molto più veloce e generalmente molto più economico (specialmente per i piccoli pagamenti)
       \n\n
-      Quando ricevi un pagamento su L1, Phoenix trasferirà automaticamente i fondi su L2 <b>SE</b> le commissioni miner rispettano la sua policy di commissioni configurata.
+      Quando riceve un pagamento su L1, Phoenix trasferirà automaticamente i fondi su L2 <b>SE</b> le commissioni miner rispettano la sua policy di commissioni configurata.
       \n\n
-      I pagamenti che ricevi su L2 possono essere ricevuti istantaneamente e senza commissioni. Tuttavia, occasionalmente è richiesta anche un\'operazione L1 per gestire il canale di pagamento L2. Questo può essere fatto automaticamente <b>SE</b> le commissioni miner rispettano la sua policy di commissioni configurata.
+      I pagamenti che riceve su L2 possono essere ricevuti istantaneamente e senza commissioni. Tuttavia, occasionalmente è richiesta anche un\'operazione L1 per gestire il canale di pagamento L2. Questo può essere fatto automaticamente <b>SE</b> le commissioni miner rispettano la sua policy di commissioni configurata.
     </string>
 
     <!-- settings: liquidity request -->
 
     <string name="liquidityads_no_channels_header">Nessun canale!</string>
-    <string name="liquidityads_no_channels_details">Per usare questa funzione devi prima avere dei fondi nel wallet.</string>
-    <string name="liquidityads_header">Pianifica la sua liquidità</string>
+    <string name="liquidityads_no_channels_details">Per usare questa funzione deve prima avere dei fondi nel wallet.</string>
+    <string name="liquidityads_header">Pianifichi la sua liquidità</string>
     <string name="liquidityads_instructions">La liquidità in entrata le permette di evitare le commissioni on-chain per i pagamenti futuri ricevuti tramite Lightning.\n\nRichiedendo più liquidità ora, può risparmiare commissioni in seguito.</string>
     <string name="liquidityads_faq_link">Maggiori informazioni</string>
     <string name="liquidityads_current_liquidity">Liquidità attuale</string>
@@ -405,7 +405,7 @@
     <string name="liquidityads_estimate_details_service_fees_help">Questa commissione va al servizio che fornisce la liquidità.</string>
     <string name="liquidityads_estimate_details_duration">Durata</string>
     <string name="liquidityads_estimate_details_duration_value">1 anno</string>
-    <string name="liquidityads_estimate_details_duration_help">Man mano che ricevi fondi, la liquidità verrà consumata e diventerà il suo saldo. Dopo un anno, la liquidità inutilizzata rimanente verrà recuperata dal servizio.</string>
+    <string name="liquidityads_estimate_details_duration_help">Man mano che riceve fondi, la liquidità verrà consumata e diventerà il suo saldo. Dopo un anno, la liquidità inutilizzata rimanente verrà recuperata dal servizio.</string>
     <string name="liquidityads_estimate_above_25">La commissione totale è superiore al 25% dell\'importo di liquidità richiesto.</string>
     <string name="liquidityads_over_balance">Le commissioni totali superano il suo saldo.</string>
 
@@ -431,7 +431,7 @@
 
     <string name="cpfp_title">Accelera le mie transazioni (CPFP).</string>
     <string name="cpfp_instructions">Può aumentare le commissioni effettive delle sue transazioni non confermate per incentivare i miner Bitcoin a dargli priorità.</string>
-    <string name="cpfp_splice_error_actual_below_user">Questo feerate è inferiore a quello già utilizzato dalle sue transazioni non confermate. Usa un feerate più alto.</string>
+    <string name="cpfp_splice_error_actual_below_user">Questo feerate è inferiore a quello già utilizzato dalle sue transazioni non confermate. Usi un feerate più alto.</string>
 
     <!-- Lightning payment errors -->
 
@@ -439,13 +439,13 @@
     <string name="outgoing_failuremessage_channel_splicing">I canali stanno già elaborando uno splice. Riprovi più tardi.</string>
     <string name="outgoing_failuremessage_not_enough_fee">La commissione è insufficiente.</string>
     <string name="outgoing_failuremessage_not_enough_balance">Questo pagamento supera il suo saldo.</string>
-    <string name="outgoing_failuremessage_too_big">L\'importo del pagamento è troppo grande - prova a dividerlo in più parti.</string>
+    <string name="outgoing_failuremessage_too_big">L\'importo del pagamento è troppo grande - provi a dividerlo in più parti.</string>
     <string name="outgoing_failuremessage_too_small">L\'importo del pagamento è troppo piccolo.</string>
     <string name="outgoing_failuremessage_expiry_too_big">La scadenza di questo pagamento è troppo lontana nel futuro.</string>
     <string name="outgoing_failuremessage_rejected_by_recipient">Il pagamento è stato rifiutato dal destinatario. Questa fattura potrebbe essere già stata pagata.</string>
     <string name="outgoing_failuremessage_recipient_offline">Il destinatario è offline.</string>
     <string name="outgoing_failuremessage_not_enough_liquidity">Il pagamento non ha potuto essere inoltrato al destinatario (probabilmente liquidità in entrata insufficiente).</string>
-    <string name="outgoing_failuremessage_temporary_failure">Si è verificato un errore su un nodo nel percorso del pagamento. Il pagamento potrebbe riuscire se riprovi.</string>
+    <string name="outgoing_failuremessage_temporary_failure">Si è verificato un errore su un nodo nel percorso del pagamento. Il pagamento potrebbe riuscire se riprova.</string>
     <string name="outgoing_failuremessage_too_many_pending">Ha troppi pagamenti in sospeso. Riprovi una volta che sono completati.</string>
 
     <string name="outgoing_failuremessage_invalid_id">L\'ID del pagamento non è valido. Riprovi.</string>
@@ -487,7 +487,7 @@
     <string name="swapinrefund_failed_address">Questo indirizzo non è valido.</string>
     <string name="swapinrefund_failed_cannot_create">Impossibile creare la transazione di rimborso.</string>
     <string name="swapinrefund_success">Transazione pubblicata.</string>
-    <string name="swapinrefund_success_details">Può trovare la transazione qui sotto. Non apparirà nella cronologia pagamenti, quindi copia il suo ID ora se necessario.</string>
+    <string name="swapinrefund_success_details">Può trovare la transazione qui sotto. Non apparirà nella cronologia pagamenti, quindi ne copi l\'ID ora se necessario.</string>
 
     <!-- Final wallet refund -->
 
@@ -499,6 +499,6 @@
     <!-- experimental features -->
 
     <string name="bip353_subtitle">Questo è un indirizzo leggibile per la sua richiesta di pagamento Bolt12.</string>
-    <string name="bip353_subtitle2">Vuole un indirizzo più bello? Usa servizi di terze parti, o ospita l\'indirizzo tu stesso!</string>
+    <string name="bip353_subtitle2">Vuole un indirizzo più bello? Usi servizi di terze parti, oppure ospiti l\'indirizzo autonomamente!</string>
 
 </resources>
