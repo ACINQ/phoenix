@@ -43,11 +43,11 @@
     <string name="notif_rejected_deposit_title">Очікується депозит on-chain (+%1$s)</string>
     <string name="notif_rejected_payment_title">Платіж відхилено (+%1$s)</string>
     <string name="notif_rejected_policy_disabled">Автоматизоване керування каналами вимкнено. Торкніться для деталей.</string>
-    <string name="notif_rejected_policy_disabled_timeout">Автоматизоване керування каналами вимкнено. Цей депозит завершиться %1$s.</string>
+    <string name="notif_rejected_policy_disabled_timeout">Автоматизоване керування каналами вимкнено. Термін дії цього депозиту спливе до %1$s.</string>
     <string name="notif_rejected_over_absolute">Комісія становила %1$s, але ваш максимум було встановлено на %2$s. Торкніться для деталей.</string>
-    <string name="notif_rejected_over_absolute_timeout">Комісія становила %1$s, але ваш максимум було встановлено на %2$s. Цей депозит завершиться %3$s.</string>
+    <string name="notif_rejected_over_absolute_timeout">Комісія становила %1$s, але ваш максимум було встановлено на %2$s. Термін дії цього депозиту спливе до %3$s.</string>
     <string name="notif_rejected_over_relative">Комісія становила %1$s, тобто понад %2$s%% отриманої суми. Торкніться для деталей.</string>
-    <string name="notif_rejected_over_relative_timeout">Комісія становила %1$s, тобто понад %2$s%% отриманої суми. Цей депозит завершиться %3$s.</string>
+    <string name="notif_rejected_over_relative_timeout">Комісія становила %1$s, тобто понад %2$s%% отриманої суми. Термін дії цього депозиту спливе до %3$s.</string>
     <string name="notif_rejected_amount_too_low">Сума платежу занадто мала.</string>
     <string name="notif_rejected_generic_error">Під час фінансування сталася помилка. Спробуйте пізніше.</string>
 
@@ -91,9 +91,9 @@
     <string name="home_swapin_ready_desc_auto">Їх буде перенесено до Lightning, коли комісії за майнінг опустяться нижче %1$s.</string>
     <string name="home_swapin_ready_desc_disabled">Вони залишаться on-chain, оскільки автоматизоване керування каналами вимкнено.</string>
     <string name="home_swapin_ready_desc_generic">Їх буде перенесено до Lightning, коли умови це дозволять.</string>
-    <string name="home_swapin_ready_expiring">Увага! Деякі кошти незабаром завершаться та більше не будуть придатні для обміну.</string>
+    <string name="home_swapin_ready_expiring">Увага! Термін дії деяких коштів незабаром спливе, і вони більше не будуть придатні для обміну.</string>
 
-    <string name="home_swapin_expired_title">Завершено</string>
+    <string name="home_swapin_expired_title">Термін дії минув</string>
     <string name="home_swapin_expired_desc">Їх більше не можна обміняти після 4 місяців очікування. Ці кошти потрібно витратити вручну.</string>
 
     <string name="home_final_title">Кінцевий гаманець</string>
@@ -341,8 +341,8 @@
     <string name="walletinfo_onchain_swapin_timeout_1day">Термін дії цього обміну завершиться за день!</string>
     <string name="walletinfo_onchain_swapin_timeout">Термін дії цього обміну завершиться за %1$s днів.</string>
 
-    <string name="walletinfo_onchain_swapin_locked_title">Завершено</string>
-    <string name="walletinfo_onchain_swapin_locked_description">Ці кошти будуть доступні починаючи з %1$s днів.</string>
+    <string name="walletinfo_onchain_swapin_locked_title">Час вичерпано</string>
+    <string name="walletinfo_onchain_swapin_locked_description">Ці кошти стануть доступними через %1$s днів.</string>
 
     <string name="walletinfo_onchain_swapin_refund_title">Скасовані кошти</string>
     <string name="walletinfo_onchain_swapin_refund_description">Ці кошти не було обміняно вчасно. Торкніться, щоб витратити.</string>
@@ -373,7 +373,7 @@
     <string name="liquiditypolicy_advanced_pay_to_open_label">Пропустити перевірку абсолютної комісії для Lightning</string>
     <string name="liquiditypolicy_advanced_pay_to_open_help">Коли активно, вхідні платежі Lightning ігнорують максимальний абсолютний ліміт комісій. Застосовуватиметься лише перевірка відсотка.\n\nУвага: якщо feerate mempool Bitcoin високий, вхідні платежі LN, що потребують операції on-chain, можуть бути дорогими.</string>
     <string name="liquiditypolicy_save_button">Зберегти політику</string>
-    <string name="liquiditypolicy_request_button">Запросити вхідну ліквідність</string>
+    <string name="liquiditypolicy_request_button">Замовити вхідну ліквідність</string>
 
     <string name="liquiditypolicy_help">
       Phoenix дозволяє вам отримувати платежі в блокчейні Bitcoin (L1) і на рівні Lightning мережі Bitcoin (L2).
@@ -392,11 +392,11 @@
     <string name="liquidityads_no_channels_header">Немає каналів!</string>
     <string name="liquidityads_no_channels_details">Щоб скористатися цією функцією, спершу потрібно мати кошти в гаманці.</string>
     <string name="liquidityads_header">Сплануйте свою ліквідність</string>
-    <string name="liquidityads_instructions">Вхідна ліквідність дозволяє уникнути комісій on-chain за майбутні платежі, отримані через Lightning.\n\nЗапросивши більше ліквідності зараз, ви можете заощадити на комісіях пізніше.</string>
+    <string name="liquidityads_instructions">Вхідна ліквідність дозволяє уникнути комісій on-chain за майбутні платежі, отримані через Lightning.\n\nЗамовивши більше ліквідності зараз, ви можете заощадити на комісіях пізніше.</string>
     <string name="liquidityads_faq_link">Докладніше</string>
     <string name="liquidityads_current_liquidity">Поточна ліквідність</string>
 
-    <string name="liquidityads_amount_label">Запросити ліквідність</string>
+    <string name="liquidityads_amount_label">Замовити ліквідність</string>
     <string name="liquidityads_estimate_button">Оцінити вартість ліквідності</string>
     <string name="liquidityads_estimating_spinner">Оцінювання вартості…</string>
     <string name="liquidityads_estimate_details_miner_fees">Комісія майнерам</string>
@@ -405,13 +405,13 @@
     <string name="liquidityads_estimate_details_service_fees_help">Ця комісія йде сервісу, що надає ліквідність.</string>
     <string name="liquidityads_estimate_details_duration">Тривалість</string>
     <string name="liquidityads_estimate_details_duration_value">1 рік</string>
-    <string name="liquidityads_estimate_details_duration_help">У міру отримання коштів ліквідність споживатиметься та ставатиме вашим балансом. Через рік решта невикористаної ліквідності буде відновлена сервісом.</string>
+    <string name="liquidityads_estimate_details_duration_help">У міру отримання коштів ліквідність споживатиметься та ставатиме вашим балансом. Через рік решту невикористаної ліквідності буде повернуто сервісу.</string>
     <string name="liquidityads_estimate_above_25">Загальна комісія перевищує 25% від запитаної суми ліквідності.</string>
     <string name="liquidityads_over_balance">Загальні комісії перевищують ваш баланс.</string>
 
     <string name="liquidityads_review_button">Переглянути</string>
     <string name="liquidityads_disclaimer_body1">Ви запитуєте <b>початкову</b> суму ліквідності. Ліквідність не є сталою в часі: у міру отримання коштів через Lightning вона споживатиметься та ставатиме вашим балансом.</string>
-    <string name="liquidityads_disclaimer_body2">Через рік решта невикористаної ліквідності буде відновлена сервісом.</string>
+    <string name="liquidityads_disclaimer_body2">Через рік решту невикористаної ліквідності буде повернуто сервісу.</string>
 
     <string name="liquidityads_request_button">Прийняти</string>
     <string name="liquidityads_requesting_spinner">Обробка splice…</string>

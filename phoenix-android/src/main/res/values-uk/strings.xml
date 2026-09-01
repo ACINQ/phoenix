@@ -261,7 +261,7 @@
     <!-- channels view -->
 
     <string name="channelsview_title">Платіжні канали</string>
-    <string name="channelsview_menu_spend_channel_balance">Витратити адресу каналу</string>
+    <string name="channelsview_menu_spend_channel_balance">Витратити кошти з адреси каналу</string>
     <string name="channelsview_header">Огляд</string>
     <string name="channelsview_balance">Баланс</string>
     <string name="channelsview_balance_about"><b>Баланс</b> — це сукупний баланс ваших активних каналів. Це те, що ви можете витратити через Lightning.</string>
@@ -293,7 +293,7 @@
 
     <!-- spend from channel address -->
 
-    <string name="spendchanneladdress_title">Витратити адресу каналу</string>
+    <string name="spendchanneladdress_title">Витратити кошти з адреси каналу</string>
     <string name="spendchanneladdress_instructions">Цей екран — інструмент налагодження для відновлення коштів, випадково надісланих на outpoint каналу.</string>
     <string name="spendchanneladdress_amount">Сума</string>
     <string name="spendchanneladdress_sign_button">Підписати</string>
@@ -316,7 +316,7 @@
     <string name="home_connection_onion">Недійсна адреса</string>
     <string name="home_connection_connecting">Підключення…</string>
     <string name="home_connection_tor_active">Tor</string>
-    <string name="home_request_liquidity">Запросити ліквідність</string>
+    <string name="home_request_liquidity">Замовити ліквідність</string>
     <string name="home_inflight_payments">Наразі у вашому гаманці %1$d платежів в очікуванні.\n\nТримайте застосунок відкритим, щоб ці платежі було належно завершено.</string>
 
     <!-- in-app notifications -->
