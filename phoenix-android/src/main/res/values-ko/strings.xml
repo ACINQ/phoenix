@@ -986,7 +986,7 @@
 
     <string name="pincode_check_screenlock_title">잠금 PIN 입력</string>
     <string name="pincode_check_spending_payment_title">지출 PIN 입력</string>
-    <string name="pincode_check_spending_displayseed_title">시드를 보려면 지출 PIN 입력</string>]
+    <string name="pincode_check_spending_displayseed_title">시드를 보려면 지출 PIN 입력</string>
     <string name="pincode_check_disabling_title">계속하려면 PIN 입력</string>
     <string name="pincode_new_screenlock_title">잠금 PIN 만들기</string>
     <string name="pincode_new_spending_title">지출 PIN 만들기</string>
