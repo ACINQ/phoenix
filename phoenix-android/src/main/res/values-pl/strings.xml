@@ -523,7 +523,7 @@
     <string name="contact_name_label">Nazwa</string>
     <string name="contact_name_hint">Proszę wprowadzić nazwę</string>
     <string name="contact_offer_key_title">Płać własnym kluczem Bolt12</string>
-    <string name="contact_offer_key_enabled">Jeśli odbiorca zna kod płatności Bolt12 nadawcy, będzie wiedzieć, że płatności pochodzą od niego.</string>
+    <string name="contact_offer_key_enabled">Jeśli ten kontakt zna kod płatności Bolt12 tego portfela, będzie w stanie rozpoznać, że płatności pochodzą właśnie z niego.</string>
     <string name="contact_offer_key_disabled">Używa tymczasowego identyfikatora przy płatnościach do tego kontaktu.</string>
     <string name="contact_codes_list">Adresy</string>
     <string name="contact_codes_add_new">Dodaj kod Bolt12 lub adres Lightning…</string>

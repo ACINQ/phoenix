@@ -481,8 +481,8 @@
     <string name="swapinrefund_instructions_2">Proszę upewnić się, że adres docelowy jest prawidłowy, i użyć rozsądnego feerate.</string>
     <string name="swapinrefund_estimate_button">Oszacuj opłaty</string>
     <string name="swapinrefund_estimating">Szacowanie opłat…</string>
-    <string name="swapinrefund_send_button">Nadaj</string>
-    <string name="swapinrefund_sending">Nadawanie…</string>
+    <string name="swapinrefund_send_button">Rozgłoś</string>
+    <string name="swapinrefund_sending">Rozgłaszanie…</string>
     <string name="swapinrefund_failed">Błąd transakcji.</string>
     <string name="swapinrefund_failed_address">Ten adres jest nieprawidłowy.</string>
     <string name="swapinrefund_failed_cannot_create">Nie można utworzyć transakcji zwrotu.</string>
