@@ -40601,7 +40601,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "swap 준비 완료"
+            "value" : "Swap 준비 완료"
           }
         }
       }
@@ -47621,7 +47621,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "swap 수수료"
+            "value" : "Swap 수수료"
           }
         }
       }
@@ -47725,7 +47725,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "swap-in 서명자"
+            "value" : "Swap-in 서명자"
           }
         }
       }
@@ -56057,7 +56057,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "swap 대기 중: "
+            "value" : "Swap 대기 중: "
           }
         }
       }

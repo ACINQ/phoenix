@@ -87,7 +87,7 @@
     <string name="home_swapin_confirming_title">확인 중</string>
     <string name="home_swapin_confirming_desc">라이트닝으로 swap하려면 먼저 확인을 기다려야 합니다.</string>
 
-    <string name="home_swapin_ready_title">swap 대기 중</string>
+    <string name="home_swapin_ready_title">Swap 대기 중</string>
     <string name="home_swapin_ready_desc_auto">채굴 수수료가 %1$s 미만이면 라이트닝으로 전환됩니다.</string>
     <string name="home_swapin_ready_desc_disabled">자동 채널 관리가 비활성화되어 있으므로 온체인에 그대로 남습니다.</string>
     <string name="home_swapin_ready_desc_generic">조건이 충족되면 라이트닝으로 전환됩니다.</string>
