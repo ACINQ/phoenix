@@ -1,0 +1,504 @@
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ This file contains string resources related to important messages in the app, and should be translated as a priority.
+  ~ It should be kept as small as possible.
+  ~
+  ~ Most technical resource strings should stay in the default `strings.xml` file.
+-->
+<resources>
+
+    <!-- generic -->
+
+    <string name="utils_ack">이해했습니다</string>
+
+    <!-- system notifications -->
+
+    <string name="notif_headless_title_default">Phoenix가 백그라운드에서 실행 중입니다</string>
+    <string name="notif_headless_received">%1$s %2$s 수신</string>
+
+    <string name="notif_pending_settlement_title">지갑을 시작해 주세요</string>
+    <string name="notif_pending_settlement_message">수신 정산이 대기 중입니다.</string>
+
+    <string name="notif_inflight_payment_title">결제가 대기 중입니다</string>
+    <string name="notif_inflight_payment_message">결제가 제때 완료될 수 있도록 Phoenix를 시작해 주세요.</string>
+
+    <string name="notif_missed_title">놓친 수신 결제</string>
+    <string name="notif_missed_unavailable">Phoenix가 백그라운드에서 시작되지 못했습니다.</string>
+
+    <string name="notif_rejected_deposit_title">온체인 입금 대기 중 (+%1$s)</string>
+    <string name="notif_rejected_payment_title">결제 거부됨 (+%1$s)</string>
+    <string name="notif_rejected_policy_disabled">자동 채널 관리가 비활성화되어 있습니다. 자세한 내용을 보려면 탭하세요.</string>
+    <string name="notif_rejected_policy_disabled_timeout">자동 채널 관리가 비활성화되어 있습니다. 이 입금은 %1$s에 만료됩니다.</string>
+    <string name="notif_rejected_over_absolute">수수료가 %1$s인데, 설정된 최대 수수료는 %2$s입니다. 자세한 내용을 보려면 탭하세요.</string>
+    <string name="notif_rejected_over_absolute_timeout">수수료가 %1$s인데, 설정된 최대 수수료는 %2$s입니다. 이 입금은 %3$s에 만료됩니다.</string>
+    <string name="notif_rejected_over_relative">수수료가 %1$s인데, 이는 수신 금액의 %2$s%%를 초과합니다. 자세한 내용을 보려면 탭하세요.</string>
+    <string name="notif_rejected_over_relative_timeout">수수료가 %1$s인데, 이는 수신 금액의 %2$s%%를 초과합니다. 이 입금은 %3$s에 만료됩니다.</string>
+    <string name="notif_rejected_amount_too_low">결제 금액이 너무 적습니다.</string>
+    <string name="notif_rejected_generic_error">펀딩 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.</string>
+
+    <string name="notif_watcher_revoked_commit_title">Phoenix를 시작해 주세요</string>
+    <string name="notif_watcher_revoked_commit_message">일부 채널이 종료되었을 수 있습니다.</string>
+
+    <!-- settings list -->
+
+    <string name="settings_general_title">일반</string>
+    <string name="settings_fees_title">수수료</string>
+    <string name="settings_security_title">개인정보 보호 및 보안</string>
+    <string name="settings_advanced_title">고급</string>
+    <string name="settings_danger_title">위험 구역</string>
+
+    <string name="settings_display_prefs">디스플레이</string>
+    <string name="settings_wallet_info">지갑 정보</string>
+    <string name="settings_liquidity_policy">채널 관리</string>
+    <string name="settings_display_seed">복구 문구</string>
+    <string name="settings_access_control">접근 제어</string>
+    <string name="settings_list_channels">결제 채널</string>
+    <string name="settings_logs">로그</string>
+    <string name="settings_electrum">Electrum 서버</string>
+    <string name="settings_reset_wallet">지갑 삭제</string>
+    <string name="settings_mutual_close">채널 종료</string>
+    <string name="settings_force_close">채널 강제 종료</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">정보</string>
+    <string name="settings_payment_settings">결제 옵션</string>
+    <string name="settings_payment_history">결제 내역</string>
+    <string name="settings_notifications">알림</string>
+    <string name="settings_contacts">연락처</string>
+    <string name="settings_converter">통화 변환기</string>
+    <string name="settings_add_liquidity">유동성 추가</string>
+
+    <!-- home: swap help -->
+
+    <string name="home_swapin_confirming_title">확인 중</string>
+    <string name="home_swapin_confirming_desc">라이트닝으로 swap하려면 먼저 확인을 기다려야 합니다.</string>
+
+    <string name="home_swapin_ready_title">Swap 대기 중</string>
+    <string name="home_swapin_ready_desc_auto">채굴 수수료가 %1$s 미만이면 라이트닝으로 전환됩니다.</string>
+    <string name="home_swapin_ready_desc_disabled">자동 채널 관리가 비활성화되어 있으므로 온체인에 그대로 남습니다.</string>
+    <string name="home_swapin_ready_desc_generic">조건이 충족되면 라이트닝으로 전환됩니다.</string>
+    <string name="home_swapin_ready_expiring">주의! 일부 자금이 곧 만료되어 더 이상 swap할 수 없게 됩니다.</string>
+
+    <string name="home_swapin_expired_title">만료됨</string>
+    <string name="home_swapin_expired_desc">4개월의 대기 기간이 지나 더 이상 swap할 수 없습니다. 이 자금은 직접 사용해야 합니다.</string>
+
+    <string name="home_final_title">최종 지갑</string>
+    <string name="home_final_desc">이 자금은 종료된 라이트닝 채널에서 나온 것입니다. 직접 사용해야 합니다.</string>
+    <string name="home_onchain_balance_only">온체인 잔액</string>
+
+    <string name="home_background_restriction_title">백그라운드 처리 제한됨</string>
+    <string name="home_background_restriction_body_1">Phoenix가 백그라운드에 있거나 종료된 상태에서는 결제를 받지 못할 수 있습니다.</string>
+    <string name="home_background_restriction_body_2">원인은 다음과 같습니다:</string>
+    <string name="home_background_restriction_powersaver">기기가 절전 모드입니다</string>
+    <string name="home_background_restriction_fcm">FCM 알림 사용 불가</string>
+    <string name="home_background_restriction_fcm_details">GrapheneOS나 CalyxOS를 사용 중이라면 Google Play 서비스를 설치해야 FCM 알림을 받을 수 있습니다. 자세한 방법은 FAQ를 확인하세요.</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">설정</string>
+    <string name="menu_send">보내기</string>
+    <string name="menu_receive">받기</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">새 지갑 만들기</string>
+    <string name="initwallet_restore">내 지갑 복구</string>
+
+    <string name="restore_disclaimer_message_1_title">Phoenix는 라이트닝 전용입니다</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix는 이미 Phoenix에서 관리한 자금만 표시합니다. 다른 애플리케이션에서 생성한 시드에 연결된 자금은 여기에 표시되지 않습니다(온체인 자금 포함).</string>
+    <string name="restore_disclaimer_message_2_title">같은 시드의 동시 사용 주의</string>
+    <string name="restore_disclaimer_message_2_body">여러 기기에서 같은 시드를 동시에 사용하지 마세요. 두 Phoenix 인스턴스 간에 충돌이 발생하여 라이트닝 채널이 종료될 수 있습니다.</string>
+
+    <string name="restore_instructions">지갑의 시드는 12개의 영어 단어로 된 목록입니다. 이 목록의 각 단어를 아래 입력란에 입력하세요.</string>
+    <string name="restore_input_label">%1$s번째 단어 입력</string>
+    <string name="restore_input_invalid">유효한 단어가 아닙니다.</string>
+    <string name="restore_seed_valid">유효한 시드입니다</string>
+    <string name="restore_seed_valid_details">이제 지갑 복원을 진행할 수 있습니다.</string>
+    <string name="restore_seed_invalid">유효하지 않은 시드입니다</string>
+    <string name="restore_seed_invalid_details">올바른 단어를 정확한 순서로 입력했는지 확인하세요.</string>
+
+    <string name="restore_payments_button">결제 내역 가져오기</string>
+    <string name="restore_payments_button_details">선택 사항입니다. 다른 기기의 결제 데이터베이스 파일을 복원하려면 이 버튼을 사용하세요.</string>
+    <string name="restore_payments_success">결제 내역 복원 예정</string>
+    <string name="restore_payments_success_button">다른 파일 사용</string>
+    <string name="restore_payments_error_header">결제 내역을 복원할 수 없습니다</string>
+    <string name="restore_payments_error_button">다시 시도</string>
+    <string name="restore_payments_error_encryption">파일을 복호화할 수 없습니다. Phoenix 데이터베이스 파일(CSV 파일 아님)이 맞는지, 이 파일이 복원 중인 지갑의 것이 맞는지 확인하세요.</string>
+    <string name="restore_payments_error_open">이 파일을 열 수 없습니다. 다시 시도하세요.</string>
+    <string name="restore_payments_error_writing">이 파일을 앱 데이터 폴더에 저장할 수 없습니다. 다시 시도하세요.</string>
+    <string name="restore_import_button">지갑 복원</string>
+
+    <!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">업데이트 필요</string>
+    <string name="upgraderequired_message">이 Phoenix 버전(v%1$s)은 사용 중인 지갑과 호환되지 않습니다. 업데이트하거나 호환되는 버전을 사용하세요.</string>
+    <string name="upgraderequired_button">Google Play에서 업데이트</string>
+
+    <!-- receive view: warning about fee/liquidity -->
+
+    <string name="receive_lightning_warning_title_surefail">결제가 실패합니다</string>
+    <string name="receive_lightning_warning_title_fee_expected">온체인 수수료 예상</string>
+    <string name="receive_lightning_warning_hint_show_details">탭하여 자세히 보기</string>
+
+    <string name="receive_lightning_sheet_dismiss">닫기</string>
+    <string name="receive_lightning_sheet_button_enable">자동 채널 활성화</string>
+    <string name="receive_lightning_sheet_button_configure">수수료 한도 설정</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">이 금액을 수신하려면 온체인 작업이 필요할 수 있습니다.\n\n수수료는 약 %1$s(으)로 예상됩니다.</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">이 금액을 받으려면 온체인 작업이 필요할 가능성이 높습니다.</string>
+
+    <string name="receive_lightning_warning_message_above_limit">이 금액을 수신하려면 %1$s의 수수료가 예상되며, 이는 설정된 한도 %2$s을(를) 초과합니다.\n\n채널 관리 설정에서 이 한도를 높이세요.</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">이 금액을 수신하려면 %1$s의 수수료가 예상되며, 이는 설정된 한도 %2$s을(를) 초과합니다.\n\n채널 관리 설정에서 이 한도를 높이거나, 추가 유동성을 요청하세요.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">이 금액을 수신하려면 %1$s의 수수료가 예상되며, 이는 금액의 %2$s%%를 초과합니다.\n\n채널 관리 설정에서 이 한도를 높이세요.</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">이 금액을 수신하려면 %1$s의 수수료가 예상되며, 이는 금액의 %2$s%%를 초과합니다.\n\n채널 관리 설정에서 이 한도를 높이거나, 추가 유동성을 요청하세요.</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">이 금액을 받기에는 수신 유동성이 부족하며, 자동 채널 관리가 비활성화되어 있습니다.</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor 사용 중</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix가 결제를 수신하는 데 문제가 생길 수 있습니다. 앱을 화면에 띄운 상태로 유지하고 연결이 안정적인지 확인하세요.</string>
+
+    <!-- send errors -->
+
+    <string name="send_error_invoice_expired">이 인보이스는 만료되었습니다.</string>
+    <string name="send_error_payment_pending">이 결제는 이미 처리 중입니다. 완료될 때까지 기다려 주세요.</string>
+    <string name="send_error_already_paid">이 인보이스는 이미 결제되었습니다.</string>
+    <string name="send_error_invalid_chain">이 결제는 지갑과 동일한 블록체인을 사용하지 않습니다.</string>
+    <string name="send_error_lnurl_invalid">이 LNURL 링크를 처리하지 못했습니다. 링크가 유효한지 확인하세요.</string>
+    <string name="send_error_lnurl_unsupported">이 유형의 LNURL은 아직 지원되지 않습니다.</string>
+    <string name="send_error_invalid_generic">지원되는 결제 요청이 아닙니다.</string>
+    <string name="send_error_bip353_connect">이 주소의 데이터를 가져올 수 없습니다. 네트워크 연결에 문제가 있을 수 있습니다.</string>
+    <string name="send_error_bip353_name_not_found">\"%2$s\"에서 이름 \"%1$s\"을(를) 찾을 수 없습니다.</string>
+    <string name="send_error_bip353_invalid_uri">이 주소는 유효하지 않은 Bip21 리소스를 사용합니다.</string>
+    <string name="send_error_bip353_invalid_offer">이 주소는 유효하지 않은 Bolt12 오퍼를 사용합니다.</string>
+    <string name="send_error_bip353_dnssec">이 주소는 안전하지 않은 DNS에 호스팅되어 있습니다. DNSSEC을 활성화해야 합니다.</string>
+
+    <!-- validation -->
+
+    <string name="validation_below_min">%1$s 이상이어야 합니다</string>
+    <string name="validation_above_max">%1$s 이하여야 합니다</string>
+
+    <!-- closing channels -->
+
+    <string name="mutualclose_input_label">비트코인 주소</string>
+    <string name="mutualclose_input_instructions">모든 자금을 비트코인 주소로 전송합니다. 모든 결제 채널이 종료됩니다.</string>
+    <string name="mutualclose_confirm_title">채널 종료 확인</string>
+    <string name="mutualclose_confirm_details">모든 자금이 다음 주소로 전송됩니다:</string>
+    <string name="mutualclose_confirm_fee">예상 채굴 수수료:</string>
+    <string name="mutualclose_confirm_fee_unknown">수수료를 추정할 수 없습니다.</string>
+
+    <string name="forceclose_title">채널 강제 종료</string>
+    <string name="forceclose_instructions">이 화면에서는 채널을 일방적으로 종료할 수 있습니다.\n\n이것은 \"모든 문제를 해결하는\" 마법 버튼이 아닙니다. 안전장치로 마련된 기능이며 <b>극단적인 상황에서만 사용해야 합니다</b>. 예를 들어 피어(ACINQ)가 영구적으로 사라져 자금을 사용할 수 없게 된 경우가 이에 해당합니다. 그 외의 모든 경우에는 <b>Phoenix에 문제가 생기면 지원팀에 문의해야 합니다</b>.\n\n채널을 강제 종료하면 비용이 발생하고(온체인 수수료 충당), 자금이 며칠 동안 잠기게 됩니다.\n\n<b>채널이 완전히 종료될 때까지 앱을 삭제하지 마세요. 그렇지 않으면 자금을 잃게 됩니다.</b>\n\n<b>이 기능이 무엇을 하는지 완전히 이해하지 못했다면 사용하지 마세요.</b></string>
+    <string name="forceclose_address_label">자금은 결국 최종 지갑으로 전송됩니다:</string>
+
+    <string name="forceclose_confirm_title">강제 종료 확인</string>
+    <string name="forceclose_confirm_details">모든 자금은 상당한 지연 후 최종 지갑으로 전송됩니다.</string>
+    <string name="forceclose_button">모든 채널 강제 종료</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_backup_seed_message">비트코인을 잃지 않도록 지갑을 백업하세요.</string>
+    <string name="inappnotif_backup_seed_action">지갑 백업하기</string>
+
+    <string name="inappnotif_notification_permission_message_short">Android 알림 활성화</string>
+    <string name="inappnotif_notification_permission_message">Android 설정에서 알림이 비활성화되어 있습니다. 결제가 처리 중일 때 Phoenix가 알림을 보낼 수 없습니다.</string>
+    <string name="inappnotif_notification_permission_enable">활성화</string>
+
+    <string name="inappnotif_swapin_timeout_message">입금이 곧 만료됩니다.</string>
+    <string name="inappnotif_swapin_timeout_action">자세히 보기</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix는 백그라운드에서 주기적으로 블록체인을 모니터링하지만, 지난 며칠간 이를 수행하지 못했습니다.\n\nAndroid가 Phoenix를 차단하지 않는지, 그리고 Electrum에 연결할 수 있는지 확인하세요.</string>
+    <string name="inappnotif_watchtower_late_action">닫기</string>
+
+    <string name="inappnotif_upgrade_message">업데이트가 있습니다</string>
+    <string name="inappnotif_upgrade_critical_message">중요 업데이트가 있습니다. 가능한 한 빨리 Phoenix를 업데이트하세요.</string>
+    <string name="inappnotif_upgrade_button">Google Play에서 업데이트</string>
+
+    <string name="inappnotif_mempool_full_message">온체인 수수료가 높습니다.</string>
+    <string name="inappnotif_mempool_full_action">Phoenix에 미치는 영향 보기</string>
+
+    <string name="inappnotif_tor_disconnected_message">Tor 네트워크에 접속할 수 없습니다. Phoenix가 정상적으로 작동하지 않습니다.</string>
+    <string name="inappnotif_tor_disconnected_action">해결하기</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">온체인 자금 대기 중 (+%1$s)</string>
+    <string name="inappnotif_payments_rejection_overview_one">최근 수신 결제 1건이 거부되었습니다</string>
+    <string name="inappnotif_payments_rejection_overview_many">최근 수신 결제 %1$d건이 거부되었습니다</string>
+    <string name="inappnotif_payment_rejected_title">결제 거부됨 (+%1$s)</string>
+    <string name="inappnotif_payment_rejected_disabled">자동 채널 관리가 비활성화되어 있습니다.</string>
+    <string name="inappnotif_payment_rejected_over_absolute">수수료가 %1$s(으)로, 설정된 최대 수수료 %2$s을(를) 초과했습니다.</string>
+    <string name="inappnotif_payment_rejected_over_relative">수수료가 %1$s(으)로, 금액의 %2$s%%를 초과했습니다.</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">탭하여 설정을 변경하세요.</string>
+    <string name="inappnotif_payment_rejected_view_wallet">자세히 보기</string>
+
+    <string name="inappnotif_watchtower_nominal_title">워치타워 보고서</string>
+    <string name="inappnotif_watchtower_nominal_description_one">%2$s에 채널 %1$d개를 성공적으로 확인했습니다. 문제가 발견되지 않았습니다.</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%2$s에 채널 %1$d개를 성공적으로 확인했습니다. 문제가 발견되지 않았습니다.</string>
+    <string name="inappnotif_watchtower_revokedfound_title">워치타워 알림</string>
+    <string name="inappnotif_watchtower_revokedfound_description">%1$s에 다음 채널에서 폐기된 커밋먼트가 발견되었습니다: %2$s. 해당 채널은 종료될 수 있습니다.</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_instructions">복구 문구(시드라고도 합니다)는 12개의 영어 단어 목록입니다. 필요할 때 자금에 대한 완전한 접근 권한을 복구할 수 있게 해줍니다.\n\n<b>이 시드는 오직 본인만 갖고 있습니다. 비밀로 유지하세요.</b>\n\n<b>이 시드를 누구와도 공유하지 마세요</b>.\n피싱에 주의하세요. Phoenix 개발자는 절대 시드를 요구하지 않습니다.\n\n<b>이 시드를 잃어버리지 마세요</b>.\n안전한 곳에 보관하세요(이 휴대폰이 아닌 곳에). 시드와 휴대폰을 모두 잃어버리면 자금을 되찾을 수 없습니다.</string>
+    <string name="displayseed_authenticate_button">시드 표시</string>
+    <string name="displayseed_dialog_header">이 시드를 안전하게 보관하세요.\n절대 공유하지 마세요.</string>
+    <string name="displayseed_backup_notice_header">복구 문구를 아직 백업하지 않았습니다!</string>
+    <string name="displayseed_backup_notice_details">백업하지 않은 채 Phoenix에 접근할 수 없게 되면 자금을 잃게 됩니다!</string>
+    <string name="displayseed_backup_checkbox">복구 문구를 안전한 곳에 보관했습니다.</string>
+    <string name="displayseed_loss_disclaimer_checkbox">휴대폰과 복구 문구를 모두 잃어버리면 지갑의 자금을 잃게 된다는 것을 이해합니다.</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_funding_fees_label">채굴 수수료</string>
+    <string name="paymentdetails_funding_fees_desc">온체인 거래를 처리하기 위해 비트코인 네트워크 채굴자에게 지불하는 수수료입니다.</string>
+    <string name="paymentdetails_service_fees_label">서비스 수수료</string>
+    <string name="paymentdetails_service_fees_desc">새 결제 채널을 생성하기 위해 지불하는 수수료입니다. 항상 필요한 것은 아닙니다.</string>
+
+    <string name="paymentdetails_liquidity_purchase_label">유동성</string>
+    <string name="paymentdetails_liquidity_service_fee_label">서비스 수수료</string>
+    <string name="paymentdetails_liquidity_service_fee_help">유동성 서비스에 지불한 수수료입니다.</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">채굴 수수료</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">온체인 거래를 처리하기 위해 비트코인 네트워크 채굴자에게 지불하는 수수료입니다.</string>
+    <string name="paymentdetails_liquidity_caused_by_label">발생 원인</string>
+    <string name="paymentdetails_liquidity_caused_by_help">이 유동성은 결제를 수신하는 데 필요했습니다.</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">최적화 방법 보기</string>
+
+    <!-- lnurl -->
+
+    <string name="lnurl_auth_instructions">다음 사이트에 익명으로 로그인하고 작업을 승인할 수 있습니다:</string>
+    <string name="lnurl_withdraw_header"><b>%1$s</b>에서\n자금을 인출할 수 있습니다.</string>
+    <string name="lnurl_withdraw_success">인출 요청을 <b>%1$s</b>에 전송했습니다.\n\n해당 서비스가 자금을 보내기까지 시간이 걸릴 수 있습니다. 그동안 앱을 온라인 상태로 유지해 주세요.</string>
+
+    <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">Tor 활성화</string>
+    <string name="tor_dialog_enable_details_1">이 기능을 사용하려면 Orbot 같은 서드파티 Tor 프록시 VPN 앱을 설치해야 합니다.</string>
+    <string name="tor_dialog_enable_details_2">Tor는 프라이버시를 강화할 수 있지만, 성능 문제나 결제 누락이 발생할 수 있습니다.</string>
+    <string name="tor_dialog_disable_title">Tor 비활성화</string>
+    <string name="tor_dialog_disable_details_1">이 옵션을 비활성화하면 IP 주소가 여러 서비스 제공자에게 노출될 수 있습니다.</string>
+    <string name="tor_dialog_disable_details_2">계속 진행하시겠습니까?</string>
+    <string name="tor_dialog_processing">변경 사항 처리 중…</string>
+
+    <string name="tor_disconnected_dialog_title">Tor 네트워크에 접속할 수 없음</string>
+    <string name="tor_disconnected_dialog_action">해결하기</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix가 정상적으로 작동하려면 Tor에 접근할 수 있어야 합니다.</string>
+    <string name="tor_disconnected_dialog_details_2">Tor 프록시 VPN 앱이 실행 중이고 Tor에 연결되어 있는지 확인하세요.</string>
+    <string name="tor_disconnected_dialog_details_3">Tor VPN 앱이 없다면 하나 설치하세요. Orbot을 권장합니다.</string>
+    <string name="tor_disconnected_dialog_open_settings">Tor 설정 열기</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Orbot 페이지 열기</string>
+
+    <!-- about -->
+
+    <string name="about_general_content">Phoenix는 라이트닝 네트워크로 결제를 보내고 받는 비트코인 지갑입니다.\n\n<a href="https://phoenix.acinq.co">ACINQ</a>가 <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 라이선스</a>에 따라 개발한 무료 오픈소스 소프트웨어입니다.</string>
+    <string name="about_seed_title">키 보호하기</string>
+    <string name="about_seed_content">이 지갑은 셀프 커스터디 방식입니다. <b>지갑의 12단어 시드 키는 오직 본인만 보관합니다</b>.\n\n이 키가 있으면 자금에 접근할 수 있습니다. 누구에게도 공개하지 말고, 피싱에 주의하세요.</string>
+    <string name="about_rates_title">환율</string>
+    <string name="about_rates_content">비트코인/법정화폐 환율은 다양한 서드파티 API에서 가져옵니다:\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\n이 환율은 정확하지 않을 수 있습니다. 결제를 보내기 전에 항상 실제 비트코인 수량을 확인하세요.</string>
+
+    <!-- introduction screens -->
+
+    <string name="intro_welcome_title">환영합니다!</string>
+    <string name="intro_welcome_sub1">Phoenix로 비트코인을 쉽고 안전하게 주고받으세요.</string>
+    <string name="intro_welcome_next_button">다음</string>
+
+    <string name="intro_channels_title">한층 강력해진 비트코인</string>
+    <string name="intro_channels_sub1">Phoenix는 결제 채널을 사용해 비트코인을 빠르고 프라이빗하게 만듭니다.</string>
+    <string name="intro_channels_next_button">다음</string>
+
+    <string name="intro_selfcustody_title">당신의 키, 당신의 비트코인</string>
+    <string name="intro_selfcustody_sub1">Phoenix는 셀프 커스터디 지갑입니다. 통제권은 본인에게 있습니다.</string>
+    <string name="intro_selfcustody_sub2">비밀키가 있으면 언제든지 지갑을 복구할 수 있습니다. 안전하게 보관하세요!</string>
+    <string name="intro_selfcustody_next_button">시작하기</string>
+
+    <!-- wallet info -->
+
+    <string name="walletinfo_onchain_swapin">Swap-in 지갑</string>
+    <string name="walletinfo_onchain_swapin_help">Swap-in 지갑은 Phoenix에 입금된 온체인 자금을 관리합니다.\n\n채널 관리 설정에 따라, 가능할 때 자금을 자동으로 라이트닝으로 swap합니다.</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">작동 방식 보기</string>
+    <string name="walletinfo_onchain_swapin_policy_view">탭하여 설정</string>
+    <string name="walletinfo_onchain_swapin_empty">진행 중인 swap이 없습니다.</string>
+
+    <string name="walletinfo_onchain_swapin_policy_auto_details">채굴자에게 지불하는 수수료가 <b>%1$s 미만</b>이면 온체인 자금이 자동으로 라이트닝으로 swap됩니다(설정 변경 가능).</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout"><b>%1$d개월 후</b>에도 swap되지 않은 자금은 온체인에서 회수할 수 있습니다.</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">자동 채널 관리가 <b>비활성화되어 있습니다</b>. swap이 발생하지 않고, 자금은 온체인에 그대로 남습니다.</string>
+
+    <string name="walletinfo_onchain_swapin_last_attempt">%1$s에 swap 시도가 실패했습니다.</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">채널 관리가 비활성화되어 있었습니다.</string>
+    <string name="walletinfo_onchain_swapin_timeout_1day">이 swap은 하루 안에 만료됩니다!</string>
+    <string name="walletinfo_onchain_swapin_timeout">이 swap은 %1$s일 안에 만료됩니다.</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">시간 초과</string>
+    <string name="walletinfo_onchain_swapin_locked_description">이 자금은 %1$s일 후부터 사용할 수 있습니다.</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">취소된 자금</string>
+    <string name="walletinfo_onchain_swapin_refund_description">이 자금은 제때 swap되지 않았습니다. 사용하려면 탭하세요.</string>
+
+    <string name="walletinfo_onchain_final_about">최종 지갑은 라이트닝 채널이 종료되거나 문제가 발생했을 때 자금이 보내지는 곳입니다. 평소에는 비어 있는 것이 정상입니다.</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_instructions">수신 결제에는 때때로 온체인 거래가 필요합니다. 항상 발생하는 것은 아니며, 필요할 때만 발생합니다.</string>
+    <string name="liquiditypolicy_fees_estimation">현재 수수료는 약 <b>%1$s</b> (≈%2$s) 수준으로 추산됩니다.</string>
+    <string name="liquiditypolicy_disable_label">자동 채널 관리</string>
+    <string name="liquiditypolicy_disable_desc">온체인 작업이 필요한 수신 결제는 거부됩니다.</string>
+
+    <string name="liquiditypolicy_fees_base_label">최대 수수료 금액</string>
+    <string name="liquiditypolicy_fees_base_help">수수료가 이 값을 초과하는 결제는 거부됩니다.</string>
+    <string name="liquiditypolicy_fees_base_too_low">값이 너무 낮습니다.</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">예상 수수료보다 낮습니다. 일부 결제가 거부될 수 있습니다.</string>
+
+    <string name="liquiditypolicy_advanced_menu">고급 옵션</string>
+    <string name="liquiditypolicy_advanced_disable">채널 관리가 비활성화되어 있습니다. 채널 관리 설정 화면에서 활성화할 수 있습니다.</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">주의!</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">이 화면은 고급 사용자를 위한 것입니다. 각 설정의 목적을 이해하지 못한다면 변경하지 마세요.</string>
+
+    <string name="liquiditypolicy_advanced_verifications_title">추가 검증</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">비율 검사</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">수신 금액 대비 수수료를 검사합니다. 소액 결제에 대한 안전장치로 유용한 옵션입니다.</string>
+    <string name="liquiditypolicy_advanced_overrides_title">정책 예외</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">라이트닝 절대 수수료 확인 건너뛰기</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">활성화하면 수신 라이트닝 결제가 절대 최대 수수료 한도를 무시합니다. 비율 검사만 적용됩니다.\n\n주의: 비트코인 멤풀 수수료율이 높으면 온체인 작업이 필요한 수신 라이트닝 결제에 큰 비용이 들 수 있습니다.</string>
+    <string name="liquiditypolicy_save_button">정책 저장</string>
+    <string name="liquiditypolicy_request_button">수신 유동성 요청</string>
+
+    <string name="liquiditypolicy_help">
+      Phoenix에서는 비트코인 블록체인(L1)과 비트코인 라이트닝 레이어(L2)로 결제를 받을 수 있습니다.
+      \n\n
+      - 블록체인 레이어(L1)는 더 느리고, 일반적으로 훨씬 더 비쌉니다(채굴 수수료 필요)
+      \n
+      - 라이트닝 레이어(L2)는 훨씬 빠르고, 일반적으로 훨씬 저렴합니다(특히 소액 결제일수록)
+      \n\n
+      L1으로 결제를 받으면, 채굴 수수료가 설정한 수수료 정책에 부합하는 <b>경우에만</b> Phoenix가 자금을 자동으로 L2로 옮깁니다.
+      \n\n
+      L2로 받는 결제는 수수료 없이 즉시 받을 수 있습니다. 다만 L2 결제 채널을 관리하기 위해 가끔 L1 작업이 필요할 때가 있습니다. 이 작업 역시 채굴 수수료가 설정한 수수료 정책에 부합하는 <b>경우에만</b> 자동으로 진행됩니다.
+    </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">아직 채널이 없습니다!</string>
+    <string name="liquidityads_no_channels_details">이 기능을 사용하려면 먼저 지갑에 자금이 있어야 합니다.</string>
+    <string name="liquidityads_header">유동성을 미리 계획하세요</string>
+    <string name="liquidityads_instructions">수신 유동성이 있으면 앞으로 라이트닝으로 받을 결제에서 온체인 거래 수수료를 피할 수 있습니다.\n\n지금 유동성을 더 요청해 두면 나중에 수수료를 절약할 수 있습니다.</string>
+    <string name="liquidityads_faq_link">자세히 알아보기</string>
+    <string name="liquidityads_current_liquidity">현재 유동성</string>
+
+    <string name="liquidityads_amount_label">유동성 요청</string>
+    <string name="liquidityads_estimate_button">유동성 비용 추정</string>
+    <string name="liquidityads_estimating_spinner">비용 추산 중…</string>
+    <string name="liquidityads_estimate_details_miner_fees">채굴 수수료</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">기반 온체인 거래에 대한 채굴 수수료 부담분입니다.</string>
+    <string name="liquidityads_estimate_details_service_fees">서비스 수수료</string>
+    <string name="liquidityads_estimate_details_service_fees_help">이 수수료는 유동성을 제공하는 서비스에 지급됩니다.</string>
+    <string name="liquidityads_estimate_details_duration">기간</string>
+    <string name="liquidityads_estimate_details_duration_value">1년</string>
+    <string name="liquidityads_estimate_details_duration_help">자금을 받으면 유동성이 소모되어 잔액으로 전환됩니다. 1년 후에는 사용되지 않은 나머지 유동성을 서비스가 회수합니다.</string>
+    <string name="liquidityads_estimate_above_25">총 수수료가 요청한 유동성의 25%를 초과합니다.</string>
+    <string name="liquidityads_over_balance">총 수수료가 잔액을 초과합니다.</string>
+
+    <string name="liquidityads_review_button">검토</string>
+    <string name="liquidityads_disclaimer_body1">지금 요청하는 것은 <b>초기</b> 유동성입니다. 유동성은 계속 일정하게 유지되지 않습니다. 라이트닝으로 자금을 받을수록 유동성이 소진되어 잔액이 됩니다.</string>
+    <string name="liquidityads_disclaimer_body2">1년이 지나면 사용되지 않고 남은 유동성은 서비스가 회수합니다.</string>
+
+    <string name="liquidityads_request_button">수락</string>
+    <string name="liquidityads_requesting_spinner">splice 처리 중…</string>
+
+    <string name="liquidityads_success">유동성이 성공적으로 추가되었습니다!</string>
+    <string name="liquidityads_success_amount">추가된 수량: %1$s</string>
+
+    <string name="liquidityads_error_header">유동성 요청 실패</string>
+    <string name="liquidityads_error_channels_unavailable">채널을 사용할 수 없습니다. 나중에 다시 시도하세요.</string>
+    <string name="liquidityads_error_invalid_funding_amount">요청한 수량이 유효하지 않습니다.</string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">미확인 · 탭하여 가속</string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">거래 가속하기 (CPFP)</string>
+    <string name="cpfp_instructions">미확인 거래의 실효 수수료를 높여 비트코인 채굴자가 해당 거래를 우선 처리하도록 유도할 수 있습니다.</string>
+    <string name="cpfp_splice_error_actual_below_user">이 수수료율은 미확인 거래에 이미 적용된 수수료율보다 낮습니다. 더 높은 수수료율을 사용하세요.</string>
+
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_failuremessage_channel_closing">채널이 종료되는 중입니다.</string>
+    <string name="outgoing_failuremessage_channel_splicing">채널이 이미 splice를 처리하고 있습니다. 나중에 다시 시도하세요.</string>
+    <string name="outgoing_failuremessage_not_enough_fee">수수료가 부족합니다.</string>
+    <string name="outgoing_failuremessage_not_enough_balance">이 결제는 잔액을 초과합니다.</string>
+    <string name="outgoing_failuremessage_too_big">결제 금액이 너무 큽니다. 여러 번에 나누어 결제해 보세요.</string>
+    <string name="outgoing_failuremessage_too_small">결제 금액이 너무 적습니다.</string>
+    <string name="outgoing_failuremessage_expiry_too_big">이 결제의 만료 시점이 너무 멀리 설정되어 있습니다.</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">수신자가 결제를 거부했습니다. 이 인보이스는 이미 결제되었을 수 있습니다.</string>
+    <string name="outgoing_failuremessage_recipient_offline">수신자가 오프라인입니다.</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">수신자에게 결제를 전달하지 못했습니다(수신 유동성이 부족할 수 있습니다).</string>
+    <string name="outgoing_failuremessage_temporary_failure">결제 경로의 한 노드에서 오류가 발생했습니다. 다시 시도하면 결제가 성공할 수 있습니다.</string>
+    <string name="outgoing_failuremessage_too_many_pending">처리 대기 중인 결제가 너무 많습니다. 정산된 후에 다시 시도하세요.</string>
+
+    <string name="outgoing_failuremessage_invalid_id">결제 ID가 유효하지 않습니다. 다시 시도하세요.</string>
+    <string name="outgoing_failuremessage_alreadypaid">이 인보이스는 이미 결제되었습니다.</string>
+    <string name="outgoing_failuremessage_not_connected">채널이 아직 연결되지 않았습니다. 연결이 안정된 후 다시 시도하세요.</string>
+    <string name="outgoing_failuremessage_channel_opening">채널이 아직 개설 중입니다. 잠시 기다렸다가 다시 시도하세요.</string>
+    <string name="outgoing_failuremessage_unsupported_features">이 인보이스는 지원되지 않는 기능을 사용합니다. 최신 버전의 Phoenix를 사용 중인지 확인하세요.</string>
+    <string name="outgoing_failuremessage_invalid_amount">결제 금액이 유효하지 않습니다.</string>
+    <string name="outgoing_failuremessage_no_available_channels">기존 채널로는 결제를 보낼 수 없었습니다.</string>
+    <string name="outgoing_failuremessage_noroutefound">수신자에게 연결할 수 없거나, 수신 유동성이 충분하지 않습니다.</string>
+    <string name="outgoing_failuremessage_unknown">알 수 없는 오류가 발생하여 결제에 실패했습니다.</string>
+    <string name="outgoing_failuremessage_restarted">결제가 처리되는 중에 지갑이 다시 시작되었습니다.</string>
+
+    <!-- spliceout: low feerate disclaimer -->
+
+    <string name="spliceout_low_feerate_dialog_title">수수료율이 낮습니다!</string>
+    <string name="spliceout_low_feerate_dialog_body1">수수료율이 충분하지 않은 거래는 확인되지 않은 채 며칠에서 몇 주까지 지연될 수 있습니다.</string>
+    <string name="spliceout_low_feerate_dialog_body2">수수료율 선택은 본인의 책임입니다. 한번 전송된 거래는 취소할 수 없으며, 더 높은 수수료로 가속하는 것만 가능합니다.</string>
+    <string name="spliceout_low_feerate_dialog_body3">계속 진행하시겠습니까?</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">채널 크기에 영향 있음</string>
+    <string name="spliceout_capacity_disclaimer_body1">온체인으로 보내는 자금은 채널의 내 쪽 잔액에서 차감되어, 그만큼 채널 크기가 줄어듭니다. 수신 유동성은 변하지 않습니다.</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">이 메시지를 다시 표시하지 않음</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">취소된 swap-in 사용</string>
+    <string name="swapinrefund_none_available_label">아직 취소된 swap-in이 없습니다.</string>
+    <string name="swapinrefund_available_label">사용 가능: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">제때 swap되지 않은 온체인 입금을 이 화면에서 사용할 수 있습니다. 라이트닝 채널에는 영향을 주지 않습니다.</string>
+    <string name="swapinrefund_instructions_2">대상 주소가 유효한지 확인하고, 적절한 수수료율을 사용하세요.</string>
+    <string name="swapinrefund_estimate_button">수수료 추정</string>
+    <string name="swapinrefund_estimating">수수료 추정 중…</string>
+    <string name="swapinrefund_send_button">브로드캐스트</string>
+    <string name="swapinrefund_sending">브로드캐스트 중…</string>
+    <string name="swapinrefund_failed">거래 오류</string>
+    <string name="swapinrefund_failed_address">이 주소는 유효하지 않습니다.</string>
+    <string name="swapinrefund_failed_cannot_create">환불 거래를 생성할 수 없습니다.</string>
+    <string name="swapinrefund_success">거래가 브로드캐스트되었습니다.</string>
+    <string name="swapinrefund_success_details">아래에서 거래를 확인할 수 있습니다. 이 거래는 결제 내역에 표시되지 않으므로, 필요하다면 지금 거래 ID를 복사해 두세요.</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">최종 지갑 자금 사용</string>
+    <string name="finalwallet_refund_available_none">사용 가능한 자금 없음</string>
+    <string name="finalwallet_refund_available">사용 가능 금액</string>
+    <string name="finalwallet_refund_instructions">이 화면에서 최종 지갑의 자금을 사용합니다. 이 자금은 과거에 종료된 채널에서 나온 것입니다. 현재 사용 중인 라이트닝 채널에는 영향을 주지 않습니다.</string>
+
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">Bolt12 결제 요청을 사람이 읽기 쉬운 형태로 만든 주소입니다.</string>
+    <string name="bip353_subtitle2">더 보기 좋은 주소를 원하시나요? 서드파티 서비스를 이용하거나 주소를 직접 호스팅하세요!</string>
+
+</resources>

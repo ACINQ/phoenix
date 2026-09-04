@@ -135,21 +135,41 @@ object Parser {
         // We want to parse the parameters and the address. However the Url api lacks a simple property to extract an address.
         val address = trimMatchingPrefix(cleanInput, bitcoinPrefixes).substringBefore("?")
 
-        // -- read parameters
+        // -- reject unhandled or invalid parameters
         val requiredParams = url.parameters.entries().filter { it.key.startsWith("req-") }.map { it.key to it.value.joinToString(";") }
         if (requiredParams.isNotEmpty()) {
             return Either.Left(BitcoinUriError.UnhandledRequiredParams(requiredParams))
         }
+        if (!url.parameters["pop"].isNullOrBlank()) {
+            return Either.Left(BitcoinUriError.UnhandledRequiredParams(listOf("pop" to "unhandled")))
+        }
+        val duplicates = listOf("label", "amount", "lightning", "lno")
+            .filter { (url.parameters.getAll(it)?.size ?: 0) > 1 }
+        if (duplicates.isNotEmpty()) {
+            return Either.Left(BitcoinUriError.InvalidUri)
+        }
 
-        val amountSplit = url.parameters["amount"]?.trim()?.split(".", ignoreCase = true, limit = 2)
-        val btcPart = amountSplit?.first()
-        val satPart = amountSplit?.last()?.take(8)?.padEnd(8, '0')
-        val amount = when {
-            btcPart != null && satPart != null -> btcPart + satPart
-            btcPart != null && satPart == null -> btcPart + "00000000"
-            btcPart == null && satPart != null -> satPart
-            else -> null
-        }?.toLongOrNull()?.takeIf { it > 0L && it <= 21e14 }?.sat
+        // -- parse parameters
+        val amount = url.parameters["amount"]?.trim()
+            // regex check that the amount parameter is either:
+            // - a number with an optional decimal part (e.g. 2 or 1.234) ;
+            // - a purely decimal part (e.g. .324)
+            // in both cases the decimal part is max 8 digits, and the decimal separator is `.`
+            // note: this is less strict that the BIP, as we accept `amount=.5` and amount=`5.` as valid.
+            // note: we don't use \d for digits as it might be too lax with unicode digits.
+            ?.takeIf { it.matches(Regex("""[0-9]+\.?[0-9]{0,8}|\.[0-9]{1,8}""")) }
+            // we do string surgery here because using string->number conversion methods from kotlin std lib (e.g. String.toDouble) opens up
+            // floating point issues, truncation and rounding consideration, and accepts scientific notations that are outside the scope of Bip21.
+            ?.let {
+                // note: whole falls back to 0 if empty, to accept a `.5` amount parameter and pass the `toLongOrNull` call.
+                val whole = it.substringBefore('.').ifEmpty { "0" }.toLongOrNull() ?: return@let null
+                val dec = it.substringAfter('.', missingDelimiterValue = "")
+                    .padEnd(8, '0')
+                    .toLong() // safe: regex guarantees 0–8 digits
+                whole * 100_000_000 + dec
+            }
+            ?.takeIf { it > 0L && it <= 21e14 }
+            ?.sat
 
         val label = url.parameters["label"]
         val message = url.parameters["message"]
@@ -216,9 +236,11 @@ sealed class EmailLikeAddress {
     abstract val source: String
     abstract val username: String
     abstract val domain: String
+
     data class UnknownType(override val source: String, override val username: String, override val domain: String) : EmailLikeAddress()
     data class LnurlBased(override val source: String, override val username: String, override val domain: String) : EmailLikeAddress() {
         val url = Lnurl.Request(Url("https://$domain/.well-known/lnurlp/$username"), tag = Lnurl.Tag.Pay)
     }
+
     data class Bip353(override val source: String, override val username: String, override val domain: String) : EmailLikeAddress()
 }

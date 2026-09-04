@@ -136,7 +136,7 @@ fun LnurlWithdrawView(
             }
             is LnurlWithdrawViewState.InvoiceSent -> {
                 Text(
-                    text = annotatedStringResource(id = R.string.lnurl_withdraw_success, withdraw.callback.host),
+                    text = annotatedStringResource(id = R.string.lnurl_withdraw_success, withdraw.initialUrl.host),
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(12.dp))

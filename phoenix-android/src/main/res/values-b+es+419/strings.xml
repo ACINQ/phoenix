@@ -477,7 +477,7 @@
     <string name="lnurl_pay_error_invalid_chain">La factura devuelta por <b>%1$s</b> no usa la misma cadena de la billetera.</string>
     <string name="lnurl_pay_error_already_paid">La factura devuelta por <b>%1$s</b> ya se pagó.</string>
     <string name="lnurl_pay_error_invalid_amount">La factura devuelta por <b>%1$s</b> tiene un importe incorrecto.</string>
-    <string name="lnurl_pay_error_invalid_malformed">La factura devuelta por <b>%1$s</b> tiene un formato incorrecto</string>
+    <string name="lnurl_pay_error_invalid_malformed">La factura devuelta por <b>%1$s</b> tiene un formato incorrecto:\n%2$s</string>
 
     <!-- settings: display preferences -->
 
@@ -667,8 +667,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Se desconoce el estado del mempool</string>
-    <string name="mempool_unknown_feerate_details">Phoenix no pudo obtener el estado actual del mempool, por lo que no puede calcular la velocidad de las transacciones.\n\nComprueba el mempool manualmente en un explorador y usa un valor adecuado.</string>
+    <string name="mempool_unknown_feerate_title">Velocidad de transacción desconocida</string>
+    <string name="mempool_unknown_feerate_details">Verifica manualmente la tarifa actual en un explorador y usa un valor adecuado.</string>
     <string name="mempool_fastest">≈ Próximo bloque</string>
     <string name="mempool_halfhour">≈ 30 minutos</string>
     <string name="mempool_hour">≈ 1 hora</string>

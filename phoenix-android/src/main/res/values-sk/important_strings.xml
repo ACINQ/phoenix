@@ -426,8 +426,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Urýchlenie mojich transakcií.</string>
-    <string name="cpfp_instructions">Všetky vaše nepotvrdené transakcie môžu zvýšiť poplatok, aby ťažiari uprednostnili vašu platbu.</string>
+    <string name="cpfp_title">Urýchlenie mojich transakcií (CPFP).</string>
+    <string name="cpfp_instructions">Môžete zvýšiť efektívne poplatky svojich nepotvrdených transakcií a motivovať tak bitcoinových ťažiarov, aby ich uprednostnili.</string>
     <string name="cpfp_splice_error_actual_below_user">Tento poplatok je nižší ako ten, ktorý už používajú vaše nepotvrdené transakcie. Zvoľte vyšší poplatok.</string>
 
     <!-- Lightning payment errors -->
@@ -474,8 +474,8 @@
 
     <string name="swapinrefund_title">Stráviť výmenu, ktorej platnosť vypršala</string>
     <string name="swapinrefund_none_available_label">Žiadny swap-in nevypršal.</string>
-    <string name="swapinrefund_available_label">Dostupné finančné prostriedky: <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Na tejto obrazovke môžete minúť vklady v reťazci, ktoré neboli včas prevedené na Lightning. Upozorňujeme, že to nijako neovplyvňuje vaše kanály Lightning.</string>
+    <string name="swapinrefund_available_label">Suma na minutie: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Na tejto obrazovke môžete minúť všetky vklady vo swap-in peňaženke, ktoré neboli včas prevedené na Lightning a ktorých platnosť už vypršala. Toto nijako neovplyvňuje vaše existujúce kanály Lightning ani prebiehajúce swap-iny.</string>
     <string name="swapinrefund_instructions_2">Uistite sa, že cieľová adresa je správna a poplatky primerané.</string>
     <string name="swapinrefund_estimate_button">Odhad poplatkov</string>
     <string name="swapinrefund_estimating">Odhad poplatkov…</string>
@@ -490,9 +490,9 @@
     <!-- Final wallet refund -->
 
     <string name="finalwallet_refund_title">Míňať prostriedky z konečnej peňaženky</string>
-    <string name="finalwallet_refund_available_none">Nie sú k dispozícii žiadne prostriedky</string>
-    <string name="finalwallet_refund_available">Dostupná suma</string>
-    <string name="finalwallet_refund_instructions">Na tejto obrazovke môžete minúť prostriedky z konečnej peňaženky. Tieto prostriedky pochádzajú z kanálov, ktoré boli v minulosti uzavreté. Toto nemá vplyv na vaše existujúce kanály Lightning.</string>
+    <string name="finalwallet_refund_available_none">Žiadne prostriedky na minutie</string>
+    <string name="finalwallet_refund_available">Suma na minutie</string>
+    <string name="finalwallet_refund_instructions">Na tejto obrazovke môžete minúť všetky prostriedky z konečnej peňaženky. Tieto prostriedky pochádzajú z kanálov, ktoré boli v minulosti uzavreté. Toto nemá vplyv na vaše existujúce kanály Lightning.</string>
 
     <!-- experimental features -->
 

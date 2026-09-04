@@ -655,7 +655,7 @@
     <string name="lnurl_pay_error_payment_pending">Faktur yang dikembalikan oleh <b>%1$s</b> sudah dalam proses.</string>
     <string name="lnurl_pay_error_already_paid">Faktur yang dikembalikan oleh <b>%1$s</b> sudah dibayar.</string>
     <string name="lnurl_pay_error_invalid_amount">Faktur yang dikembalikan oleh <b>%1$s</b> memiliki jumlah yang salah.</string>
-    <string name="lnurl_pay_error_invalid_malformed">Faktur yang dikembalikan oleh <b>%1$s</b> tidak sesuai format.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Faktur yang dikembalikan oleh <b>%1$s</b> tidak sesuai format:\n%2$s</string>
 
     <!-- settings: display preferences -->
 
@@ -881,8 +881,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Status mempool tidak diketahui</string>
-    <string name="mempool_unknown_feerate_details">Phoenix tidak dapat mengambil status mempool saat ini dan tidak dapat memperkirakan kecepatan transaksi Anda.\n\nPeriksa mempool secara manual di explorer, dan gunakan nilai yang sesuai!</string>
+    <string name="mempool_unknown_feerate_title">Kecepatan transaksi tidak diketahui</string>
+    <string name="mempool_unknown_feerate_details">Periksa secara manual tarif biaya saat ini di explorer dan gunakan nilai yang sesuai.</string>
     <string name="mempool_fastest">≈ 10 menit</string>
     <string name="mempool_halfhour">≈ 30 menit</string>
     <string name="mempool_hour">≈ 1 jam</string>

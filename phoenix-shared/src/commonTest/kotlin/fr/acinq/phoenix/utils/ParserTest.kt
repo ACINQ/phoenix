@@ -22,6 +22,8 @@ import fr.acinq.bitcoin.BitcoinError
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.utils.btc
+import fr.acinq.lightning.utils.mbtc
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.OfferTypes
 import fr.acinq.phoenix.data.BitcoinUriError
@@ -98,6 +100,26 @@ class ParserTest {
     }
 
     @Test
+    fun parse_bitcoinuri_reject_duplicate_params() {
+        listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
+            "bitcoin:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa?amount=1&amount=1" to Either.Left(
+                BitcoinUriError.InvalidUri
+            ),
+            "bitcoin:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa?amount=1&amount=2" to Either.Left(
+                BitcoinUriError.InvalidUri
+            ),
+            "bitcoin:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa?label=foobar&label=barbaz" to Either.Left(
+                BitcoinUriError.InvalidUri
+            ),
+            "bitcoin:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa?lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp&lno=lno1qgsyxjtl6luzd9t3pr62xr7eemp6awnejusgf6gw45q75vcfqqqqqqqsespexwyy4tcadvgg89l9aljus6709kx235hhqrk6n8dey98uyuftzdqrt2gkjvf2rj2vnt7m7chnmazen8wpur2h65ttgftkqaugy6ql9dcsyq39xc2g084xfn0s50zlh2ex22vvaqxqz3vmudklz453nns4d0624sqr8ux4p5usm22qevld4ydfck7hwgcg9wc3f78y7jqhc6hwdq7e9dwkhty3svq5ju4dptxtldjumlxh5lw48jsz6pnagtwrmeus7uq9rc5g6uddwcwldpklxexvlezld8egntua4gsqqy8auz966nksacdac8yv3maq6elp" to Either.Left(
+                BitcoinUriError.InvalidUri
+            ),
+        ).forEach {
+            assertEquals(it.second, Parser.parseBip21Uri(Chain.Mainnet, it.first))
+        }
+    }
+
+    @Test
     fun parse_bitcoin_uri_with_parameters() {
         listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
             // ignore unhandled params
@@ -121,6 +143,10 @@ class ParserTest {
             // fail if uri contains required params we don't understand
             "bitcoin:175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W?req-somethingyoudontunderstand=50&req-somethingelseyoudontget=999" to Either.Left(
                 BitcoinUriError.UnhandledRequiredParams(parameters = listOf("req-somethingyoudontunderstand" to "50", "req-somethingelseyoudontget" to "999"))
+            ),
+            // reject proof-of-payment uris
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?pop=foobar" to Either.Left(
+                BitcoinUriError.UnhandledRequiredParams(parameters = listOf("pop" to "unhandled"))
             ),
         ).forEach {
             assertEquals(it.second, Parser.parseBip21Uri(Chain.Mainnet, it.first))
@@ -161,6 +187,79 @@ class ParserTest {
     @Test
     fun parse_bitcoin_uri_with_amount() {
         listOf<Pair<String, Either<BitcoinUriError, BitcoinUri>>>(
+            // 1
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1.btc
+                )
+            ),
+            // +1
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=+1" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1.btc
+                )
+            ),
+            // percent-encoded
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=%31.5" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1500.mbtc
+                )
+            ),
+            // percent-encoded separator
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1%2E5" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1500.mbtc
+                )
+            ),
+            // 10
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=10" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 10.btc
+                )
+            ),
+            // 1.0
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.0" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1.btc
+                )
+            ),
+            // 1.1
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.1" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1_100_00000.sat
+                )
+            ),
+            // 1.23456789
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.23456789" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1_234_56789.sat
+                )
+            ),
+            // trim extra space
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.0123  " to Either.Right(
                 BitcoinUri(
                     chain = Chain.Mainnet,
@@ -169,12 +268,39 @@ class ParserTest {
                     amount = 12_30000.sat
                 )
             ),
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.23456789999" to Either.Right(
+            // accept decimal separator without whole part, or without decimal part
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=5." to Either.Right(
                 BitcoinUri(
                     chain = Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
                     script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
-                    amount = 1_234_56789.sat
+                    amount = 5.btc
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=.5" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 500.mbtc
+                )
+            ),
+            // 1 sat
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=000.00000001" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1.sat
+                )
+            ),
+            // 21 million btc
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=21000000.00000000" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 21_000_000.btc
                 )
             ),
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=21000000.000" to Either.Right(
@@ -185,7 +311,152 @@ class ParserTest {
                     amount = 21_000_000_000_00000.sat
                 )
             ),
-            // amount with invalid chars is ignored
+            // reject 0
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject > 21M btc
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=21000000.00000001" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject negative
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=-1" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject non-ASCII 0-9 digits
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=١٢٣" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=１２３" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=１２.３" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject lone separator
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=." to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject nasty separator
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1٠23" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1．23" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1·23" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject RTL override
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1\\u202E5.2\\u202C" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=\\u202E5.1" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject zero-width-space & bom
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1\u200B.5" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1\u2060.5" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=\uFEFF1.5" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject long decimal part
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.2345678999" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=.123456789" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject invalid chars
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.001a2" to Either.Right(
                 BitcoinUri(
                     chain = Chain.Mainnet,
@@ -194,7 +465,47 @@ class ParserTest {
                     amount = null
                 )
             ),
-            // amount with two decimal separators is ignored
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1e2" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=Infinity" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=NaN" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=null" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0x213" to Either.Right(
+                BitcoinUri(
+                    chain = Chain.Mainnet,
+                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = null
+                )
+            ),
+            // reject multiple decimal separators
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.001.2" to Either.Right(
                 BitcoinUri(
                     chain = Chain.Mainnet,
@@ -203,7 +514,7 @@ class ParserTest {
                     amount = null
                 )
             ),
-            // amount with a comma separator is ignored
+            // reject comma separator
             "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0,0012" to Either.Right(
                 BitcoinUri(
                     chain = Chain.Mainnet,
@@ -212,8 +523,8 @@ class ParserTest {
                     amount = null
                 )
             ),
-            // amount < 1 sat is ignored
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.000000001" to Either.Right(
+            // reject < 1 sat is ignored
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.00000000999" to Either.Right(
                 BitcoinUri(
                     chain = Chain.Mainnet,
                     address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
@@ -221,17 +532,8 @@ class ParserTest {
                     amount = null
                 )
             ),
-            // amount > 21e6 btc is ignored
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=21000000.00000001" to Either.Right(
-                BitcoinUri(
-                    chain = Chain.Mainnet,
-                    address = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-                    script = ByteVector("0014751e76e8199196d454941c45d1b3a323f1433bd6"),
-                    amount = null
-                )
-            )
         ).forEach {
-            assertEquals(it.second, Parser.parseBip21Uri(Chain.Mainnet, it.first))
+            assertEquals(it.second, Parser.parseBip21Uri(Chain.Mainnet, it.first), message = "${it.first} does not match: ")
         }
     }
 

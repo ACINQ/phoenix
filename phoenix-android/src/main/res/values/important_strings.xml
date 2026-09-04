@@ -429,8 +429,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Accelerate my transactions.</string>
-    <string name="cpfp_instructions">You can make all your unconfirmed transactions use a higher feerate to encourage miners to favour your payments.</string>
+    <string name="cpfp_title">Accelerate my transactions (CPFP).</string>
+    <string name="cpfp_instructions">You can increase the effective fees on your unconfirmed transactions to incentivize Bitcoin miners to prioritize them.</string>
     <string name="cpfp_splice_error_actual_below_user">This feerate is less than what your unconfirmed transactions are already using. Use a higher feerate.</string>
 
     <!-- Lightning payment errors -->
@@ -476,8 +476,8 @@
 
     <string name="swapinrefund_title">Spend cancelled swap-ins</string>
     <string name="swapinrefund_none_available_label">No cancelled swap-ins yet.</string>
-    <string name="swapinrefund_available_label">Available: <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Use this screen to spend on-chain deposits that were not swapped in time. This does not affect your Lightning channels.</string>
+    <string name="swapinrefund_available_label">Amount to spend: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Use this screen to spend all the deposits on the swap-in wallet that were not swapped in time and have now expired. This does not affect your existing Lightning channels, or the pending swap-ins.</string>
     <string name="swapinrefund_instructions_2">Make sure the destination address is valid, and use a reasonable feerate.</string>
     <string name="swapinrefund_estimate_button">Estimate fees</string>
     <string name="swapinrefund_estimating">Estimating fees…</string>
@@ -492,9 +492,9 @@
     <!-- Final wallet refund -->
 
     <string name="finalwallet_refund_title">Spend funds from final wallet</string>
-    <string name="finalwallet_refund_available_none">No funds available</string>
-    <string name="finalwallet_refund_available">Amount available</string>
-    <string name="finalwallet_refund_instructions">Use this screen to spend funds from your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels.</string>
+    <string name="finalwallet_refund_available_none">No funds to spend</string>
+    <string name="finalwallet_refund_available">Amount to spend</string>
+    <string name="finalwallet_refund_instructions">Use this screen to spend all the funds on your final wallet. These funds come from channels that have been closed in the past. This does not affect your existing Lightning channels.</string>
 
     <!-- experimental features -->
 

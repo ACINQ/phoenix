@@ -21,10 +21,11 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.utils.Try
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
+import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.format
-import fr.acinq.phoenix.db.cloud.b64Decode
 import io.ktor.http.*
 import kotlinx.serialization.json.*
+import kotlin.io.encoding.Base64
 
 sealed class LnurlPay : Lnurl.Qualified {
 
@@ -106,71 +107,95 @@ sealed class LnurlPay : Lnurl.Qualified {
         /** Parses json into a [LnurlPay.Invoice] object. Throws an [LnurlError.PayInvoice] exception if unreadable. */
         fun parseLnurlPayInvoice(
             intent: Intent,
-            origin: String,
             json: JsonObject
         ): Invoice {
             try {
-                val pr = json["pr"]?.jsonPrimitive?.content ?: throw LnurlError.Pay.Invoice.Malformed(origin, "missing pr")
+                val pr = json["pr"]?.jsonPrimitive?.content ?: throw LnurlError.Pay.Invoice.Malformed(intent.callback.host, "missing pr")
                 val invoice = when (val res = Bolt11Invoice.read(pr)) {
                     is Try.Success -> res.result
-                    is Try.Failure -> throw LnurlError.Pay.Invoice.Malformed(origin, res.error.message ?: res.error::class.toString())
+                    is Try.Failure -> throw LnurlError.Pay.Invoice.Malformed(intent.callback.host, res.error.message ?: res.error::class.toString())
                 }
 
-                val successAction = parseSuccessAction(origin, json)
+                val successAction = parseSuccessAction(intent.callback.host, json)
                 return Invoice(intent.initialUrl, invoice, successAction)
             } catch (t: Throwable) {
                 when (t) {
                     is LnurlError.Pay.Invoice -> throw t
-                    else -> throw LnurlError.Pay.Invoice.Malformed(origin, "unknown error")
+                    else -> throw LnurlError.Pay.Invoice.Malformed(intent.callback.host, "unknown error")
                 }
             }
         }
 
+        /**
+         * See LUD09/LUD10.
+         * @param origin the lnurl-pay callback's host
+         */
         private fun parseSuccessAction(
             origin: String,
             json: JsonObject
         ): Invoice.SuccessAction? {
-            val obj = try {
-                json["successAction"]?.jsonObject // throws on Non-JsonObject (e.g. JsonNull)
-            } catch (t: Throwable) {
-                null
-            } ?: return null
+            val obj = when (val successAction = json["successAction"]) {
+                null -> return null
+                is JsonNull -> return null
+                is JsonObject -> successAction.jsonObject
+                else -> throw LnurlError.Pay.Invoice.Malformed(origin, "success: invalid successAction content")
+            }
 
-            return when (obj["tag"]?.jsonPrimitive?.content) {
+            return when (val tag = obj["tag"]?.jsonPrimitive?.content) {
                 Invoice.SuccessAction.Tag.Message.label -> {
-                    val message = obj["message"]?.jsonPrimitive?.content ?: return null
-                    if (message.isBlank() || message.length > 144) {
-                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.message: bad length")
+                    val message = obj["message"]?.jsonPrimitive?.content
+                    if (message.isNullOrBlank() || message.length > 144) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.message.message: missing or bad length")
                     }
                     Invoice.SuccessAction.Message(message)
                 }
                 Invoice.SuccessAction.Tag.Url.label -> {
-                    val description = obj["description"]?.jsonPrimitive?.content ?: return null
-                    if (description.length > 144) {
-                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.description: bad length")
+                    val description = obj["description"]?.jsonPrimitive?.content
+                    if (description.isNullOrBlank() || description.length > 144) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.description: missing or bad length")
                     }
-                    val urlStr = obj["url"]?.jsonPrimitive?.content ?: return null
-                    val url = Url(urlStr)
+                    val urlStr = obj["url"]?.jsonPrimitive?.content ?: throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: missing url")
+                    val url = try {
+                        Url(urlStr)
+                    } catch (_: Exception) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: invalid url")
+                    }
+                    if (!url.protocol.isSecure()) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: TLS required")
+                    }
+                    if (url.host != origin) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: callback host mismatch")
+                    }
                     Invoice.SuccessAction.Url(description, url)
                 }
                 Invoice.SuccessAction.Tag.Aes.label -> {
-                    val description = obj["description"]?.jsonPrimitive?.content ?: return null
-                    if (description.length > 144) {
+                    val description = obj["description"]?.jsonPrimitive?.content
+                    if (description.isNullOrBlank() || description.length > 144) {
                         throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.description: bad length")
                     }
-                    val ciphertextStr = obj["ciphertext"]?.jsonPrimitive?.content ?: return null
-                    val ciphertext = ByteVector(ciphertextStr.b64Decode())
+                    val ciphertextStr = obj["ciphertext"]?.jsonPrimitive?.content ?: throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.ciphertext: missing")
+                    val ciphertext = try {
+                        Base64.decode(ciphertextStr).toByteVector()
+                    } catch (_: Exception) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.ciphertext: invalid b64")
+                    }
                     if (ciphertext.size() > (4 * 1024)) {
                         throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.ciphertext: bad length")
                     }
-                    val ivStr = obj["iv"]?.jsonPrimitive?.content ?: return null
-                    if (ivStr.length != 24) {
-                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.iv: bad length")
+                    val ivStr = obj["iv"]?.jsonPrimitive?.content
+                    if (ivStr.isNullOrBlank() || ivStr.length != 24) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.iv: missing or bad length")
                     }
-                    val iv = ByteVector(ivStr.b64Decode())
+                    val iv = try {
+                        Base64.decode(ivStr).toByteVector()
+                    } catch (_: Exception) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.iv: invalid b64")
+                    }
                     Invoice.SuccessAction.Aes(description, ciphertext = ciphertext, iv = iv)
                 }
-                else -> null
+                else -> {
+                    throw LnurlError.Pay.Invoice.Malformed(origin, "unhandled tag action: $tag")
+                }
             }
         }
 

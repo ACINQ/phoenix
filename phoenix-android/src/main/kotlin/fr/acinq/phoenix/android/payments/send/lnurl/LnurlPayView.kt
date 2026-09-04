@@ -126,7 +126,7 @@ fun LnurlPayView(
             Spacer(modifier = Modifier.height(16.dp))
         }
         SplashLabelRow(label = stringResource(R.string.lnurl_pay_domain)) {
-            Text(text = payIntent.callback.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = payIntent.initialUrl.host, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Spacer(modifier = Modifier.height(8.dp))
         SplashLabelRow(label = stringResource(R.string.lnurl_pay_meta_description)) {
@@ -171,12 +171,12 @@ fun LnurlPayView(
                         details = when (state) {
                             is LnurlPayViewState.Error.Generic -> state.cause.localizedMessage
                             is LnurlPayViewState.Error.PayError -> when (val error = state.error) {
-                                is SendManager.LnurlPayError.PaymentPending -> annotatedStringResource(R.string.lnurl_pay_error_payment_pending, payIntent.callback.host)
-                                is SendManager.LnurlPayError.AlreadyPaidInvoice -> annotatedStringResource(R.string.lnurl_pay_error_already_paid, payIntent.callback.host)
-                                is SendManager.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, payIntent.callback.host)
+                                is SendManager.LnurlPayError.PaymentPending -> annotatedStringResource(R.string.lnurl_pay_error_payment_pending, payIntent.initialUrl.host)
+                                is SendManager.LnurlPayError.AlreadyPaidInvoice -> annotatedStringResource(R.string.lnurl_pay_error_already_paid, payIntent.initialUrl.host)
+                                is SendManager.LnurlPayError.ChainMismatch -> annotatedStringResource(R.string.lnurl_pay_error_invalid_chain, payIntent.initialUrl.host)
                                 is SendManager.LnurlPayError.BadResponseError -> when (val errorDetail = error.err) {
                                     is LnurlError.Pay.Invoice.InvalidAmount -> annotatedStringResource(R.string.lnurl_pay_error_invalid_amount, errorDetail.origin)
-                                    is LnurlError.Pay.Invoice.Malformed -> annotatedStringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin)
+                                    is LnurlError.Pay.Invoice.Malformed -> annotatedStringResource(R.string.lnurl_pay_error_invalid_malformed, errorDetail.origin, errorDetail.context)
                                 }
                                 is SendManager.LnurlPayError.RemoteError -> error.err.toLocalisedMessage()
                             }

@@ -433,8 +433,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Tăng tốc giao dịch của tôi.</string>
-    <string name="cpfp_instructions">Bạn có thể trả phí cao hơn để các thợ đào ưu tiên các khoản thanh toán chưa được xác nhận của mình.</string>
+    <string name="cpfp_title">Tăng tốc giao dịch của tôi (CPFP).</string>
+    <string name="cpfp_instructions">Bạn có thể tăng phí thực tế của các giao dịch chưa được xác nhận để khuyến khích các thợ đào Bitcoin ưu tiên chúng.</string>
     <string name="cpfp_splice_error_actual_below_user">Mức phí này thấp hơn so với mức phí đang dùng cho các giao dịch chưa được xác nhận của bạn. Hãy sử dụng mức phí cao hơn.</string>
 
     <!-- Lightning payment errors -->
@@ -481,8 +481,8 @@
 
     <string name="swapinrefund_title">Chi tiêu các khoản hoán đổi đã bị hủy</string>
     <string name="swapinrefund_none_available_label">Chưa có giao dịch hoán đổi nào bị hủy.</string>
-    <string name="swapinrefund_available_label">Có sẵn: <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Sử dụng màn hình này để chi tiêu các khoản tiền gửi trên chuỗi không được hoán đổi kịp thời. Điều này không ảnh hưởng đến các kênh Lightning của bạn.</string>
+    <string name="swapinrefund_available_label">Số tiền cần chi tiêu: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Sử dụng màn hình này để chi tiêu toàn bộ các khoản tiền gửi trong ví swap-in không được hoán đổi kịp thời và hiện đã hết hạn. Điều này không ảnh hưởng đến các kênh Lightning hiện tại của bạn, cũng như các swap-in đang chờ xử lý.</string>
     <string name="swapinrefund_instructions_2">Đảm bảo địa chỉ đích là hợp lệ và mức phí hợp lý.</string>
     <string name="swapinrefund_estimate_button">Ước tính phí</string>
     <string name="swapinrefund_estimating">Ước tính chi phí…</string>
@@ -497,9 +497,9 @@
     <!-- Final wallet refund -->
 
     <string name="finalwallet_refund_title">Chi tiêu tiền từ ví cuối cùng</string>
-    <string name="finalwallet_refund_available_none">Không có sẵn tiền</string>
-    <string name="finalwallet_refund_available">Số tiền có sẵn</string>
-    <string name="finalwallet_refund_instructions">Sử dụng màn hình này để tiêu tiền từ ví cuối cùng của bạn. Những khoản tiền này đến từ các kênh đã bị đóng trong quá khứ. Điều này không ảnh hưởng đến các kênh Lightning hiện tại của bạn.</string>
+    <string name="finalwallet_refund_available_none">Không có tiền để chi tiêu</string>
+    <string name="finalwallet_refund_available">Số tiền cần chi tiêu</string>
+    <string name="finalwallet_refund_instructions">Sử dụng màn hình này để chi tiêu toàn bộ số tiền trong ví cuối cùng của bạn. Những khoản tiền này đến từ các kênh đã bị đóng trong quá khứ. Điều này không ảnh hưởng đến các kênh Lightning hiện tại của bạn.</string>
 
     <!-- experimental features -->
 

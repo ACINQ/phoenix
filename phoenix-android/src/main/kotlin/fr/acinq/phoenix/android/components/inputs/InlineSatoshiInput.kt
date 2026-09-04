@@ -62,9 +62,13 @@ fun InlineSatoshiInput(
     amount: Satoshi?,
     onAmountChange: (Satoshi?) -> Unit,
     modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    minAmount: Satoshi = 0.sat,
+    maxAmount: Satoshi = Satoshi.MAX_MONEY,
     enabled: Boolean = true,
+    showConvertedValue: Boolean = true,
     isError: Boolean,
 ) {
     val prefFiat = LocalFiatCurrencies.current.primary
@@ -83,14 +87,18 @@ fun InlineSatoshiInput(
             OutlinedTextField(
                 value = internalText,
                 onValueChange = {
-                    internalText = it
                     val newAmount = it.toDoubleOrNull()?.toLong()?.sat
-                    convertedValue = rate?.let { newAmount?.toMilliSatoshi()?.toFiat(rate.price)?.toPrettyString(prefFiat, withUnit = true) } ?: ""
-                    onAmountChange(newAmount)
+                    if (newAmount == null || newAmount in minAmount..maxAmount) {
+                        internalText = it
+                        if (showConvertedValue) {
+                            convertedValue = rate?.let { newAmount?.toMilliSatoshi()?.toFiat(rate.price)?.toPrettyString(prefFiat, withUnit = true) } ?: ""
+                        }
+                        onAmountChange(newAmount)
+                    }
                 },
                 isError = isError,
                 enabled = enabled,
-                label = null,
+                label = label,
                 placeholder = placeholder,
                 trailingIcon = trailingIcon,
                 singleLine = true,
@@ -106,7 +114,7 @@ fun InlineSatoshiInput(
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.padding(bottom = 8.dp),
             )
-            if (convertedValue.isNotBlank()) {
+            if (showConvertedValue && convertedValue.isNotBlank()) {
                 Text(
                     text = stringResource(id = R.string.utils_converted_amount, convertedValue),
                     maxLines = 1,

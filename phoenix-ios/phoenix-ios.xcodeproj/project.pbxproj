@@ -850,7 +850,9 @@
 		DCBA60CE2C90E41000878895 /* ScanQrCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQrCodeView.swift; sourceTree = "<group>"; };
 		DCBA60D32C93544C00878895 /* InsetGroupBoxStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetGroupBoxStyle.swift; sourceTree = "<group>"; };
 		DCBDB8812BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/about.html; sourceTree = "<group>"; };
+		6415CA97CD04DD2B0ABD6869 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ko; path = ko.lproj/about.html; sourceTree = "<group>"; };
 		DCBDB8822BE154840097F940 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = de; path = de.lproj/liquidity.html; sourceTree = "<group>"; };
+		DAF17AB28BC4F20C020FDC04 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ko; path = ko.lproj/liquidity.html; sourceTree = "<group>"; };
 		DCC4F3082E4A8BF600060704 /* Hash160.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hash160.swift; sourceTree = "<group>"; };
 		DCC4F30D2E4B9DA900060704 /* PushNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotification.swift; sourceTree = "<group>"; };
 		DCC753E22CB98221006F646B /* String+Email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Email.swift"; sourceTree = "<group>"; };
@@ -2002,6 +2004,7 @@
 				cs,
 				ar,
 				de,
+				ko,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -2621,6 +2624,7 @@
 				DC0E31B826EF85B4002071C6 /* cs */,
 				DCF9312F279F1BD900FD7776 /* ar */,
 				DCBDB8812BE154840097F940 /* de */,
+				6415CA97CD04DD2B0ABD6869 /* ko */,
 			);
 			name = about.html;
 			sourceTree = "<group>";
@@ -2632,6 +2636,7 @@
 				968B38392AC34C260030DBF4 /* fr */,
 				96DB8DAF2AC4A260007D3D54 /* cs */,
 				DCBDB8822BE154840097F940 /* de */,
+				DAF17AB28BC4F20C020FDC04 /* ko */,
 			);
 			name = liquidity.html;
 			sourceTree = "<group>";

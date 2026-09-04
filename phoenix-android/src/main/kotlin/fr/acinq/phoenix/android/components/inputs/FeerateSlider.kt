@@ -16,14 +16,15 @@
 
 package fr.acinq.phoenix.android.components.inputs
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -35,15 +36,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.buttons.FilledButton
 import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.dialogs.Dialog
-import fr.acinq.phoenix.android.utils.mutedBgColor
+import fr.acinq.phoenix.android.components.feedback.InfoMessage
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.data.MempoolFeerate
 
@@ -56,37 +57,69 @@ fun FeerateSlider(
     enabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    var showUnknownMempoolStateDialog by remember { mutableStateOf(false) }
-    Column(modifier = modifier) {
+    var showManualFeeDialog by remember { mutableStateOf(false) }
+
+    if (showManualFeeDialog) {
+        Dialog(
+            onDismiss = { showManualFeeDialog = false },
+            title = stringResource(R.string.feerate_slider_dialog_title),
+        ) {
+            var errorMessage by remember { mutableStateOf("") }
+
+            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                Spacer(Modifier.height(16.dp))
+                InlineSatoshiInput(
+                    amount = feerate,
+                    onAmountChange = {
+                        errorMessage = ""
+                        when {
+                            it == null -> Unit
+                            else -> { onFeerateChange(it) }
+                        }
+                    },
+                    label = { Text(text = stringResource(R.string.feerate_slider_dialog_input_label), style = MaterialTheme.typography.body2) },
+                    minAmount = 0.sat, maxAmount = 3000.sat,
+                    placeholder = { Text(text = stringResource(R.string.feerate_slider_dialog_input_placeholder)) },
+                    isError = errorMessage.isNotBlank(),
+                    showConvertedValue = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (errorMessage.isNotBlank()) {
+                    Spacer(Modifier.height(2.dp))
+                    Text(text = errorMessage, color = negativeColor, fontSize = 14.sp)
+                }
+
+                if (mempoolFeerate == null) {
+                    Spacer(Modifier.height(16.dp))
+                    InfoMessage(
+                        header = stringResource(id = R.string.mempool_unknown_feerate_title),
+                        details = stringResource(id = R.string.mempool_unknown_feerate_details),
+                        padding = PaddingValues(0.dp),
+                    )
+                }
+            }
+        }
+    }
+
+    Column(modifier = modifier
+        .then(Modifier.clickable(
+            onClick = { showManualFeeDialog = true },
+            onClickLabel = stringResource(R.string.feerate_slider_dialog_title),
+            role = Role.Button,
+            enabled = enabled,
+        ))
+    ) {
         // the actual value of the feerate, in sat/vbyte
         Text(text = stringResource(id = R.string.cpfp_feerate_value, feerate.sat), style = MaterialTheme.typography.body2)
 
         // feedback giving a speed estimate from the current state of the  mempool
         if (mempoolFeerate == null) {
-            if (showUnknownMempoolStateDialog) {
-                Dialog(
-                    onDismiss = { showUnknownMempoolStateDialog = false },
-                    title = stringResource(id = R.string.mempool_unknown_feerate_title)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.mempool_unknown_feerate_details),
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                    )
-                }
-            }
             Spacer(Modifier.height(2.dp))
-            FilledButton(
+            Text(
                 text = stringResource(id = R.string.mempool_unknown_feerate_title),
-                icon = R.drawable.ic_alert_triangle,
-                textStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp),
-                iconTint = negativeColor,
+                style = MaterialTheme.typography.subtitle2,
                 maxLines = 1,
-                space = 6.dp,
-                shape = RoundedCornerShape(10.dp),
-                backgroundColor = mutedBgColor,
-                padding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                modifier = Modifier.offset(x = (-6).dp),
-                onClick = { showUnknownMempoolStateDialog = true }
             )
             Spacer(Modifier.height(2.dp))
         } else {

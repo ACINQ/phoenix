@@ -153,7 +153,7 @@ private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlP
     Spacer(modifier = Modifier.height(8.dp))
     SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_service)) {
         SelectionContainer {
-            Text(text = metadata.pay.callback.host)
+            Text(text = metadata.pay.initialUrl.host)
         }
     }
     metadata.successAction?.let {

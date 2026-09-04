@@ -429,8 +429,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Percepat transaksi saya.</string>
-    <string name="cpfp_instructions">Anda dapat membuat semua transaksi yang belum dikonfirmasi menggunakan tarif biaya yang lebih tinggi untuk mendorong penambang agar lebih menyukai pembayaran Anda.</string>
+    <string name="cpfp_title">Percepat transaksi saya (CPFP).</string>
+    <string name="cpfp_instructions">Anda dapat meningkatkan biaya efektif transaksi yang belum dikonfirmasi untuk mendorong penambang Bitcoin memprioritaskannya.</string>
     <string name="cpfp_splice_error_actual_below_user">Tarif biaya ini lebih rendah daripada yang sudah digunakan oleh transaksi Anda yang belum dikonfirmasi. Gunakan tarif biaya yang lebih tinggi.</string>
 
     <!-- Lightning payment errors -->
@@ -476,8 +476,8 @@
 
     <string name="swapinrefund_title">Pengeluaran untuk penggantian yang dibatalkan</string>
     <string name="swapinrefund_none_available_label">Belum ada dana swap-in yang dibatalkan.</string>
-    <string name="swapinrefund_available_label">Tersedia: <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Gunakan layar ini untuk membelanjakan deposit on-chain yang tidak sempat ditukarkan tepat waktu. Ini tidak memengaruhi saluran Lightning Anda.</string>
+    <string name="swapinrefund_available_label">Jumlah untuk dibelanjakan: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Gunakan layar ini untuk membelanjakan semua deposit di dompet swap-in yang tidak sempat ditukarkan tepat waktu dan kini telah kedaluwarsa. Ini tidak memengaruhi saluran Lightning Anda yang sudah ada, maupun swap-in yang masih tertunda.</string>
     <string name="swapinrefund_instructions_2">Pastikan alamat tujuan valid, dan gunakan tarif yang wajar.</string>
     <string name="swapinrefund_estimate_button">Perkiraan biaya</string>
     <string name="swapinrefund_estimating">Memperkirakan biaya…</string>
@@ -492,9 +492,9 @@
     <!-- Final wallet refund -->
 
     <string name="finalwallet_refund_title">Gunakan dana dari dompet terakhir.</string>
-    <string name="finalwallet_refund_available_none">Tidak ada dana yang tersedia</string>
-    <string name="finalwallet_refund_available">Jumlah yang tersedia</string>
-    <string name="finalwallet_refund_instructions">Gunakan layar ini untuk membelanjakan dana dari dompet akhir Anda. Dana ini berasal dari saluran yang telah ditutup di masa lalu. Ini tidak memengaruhi saluran Lightning Anda yang sudah ada.</string>
+    <string name="finalwallet_refund_available_none">Tidak ada dana untuk dibelanjakan</string>
+    <string name="finalwallet_refund_available">Jumlah untuk dibelanjakan</string>
+    <string name="finalwallet_refund_instructions">Gunakan layar ini untuk membelanjakan semua dana dari dompet akhir Anda. Dana ini berasal dari saluran yang telah ditutup di masa lalu. Ini tidak memengaruhi saluran Lightning Anda yang sudah ada.</string>
 
     <!-- experimental features -->
 

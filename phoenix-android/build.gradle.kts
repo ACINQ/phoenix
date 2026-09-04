@@ -21,8 +21,8 @@ android {
         applicationId = "fr.acinq.phoenix.mainnet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 117
-        versionName = "2.8.1"
+        versionCode = 118
+        versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -69,7 +69,7 @@ android {
     }
 
     androidResources {
-        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw", "in"))
+        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw", "in", "ko", "it", "ja", "pl", "uk"))
     }
 }
 

@@ -514,7 +514,7 @@
     <string name="lnurl_pay_error_invalid_chain">Faktúra vrátená <b>%1$s</b> nepoužíva rovnaký blockchain ako vaša peňaženka.</string>
     <string name="lnurl_pay_error_already_paid">Faktúra vrátená <b>%1$s</b> už bola zaplatená.</string>
     <string name="lnurl_pay_error_invalid_amount">Faktúra vrátená <b>%1$s</b> obsahuje neplatnú sumu.</string>
-    <string name="lnurl_pay_error_invalid_malformed">Faktúra vrátená <b>%1$s</b> je chybná.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Faktúra vrátená <b>%1$s</b> je chybná:\n%2$s</string>
 
     <!-- settings: display preferences -->
 
@@ -721,8 +721,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Neznámy stav mempoolu</string>
-    <string name="mempool_unknown_feerate_details">Phoenixu sa nepodarilo získať aktuálny stav mempoolu a nemôže odhadnúť rýchlosť vašich transakcií.\n\nSkontrolujte mempool ručne v preskúmavači a použite adekvátnu hodnotu!</string>
+    <string name="mempool_unknown_feerate_title">Neznáma rýchlosť transakcie</string>
+    <string name="mempool_unknown_feerate_details">Manuálne skontrolujte aktuálnu sadzbu poplatku v exploreri a použite vhodnú hodnotu.</string>
     <string name="mempool_fastest">≈ Ďalší blok</string>
     <string name="mempool_halfhour">≈ 30 minút</string>
     <string name="mempool_hour">≈ 1 hodina</string>

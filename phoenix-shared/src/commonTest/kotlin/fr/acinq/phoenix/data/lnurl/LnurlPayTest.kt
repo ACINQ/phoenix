@@ -17,6 +17,19 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import fr.acinq.bitcoin.Chain
+import fr.acinq.bitcoin.utils.Either
+import fr.acinq.lightning.CltvExpiryDelta
+import fr.acinq.lightning.Feature
+import fr.acinq.lightning.FeatureSupport
+import fr.acinq.lightning.Features
+import fr.acinq.lightning.Lightning
+import fr.acinq.lightning.Lightning.randomBytes32
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.payment.Bolt11Invoice
+import kotlinx.serialization.json.jsonObject
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 class LnurlPayTest {
 
@@ -95,7 +108,8 @@ class LnurlPayTest {
         runBlocking {
             val engine = MockEngine {
                 respond(
-                    content = ByteReadChannel("""
+                    content = ByteReadChannel(
+                        """
                         {
                             "minSendable":1000,
                             "maxSendable":100000000,
@@ -111,7 +125,8 @@ class LnurlPayTest {
                             "allowsNostr":true,
                             "nostrPubkey":"12345"
                         }
-                    """.trimIndent()),
+                    """.trimIndent()
+                    ),
                     status = HttpStatusCode.OK,
                     headers = headersOf(HttpHeaders.ContentType, "application/json")
                 )
@@ -155,4 +170,205 @@ class LnurlPayTest {
         assertIs<Lnurl.Request>(Lnurl.extractLnurl("http://service.com/api/test?lightning=$validBech32Lnurl", logger))
         assertIs<Lnurl.Request>(Lnurl.extractLnurl("test://whatever/token?lightning=$validBech32Lnurl", logger))
     }
+
+    private val payeeKey = Lightning.randomKey()
+
+    /** Note: initialUrl and callback are deliberately on different hosts (see LUD-06 §4 / display-host discussions). */
+    private val intent = LnurlPay.Intent(
+        initialUrl = Url("https://acinq.co/pay/alice"),
+        callback = Url("https://backend.example.com/lnurl-pay/cb/123"),
+        minSendable = 1_000.msat,
+        maxSendable = 100_000_000.msat,
+        metadata = LnurlPay.Intent.Metadata(
+            raw = """[["text/plain","test"]]""",
+            plainText = "test",
+            longDesc = null, imagePng = null, imageJpg = null,
+            identifier = null, email = null, unknown = null
+        ),
+        maxCommentLength = null
+    )
+
+    private fun makeBolt11(amount: MilliSatoshi? = 25_000.msat): Bolt11Invoice = Bolt11Invoice.create(
+        chain = Chain.Mainnet,
+        amount = amount,
+        paymentHash = randomBytes32(),
+        privateKey = payeeKey,
+        description = Either.Left("service description"),
+        minFinalCltvExpiryDelta = CltvExpiryDelta(18),
+        features = Features(
+            Feature.VariableLengthOnion to FeatureSupport.Mandatory,
+            Feature.PaymentSecret to FeatureSupport.Mandatory,
+        )
+    )
+
+    private fun json(raw: String) = Json.parseToJsonElement(raw).jsonObject
+
+    // --- happy paths ---
+
+    @Test
+    fun invoice_valid_without_successaction() {
+        val bolt11 = makeBolt11()
+        val res = LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${bolt11.write()}"}"""))
+        assertEquals(bolt11.paymentHash, res.invoice.paymentHash)
+        assertEquals(25_000.msat, res.invoice.amount)
+        assertNull(res.successAction)
+        // provenance: the Invoice must carry the *initial* url, not the callback (LUD-06 §4)
+        assertEquals(intent.initialUrl, res.initialUrl)
+    }
+
+    @Test
+    fun invoice_successaction_message() {
+        val res = LnurlPay.parseLnurlPayInvoice(
+            intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"message","message":"thanks!"}}""")
+        )
+        assertEquals(LnurlPay.Invoice.SuccessAction.Message("thanks!"), res.successAction)
+    }
+
+    @Test
+    fun invoice_successaction_url() {
+        val res = LnurlPay.parseLnurlPayInvoice(
+            intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"url","description":"order details","url":"https://backend.example.com/order/42"}}""")
+        )
+        val action = res.successAction
+        assertIs<LnurlPay.Invoice.SuccessAction.Url>(action)
+        assertEquals("order details", action.description)
+        assertEquals(Url("https://backend.example.com/order/42"), action.url)
+    }
+
+    @Test
+    fun invoice_successaction_aes() {
+        // same data as phoenix-android LnurlPayTest AES-decryption test, base64-encoded:
+        // iv = 8b26f326a41ef49b846a1ef2c92416be, ciphertext = aes(preimage, "sic transit gloria mundi")
+        val res = LnurlPay.parseLnurlPayInvoice(
+            intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"aes","description":"your secret","ciphertext":"ahj9qQxHwjZmyv+H5floPkXdXvv0cNj3KCLxPOH1Pw8=","iv":"iybzJqQe9JuEah7yySQWvg=="}}""")
+        )
+        val action = res.successAction
+        assertIs<LnurlPay.Invoice.SuccessAction.Aes>(action)
+        assertEquals("8b26f326a41ef49b846a1ef2c92416be", action.iv.toHex())
+        assertEquals("6a18fda90c47c23666caff87e5f9683e45dd5efbf470d8f72822f13ce1f53f0f", action.ciphertext.toHex())
+    }
+
+    @Test
+    fun invoice_ignores_accept_unknown_json_fields() {
+        val res = LnurlPay.parseLnurlPayInvoice(
+            intent, json("""{"pr":"${makeBolt11().write()}","routes":[],"disposable":false,"someFutureField":123}""")
+        )
+        assertNull(res.successAction)
+    }
+
+    @Test
+    fun invoice_successaction_accept_no_success_action() {
+        val res = LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${makeBolt11().write()}"}"""))
+        assertNull(res.successAction)
+        val res2 = LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${makeBolt11().write()}", "successAction":null}"""))
+        assertNull(res.successAction)
+    }
+
+    @Test
+    fun invoice_accept_amountless_bolt11() {
+        val res = LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${makeBolt11(amount = null).write()}"}"""))
+        assertNull(res.invoice.amount)
+    }
+
+    // --- malformed responses ---
+
+    @Test
+    fun invoice_reject_missing_pr() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(intent, json("""{"successAction":{"tag":"message","message":"no pr here"}}"""))
+        }
+    }
+
+    @Test
+    fun invoice_reject_garbage_pr() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"lnbc1notaninvoice"}"""))
+        }
+    }
+
+    @Test
+    fun invoice_successaction_reject_invalid() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${makeBolt11().write()}","successAction": "hello"}"""))
+        }
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${makeBolt11().write()}","successAction": []}"""))
+        }
+    }
+
+    @Test
+    fun invoice_successaction_reject_message_invalid() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"message","message":""}}"""))
+        }
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"message","message":"${"x".repeat(145)}"}}"""))
+        }
+    }
+
+    @Test
+    fun invoice_successaction_aes_ciphertext_at_cap() {
+        val atCap = "A".repeat(5462) + "=="
+        val res = LnurlPay.parseLnurlPayInvoice(
+            intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"aes","description":"d","ciphertext":"$atCap","iv":"iybzJqQe9JuEah7yySQWvg=="}}""")
+        )
+        assertIs<LnurlPay.Invoice.SuccessAction.Aes>(res.successAction)
+    }
+
+    @Test
+    fun invoice_successaction_reject_aes_ciphertext_over_cap() {
+        // 5463 chars + "=" decode to 4097 bytes: one over the limit, must throw
+        val overCap = "A".repeat(5463) + "="
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(
+                intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"aes","description":"d","ciphertext":"$overCap","iv":"iybzJqQe9JuEah7yySQWvg=="}}""")
+            )
+        }
+    }
+    @Test
+    fun invoice_successaction_reject_aes_iv_over_cap() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(
+                intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"aes","description":"d","ciphertext":"hello","iv":"iybzJqQe9JuEah7yySQWvggg=="}}""")
+            )
+        }
+    }
+
+    @Test
+    fun invoice_successaction_reject_unknown_tag() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(
+                intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"foobar","payload":"???"}}""")
+            )
+        }
+    }
+
+    @Test
+    fun invoice_successaction_reject_missing_url() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(
+                intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"url","description":"no url"}}""")
+            )
+        }
+    }
+
+    @Test
+    fun invoice_successaction_reject_cross_domain_url() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(
+                intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"url","description":"d","url":"https://evil.example.org/x"}}""")
+            )
+        }
+    }
+
+    @Test
+    fun invoice_successaction_reject_cleartext_url() {
+        assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+            LnurlPay.parseLnurlPayInvoice(
+                intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"url","description":"d","url":"http://acinq.co/x"}}""")
+            )
+        }
+    }
+
+
 }

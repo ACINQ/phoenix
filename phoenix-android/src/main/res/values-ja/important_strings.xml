@@ -1,0 +1,504 @@
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ This file contains string resources related to important messages in the app, and should be translated as a priority.
+  ~ It should be kept as small as possible.
+  ~
+  ~ Most technical resource strings should stay in the default `strings.xml` file.
+-->
+<resources>
+
+    <!-- generic -->
+
+    <string name="utils_ack">了解しました。</string>
+
+    <!-- system notifications -->
+
+    <string name="notif_headless_title_default">Phoenix はバックグラウンドで実行中です</string>
+    <string name="notif_headless_received">%1$s %2$s を受け取りました</string>
+
+    <string name="notif_pending_settlement_title">ウォレットを起動してください</string>
+    <string name="notif_pending_settlement_message">受け取り処理が保留中です。</string>
+
+    <string name="notif_inflight_payment_title">支払いが保留中です</string>
+    <string name="notif_inflight_payment_message">適切なタイミングで支払いが完了するように、Phoenix を起動してください。</string>
+
+    <string name="notif_missed_title">受信支払いを逃しました</string>
+    <string name="notif_missed_unavailable">Phoenix をバックグラウンドで起動できませんでした。</string>
+
+    <string name="notif_rejected_deposit_title">オンチェーン入金が保留中です（+%1$s）</string>
+    <string name="notif_rejected_payment_title">支払いが拒否されました（+%1$s）</string>
+    <string name="notif_rejected_policy_disabled">チャネルの自動管理が無効になっています。タップして詳細をご確認ください。</string>
+    <string name="notif_rejected_policy_disabled_timeout">チャネルの自動管理が無効になっています。この入金は %1$s に期限切れになります。</string>
+    <string name="notif_rejected_over_absolute">手数料は %1$s でしたが、上限は %2$s に設定されています。タップして詳細をご確認ください。</string>
+    <string name="notif_rejected_over_absolute_timeout">手数料は %1$s でしたが、上限は %2$s に設定されています。この入金は %3$s に期限切れになります。</string>
+    <string name="notif_rejected_over_relative">手数料は %1$s で、受取額の %2$s%% を超えています。タップして詳細をご確認ください。</string>
+    <string name="notif_rejected_over_relative_timeout">手数料は %1$s で、受取額の %2$s%% を超えています。この入金は %3$s に期限切れになります。</string>
+    <string name="notif_rejected_amount_too_low">支払い金額が小さすぎます。</string>
+    <string name="notif_rejected_generic_error">資金調達中にエラーが発生しました。後ほどもう一度お試しください。</string>
+
+    <string name="notif_watcher_revoked_commit_title">Phoenix を起動してください</string>
+    <string name="notif_watcher_revoked_commit_message">一部のチャネルが閉じられた可能性があります。</string>
+
+    <!-- settings list -->
+
+    <string name="settings_general_title">一般</string>
+    <string name="settings_fees_title">手数料</string>
+    <string name="settings_security_title">プライバシーとセキュリティ</string>
+    <string name="settings_advanced_title">詳細設定</string>
+    <string name="settings_danger_title">危険な操作</string>
+
+    <string name="settings_display_prefs">表示</string>
+    <string name="settings_wallet_info">ウォレット情報</string>
+    <string name="settings_liquidity_policy">チャネル管理</string>
+    <string name="settings_display_seed">リカバリーフレーズ</string>
+    <string name="settings_access_control">アクセス制御</string>
+    <string name="settings_list_channels">ペイメントチャネル</string>
+    <string name="settings_logs">ログ</string>
+    <string name="settings_electrum">Electrum サーバー</string>
+    <string name="settings_reset_wallet">ウォレットを削除</string>
+    <string name="settings_mutual_close">チャネルを閉じる</string>
+    <string name="settings_force_close">チャネルを強制的に閉じる</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">このアプリについて</string>
+    <string name="settings_payment_settings">支払いオプション</string>
+    <string name="settings_payment_history">支払い履歴</string>
+    <string name="settings_notifications">通知</string>
+    <string name="settings_contacts">連絡先</string>
+    <string name="settings_converter">通貨コンバーター</string>
+    <string name="settings_add_liquidity">流動性を追加</string>
+
+    <!-- home: swap help -->
+
+    <string name="home_swapin_confirming_title">承認待ち</string>
+    <string name="home_swapin_confirming_desc">Lightning へスワップする前に、承認を待っています。</string>
+
+    <string name="home_swapin_ready_title">スワップ待ち</string>
+    <string name="home_swapin_ready_desc_auto">マイニング手数料が %1$s を下回ると、Lightning へ移されます。</string>
+    <string name="home_swapin_ready_desc_disabled">チャネルの自動管理が無効になっているため、オンチェーンのままになります。</string>
+    <string name="home_swapin_ready_desc_generic">条件が整い次第、Lightning へ移されます。</string>
+    <string name="home_swapin_ready_expiring">ご注意ください！一部の資金がまもなく期限切れになり、スワップできなくなります。</string>
+
+    <string name="home_swapin_expired_title">期限切れ</string>
+    <string name="home_swapin_expired_desc">4 か月の待機期間を過ぎたため、スワップできなくなりました。これらの資金は手動で使用する必要があります。</string>
+
+    <string name="home_final_title">ファイナルウォレット</string>
+    <string name="home_final_desc">これらの資金は、閉じられた Lightning チャネルから送られたものです。手動で使用する必要があります。</string>
+    <string name="home_onchain_balance_only">オンチェーン残高</string>
+
+    <string name="home_background_restriction_title">バックグラウンド処理が制限されています</string>
+    <string name="home_background_restriction_body_1">Phoenix がバックグラウンドにあるとき、または終了しているときに、支払いを受け取れない場合があります。</string>
+    <string name="home_background_restriction_body_2">原因は以下のとおりです：</string>
+    <string name="home_background_restriction_powersaver">端末が省電力モードになっています</string>
+    <string name="home_background_restriction_fcm">FCM 通知が利用できません</string>
+    <string name="home_background_restriction_fcm_details">GrapheneOS または CalyxOS をご利用の場合は、FCM 通知を受け取るために Google Play Services をインストールしてください。詳細は FAQ をご覧ください。</string>
+
+    <!-- home: bottom menu -->
+
+    <string name="menu_settings">設定</string>
+    <string name="menu_send">送金</string>
+    <string name="menu_receive">受け取る</string>
+
+    <!-- init wallet / automated wallet creation -->
+
+    <string name="initwallet_create">新しいウォレットを作成</string>
+    <string name="initwallet_restore">ウォレットを復元</string>
+
+    <string name="restore_disclaimer_message_1_title">Phoenix は Lightning 専用です</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix には、すでに Phoenix が管理している資金のみが表示されます。他のアプリで生成されたシードに紐づく資金（オンチェーン資金を含む）はここには表示されません。</string>
+    <string name="restore_disclaimer_message_2_title">同じシードの並行使用にご注意ください</string>
+    <string name="restore_disclaimer_message_2_body">同じシードを複数の端末で同時に使用しないでください。2 つの Phoenix インスタンス間で競合が発生し、Lightning チャネルが閉じられる可能性があります。</string>
+
+    <string name="restore_instructions">ウォレットのシードは、12 個の英単語のリストです。リストの各単語を下の入力欄に入力してください。</string>
+    <string name="restore_input_label">単語 #%1$s を入力してください</string>
+    <string name="restore_input_invalid">この単語は無効です。</string>
+    <string name="restore_seed_valid">このシードは有効です</string>
+    <string name="restore_seed_valid_details">続行してウォレットを復元できます</string>
+    <string name="restore_seed_invalid">このシードは無効です</string>
+    <string name="restore_seed_invalid_details">正しい単語を正しい順序で入力したかご確認ください。</string>
+
+    <string name="restore_payments_button">支払い履歴をインポート</string>
+    <string name="restore_payments_button_details">任意です。このボタンを使用して、別の端末の支払いデータベースファイルを復元できます。</string>
+    <string name="restore_payments_success">支払い履歴が復元されます</string>
+    <string name="restore_payments_success_button">別のファイルを使用</string>
+    <string name="restore_payments_error_header">支払いを復元できませんでした</string>
+    <string name="restore_payments_error_button">もう一度お試しください</string>
+    <string name="restore_payments_error_encryption">ファイルを復号できません。Phoenix のデータベースファイル（CSV ではありません）を使用しているか、復元中のウォレットと一致しているかご確認ください。</string>
+    <string name="restore_payments_error_open">このファイルを開けません。もう一度お試しください。</string>
+    <string name="restore_payments_error_writing">このファイルをアプリのデータフォルダーに書き込めませんでした。もう一度お試しください。</string>
+    <string name="restore_import_button">ウォレットを復元</string>
+
+    <!-- upgrade required dialog -->
+
+    <string name="upgraderequired_title">アップデートが必要です</string>
+    <string name="upgraderequired_message">このバージョンの Phoenix（v%1$s）は、お使いのウォレットと互換性がありません。アプリをアップデートするか、互換性のあるバージョンをご使用ください。</string>
+    <string name="upgraderequired_button">Google Play でアップデート</string>
+
+    <!-- receive view: warning about fee/liquidity -->
+
+    <string name="receive_lightning_warning_title_surefail">支払いは失敗します</string>
+    <string name="receive_lightning_warning_title_fee_expected">オンチェーン手数料が予想されます</string>
+    <string name="receive_lightning_warning_hint_show_details">タップして詳細を表示</string>
+
+    <string name="receive_lightning_sheet_dismiss">閉じる</string>
+    <string name="receive_lightning_sheet_button_enable">チャネルの自動管理を有効にする</string>
+    <string name="receive_lightning_sheet_button_configure">手数料の上限を設定</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">この金額を受け取るには、オンチェーン操作が必要になる可能性があります。\n\n手数料は約 %1$s と見込まれます。</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">この金額を受け取るには、オンチェーン操作が必要になる可能性があります。</string>
+
+    <string name="receive_lightning_warning_message_above_limit">この金額を受け取るには %1$s の手数料が見込まれますが、上限の %2$s を超えています。\n\nチャネル管理設定でこの上限を引き上げてください。</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">この金額を受け取るには %1$s の手数料が見込まれますが、上限の %2$s を超えています。\n\nチャネル管理設定でこの上限を引き上げるか、追加の流動性をリクエストしてください。</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">この金額を受け取るには %1$s の手数料が見込まれますが、金額の %2$s%% を超えています。\n\nチャネル管理設定でこの上限を引き上げてください。</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">この金額を受け取るには %1$s の手数料が見込まれますが、金額の %2$s%% を超えています。\n\nチャネル管理設定でこの上限を引き上げるか、追加の流動性をリクエストしてください。</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">この金額に対してインバウンド流動性が不足しており、チャネルの自動管理が無効になっています。</string>
+
+    <!-- receive: Tor warning -->
+
+    <string name="receive_tor_warning_title">Tor が有効です</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix が支払いの受け取りに問題を抱える可能性があります。アプリをフォアグラウンドで開いたままにし、接続が安定していることをご確認ください。</string>
+
+    <!-- send errors -->
+
+    <string name="send_error_invoice_expired">このインボイスは期限切れです。</string>
+    <string name="send_error_payment_pending">この支払いはすでに処理中です。完了までお待ちください。</string>
+    <string name="send_error_already_paid">このインボイスはすでに支払い済みです。</string>
+    <string name="send_error_invalid_chain">この支払いは、お使いのウォレットと同じブロックチェーンを使用していません。</string>
+    <string name="send_error_lnurl_invalid">この LNURL リンクを処理できません。有効かどうかご確認ください。</string>
+    <string name="send_error_lnurl_unsupported">このタイプの LNURL はまだサポートされていません。</string>
+    <string name="send_error_invalid_generic">この支払いリクエストはサポートされていません。</string>
+    <string name="send_error_bip353_connect">このアドレスのデータを取得できませんでした。接続に問題がある可能性があります。</string>
+    <string name="send_error_bip353_name_not_found">名前「%1$s」は「%2$s」に見つかりませんでした。</string>
+    <string name="send_error_bip353_invalid_uri">このアドレスは無効な Bip21 リソースを使用しています。</string>
+    <string name="send_error_bip353_invalid_offer">このアドレスは無効な Bolt12 オファーを使用しています。</string>
+    <string name="send_error_bip353_dnssec">このアドレスは安全でない DNS でホストされています。DNSSEC を有効にする必要があります。</string>
+
+    <!-- validation -->
+
+    <string name="validation_below_min">%1$s 以上である必要があります</string>
+    <string name="validation_above_max">%1$s を超えることはできません</string>
+
+    <!-- closing channels -->
+
+    <string name="mutualclose_input_label">Bitcoin アドレス</string>
+    <string name="mutualclose_input_instructions">すべての資金を Bitcoin アドレスに送金します。すべてのペイメントチャネルが閉じられます。</string>
+    <string name="mutualclose_confirm_title">クローズの確認</string>
+    <string name="mutualclose_confirm_details">すべての資金は以下に送金されます：</string>
+    <string name="mutualclose_confirm_fee">マイナー手数料の見積もり：</string>
+    <string name="mutualclose_confirm_fee_unknown">手数料を見積もることができません。</string>
+
+    <string name="forceclose_title">チャネルを強制的に閉じる</string>
+    <string name="forceclose_instructions">この画面では、チャネルを一方的に閉じることができます。\n\nこれは魔法のボタンではありません。<b>極端な状況でのみ使用する</b>安全対策です。たとえば、ピア（ACINQ）が永久に消滅し、資金を使用できなくなった場合などです。それ以外の場合、<b>Phoenix に問題がある場合はサポートにお問い合わせください</b>。\n\nチャネルの強制クローズには費用がかかり（オンチェーン手数料のため）、資金は数日間ロックされます。\n\n<b>チャネルが完全に閉じられるまでアプリをアンインストールしないでください。資金を失うことになります。</b>\n\n<b>この機能の動作を完全に理解していない場合は使用しないでください。</b></string>
+    <string name="forceclose_address_label">資金は最終的にファイナルウォレットに送金されます：</string>
+
+    <string name="forceclose_confirm_title">強制クローズの確認</string>
+    <string name="forceclose_confirm_details">すべての資金は、相当な遅延の後、ファイナルウォレットに送金されます。</string>
+    <string name="forceclose_button">すべてのチャネルを強制的に閉じる</string>
+
+    <!-- in-app notifications -->
+
+    <string name="inappnotif_backup_seed_message">bitcoin を失わないよう、ウォレットをバックアップしてください。</string>
+    <string name="inappnotif_backup_seed_action">ウォレットをバックアップ</string>
+
+    <string name="inappnotif_notification_permission_message_short">Android の通知を有効にしてください</string>
+    <string name="inappnotif_notification_permission_message">Android の設定で通知が無効になっています。支払いの処理中に Phoenix からお知らせすることができません。</string>
+    <string name="inappnotif_notification_permission_enable">有効にする</string>
+
+    <string name="inappnotif_swapin_timeout_message">入金がまもなく期限切れになります。</string>
+    <string name="inappnotif_swapin_timeout_action">詳細を表示</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix は定期的にバックグラウンドでブロックチェーンを監視していますが、ここ数日は監視できていません。\n\nAndroid が Phoenix をブロックしていないこと、Electrum に接続できることをご確認ください。</string>
+    <string name="inappnotif_watchtower_late_action">閉じる</string>
+
+    <string name="inappnotif_upgrade_message">アップデートが利用可能です</string>
+    <string name="inappnotif_upgrade_critical_message">重要なアップデートが利用可能です。できるだけ早く Phoenix をアップデートしてください。</string>
+    <string name="inappnotif_upgrade_button">Google Play でアップデート</string>
+
+    <string name="inappnotif_mempool_full_message">オンチェーン手数料が高くなっています。</string>
+    <string name="inappnotif_mempool_full_action">Phoenix への影響を確認</string>
+
+    <string name="inappnotif_tor_disconnected_message">Tor ネットワークにアクセスできません。Phoenix は正常に動作しません。</string>
+    <string name="inappnotif_tor_disconnected_action">修正する</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">オンチェーン資金が保留中です（+%1$s）</string>
+    <string name="inappnotif_payments_rejection_overview_one">最近、受信支払いが 1 件拒否されました</string>
+    <string name="inappnotif_payments_rejection_overview_many">最近、受信支払いが %1$d 件拒否されました</string>
+    <string name="inappnotif_payment_rejected_title">支払いが拒否されました（+%1$s）</string>
+    <string name="inappnotif_payment_rejected_disabled">チャネルの自動管理が無効になっています。</string>
+    <string name="inappnotif_payment_rejected_over_absolute">手数料は %1$s でしたが、上限は %2$s に設定されています。</string>
+    <string name="inappnotif_payment_rejected_over_relative">手数料は %1$s で、金額の %2$s%% を超えています。</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">タップして設定してください。</string>
+    <string name="inappnotif_payment_rejected_view_wallet">詳細を表示</string>
+
+    <string name="inappnotif_watchtower_nominal_title">Watchtower レポート</string>
+    <string name="inappnotif_watchtower_nominal_description_one">%2$s に %1$d 件のチャネルを正常に確認しました。問題は見つかりませんでした。</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%2$s に %1$d 件のチャネルを正常に確認しました。問題は見つかりませんでした。</string>
+    <string name="inappnotif_watchtower_revokedfound_title">Watchtower 警告</string>
+    <string name="inappnotif_watchtower_revokedfound_description">%1$s に、次のチャネルで失効した commitment が見つかりました：%2$s。これらのチャネルは閉じられる可能性があります。</string>
+
+    <!-- settings: display seed -->
+
+    <string name="displayseed_instructions">リカバリーフレーズ（シードとも呼ばれます）は、12 個の英単語のリストです。必要に応じて、資金への完全なアクセスを回復できます。\n\n<b>このシードを所有しているのはあなただけです。秘密に保管してください。</b>\n\n<b>このシードを誰にも教えないでください</b>。\nフィッシングにご注意ください。Phoenix の開発者がシードをお尋ねすることは決してありません。\n\n<b>このシードを失くさないでください</b>。\n安全な場所（この端末以外）に保管してください。シードと端末の両方を失うと、資金を失うことになります。</string>
+    <string name="displayseed_authenticate_button">シードを表示</string>
+    <string name="displayseed_dialog_header">このシードは安全に保管してください。\n誰にも教えないでください。</string>
+    <string name="displayseed_backup_notice_header">リカバリーフレーズがバックアップされていません！</string>
+    <string name="displayseed_backup_notice_details">保存せずに Phoenix へのアクセスを失うと、資金を失うことになります！</string>
+    <string name="displayseed_backup_checkbox">リカバリーフレーズを安全な場所に保存しました。</string>
+    <string name="displayseed_loss_disclaimer_checkbox">端末とリカバリーフレーズの両方を失った場合、ウォレットの資金を失うことを理解しました。</string>
+
+    <!-- payment details -->
+
+    <string name="paymentdetails_funding_fees_label">マイナー手数料</string>
+    <string name="paymentdetails_funding_fees_desc">オンチェーントランザクションの処理のために Bitcoin ネットワークのマイナーに支払われる手数料です。</string>
+    <string name="paymentdetails_service_fees_label">サービス手数料</string>
+    <string name="paymentdetails_service_fees_desc">新しいペイメントチャネルの作成に対して支払われる手数料です。常に必要となるわけではありません。</string>
+
+    <string name="paymentdetails_liquidity_purchase_label">流動性</string>
+    <string name="paymentdetails_liquidity_service_fee_label">サービス手数料</string>
+    <string name="paymentdetails_liquidity_service_fee_help">流動性サービスに対して支払われる手数料です。</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">マイナー手数料</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">オンチェーントランザクションの処理のために Bitcoin ネットワークのマイナーに支払われる手数料です。</string>
+    <string name="paymentdetails_liquidity_caused_by_label">原因</string>
+    <string name="paymentdetails_liquidity_caused_by_help">支払いの受け取りにこの流動性が必要でした。</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">最適化の方法を確認</string>
+
+    <!-- lnurl -->
+
+    <string name="lnurl_auth_instructions">匿名でログインし、次のサイトでの操作を承認できます：</string>
+    <string name="lnurl_withdraw_header">\n<b>%1$s</b> から資金を引き出せます。</string>
+    <string name="lnurl_withdraw_success">引き出しリクエストを <b>%1$s</b> に送信しました。\n\n資金の送信までしばらくかかる場合があります。その間、アプリをオンラインのままにしておいてください。</string>
+
+    <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">Tor の有効化</string>
+    <string name="tor_dialog_enable_details_1">Orbot などのサードパーティ製 Tor Proxy VPN アプリのインストールが必要です。</string>
+    <string name="tor_dialog_enable_details_2">Tor はプライバシーを向上させる一方で、パフォーマンスの問題や支払いの取りこぼしを引き起こす可能性があります。</string>
+    <string name="tor_dialog_disable_title">Tor の無効化</string>
+    <string name="tor_dialog_disable_details_1">このオプションを無効にすると、IP アドレスがさまざまなサービス提供者に開示される可能性があります。</string>
+    <string name="tor_dialog_disable_details_2">続行してもよろしいですか？</string>
+    <string name="tor_dialog_processing">変更を処理中…</string>
+
+    <string name="tor_disconnected_dialog_title">Tor ネットワークにアクセスできません</string>
+    <string name="tor_disconnected_dialog_action">修正する</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix が正常に動作するには、Tor へのアクセスが必要です。</string>
+    <string name="tor_disconnected_dialog_details_2">Tor Proxy VPN アプリが有効で、Tor に接続されていることをご確認ください。</string>
+    <string name="tor_disconnected_dialog_details_3">Tor VPN アプリをお持ちでない場合は、インストールしてください。Orbot をお勧めします。</string>
+    <string name="tor_disconnected_dialog_open_settings">Tor 設定を開く</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">Orbot のページを開く</string>
+
+    <!-- about -->
+
+    <string name="about_general_content">Phoenix は、Lightning ネットワークを利用して支払いの送受信を行う Bitcoin ウォレットです。\n\n<a href="https://phoenix.acinq.co">ACINQ</a> が <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License 2.0</a> のもとで開発した、自由なオープンソースソフトウェアです。</string>
+    <string name="about_seed_title">鍵の保護について</string>
+    <string name="about_seed_content">このウォレットはセルフカストディ型です。<b>12 単語のシードキーを保管するのはご自身のみです</b>。\n\nこの鍵は資金へのアクセスを可能にします。誰にも開示せず、フィッシングにご注意ください。</string>
+    <string name="about_rates_title">為替レート</string>
+    <string name="about_rates_content">Bitcoin/法定通貨の為替レートは、以下のサードパーティ API から取得しています：\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\nこれらのレートは正確でない場合があります。支払いを送信する前に、必ず実際の Bitcoin 額をご確認ください。</string>
+
+    <!-- introduction screens -->
+
+    <string name="intro_welcome_title">ようこそ！</string>
+    <string name="intro_welcome_sub1">Phoenix なら、bitcoin の送受信をシンプルかつ安全に行えます。</string>
+    <string name="intro_welcome_next_button">次へ</string>
+
+    <string name="intro_channels_title">パワーアップした Bitcoin</string>
+    <string name="intro_channels_sub1">Phoenix はペイメントチャネルを利用して、Bitcoin を高速かつプライベートにします。</string>
+    <string name="intro_channels_next_button">次へ</string>
+
+    <string name="intro_selfcustody_title">あなたの鍵、あなたの bitcoin</string>
+    <string name="intro_selfcustody_sub1">Phoenix はセルフカストディ型です。管理するのはあなたです。</string>
+    <string name="intro_selfcustody_sub2">秘密鍵を使えば、いつでもウォレットを復元できます。安全に保管してください！</string>
+    <string name="intro_selfcustody_next_button">始める</string>
+
+    <!-- wallet info -->
+
+    <string name="walletinfo_onchain_swapin">スワップインウォレット</string>
+    <string name="walletinfo_onchain_swapin_help">スワップインウォレットは、Phoenix に入金されたオンチェーン資金を管理します。\n\nチャネル管理設定に従い、可能なタイミングで自動的に Lightning へスワップします。</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">仕組みを確認</string>
+    <string name="walletinfo_onchain_swapin_policy_view">タップして設定</string>
+    <string name="walletinfo_onchain_swapin_empty">進行中のスワップはありません。</string>
+
+    <string name="walletinfo_onchain_swapin_policy_auto_details">マイナーに支払う手数料が <b>%1$s 未満</b>の場合、オンチェーン資金は自動的に Lightning へスワップされます（設定変更可能）。</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout"><b>%1$d か月</b>を過ぎてもスワップされなかった資金は、オンチェーンで回収できます。</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">チャネルの自動管理は<b>無効</b>です。スワップは実行されず、資金はオンチェーンのままになります。</string>
+
+    <string name="walletinfo_onchain_swapin_last_attempt">スワップの試行が %1$s に失敗しました</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">チャネル管理が無効になっていました。</string>
+    <string name="walletinfo_onchain_swapin_timeout_1day">このスワップは 1 日後に期限切れになります！</string>
+    <string name="walletinfo_onchain_swapin_timeout">このスワップは %1$s 日後に期限切れになります。</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">期限切れ</string>
+    <string name="walletinfo_onchain_swapin_locked_description">これらの資金は %1$s 日後から利用可能になります。</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">キャンセルされた資金</string>
+    <string name="walletinfo_onchain_swapin_refund_description">これらの資金は期限内にスワップされませんでした。タップして使用してください。</string>
+
+    <string name="walletinfo_onchain_final_about">ファイナルウォレットは、Lightning チャネルが閉じられたときや問題が発生したときに、資金が送られる場所です。通常は空のはずです。</string>
+
+    <!-- settings: liquidity policy for channels creation -->
+
+    <string name="liquiditypolicy_instructions">受信支払いには、オンチェーントランザクションが必要になる場合があります。これは常にではなく、必要な場合にのみ発生します。</string>
+    <string name="liquiditypolicy_fees_estimation">現在の手数料は約 <b>%1$s</b>（≈%2$s）と見積もられています。</string>
+    <string name="liquiditypolicy_disable_label">チャネルの自動管理</string>
+    <string name="liquiditypolicy_disable_desc">オンチェーン操作が必要な受信支払いは拒否されます。</string>
+
+    <string name="liquiditypolicy_fees_base_label">手数料の上限額</string>
+    <string name="liquiditypolicy_fees_base_help">手数料がこの値を超える支払いは拒否されます。</string>
+    <string name="liquiditypolicy_fees_base_too_low">この値は小さすぎます。</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">予想される手数料を下回っています。一部の支払いが拒否される可能性があります。</string>
+
+    <string name="liquiditypolicy_advanced_menu">詳細オプション</string>
+    <string name="liquiditypolicy_advanced_disable">チャネル管理が無効になっています。チャネル管理画面で有効にできます。</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">ご注意ください！</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">この画面は上級者向けです。目的を理解していない場合は、これらの設定を変更しないでください。</string>
+
+    <string name="liquiditypolicy_advanced_verifications_title">追加の検証</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">割合チェック</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">受取額に対する手数料の割合を確認します。少額の支払いに対する安全確認として有用です。</string>
+    <string name="liquiditypolicy_advanced_overrides_title">ポリシーの上書き</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">Lightning では絶対手数料チェックをスキップ</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">有効にすると、受信 Lightning 支払いは手数料の絶対上限を無視します。割合チェックのみが適用されます。\n\nご注意：Bitcoin の mempool の feerate が高い場合、オンチェーン操作を必要とする受信 LN 支払いが高額になる可能性があります。</string>
+    <string name="liquiditypolicy_save_button">ポリシーを保存</string>
+    <string name="liquiditypolicy_request_button">インバウンド流動性をリクエスト</string>
+
+    <string name="liquiditypolicy_help">
+      Phoenix では、Bitcoin ブロックチェーン（L1）と Bitcoin の Lightning レイヤー（L2）の両方で支払いを受け取ることができます。
+      \n\n
+      - ブロックチェーンレイヤー（L1）は低速で、一般的に費用が高くなります（マイナー手数料が必要です）
+      \n
+      - Lightning レイヤー（L2）は非常に高速で、一般的に費用が大幅に安くなります（特に少額の支払いの場合）
+      \n\n
+      L1 で支払いを受け取ると、マイナー手数料が設定済みの手数料ポリシーを満たしている<b>場合</b>、Phoenix は自動的に資金を L2 へ移動します。
+      \n\n
+      L2 で受け取る支払いは、即座に手数料なしで受け取れます。ただし、L2 ペイメントチャネルの管理のために、L1 操作が必要になることがあります。これは、マイナー手数料が設定済みの手数料ポリシーを満たしている<b>場合</b>、自動的に行われます。
+    </string>
+
+    <!-- settings: liquidity request -->
+
+    <string name="liquidityads_no_channels_header">チャネルがありません！</string>
+    <string name="liquidityads_no_channels_details">この機能を利用するには、まずウォレットに資金が必要です。</string>
+    <string name="liquidityads_header">流動性の計画</string>
+    <string name="liquidityads_instructions">インバウンド流動性により、今後 Lightning 経由で受け取る支払いのオンチェーン手数料を回避できます。\n\n今より多くの流動性をリクエストしておくことで、後の手数料を節約できます。</string>
+    <string name="liquidityads_faq_link">詳細情報</string>
+    <string name="liquidityads_current_liquidity">現在の流動性</string>
+
+    <string name="liquidityads_amount_label">流動性をリクエスト</string>
+    <string name="liquidityads_estimate_button">流動性のコストを見積もる</string>
+    <string name="liquidityads_estimating_spinner">コストを見積もり中…</string>
+    <string name="liquidityads_estimate_details_miner_fees">マイナー手数料</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">基盤となるオンチェーントランザクションのマイニング手数料への拠出分です。</string>
+    <string name="liquidityads_estimate_details_service_fees">サービス手数料</string>
+    <string name="liquidityads_estimate_details_service_fees_help">この手数料は、流動性を提供するサービスに支払われます。</string>
+    <string name="liquidityads_estimate_details_duration">期間</string>
+    <string name="liquidityads_estimate_details_duration_value">1 年</string>
+    <string name="liquidityads_estimate_details_duration_help">資金を受け取るにつれて、流動性は消費され、残高になります。1 年後、未使用の流動性はサービスによって回収されます。</string>
+    <string name="liquidityads_estimate_above_25">合計手数料が、リクエストした流動性額の 25% を超えています。</string>
+    <string name="liquidityads_over_balance">合計手数料が残高を超えています。</string>
+
+    <string name="liquidityads_review_button">確認</string>
+    <string name="liquidityads_disclaimer_body1">リクエストしているのは<b>初期</b>の流動性額です。流動性は時間とともに変化します。Lightning 経由で資金を受け取るにつれて消費され、残高になります。</string>
+    <string name="liquidityads_disclaimer_body2">1 年後、未使用の流動性はサービスによって回収されます。</string>
+
+    <string name="liquidityads_request_button">承諾</string>
+    <string name="liquidityads_requesting_spinner">splice を処理中…</string>
+
+    <string name="liquidityads_success">流動性が正常に追加されました！</string>
+    <string name="liquidityads_success_amount">追加額：%1$s</string>
+
+    <string name="liquidityads_error_header">流動性のリクエストに失敗しました</string>
+    <string name="liquidityads_error_channels_unavailable">チャネルが利用できません。後ほどもう一度お試しください。</string>
+    <string name="liquidityads_error_invalid_funding_amount">リクエストされた金額が無効です。</string>
+
+    <!-- payment line -->
+
+    <string name="paymentline_outgoing_unconfirmed">未承認 — タップして高速化</string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">トランザクションを高速化（CPFP）。</string>
+    <string name="cpfp_instructions">未承認トランザクションの実効手数料を引き上げることで、Bitcoin マイナーが優先的に処理するよう促すことができます。</string>
+    <string name="cpfp_splice_error_actual_below_user">この feerate は、未承認トランザクションですでに使用されているものより低くなっています。より高い feerate をご使用ください。</string>
+
+    <!-- Lightning payment errors -->
+
+    <string name="outgoing_failuremessage_channel_closing">チャネルはクローズ処理中です。</string>
+    <string name="outgoing_failuremessage_channel_splicing">チャネルはすでに splice を処理中です。後ほどもう一度お試しください。</string>
+    <string name="outgoing_failuremessage_not_enough_fee">手数料が不足しています。</string>
+    <string name="outgoing_failuremessage_not_enough_balance">この支払いは残高を超えています。</string>
+    <string name="outgoing_failuremessage_too_big">支払い金額が大きすぎます。複数回に分けてお試しください。</string>
+    <string name="outgoing_failuremessage_too_small">支払い金額が小さすぎます。</string>
+    <string name="outgoing_failuremessage_expiry_too_big">この支払いの有効期限が先すぎます。</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">支払いが受取人によって拒否されました。このインボイスはすでに支払い済みの可能性があります。</string>
+    <string name="outgoing_failuremessage_recipient_offline">受取人がオフラインです。</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">支払いを受取人に中継できませんでした（インバウンド流動性が不足している可能性があります）。</string>
+    <string name="outgoing_failuremessage_temporary_failure">支払い経路上のノードでエラーが発生しました。再試行すると成功する場合があります。</string>
+    <string name="outgoing_failuremessage_too_many_pending">保留中の支払いが多すぎます。完了後にもう一度お試しください。</string>
+
+    <string name="outgoing_failuremessage_invalid_id">支払い ID が無効です。もう一度お試しください。</string>
+    <string name="outgoing_failuremessage_alreadypaid">このインボイスはすでに支払い済みです。</string>
+    <string name="outgoing_failuremessage_not_connected">チャネルがまだ接続されていません。安定した接続をお待ちいただき、もう一度お試しください。</string>
+    <string name="outgoing_failuremessage_channel_opening">チャネルはまだ開設中です。しばらくお待ちいただき、もう一度お試しください。</string>
+    <string name="outgoing_failuremessage_unsupported_features">このインボイスはサポートされていない機能を使用しています。Phoenix が最新バージョンかご確認ください。</string>
+    <string name="outgoing_failuremessage_invalid_amount">支払い金額が無効です。</string>
+    <string name="outgoing_failuremessage_no_available_channels">既存のチャネルを通じて支払いを送信できませんでした。</string>
+    <string name="outgoing_failuremessage_noroutefound">受取人に到達できないか、受取人のインバウンド流動性が不足しています。</string>
+    <string name="outgoing_failuremessage_unknown">不明なエラーが発生し、支払いに失敗しました。</string>
+    <string name="outgoing_failuremessage_restarted">支払いの処理中にウォレットが再起動されました。</string>
+
+    <!-- spliceout: low feerate disclaimer -->
+
+    <string name="spliceout_low_feerate_dialog_title">feerate が低すぎます！</string>
+    <string name="spliceout_low_feerate_dialog_body1">feerate が不十分なトランザクションは、承認まで数日から数週間かかる場合があります。</string>
+    <string name="spliceout_low_feerate_dialog_body2">feerate の選択はご自身の責任です。一度送信したトランザクションはキャンセルできず、より高い手数料で高速化することしかできません。</string>
+    <string name="spliceout_low_feerate_dialog_body3">続行してもよろしいですか？</string>
+
+    <!-- spliceout: capacity disclaimer -->
+
+    <string name="spliceout_capacity_disclaimer_title">チャネルサイズの縮小</string>
+    <string name="spliceout_capacity_disclaimer_body1">オンチェーンで送信される資金はチャネルの自分側から引き出され、チャネルサイズが同額だけ縮小されます。インバウンド流動性は変わりません。</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">このメッセージを今後表示しない。</string>
+
+    <!-- Spend swap-in refund -->
+
+    <string name="swapinrefund_title">キャンセルされたスワップインを使用</string>
+    <string name="swapinrefund_none_available_label">キャンセルされたスワップインはありません。</string>
+    <string name="swapinrefund_available_label">利用可能：<b>%1$s</b>（%2$s）</string>
+    <string name="swapinrefund_instructions_1">この画面では、期限内にスワップされなかったオンチェーン入金を使用できます。Lightning チャネルには影響しません。</string>
+    <string name="swapinrefund_instructions_2">送金先アドレスが有効であることをご確認のうえ、適切な feerate をご使用ください。</string>
+    <string name="swapinrefund_estimate_button">手数料を見積もる</string>
+    <string name="swapinrefund_estimating">手数料を見積もり中…</string>
+    <string name="swapinrefund_send_button">ブロードキャスト</string>
+    <string name="swapinrefund_sending">ブロードキャスト中…</string>
+    <string name="swapinrefund_failed">トランザクションエラー。</string>
+    <string name="swapinrefund_failed_address">このアドレスは無効です。</string>
+    <string name="swapinrefund_failed_cannot_create">返金トランザクションを作成できません。</string>
+    <string name="swapinrefund_success">トランザクションを公開しました。</string>
+    <string name="swapinrefund_success_details">トランザクションは以下でご確認いただけます。支払い履歴には表示されないため、必要な場合は今すぐ ID をコピーしてください。</string>
+
+    <!-- Final wallet refund -->
+
+    <string name="finalwallet_refund_title">ファイナルウォレットの資金を使用</string>
+    <string name="finalwallet_refund_available_none">利用可能な資金はありません</string>
+    <string name="finalwallet_refund_available">利用可能な金額</string>
+    <string name="finalwallet_refund_instructions">この画面では、ファイナルウォレットの資金を使用できます。これらの資金は、過去に閉じられたチャネルから送られたものです。既存の Lightning チャネルには影響しません。</string>
+
+    <!-- experimental features -->
+
+    <string name="bip353_subtitle">これは、Bolt12 支払いリクエスト用の読みやすいアドレスです。</string>
+    <string name="bip353_subtitle2">より良いアドレスをご希望ですか？サードパーティのサービスを利用するか、ご自身でアドレスをホストすることもできます！</string>
+
+</resources>

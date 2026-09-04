@@ -121,8 +121,9 @@ struct SpendOnChainFunds: View {
 		Section {
 			Text(
 				"""
-				Use this screen to spend your on-chain funds that were not swapped \
-				in time. The swap-in request has now expired.
+				Use this screen to spend all the deposits on your swap-in wallet that were not swapped \
+				in time and have now expired. This does not affect your existing Lightning channels, \
+				or the pending swap-ins.
 				"""
 			)
 			.fixedSize(horizontal: false, vertical: true) // text truncation bugs
@@ -135,7 +136,7 @@ struct SpendOnChainFunds: View {
 		Section {
 			Text(
 				"""
-				Use this screen to spend funds from your final wallet. \
+				Use this screen to spend all the funds on your final wallet. \
 				These funds come from channels that have been closed in the past. \
 				This does not affect your existing Lightning channels.
 				"""

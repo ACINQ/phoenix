@@ -26,4 +26,9 @@
     <locale android:name="vi" />
     <locale android:name="sw" />
     <locale android:name="in" />
+    <locale android:name="ko" />
+    <locale android:name="it" />
+    <locale android:name="ja" />
+    <locale android:name="pl" />
+    <locale android:name="uk" />
 </locale-config>

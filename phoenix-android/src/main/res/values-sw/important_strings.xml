@@ -429,8 +429,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Ongeza kasi ya miamala yangu.</string>
-    <string name="cpfp_instructions">Unaweza kufanya miamala yako yote isiyothibitishwa itumie kiwango cha ada cha juu zaidi ili kuwashawishi wachimbaji kupendelea malipo yako.</string>
+    <string name="cpfp_title">Ongeza kasi ya miamala yangu (CPFP).</string>
+    <string name="cpfp_instructions">Unaweza kuongeza ada halisi za miamala yako ambayo bado haijathibitishwa ili kuhimiza wachimbaji wa Bitcoin kuipa kipaumbele.</string>
     <string name="cpfp_splice_error_actual_below_user">Kiwango hiki cha ada ni chini ya kile ambacho miamala yako isiyothibitishwa tayari inatumia. Tumia kiwango cha ada cha juu zaidi.</string>
 
     <!-- Lightning payment errors -->
@@ -476,8 +476,8 @@
 
     <string name="swapinrefund_title">Tumia swap-ins zilizofutwa</string>
     <string name="swapinrefund_none_available_label">Hakuna swap-ins zilizofutwa bado.</string>
-    <string name="swapinrefund_available_label">Inapatikana: <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Tumia skrini hii kutumia amana za kwenye mnyororo ambazo hazikubadilishwa kwa wakati. Hii haiathiri njia zako za Lightning.</string>
+    <string name="swapinrefund_available_label">Kiasi cha kutumia: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Tumia skrini hii kutumia amana zote za pochi ya swap-in ambazo hazikubadilishwa kwa wakati na sasa muda wake umekwisha. Hii haiathiri chaneli zako zilizopo za Lightning, wala swap-in zinazosubiri.</string>
     <string name="swapinrefund_instructions_2">Hakikisha anwani ya marudio ni sahihi na kiwango cha ada ni cha kuridhisha.</string>
     <string name="swapinrefund_estimate_button">Kadiria ada</string>
     <string name="swapinrefund_estimating">Inakadiria ada…</string>
@@ -492,9 +492,9 @@
     <!-- Final wallet refund -->
 
     <string name="finalwallet_refund_title">Tumia pesa kutoka kwa mkoba wa mwisho</string>
-    <string name="finalwallet_refund_available_none">Hakuna fedha zinazopatikana</string>
-    <string name="finalwallet_refund_available">Kiasi kinachopatikana</string>
-    <string name="finalwallet_refund_instructions">Tumia skrini hii kutumia pesa kutoka kwa pochi yako ya mwisho. Fedha hizi hutoka kwa chaneli ambazo zilifungwa hapo awali. Hii haiathiri chaneli zako zilizopo za Lightning.</string>
+    <string name="finalwallet_refund_available_none">Hakuna fedha za kutumia</string>
+    <string name="finalwallet_refund_available">Kiasi cha kutumia</string>
+    <string name="finalwallet_refund_instructions">Tumia skrini hii kutumia fedha zote kutoka kwa pochi yako ya mwisho. Fedha hizi hutoka kwa chaneli ambazo zilifungwa hapo awali. Hii haiathiri chaneli zako zilizopo za Lightning.</string>
 
     <!-- experimental features -->
 

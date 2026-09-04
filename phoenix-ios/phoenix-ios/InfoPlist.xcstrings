@@ -34,6 +34,12 @@
             "state" : "translated",
             "value" : "Phoenix"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix"
+          }
         }
       }
     },
@@ -45,6 +51,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "The app would like to scan an NFC card."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC 카드를 스캔하려고 합니다."
           }
         }
       }
@@ -82,6 +94,12 @@
             "state" : "translated",
             "value" : "Phoenix souhaiterait utiliser la caméra pour scanner des requêtes de paiement."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix가 결제 요청을 스캔하기 위해 카메라를 사용하려고 합니다."
+          }
         }
       }
     },
@@ -118,6 +136,12 @@
             "state" : "translated",
             "value" : "Authentification avec Face ID"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID로 로그인합니다."
+          }
         }
       }
     },
@@ -153,6 +177,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Phoenix souhaiterait sauver l’image du QR code dans votre bibliothèque de photos."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phoenix가 QR 코드 이미지를 사진 보관함에 저장하려고 합니다."
           }
         }
       }

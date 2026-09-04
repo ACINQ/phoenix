@@ -632,7 +632,7 @@
     <string name="lnurl_pay_error_payment_pending">Faktura vrácena od <b>%1$s</b> se již zpracovává.</string>
     <string name="lnurl_pay_error_already_paid">Faktura vrácená <b>%1$s</b> již byla zaplacena.</string>
     <string name="lnurl_pay_error_invalid_amount">Faktura vrácená <b>%1$s</b> obsahuje neplatnou částku.</string>
-    <string name="lnurl_pay_error_invalid_malformed">Faktura vrácená <b>%1$s</b> je chybná.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Faktura vrácená <b>%1$s</b> je chybná:\n%2$s</string>
 
     <!-- settings: display preferences -->
 
@@ -858,8 +858,8 @@
 
     <!-- mempool -->
 
-    <string name="mempool_unknown_feerate_title">Neznámý stav mempoolu</string>
-    <string name="mempool_unknown_feerate_details">Phoenix se nepodařilo získat aktuální stav mempoolu a nemůže odhadnout rychlost vašich transakcí.\n\nZkontrolujte mempool ručně v průzkumníku a použijte adekvátní hodnotu!</string>
+    <string name="mempool_unknown_feerate_title">Neznámá rychlost transakce</string>
+    <string name="mempool_unknown_feerate_details">Zkontrolujte ručně aktuální sazbu poplatku v exploreru a použijte vhodnou hodnotu.</string>
     <string name="mempool_fastest">≈ Další blok</string>
     <string name="mempool_halfhour">≈ 30 minut</string>
     <string name="mempool_hour">≈ 1 hodina</string>

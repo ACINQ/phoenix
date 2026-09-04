@@ -115,21 +115,20 @@ class LnurlManager(
             builder.appendParameter(name = "comment", value = comment)
         }
         val callback = builder.build()
-        val origin = callback.host
 
         val response: HttpResponse = try {
             httpClient.get(callback)
-        } catch (err: Throwable) {
-            throw LnurlError.RemoteFailure.CouldNotConnect(origin)
+        } catch (_: Throwable) {
+            throw LnurlError.RemoteFailure.CouldNotConnect(intent.callback.host)
         }
 
         val json = Lnurl.processLnurlResponse(response, log)
-        val invoice = LnurlPay.parseLnurlPayInvoice(intent, origin, json)
+        val invoice = LnurlPay.parseLnurlPayInvoice(intent, json)
 
         // SPECS: LN WALLET verifies that the amount in the provided invoice equals the amount previously specified by user.
         if (amount != invoice.invoice.amount) {
-            log.error { "rejecting invoice from $origin with amount_invoice=${invoice.invoice.amount} requested_amount=$amount" }
-            throw LnurlError.Pay.Invoice.InvalidAmount(origin)
+            log.error { "rejecting invoice from ${intent.callback.host} with amount_invoice=${invoice.invoice.amount} requested_amount=$amount" }
+            throw LnurlError.Pay.Invoice.InvalidAmount(intent.callback.host)
         }
 
         return@async invoice

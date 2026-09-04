@@ -414,8 +414,8 @@
 
     <!-- CPFP -->
 
-    <string name="cpfp_title">Acelerar mis transacciones.</string>
-    <string name="cpfp_instructions">Puedes aumentar el feerate de todas tus transacciones no confirmadas a fin de que los mineros tengan un incentivo para favorecer tus pagos.</string>
+    <string name="cpfp_title">Acelerar mis transacciones (CPFP).</string>
+    <string name="cpfp_instructions">Puedes aumentar las tarifas efectivas de tus transacciones no confirmadas para incentivar a los mineros de Bitcoin a priorizarlas.</string>
     <string name="cpfp_splice_error_actual_below_user">Este feerate es inferior al que ya usan tus transacciones no confirmadas. Usa un feerate más alto.</string>
 
     <!-- Lightning payment errors -->
@@ -462,8 +462,8 @@
 
     <string name="swapinrefund_title">Gastar un intercambio caducado</string>
     <string name="swapinrefund_none_available_label">No hay swap-in caducado.</string>
-    <string name="swapinrefund_available_label">Fondos disponibles : <b>%1$s</b> (%2$s)</string>
-    <string name="swapinrefund_instructions_1">Utiliza esta pantalla para gastar depósitos on-chain que no hayan sido cambiados a Lightning a tiempo. Tenga en cuenta que esto no afecta en modo alguno a sus canales Lightning.</string>
+    <string name="swapinrefund_available_label">Importe a gastar: <b>%1$s</b> (%2$s)</string>
+    <string name="swapinrefund_instructions_1">Utilice esta pantalla para gastar todos los depósitos de la billetera swap-in que no se cambiaron a Lightning a tiempo y que ya han expirado. Esto no afecta a sus canales Lightning existentes ni a los swap-ins pendientes.</string>
     <string name="swapinrefund_instructions_2">Asegúrese de que la dirección de destino es correcta y los gastos razonables.</string>
     <string name="swapinrefund_estimate_button">Estimar las tasas</string>
     <string name="swapinrefund_estimating">Estimación de tasas…</string>
@@ -478,9 +478,9 @@
     <!-- Final wallet refund -->
 
     <string name="finalwallet_refund_title">Gastar fondos del billetero final</string>
-    <string name="finalwallet_refund_available_none">No hay fondos disponibles</string>
-    <string name="finalwallet_refund_available">Importe disponible</string>
-    <string name="finalwallet_refund_instructions">Utilice esta pantalla para gastar fondos de su billetera final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a sus canales Lightning existentes.</string>
+    <string name="finalwallet_refund_available_none">No hay fondos para gastar</string>
+    <string name="finalwallet_refund_available">Importe a gastar</string>
+    <string name="finalwallet_refund_instructions">Utilice esta pantalla para gastar todos los fondos de su billetera final. Estos fondos proceden de canales que se han cerrado en el pasado. Esto no afecta a sus canales Lightning existentes.</string>
 
     <!-- experimental features -->
 
