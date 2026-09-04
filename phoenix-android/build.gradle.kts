@@ -69,7 +69,7 @@ android {
     }
 
     androidResources {
-        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw", "in", "ko"))
+        localeFilters.addAll(listOf("en", "fr", "de", "es", "b+es+419", "cs", "pt-rBR", "sk", "vi", "sw", "in", "ko", "it", "ja", "pl", "uk"))
     }
 }
 
