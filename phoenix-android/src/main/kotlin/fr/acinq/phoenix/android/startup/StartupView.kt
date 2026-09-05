@@ -51,6 +51,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -354,15 +356,37 @@ private fun BoxScope.LoadWallet(
             WalletStartupView(text = stringResource(R.string.utils_loading_prefs), metadata = metadata)
         }
         true -> {
-            WalletStartupView(text = stringResource(id = R.string.lockprompt_title), metadata = metadata)
-            ScreenLockPrompt(
-                walletId = userWallet.walletId,
-                walletName = metadata.nameOrDefault(),
-                promptScreenLockImmediately = promptScreenLockImmediately,
-                onUnlock = { doLoadWallet(userWallet) },
-                onLock = { },
-                goToWalletSelector = goToWalletSelector,
-            )
+            // The lock screen is rendered above the previous destination via Compose Navigation,
+            // but pointer events in empty regions of this overlay would otherwise reach whatever
+            // is drawn underneath (e.g. an active dialog trigger on the payment details screen).
+            // Wrap the lock prompt in a Box that consumes every pointer event left unhandled by
+            // its own children — the biometric/PIN buttons consume their taps first during the
+            // Main pass, so this Final-pass sink only catches "empty space" taps.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent(PointerEventPass.Final)
+                                event.changes.forEach { change ->
+                                    if (!change.isConsumed) change.consume()
+                                }
+                            }
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                WalletStartupView(text = stringResource(id = R.string.lockprompt_title), metadata = metadata)
+                ScreenLockPrompt(
+                    walletId = userWallet.walletId,
+                    walletName = metadata.nameOrDefault(),
+                    promptScreenLockImmediately = promptScreenLockImmediately,
+                    onUnlock = { doLoadWallet(userWallet) },
+                    onLock = { },
+                    goToWalletSelector = goToWalletSelector,
+                )
+            }
         }
         false -> {
             WalletStartupView(text = stringResource(id = R.string.startup_starting), metadata = metadata)
