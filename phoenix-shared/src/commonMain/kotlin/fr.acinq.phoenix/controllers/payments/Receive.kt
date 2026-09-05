@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.phoenix.controllers.MVI
 
 object Receive {
@@ -8,7 +9,13 @@ object Receive {
     sealed class Model : MVI.Model() {
         object Awaiting : Model()
         object Generating: Model()
-        data class Generated(val request: String, val paymentHash: String, val amount: MilliSatoshi?, val desc: String?): Model()
+        data class Generated(
+            val invoice: Bolt11Invoice,
+            val request: String,
+            val paymentHash: String,
+            val amount: MilliSatoshi?,
+            val desc: String?
+        ): Model()
     }
 
     sealed class Intent : MVI.Intent() {
