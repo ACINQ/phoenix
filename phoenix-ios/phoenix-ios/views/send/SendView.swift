@@ -77,6 +77,7 @@ struct SendView: View {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	@Environment(\.dynamicTypeSize) var dynamicTypeSize: DynamicTypeSize
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
 	@EnvironmentObject var popoverState: PopoverState
@@ -236,11 +237,17 @@ struct SendView: View {
 	
 	@ViewBuilder
 	func footer() -> some View {
-		
-		ViewThatFits {
-			footer_standard()
-			footer_compact()
-			footer_accessibility()
+
+		Group {
+			if dynamicTypeSize.isAccessibilitySize {
+				footer_scrollable()
+			} else {
+				ViewThatFits {
+					footer_standard()
+					footer_compact()
+					footer_accessibility()
+				}
+			}
 		}
 		.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 		.background(
@@ -248,6 +255,30 @@ struct SendView: View {
 				.cornerRadius(15, corners: [.topLeft, .topRight])
 				.edgesIgnoringSafeArea([.horizontal, .bottom])
 		)
+	}
+
+	@ViewBuilder
+	func footer_scrollable() -> some View {
+
+		ScrollView(.horizontal, showsIndicators: false) {
+			HStack(alignment: VerticalAlignment.top, spacing: 20) {
+				roundButton_paste()
+					.frame(width: maxButtonWidth)
+					.read(maxButtonWidthReader)
+				roundButton_chooseImage()
+					.frame(width: maxButtonWidth)
+					.read(maxButtonWidthReader)
+				roundButton_nfc()
+					.frame(width: maxButtonWidth)
+					.read(maxButtonWidthReader)
+				roundButton_scanQrCode()
+					.frame(width: maxButtonWidth)
+					.read(maxButtonWidthReader)
+			}
+			.padding(.horizontal, 20)
+		}
+		.padding(.top, 20)
+		.padding(.bottom, deviceInfo.isFaceID ? 10 : 20)
 	}
 	
 	@ViewBuilder
