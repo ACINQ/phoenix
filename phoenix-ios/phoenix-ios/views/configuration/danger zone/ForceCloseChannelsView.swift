@@ -13,7 +13,8 @@ struct ForceCloseChannelsView : MVIView {
 	@StateObject var mvi = MVIState({ Biz.business.controllers.forceCloseChannelsConfiguration() })
 	
 	@EnvironmentObject var popoverState: PopoverState
-	
+	@EnvironmentObject var smartModalState: SmartModalState
+
 	// --------------------------------------------------
 	// MARK: ViewBuilders
 	// --------------------------------------------------
@@ -273,7 +274,28 @@ struct ForceCloseChannelsView : MVIView {
 	
 	func confirmForceCloseChannels() -> Void {
 		log.trace("confirmForceCloseChannels()")
-		
+
+		// Force closing moves all channel funds on-chain (to the user's own final wallet).
+		// It is destructive and costly, so it must be protected by the spending PIN.
+		let enabledSecurity = Keychain.current.enabledSecurity
+		if enabledSecurity.contains(.spendingPin) {
+
+			smartModalState.display(dismissable: false) {
+				AuthenticateWithPinSheet(type: .spendingPin) { result in
+					if result == .Authenticated {
+						forceCloseChannels_authenticated()
+					}
+				}
+			}
+
+		} else {
+			forceCloseChannels_authenticated()
+		}
+	}
+
+	func forceCloseChannels_authenticated() -> Void {
+		log.trace("forceCloseChannels_authenticated()")
+
 		mvi.intent(CloseChannelsConfiguration.IntentForceCloseAllChannels())
 	}
 }
