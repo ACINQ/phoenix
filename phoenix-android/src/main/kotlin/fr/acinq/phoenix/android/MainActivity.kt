@@ -40,9 +40,6 @@ import fr.acinq.phoenix.android.services.HceService
 import fr.acinq.phoenix.android.services.PaymentsForegroundService
 import fr.acinq.phoenix.android.utils.nfc.NfcReaderCallback
 import fr.acinq.phoenix.managers.AppConnectionsDaemon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -74,7 +71,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        intent?.fixUri()
+        // replace the activity's own intent with a sanitized copy
+        intent = intent?.toSafeDeeplink() ?: Intent(Intent.ACTION_MAIN)
+
         onNewIntent(intent)
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
@@ -97,36 +96,45 @@ class MainActivity : AppCompatActivity() {
         appViewModel.scheduleAutoLock()
     }
 
-    val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         log.info("receive new_intent with action=${intent?.action} data=${intent?.data}")
 
-        when (intent?.action) {
-            NfcAdapter.ACTION_NDEF_DISCOVERED, NfcAdapter.ACTION_TAG_DISCOVERED -> {
-                // ignored
-            }
-            else -> {
-                // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
-                // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
-                // TODO: look into detaching the app state from the activity
-                intent?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                intent?.fixUri()
-                try {
-                    scope.launch {
-                        delay(1000)
-                        if (navController != null) {
-                            log.info("handling deeplink=$intent")
-                            navController?.handleDeepLink(intent)
-                        } else {
-                            log.warn("navigation controller is not initialized, ignoring deeplink=$intent")
-                        }
-                    }
-                } catch (e: Exception) {
-                    log.warn("could not handle deeplink: {}", e.localizedMessage)
+        // NFC discovery intents, the launcher intent, and intents with an unsupported scheme are not deeplinks.
+        val deeplink = intent?.toSafeDeeplink() ?: return
+        try {
+            // use the lifecycle scope so that this job is cancelled if the activity is destroyed before the delay completes (would crash the app)
+            lifecycleScope.launch {
+                delay(1000)
+                if (navController != null) {
+                    log.info("handling deeplink=$deeplink")
+                    navController?.handleDeepLink(deeplink)
+                } else {
+                    log.warn("navigation controller is not initialized, ignoring deeplink=$deeplink")
                 }
             }
+        } catch (e: Exception) {
+            log.warn("could not handle deeplink: {}", e.localizedMessage)
+        }
+    }
+
+    /**
+     * Returns a sanitized copy of this intent that can be safely passed to [NavHostController.handleDeepLink], or null if
+     * this intent is not a deeplink we support.
+     *
+     * Only the action and the uri are kept. In particular, all extras are dropped: the navigation library also accepts
+     * explicit destination ids passed as extras, which would let any application navigate to any screen of Phoenix.
+     */
+    private fun Intent.toSafeDeeplink(): Intent? {
+        if (this.action != Intent.ACTION_VIEW) return null
+        val uri = this.data ?: return null
+        if (uri.scheme?.lowercase() !in DEEPLINK_SCHEMES) return null
+        return Intent(Intent.ACTION_VIEW, uri).apply {
+            // force the intent flag to single top, in order to avoid [handleDeepLink] finish the current activity.
+            // this would otherwise clear the app view model, i.e. loose the state which virtually reboots the app
+            // TODO: look into detaching the app state from the activity
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            fixUri()
         }
     }
 
@@ -250,8 +258,13 @@ class MainActivity : AppCompatActivity() {
         val ssp = initialUri?.schemeSpecificPart
         if (scheme == "phoenix" && ssp != null && (ssp.startsWith("lnbc") || ssp.startsWith("lntb") || ssp.startsWith("lnurl") || ssp.startsWith("lno"))) {
             this.data = "lightning:$ssp".toUri()
-            log.debug("rewritten intent uri from {} to {}", initialUri, intent.data)
+            log.debug("rewritten intent uri from {} to {}", initialUri, this.data)
         }
+    }
+
+    companion object {
+        /** Uri schemes accepted as deeplinks. Must match the intent filters declared in the manifest. */
+        private val DEEPLINK_SCHEMES = setOf("bitcoin", "lightning", "lnurl", "lnurlw", "lnurlp", "keyauth", "phoenix")
     }
 
 }
