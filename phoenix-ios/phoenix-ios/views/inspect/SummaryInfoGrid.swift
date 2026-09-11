@@ -179,7 +179,10 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 	func paymentMessageRow() -> some View {
 		let identifier: String = #function
 		let successAction = paymentInfo.metadata.lnurl?.successAction
-		
+
+		// the callback host is needed to check whether the success action is valid
+		let lnurlOrigin = paymentInfo.metadata.lnurl?.pay.callback.host ?? ""
+
 		if let sa_message = successAction as? LnurlPay.Invoice_SuccessAction_Message {
 			
 			InfoGridRow(
@@ -222,8 +225,10 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					
 					Text(sa_url.description_)
-					
-					if let url = URL(string: sa_url.url.description()) {
+
+					if LnurlPay.companion.isValidSuccessActionUrl(url: sa_url.url, origin: lnurlOrigin),
+					   let url = URL(string: sa_url.url.description())
+					{
 						Button {
 							openURL(url)
 						} label: {
@@ -236,6 +241,8 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 								Text("Copy link")
 							}
 						}
+					} else {
+						Text(sa_url.url.description())
 					}
 				} // </VStack>
 				
@@ -260,8 +267,10 @@ struct SummaryInfoGrid: InfoGridView { // See InfoGridView for architecture disc
 					Text(sa_aes.description_)
 					
 					if let sa_aes_decrypted = decrypt(aes: sa_aes) {
-					
-						if let url = URL(string: sa_aes_decrypted.plaintext) {
+
+						if let linkUrl = sa_aes_decrypted.textAsUrl(origin: lnurlOrigin),
+						   let url = URL(string: linkUrl.description())
+						{
 							Button {
 								openURL(url)
 							} label: {

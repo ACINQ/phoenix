@@ -29,3 +29,10 @@ fun UUID.toByteArray() =
         writeUuid(this@toByteArray)
         toByteArray()
     }
+
+/** Executes block, returns null if an exception is raised. */
+inline fun <T> tryOrNull(block: () -> T): T? = try {
+    block()
+} catch (e: Exception) {
+    null
+}

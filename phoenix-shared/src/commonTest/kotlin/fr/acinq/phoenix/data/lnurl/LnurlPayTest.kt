@@ -335,6 +335,56 @@ class LnurlPayTest {
     }
 
     @Test
+    fun invoice_successaction_reject_aes_iv_not_16_bytes() {
+        val validCiphertext = "ahj9qQxHwjZmyv+H5floPkXdXvv0cNj3KCLxPOH1Pw8="
+        // 24 base64 chars decode to 16 bytes only with "==" padding: these decode to 17 and 18 bytes
+        listOf("iybzJqQe9JuEah7yySQWvgE=", "iybzJqQe9JuEah7yySQWvgEB").forEach { badIv ->
+            assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+                LnurlPay.parseLnurlPayInvoice(
+                    intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"aes","description":"d","ciphertext":"$validCiphertext","iv":"$badIv"}}""")
+                )
+            }
+        }
+    }
+
+    @Test
+    fun invoice_successaction_reject_aes_ciphertext_not_block_aligned() {
+        // empty, and 5 bytes ("hello"): both are invalid AES-CBC ciphertexts and would make decryption throw
+        listOf("", "aGVsbG8=").forEach { badCiphertext ->
+            assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
+                LnurlPay.parseLnurlPayInvoice(
+                    intent, json("""{"pr":"${makeBolt11().write()}","successAction":{"tag":"aes","description":"d","ciphertext":"$badCiphertext","iv":"iybzJqQe9JuEah7yySQWvg=="}}""")
+                )
+            }
+        }
+    }
+
+    @Test
+    fun successaction_url_validation() {
+        val origin = intent.callback.host
+        assertTrue(LnurlPay.isValidSuccessActionUrl(Url("https://backend.example.com/order/42"), origin))
+        assertTrue(!LnurlPay.isValidSuccessActionUrl(Url("http://backend.example.com/order/42"), origin))
+        assertTrue(!LnurlPay.isValidSuccessActionUrl(Url("https://evil.example.org/order/42"), origin))
+        assertTrue(!LnurlPay.isValidSuccessActionUrl(Url("https://acinq.co/order/42"), origin)) // initialUrl host is not the callback host
+        assertTrue(!LnurlPay.isValidSuccessActionUrl(Url("intent://backend.example.com/#Intent;scheme=https;end"), origin))
+    }
+
+    @Test
+    fun successaction_aes_decrypted_link() {
+        val origin = intent.callback.host
+        fun decrypted(plaintext: String) = LnurlPay.Invoice.SuccessAction.Aes.Decrypted(description = "d", plaintext = plaintext)
+
+        assertEquals(Url("https://backend.example.com/secret/42"), decrypted("https://backend.example.com/secret/42").textAsUrl(origin))
+        // the service controls the plaintext: anything that is not a valid success-action url must not be offered as a link
+        assertNull(decrypted("sic transit gloria mundi").textAsUrl(origin))
+        assertNull(decrypted("http://backend.example.com/secret/42").textAsUrl(origin))
+        assertNull(decrypted("https://evil.example.org/secret/42").textAsUrl(origin))
+        assertNull(decrypted("intent://evil.example.org/#Intent;scheme=https;package=com.evil;end").textAsUrl(origin))
+        assertNull(decrypted("shortcuts://run-shortcut?name=x").textAsUrl(origin))
+        assertNull(decrypted("").textAsUrl(origin))
+    }
+
+    @Test
     fun invoice_successaction_reject_unknown_tag() {
         assertFailsWith<LnurlError.Pay.Invoice.Malformed> {
             LnurlPay.parseLnurlPayInvoice(

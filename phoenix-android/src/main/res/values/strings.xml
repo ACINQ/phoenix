@@ -427,6 +427,7 @@
     <string name="paymentdetails_lnurlpay_action_url_button">Open link</string>
     <string name="paymentdetails_lnurlpay_action_aes_label">Message</string>
     <string name="paymentdetails_lnurlpay_action_aes_decrypting">Decrypting message…</string>
+    <string name="paymentdetails_lnurlpay_action_aes_error">Could not decrypt the message.</string>
 
     <string name="paymentdetails_desc_label">Description</string>
     <string name="paymentdetails_note_label">Note</string>

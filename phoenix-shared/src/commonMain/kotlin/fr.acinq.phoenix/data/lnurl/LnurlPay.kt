@@ -23,6 +23,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.Bolt11Invoice
 import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.data.lnurl.Lnurl.Companion.format
+import fr.acinq.phoenix.utils.extensions.tryOrNull
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 import kotlin.io.encoding.Base64
@@ -90,7 +91,17 @@ sealed class LnurlPay : Lnurl.Qualified {
                 data class Decrypted(
                     val description: String,
                     val plaintext: String
-                )
+                ) {
+                    /**
+                     * Get the decrypted payload as an url. If not valid, or not an url, returns null.
+                     * @param origin the lnurl-pay callback's host
+                     */
+                    fun textAsUrl(origin: String): io.ktor.http.Url? {
+                        return tryOrNull { Url(plaintext) }?.takeIf {
+                            isValidSuccessActionUrl(it, origin)
+                        }
+                    }
+                }
             }
 
             enum class Tag(val label: String) {
@@ -103,6 +114,11 @@ sealed class LnurlPay : Lnurl.Qualified {
 
 
     companion object {
+
+        /** An url in a LNURL success action must be TLS, and must point to the lnurl-pay callback's host (LUD-09) */
+        fun isValidSuccessActionUrl(url: Url, origin: String): Boolean {
+            return url.protocol.isSecure() && url.host == origin
+        }
 
         /** Parses json into a [LnurlPay.Invoice] object. Throws an [LnurlError.PayInvoice] exception if unreadable. */
         fun parseLnurlPayInvoice(
@@ -160,11 +176,8 @@ sealed class LnurlPay : Lnurl.Qualified {
                     } catch (_: Exception) {
                         throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: invalid url")
                     }
-                    if (!url.protocol.isSecure()) {
-                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: TLS required")
-                    }
-                    if (url.host != origin) {
-                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: callback host mismatch")
+                    if (!isValidSuccessActionUrl(url, origin)) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.url.url: TLS required and host must match callback")
                     }
                     Invoice.SuccessAction.Url(description, url)
                 }
@@ -179,17 +192,21 @@ sealed class LnurlPay : Lnurl.Qualified {
                     } catch (_: Exception) {
                         throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.ciphertext: invalid b64")
                     }
-                    if (ciphertext.size() > (4 * 1024)) {
+                    // AES-CBC with PKCS padding: the ciphertext must be a non-empty multiple of the block size
+                    if (ciphertext.size() == 0 || ciphertext.size() % 16 != 0 || ciphertext.size() > (4 * 1024)) {
                         throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.ciphertext: bad length")
                     }
                     val ivStr = obj["iv"]?.jsonPrimitive?.content
-                    if (ivStr.isNullOrBlank() || ivStr.length != 24) {
-                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.iv: missing or bad length")
+                    if (ivStr.isNullOrBlank()) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.iv: missing")
                     }
                     val iv = try {
                         Base64.decode(ivStr).toByteVector()
                     } catch (_: Exception) {
                         throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.iv: invalid b64")
+                    }
+                    if (iv.size() != 16) {
+                        throw LnurlError.Pay.Invoice.Malformed(origin, "success.aes.iv: bad length")
                     }
                     Invoice.SuccessAction.Aes(description, ciphertext = ciphertext, iv = iv)
                 }
