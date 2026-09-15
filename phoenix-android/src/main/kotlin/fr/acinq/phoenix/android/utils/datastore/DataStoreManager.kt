@@ -25,11 +25,16 @@ import fr.acinq.phoenix.android.globalPrefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import java.io.File
 
+/**
+ * Owns the per-wallet [UserPrefs] and [InternalPrefs] datastore instances.
+ *
+ * DataStore forbids two live instances backed by the same file. Looking up an instance
+ * and creating it must therefore happen atomically.
+ */
 object DataStoreManager {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -37,40 +42,34 @@ object DataStoreManager {
     private val scope = CoroutineScope(Dispatchers.Main.immediate + supervisor)
 
     // maps of: (wallet_id -> userPrefs) and (wallet_id -> internalPrefs)
-    private val _userPrefsMapFlow = MutableStateFlow<Map<WalletId, UserPrefs>>(emptyMap())
-    private val _internalPrefsMapFlow = MutableStateFlow<Map<WalletId, InternalPrefs>>(emptyMap())
+    private val userPrefsMap = mutableMapOf<WalletId, UserPrefs>()
+    private val internalPrefsMap = mutableMapOf<WalletId, InternalPrefs>()
 
+    @Synchronized
     fun loadUserPrefsForWallet(context: Context, walletId: WalletId): UserPrefs {
-        val existingUserPrefs = _userPrefsMapFlow.value[walletId]
-        if (existingUserPrefs != null) return existingUserPrefs
-
-        val newUserPrefs = PreferenceDataStoreFactory.create {
-            userPrefsFile(context, walletId)
-        }.let { UserPrefs(it) }
-
-        val newUserPrefsMap = _userPrefsMapFlow.value.toMutableMap()
-        newUserPrefsMap[walletId] = newUserPrefs
-        _userPrefsMapFlow.value = newUserPrefsMap
-
-        return newUserPrefs
+        return userPrefsMap.getOrPut(walletId) {
+            log.debug("creating user prefs datastore for wallet={}", walletId)
+            PreferenceDataStoreFactory.create {
+                userPrefsFile(context, walletId)
+            }.let { UserPrefs(it) }
+        }
     }
 
+    @Synchronized
     fun loadInternalPrefsForWallet(context: Context, walletId: WalletId): InternalPrefs {
-        val existingInternalPrefs = _internalPrefsMapFlow.value[walletId]
-        if (existingInternalPrefs != null) return existingInternalPrefs
-
-        val newInternalPrefs = PreferenceDataStoreFactory.create {
-            internalPrefsFile(context, walletId)
-        }.let { InternalPrefs(it) }
-
-        val newInternalPrefsMap = _internalPrefsMapFlow.value.toMutableMap()
-        newInternalPrefsMap[walletId] = newInternalPrefs
-        _internalPrefsMapFlow.value = newInternalPrefsMap
-
-        return newInternalPrefs
+        return internalPrefsMap.getOrPut(walletId) {
+            log.debug("creating internal prefs datastore for wallet={}", walletId)
+            PreferenceDataStoreFactory.create {
+                internalPrefsFile(context, walletId)
+            }.let { InternalPrefs(it) }
+        }
     }
 
-    /** Deletes the preferences files for a given wallet id, and removes the preferences from the map flow. */
+    /**
+     * Deletes the preferences files for a given wallet id.
+     *
+     * TODO: this does not evict the wallet from the maps above, nor close its datastores.
+     */
     fun deleteNodeUserPrefs(context: Context, id: WalletId): Boolean {
         val userPrefsFile = userPrefsFile(context, id)
         val userPrefsFileDeleted = userPrefsFile.delete()
