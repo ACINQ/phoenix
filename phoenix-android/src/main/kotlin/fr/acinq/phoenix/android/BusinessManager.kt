@@ -141,6 +141,7 @@ object BusinessManager {
                 // cleared ASAP here to avoid rugpulling the UI.
                 log.info("adopting existing headless business for wallet=$walletId")
                 updateBusinessActiveInUIUnsafe(walletId)
+                existingBusiness.business.appConnectionsDaemon?.forceReconnect()
             } else {
                 log.info("business already exists in flow, ignoring...")
             }
