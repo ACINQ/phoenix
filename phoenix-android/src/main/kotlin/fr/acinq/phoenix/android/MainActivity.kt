@@ -102,19 +102,19 @@ class MainActivity : AppCompatActivity() {
 
         // NFC discovery intents, the launcher intent, and intents with an unsupported scheme are not deeplinks.
         val deeplink = intent?.toSafeDeeplink() ?: return
-        try {
-            // use the lifecycle scope so that this job is cancelled if the activity is destroyed before the delay completes (would crash the app)
-            lifecycleScope.launch {
-                delay(1000)
-                if (navController != null) {
-                    log.info("handling deeplink=$deeplink")
-                    navController?.handleDeepLink(deeplink)
-                } else {
-                    log.warn("navigation controller is not initialized, ignoring deeplink=$deeplink")
-                }
+        // use the lifecycle scope so that this job is cancelled if the activity is destroyed before the delay completes (would crash the app)
+        lifecycleScope.launch {
+            delay(1000)
+            if (navController == null) {
+                log.warn("navigation controller is not initialized, ignoring deeplink=$deeplink")
+                return@launch
             }
-        } catch (e: Exception) {
-            log.warn("could not handle deeplink: {}", e.localizedMessage)
+            log.info("handling deeplink=$deeplink")
+            try {
+                navController?.handleDeepLink(deeplink)
+            } catch (e: Exception) {
+                log.warn("navigation controller is not initialized, ignoring deeplink=$deeplink: ", e)
+            }
         }
     }
 
