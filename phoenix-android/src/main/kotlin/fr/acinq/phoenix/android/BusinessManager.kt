@@ -116,7 +116,7 @@ object BusinessManager {
             log.debug("loading wallet before starting a new business")
             val seed = business.walletManager.mnemonicsToSeed(words, wordList = MnemonicLanguage.English.wordlist())
             business.walletManager.loadWallet(seed)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             log.error("unable to load wallet, likely because of an invalid seed, aborting...")
             return StartBusinessResult.Failure.LoadWalletError
         }
@@ -132,10 +132,17 @@ object BusinessManager {
         val userPrefs = DataStoreManager.loadUserPrefsForWallet(appContext, walletId)
         val internalPrefs = DataStoreManager.loadInternalPrefsForWallet(appContext, walletId)
 
-        val businessInFlow = businessFlow.value[walletId]?.business
-        if (businessInFlow != null) {
-            log.info("business already exists in flow, ignoring...")
-            return StartBusinessResult.Success(walletInfo, businessInFlow)
+        val existingBusiness = businessFlow.value[walletId]
+        if (existingBusiness != null) {
+            if (!isHeadless && existingBusiness.isHeadless) {
+                // A service started this business first and the UI is now adopting it. The headless flag must be
+                // cleared ASAP here to avoid rugpulling the UI.
+                log.info("adopting existing headless business for wallet=$walletId")
+                updateBusinessActiveInUI(walletId)
+            } else {
+                log.info("business already exists in flow, ignoring...")
+            }
+            return StartBusinessResult.Success(walletInfo, existingBusiness.business)
         }
 
         return try {
@@ -193,8 +200,8 @@ object BusinessManager {
     }
 
     /**
-     * Updates the matching business in the map of active businesses with a non-headless flag. Should be called when the UI starts a given wallet.
-     * If called improperly, will not have severe effects ; the app will just show incoming payment notifications.
+     * Clears the headless flag on the matching business, and cancels the job monitoring headless payments.
+     * Useful when the UI takes ownership of a business created by an headless service.
      */
     fun updateBusinessActiveInUI(walletId: WalletId) {
         val businessMap = _businessFlow.value.toMutableMap()
