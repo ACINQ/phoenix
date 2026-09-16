@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.phoenix.android.BusinessManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
@@ -87,6 +86,8 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
 
             delay(250)
 
+            BusinessManager.stopBusiness(walletId)
+
             state.value = ResetWalletStep.Deleting.Databases
             val chain = NodeParamsManager.chain
             context.deleteDatabase("payments-${chain.phoenixName}-${walletId.nodeIdHash}.sqlite")
@@ -94,7 +95,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
             delay(500)
 
             state.value = ResetWalletStep.Deleting.Prefs
-            DataStoreManager.deleteNodeUserPrefs(application.applicationContext, walletId)
+            DataStoreManager.deleteWalletPrefs(application.applicationContext, walletId)
 
             delay(400)
 

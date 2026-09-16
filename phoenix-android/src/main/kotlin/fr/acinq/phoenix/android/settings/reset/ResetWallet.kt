@@ -102,7 +102,6 @@ fun ResetWallet(
                     business = business,
                     onConfirmClick = {
                         vm.deleteWalletData(onWalletDeleted = { context ->
-                            BusinessManager.stopBusiness(walletId)
                             context.startActivity(
                                 Intent(context, MainActivity::class.java).apply {
                                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
