@@ -632,7 +632,7 @@
     <string name="lnurl_pay_error_payment_pending">Рахунок, повернутий <b>%1$s</b>, уже в процесі оплати.</string>
     <string name="lnurl_pay_error_already_paid">Рахунок, повернутий <b>%1$s</b>, уже оплачено.</string>
     <string name="lnurl_pay_error_invalid_amount">Рахунок, повернутий <b>%1$s</b>, має хибну суму.</string>
-    <string name="lnurl_pay_error_invalid_malformed">Рахунок, повернутий <b>%1$s</b>, спотворено.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Рахунок, повернутий <b>%1$s</b>, спотворено:\n%2$s</string>
 
     <!-- settings: display preferences -->
 
