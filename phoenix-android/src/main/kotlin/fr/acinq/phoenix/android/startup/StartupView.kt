@@ -96,6 +96,7 @@ fun StartupView(
     onWalletReady: () -> Unit,
     forceWalletId: WalletId?,
 ) {
+    val scope = rememberCoroutineScope()
     val showIntro by application.globalPrefs.getShowIntro.collectAsState(initial = null)
     if (showIntro == true) {
         LaunchedEffect(Unit) { onShowIntro() }
@@ -203,9 +204,11 @@ fun StartupView(
                             }
                             is StartupViewState.Error -> {
                                 StartBusinessError(error = startupState, onTryAgainClick = {
-                                    BusinessManager.stopAllBusinesses()
-                                    appViewModel.resetToSelector()
-                                    startupViewModel.state.value = StartupViewState.Init
+                                    scope.launch {
+                                        BusinessManager.stopAllBusinesses()
+                                        appViewModel.resetToSelector()
+                                        startupViewModel.state.value = StartupViewState.Init
+                                    }
                                 })
                             }
                         }

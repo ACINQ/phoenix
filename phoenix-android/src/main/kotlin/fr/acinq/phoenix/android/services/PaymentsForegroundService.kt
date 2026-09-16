@@ -56,8 +56,10 @@ class PaymentsForegroundService : Service() {
     private val shutdownRunnable: Runnable = Runnable {
         log.info("reached scheduled shutdown while headless")
         stopForeground(STOP_FOREGROUND_REMOVE)
-        BusinessManager.stopAllHeadlessBusinesses()
-        stopSelf()
+        serviceScope.launch {
+            BusinessManager.stopAllHeadlessBusinesses()
+            stopSelf()
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

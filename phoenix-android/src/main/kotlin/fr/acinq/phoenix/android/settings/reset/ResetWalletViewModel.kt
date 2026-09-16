@@ -62,7 +62,7 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
     val state = mutableStateOf<ResetWalletStep>(ResetWalletStep.Init)
 
     fun deleteWalletData(
-        onWalletDeleted: (Context) -> Unit,
+        onWalletDeleted: suspend (Context) -> Unit,
     ) {
         if (state.value != ResetWalletStep.Confirm) return
         state.value = ResetWalletStep.Deleting.Init

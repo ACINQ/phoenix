@@ -44,6 +44,7 @@ import fr.acinq.phoenix.utils.MnemonicLanguage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +55,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.hours
 
@@ -138,7 +140,7 @@ object BusinessManager {
                 // A service started this business first and the UI is now adopting it. The headless flag must be
                 // cleared ASAP here to avoid rugpulling the UI.
                 log.info("adopting existing headless business for wallet=$walletId")
-                updateBusinessActiveInUI(walletId)
+                updateBusinessActiveInUIUnsafe(walletId)
             } else {
                 log.info("business already exists in flow, ignoring...")
             }
@@ -194,7 +196,7 @@ object BusinessManager {
             StartBusinessResult.Success(walletInfo, business)
         } catch (e: Exception) {
             log.error("there was an error when initialising new business: ", e)
-            stopBusiness(walletId)
+            stopBusinessUnsafe(walletId)
             StartBusinessResult.Failure.Generic(e)
         }
     }
@@ -203,7 +205,24 @@ object BusinessManager {
      * Clears the headless flag on the matching business, and cancels the job monitoring headless payments.
      * Useful when the UI takes ownership of a business created by an headless service.
      */
-    fun updateBusinessActiveInUI(walletId: WalletId) {
+    suspend fun updateBusinessActiveInUI(walletId: WalletId) = withBusinessLock { updateBusinessActiveInUIUnsafe(walletId) }
+
+    suspend fun stopAllHeadlessBusinesses() = withBusinessLock { stopAllHeadlessBusinessesUnsafe() }
+
+    suspend fun stopAllBusinesses() = withBusinessLock { stopAllBusinessesUnsafe() }
+
+    suspend fun stopBusiness(walletId: WalletId) = withBusinessLock { stopBusinessUnsafe(walletId) }
+
+    /**
+     * Runs [block] under [startupMutex] ; used to prevent interleaving with a business being started.
+     * [NonCancellable] because several callers stop businesses from a `finally` block.
+     */
+    private suspend fun <T> withBusinessLock(block: () -> T): T = withContext(NonCancellable) {
+        startupMutex.withLock { block() }
+    }
+
+    // Unsafe if not used under the mutex lock
+    private fun updateBusinessActiveInUIUnsafe(walletId: WalletId) {
         val businessMap = _businessFlow.value.toMutableMap()
         businessMap[walletId]?.let {
             businessMap[walletId] = it.copy(isHeadless = false)
@@ -212,20 +231,23 @@ object BusinessManager {
         _businessFlow.value = businessMap
     }
 
-    fun stopAllHeadlessBusinesses() {
+    // Unsafe if not used under the mutex lock
+    private fun stopAllHeadlessBusinessesUnsafe() {
         val headlessBusinesses = businessFlow.value.filter { it.value.isHeadless }
         log.info("stopping all headless businesses (${headlessBusinesses.size})...")
         headlessBusinesses.forEach { doStopBusiness(it.key, it.value) }
         _businessFlow.value = businessFlow.value.minus(headlessBusinesses.keys)
     }
 
-    fun stopAllBusinesses() {
+    // Unsafe if not used under the mutex lock
+    private fun stopAllBusinessesUnsafe() {
         log.info("stopping all businesses...")
         businessFlow.value.forEach { doStopBusiness(it.key, it.value) }
         _businessFlow.value = emptyMap()
     }
 
-    fun stopBusiness(walletId: WalletId) {
+    // Unsafe if not used under the mutex lock
+    private fun stopBusinessUnsafe(walletId: WalletId) {
         val businessMap = _businessFlow.value.toMutableMap()
         businessMap[walletId]?.let { doStopBusiness(walletId, it)}
         businessMap.remove(walletId)
