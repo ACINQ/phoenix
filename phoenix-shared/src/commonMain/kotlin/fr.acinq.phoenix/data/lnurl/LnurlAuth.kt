@@ -90,7 +90,7 @@ data class LnurlAuth(
             val useAndroidLegacyScheme = scheme == Scheme.ANDROID_LEGACY_SCHEME && LegacyDomain.isEligible(serviceUrl)
             val hashingKeyPath = KeyPath("m/138'/0")
             val hashingKey = if (useAndroidLegacyScheme) {
-                DeterministicWallet.derivePrivateKey(localKeyManager.nodeKeys.legacyNodeKey, hashingKeyPath)
+                 localKeyManager.nodeKeys.legacyNodeKey.derivePrivateKey(hashingKeyPath)
             } else {
                 localKeyManager.derivePrivateKey(hashingKeyPath)
             }
@@ -100,7 +100,7 @@ data class LnurlAuth(
                 hashingKey = hashingKey.privateKey.value.toByteArray()
             )
             return if (useAndroidLegacyScheme) {
-                DeterministicWallet.derivePrivateKey(hashingKey, path).privateKey
+                hashingKey.derivePrivateKey(path).privateKey
             } else {
                 localKeyManager.derivePrivateKey(path).privateKey
             }
