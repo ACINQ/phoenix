@@ -514,7 +514,7 @@
     <string name="electrum_dialog_invalid_input">Este endereço é inválido.</string>
     <string name="electrum_dialog_cert_check_button">Conectar</string>
     <string name="electrum_dialog_cert_checking">Verificando certificado…</string>
-    <string name="electrum_dialog_cert_failure">Erro de conexão:\n%1$s</string>
+    <string name="electrum_dialog_cert_failure">Erro de conexão</string>
     <string name="electrum_dialog_cert_unresolved">Este endereço não pode ser resolvido.</string>
     <string name="electrum_dialog_cert_header">Certificado não confiável</string>
     <string name="electrum_dialog_cert_sha1">Impressão digital SHA1</string>

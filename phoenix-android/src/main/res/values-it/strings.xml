@@ -632,7 +632,7 @@
     <string name="lnurl_pay_error_payment_pending">La fattura restituita da <b>%1$s</b> è già in corso di pagamento.</string>
     <string name="lnurl_pay_error_already_paid">La fattura restituita da <b>%1$s</b> è già stata pagata.</string>
     <string name="lnurl_pay_error_invalid_amount">La fattura restituita da <b>%1$s</b> ha un importo errato.</string>
-    <string name="lnurl_pay_error_invalid_malformed">La fattura restituita da <b>%1$s</b> è malformata.</string>
+    <string name="lnurl_pay_error_invalid_malformed">La fattura restituita da <b>%1$s</b> è malformata:\n%2$s</string>
 
     <!-- settings: display preferences -->
 

@@ -673,7 +673,7 @@
     <string name="lnurl_pay_error_payment_pending"><b>%1$s</b>이(가) 반환한 인보이스는 이미 결제가 진행 중입니다.</string>
     <string name="lnurl_pay_error_already_paid"><b>%1$s</b>이(가) 반환한 인보이스는 이미 결제되었습니다.</string>
     <string name="lnurl_pay_error_invalid_amount"><b>%1$s</b>이(가) 반환한 인보이스의 금액이 올바르지 않습니다.</string>
-    <string name="lnurl_pay_error_invalid_malformed"><b>%1$s</b>이(가) 반환한 인보이스의 형식이 잘못되었습니다.</string>
+    <string name="lnurl_pay_error_invalid_malformed"><b>%1$s</b>이(가) 반환한 인보이스의 형식이 잘못되었습니다:\n%2$s</string>
 
     <!-- settings: display preferences -->
 
