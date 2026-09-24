@@ -52,6 +52,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
     private val FIELD_SERVICE_FEE_FIAT = "service_fee_fiat"
     private val FIELD_PAYMENT_HASH = "payment_hash"
     private val FIELD_TX_ID = "tx_id"
+    private val FIELD_TX_CONFIRMED = "confirmed_at"
     private val FIELD_DESTINATION = "destination"
     private val FIELD_DESCRIPTION = "description"
 
@@ -69,6 +70,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             FIELD_SERVICE_FEE_FIAT,
             FIELD_PAYMENT_HASH,
             FIELD_TX_ID,
+            FIELD_TX_CONFIRMED,
             FIELD_DESTINATION,
             FIELD_DESCRIPTION
         )
@@ -96,6 +98,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
         val serviceFee: MilliSatoshi,
         val paymentHash: ByteVector32?,
         val txId: TxId?,
+        val confirmedAt: Long?,
         val destination: String? = null,
         val description: String? = null,
     )
@@ -122,6 +125,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
             if (configuration.includesFiat) convertToFiat(details.serviceFee, originalFiat) else "",
             details.paymentHash?.toHex() ?: "",
             if (configuration.includesOriginDestination) details.txId?.toString() ?: "" else "",
+            details.confirmedAt?.let { Instant.fromEpochMilliseconds(it).toString() } ?: "",
             if (configuration.includesOriginDestination) details.destination ?: "" else "",
             if (configuration.includesDescription) listOf(
                 details.description, metadata?.userDescription, metadata?.userNotes, metadata?.lnurl?.pay?.metadata?.longDesc
@@ -143,6 +147,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 serviceFee = payment.liquidityPurchaseDetails?.purchase?.fees?.serviceFee?.toMilliSatoshi() ?: 0.msat,
                 paymentHash = payment.paymentHash,
                 txId = payment.liquidityPurchaseDetails?.txId,
+                confirmedAt = null,
                 description = (payment as? Bolt11IncomingPayment)?.paymentRequest?.description
             )
 
@@ -154,6 +159,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 serviceFee = 0.msat,
                 paymentHash = null,
                 txId = null,
+                confirmedAt = null,
                 destination = payment.address
             )
 
@@ -165,6 +171,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 serviceFee = payment.parts.filterIsInstance<LegacyPayToOpenIncomingPayment.Part.OnChain>().map { it.serviceFee }.sum(),
                 paymentHash = payment.paymentHash,
                 txId = payment.parts.filterIsInstance<LegacyPayToOpenIncomingPayment.Part.OnChain>().map { it.txId }.firstOrNull(),
+                confirmedAt = payment.parts.filterIsInstance<LegacyPayToOpenIncomingPayment.Part.OnChain>().map { it.confirmedAt }.firstOrNull(),
                 description = (payment.origin as? LegacyPayToOpenIncomingPayment.Origin.Invoice)?.paymentRequest?.description
             )
 
@@ -175,7 +182,8 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 miningFee = payment.miningFee,
                 serviceFee = payment.serviceFee,
                 paymentHash = null,
-                txId = payment.txId
+                txId = payment.txId,
+                confirmedAt = payment.confirmedAt,
             )
 
             is LightningOutgoingPayment -> when (val details = payment.details) {
@@ -187,6 +195,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                     serviceFee = payment.fees,
                     paymentHash = payment.paymentHash,
                     txId = null,
+                    confirmedAt = null,
                     destination = details.paymentRequest.nodeId.toHex(),
                     description = details.paymentRequest.description
                 )
@@ -199,6 +208,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                     serviceFee = 0.msat,
                     paymentHash = null,
                     txId = null,
+                    confirmedAt = (payment.status as? LightningOutgoingPayment.Status.Completed)?.completedAt,
                     destination = details.address
                 )
 
@@ -210,6 +220,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                     serviceFee = payment.fees,
                     paymentHash = payment.paymentHash,
                     txId = null,
+                    confirmedAt = null,
                     description = details.paymentRequest.description
                 )
             }
@@ -222,6 +233,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 serviceFee = 0.msat,
                 paymentHash = null,
                 txId = payment.txId,
+                confirmedAt = payment.confirmedAt,
                 destination = payment.address
             )
 
@@ -233,6 +245,7 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 serviceFee = 0.msat,
                 paymentHash = null,
                 txId = payment.txId,
+                confirmedAt = payment.confirmedAt,
                 destination = payment.address
             )
 
@@ -243,7 +256,8 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 miningFee = payment.miningFee,
                 serviceFee = 0.msat,
                 paymentHash = null,
-                txId = payment.txId
+                txId = payment.txId,
+                confirmedAt = payment.confirmedAt,
             )
 
             is AutomaticLiquidityPurchasePayment -> if (payment.incomingPaymentReceivedAt == null) {
@@ -254,7 +268,8 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                     miningFee = payment.miningFee,
                     serviceFee = payment.serviceFee,
                     paymentHash = null,
-                    txId = payment.txId
+                    txId = payment.txId,
+                    confirmedAt = payment.confirmedAt,
                 )
             } else {
                 // If the corresponding Lightning payment was received, then liquidity fees will be included in the Lightning payment
@@ -268,7 +283,8 @@ class WalletPaymentCsvWriter(val configuration: Configuration) : CsvWriter() {
                 miningFee = payment.miningFee,
                 serviceFee = payment.serviceFee,
                 paymentHash = null,
-                txId = payment.txId
+                txId = payment.txId,
+                confirmedAt = payment.confirmedAt,
             )
         }
 
