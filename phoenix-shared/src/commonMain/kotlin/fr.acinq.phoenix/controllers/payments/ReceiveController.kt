@@ -51,7 +51,13 @@ class AppReceiveController(
                         description = Either.Left(intent.description),
                         expiry = intent.expirySeconds.seconds
                     )
-                    model(Receive.Model.Generated(paymentRequest.write(), paymentRequest.paymentHash.toHex(), paymentRequest.amount, paymentRequest.description))
+                    model(Receive.Model.Generated(
+                        invoice = paymentRequest,
+                        request = paymentRequest.write(),
+                        paymentHash = paymentRequest.paymentHash.toHex(),
+                        amount = paymentRequest.amount,
+                        desc = paymentRequest.description
+                    ))
                 }
             }
         }
