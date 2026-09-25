@@ -632,7 +632,7 @@
     <string name="lnurl_pay_error_payment_pending">Faktura zwrócona przez <b>%1$s</b> jest już w trakcie opłacania.</string>
     <string name="lnurl_pay_error_already_paid">Faktura zwrócona przez <b>%1$s</b> została już opłacona.</string>
     <string name="lnurl_pay_error_invalid_amount">Faktura zwrócona przez <b>%1$s</b> ma błędną kwotę.</string>
-    <string name="lnurl_pay_error_invalid_malformed">Faktura zwrócona przez <b>%1$s</b> jest nieprawidłowo sformułowana.</string>
+    <string name="lnurl_pay_error_invalid_malformed">Faktura zwrócona przez <b>%1$s</b> jest nieprawidłowo sformułowana:\n%2$s</string>
 
     <!-- settings: display preferences -->
 

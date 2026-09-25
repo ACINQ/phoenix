@@ -632,7 +632,7 @@
     <string name="lnurl_pay_error_payment_pending"><b>%1$s</b> が返したインボイスは、すでに支払い処理中です。</string>
     <string name="lnurl_pay_error_already_paid"><b>%1$s</b> が返したインボイスは、すでに支払い済みです。</string>
     <string name="lnurl_pay_error_invalid_amount"><b>%1$s</b> が返したインボイスの金額が正しくありません。</string>
-    <string name="lnurl_pay_error_invalid_malformed"><b>%1$s</b> が返したインボイスの形式が不正です。</string>
+    <string name="lnurl_pay_error_invalid_malformed"><b>%1$s</b> が返したインボイスの形式が不正です:\n%2$s</string>
 
     <!-- settings: display preferences -->
 

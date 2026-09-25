@@ -510,11 +510,34 @@ struct SpendOnChainFunds: View {
 	
 	func sendButtonTapped() {
 		log.trace("sendButtonTapped()")
-		
+
+		dismissKeyboardIfVisible()
+
+		// Spending on-chain funds sends them to an arbitrary address.
+		// It must be protected by the spending PIN, like any other spend.
+		let enabledSecurity = Keychain.current.enabledSecurity
+		if enabledSecurity.contains(.spendingPin) {
+
+			smartModalState.display(dismissable: false) {
+				AuthenticateWithPinSheet(type: .spendingPin) { result in
+					if result == .Authenticated {
+						sendFunds()
+					}
+				}
+			}
+
+		} else {
+			sendFunds()
+		}
+	}
+
+	func sendFunds() {
+		log.trace("sendFunds()")
+
 		switch source {
 		case .expiredSwapIns:
 			spendExpiredSwapInFunds()
-			
+
 		case .finalWallet:
 			spendFinalWalletFunds()
 		}

@@ -18,6 +18,7 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.Chain
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.NodeParams
 import fr.acinq.lightning.NodeUri
 import fr.acinq.lightning.logging.LoggerFactory
@@ -70,6 +71,7 @@ class NodeParamsManager(
             }.collect {
                 log.info { "hello!" }
                 log.info { "nodeid=${it.nodeId}" }
+                log.info { "nodeid_hash=${it.nodeId.hash160().byteVector().toHex()}" }
                 log.info { "commit=${BuildVersions.PHOENIX_COMMIT}" }
                 log.info { "lightning-kmp version=${BuildVersions.LIGHTNING_KMP_VERSION}" }
                 _nodeParams.value = it

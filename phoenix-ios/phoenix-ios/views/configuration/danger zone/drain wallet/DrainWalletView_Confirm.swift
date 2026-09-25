@@ -33,7 +33,8 @@ struct DrainWalletView_Confirm: MVISubView {
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	@EnvironmentObject var navCoordinator: NavigationCoordinator
-	
+	@EnvironmentObject var smartModalState: SmartModalState
+
 	// --------------------------------------------------
 	// MARK: View Builders
 	// --------------------------------------------------
@@ -147,7 +148,7 @@ struct DrainWalletView_Confirm: MVISubView {
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
 				Button {
-					drainWallet()
+					maybeDrainWallet()
 				} label: {
 					HStack(alignment: VerticalAlignment.center, spacing: 5) {
 						Image(systemName: "bitcoinsign.circle")
@@ -280,9 +281,30 @@ struct DrainWalletView_Confirm: MVISubView {
 		}
 	}
 	
+	func maybeDrainWallet() {
+		log.trace("maybeDrainWallet()")
+
+		// Draining the wallet sends the entire balance to an arbitrary address.
+		// It must be protected by the spending PIN, like any other spend.
+		let enabledSecurity = Keychain.current.enabledSecurity
+		if enabledSecurity.contains(.spendingPin) {
+
+			smartModalState.display(dismissable: false) {
+				AuthenticateWithPinSheet(type: .spendingPin) { result in
+					if result == .Authenticated {
+						drainWallet()
+					}
+				}
+			}
+
+		} else {
+			drainWallet()
+		}
+	}
+
 	func drainWallet() {
 		log.trace("drainWallet()")
-		
+
 		if !actionFired {
 			actionFired = true
 			expectedTxCount = nonZeroChannelCount()

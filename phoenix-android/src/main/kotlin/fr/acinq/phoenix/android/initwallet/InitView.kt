@@ -49,7 +49,7 @@ import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.components.settings.SettingSwitch
 import fr.acinq.phoenix.android.navigation.Screen
 import fr.acinq.phoenix.android.settings.electrum.ElectrumServerDialog
-import fr.acinq.phoenix.android.utils.extensions.tryOrNull
+import fr.acinq.phoenix.utils.extensions.tryOrNull
 
 
 @Composable

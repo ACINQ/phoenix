@@ -32,6 +32,9 @@ fileprivate var log = LoggerFactory.shared.logger(filename, .info)
  */
 class NotificationService: UNNotificationServiceExtension {
 	
+	/// identifier used for generic "running in the background" notifications to collapse existing msg into a single one
+	private static let backgroundThreadId = "unknown"
+
 	private var contentHandler: ((UNNotificationContent) -> Void)?
 	private var remoteNotificationContent: UNMutableNotificationContent?
 	
@@ -405,7 +408,38 @@ class NotificationService: UNNotificationServiceExtension {
 		stopXpc()
 		stopPhoenix()
 		
-		contentHandler(remoteNotificationContent)
+		coalesceBackgroundPlaceholders(remoteNotificationContent) {
+			contentHandler(remoteNotificationContent)
+		}
+	}
+
+	/// We don't want to stack similar "running in the background" notifications. Instead they are collapsed into a
+	/// single visible notification. We use the static threadIdentifier to do that.
+	///
+	/// Note: [removeDeliveredNotifications] only affects notifications that have *already* been delivered, so the
+	/// notification we're about to hand to [contentHandler] is not removed.
+	private func coalesceBackgroundPlaceholders(
+		_ content: UNMutableNotificationContent,
+		completion: @escaping () -> Void
+	) {
+		guard content.threadIdentifier == Self.backgroundThreadId else {
+			completion() // not a placeholder: deliver as-is
+			return
+		}
+
+		let center = UNUserNotificationCenter.current()
+		center.getDeliveredNotifications { delivered in
+			let staleIds = delivered
+			.filter { $0.request.content.threadIdentifier == Self.backgroundThreadId }
+			.map { $0.request.identifier }
+			if !staleIds.isEmpty {
+				log.info("coalesceBackgroundPlaceholders(): removing \(staleIds.count) stale placeholder(s)")
+				center.removeDeliveredNotifications(withIdentifiers: staleIds)
+			}
+			DispatchQueue.main.async {
+				completion()
+			}
+		}
 	}
 	
 	private func updateRemoteNotificationContent(
@@ -554,7 +588,10 @@ class NotificationService: UNNotificationServiceExtension {
 		content.title = "Phoenix"
 		content.body = String(localized: "is running in the background", comment: "")
 		content.relevanceScore = 0.0
-		content.threadIdentifier = "unknown"
+		content.threadIdentifier = Self.backgroundThreadId
+
+		// silent delivery: repeated background wake-ups must not re-play a sound or wake the screen every time.
+		content.interruptionLevel = .passive
 	}
 	
 	// --------------------------------------------------

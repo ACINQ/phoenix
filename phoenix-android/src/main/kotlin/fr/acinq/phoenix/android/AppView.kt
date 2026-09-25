@@ -72,7 +72,7 @@ fun AppRoot(
 ) {
     val log = logger("AppRoot")
 
-    val activeWallet by appViewModel.activeWalletInUI.collectAsState(null)
+    val activeWallet by appViewModel.activeWalletInUI.collectAsState()
     log.debug("entering app root with active_wallet={}", activeWallet)
     val activeWalletId = activeWallet?.id
     val business = activeWallet?.business

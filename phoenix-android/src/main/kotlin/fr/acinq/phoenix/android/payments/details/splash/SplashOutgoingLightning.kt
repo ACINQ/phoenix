@@ -56,7 +56,6 @@ import fr.acinq.phoenix.data.lnurl.LnurlPay
 import fr.acinq.phoenix.utils.extensions.WalletPaymentState
 import fr.acinq.phoenix.utils.extensions.outgoingInvoiceRequest
 import fr.acinq.phoenix.utils.extensions.state
-import io.ktor.http.Url
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -157,12 +156,15 @@ private fun LnurlPayInfoView(payment: LightningOutgoingPayment, metadata: LnurlP
         }
     }
     metadata.successAction?.let {
-        LnurlSuccessAction(payment = payment, action = it)
+        LnurlSuccessAction(payment = payment, action = it, origin = metadata.pay.callback.host)
     }
 }
 
+/**
+ * @param origin the lnurl-pay callback's host, needed to check if an url in the success action is valid. See [LnurlPay.isValidSuccessActionUrl].
+ */
 @Composable
-private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlPay.Invoice.SuccessAction) {
+private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlPay.Invoice.SuccessAction, origin: String) {
     Spacer(modifier = Modifier.height(8.dp))
     when (action) {
         is LnurlPay.Invoice.SuccessAction.Message -> {
@@ -175,32 +177,43 @@ private fun LnurlSuccessAction(payment: LightningOutgoingPayment, action: LnurlP
         is LnurlPay.Invoice.SuccessAction.Url -> {
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_label)) {
                 Text(text = action.description)
-                WebLink(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_button), url = action.url.toString())
+                if (LnurlPay.isValidSuccessActionUrl(action.url, origin)) {
+                    WebLink(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_button), url = action.url.toString())
+                } else {
+                    SelectionContainer {
+                        Text(text = action.url.toString())
+                    }
+                }
             }
         }
         is LnurlPay.Invoice.SuccessAction.Aes -> {
             SplashLabelRow(label = stringResource(id = R.string.paymentdetails_lnurlpay_action_aes_label)) {
                 val status = payment.status
                 if (status is LightningOutgoingPayment.Status.Succeeded) {
-                    val deciphered by produceState<String?>(initialValue = null) {
-                        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-                        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(status.preimage.toByteArray(), "AES"), IvParameterSpec(action.iv.toByteArray()))
-                        value = String(cipher.doFinal(action.ciphertext.toByteArray()), Charsets.UTF_8)
+                    // The ciphertext and iv are controlled by the service: decryption may fail and must not crash the app.
+                    val decrypted by produceState<Result<LnurlPay.Invoice.SuccessAction.Aes.Decrypted>?>(initialValue = null) {
+                        value = runCatching {
+                            val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+                            cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(status.preimage.toByteArray(), "AES"), IvParameterSpec(action.iv.toByteArray()))
+                            val plaintext = String(cipher.doFinal(action.ciphertext.toByteArray()), Charsets.UTF_8)
+                            LnurlPay.Invoice.SuccessAction.Aes.Decrypted(description = action.description, plaintext = plaintext)
+                        }
                     }
                     Text(text = action.description)
-                    when (deciphered) {
+                    when (val result = decrypted) {
                         null -> ProgressView(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_aes_decrypting), padding = PaddingValues(0.dp))
                         else -> {
-                            val url = try {
-                                Url(deciphered!!)
-                            } catch (e: Exception) {
-                                null
-                            }
-                            if (url != null) {
-                                WebLink(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_button), url = url.toString())
+                            val content = result.getOrNull()
+                            if (content == null) {
+                                Text(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_aes_error))
                             } else {
-                                SelectionContainer {
-                                    Text(text = deciphered!!)
+                                val url = content.textAsUrl(origin)
+                                if (url != null) {
+                                    WebLink(text = stringResource(id = R.string.paymentdetails_lnurlpay_action_url_button), url = url.toString())
+                                } else {
+                                    SelectionContainer {
+                                        Text(text = content.plaintext)
+                                    }
                                 }
                             }
                         }

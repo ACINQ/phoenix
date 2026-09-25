@@ -65,6 +65,7 @@ import fr.acinq.phoenix.android.components.layouts.CardHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
 import fr.acinq.phoenix.android.utils.annotatedStringResource
+import fr.acinq.phoenix.android.utils.datastore.InternalPrefs
 import fr.acinq.phoenix.android.utils.extensions.safeLet
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.launch
@@ -75,7 +76,23 @@ fun DisplaySeedView(
     onBackClick: () -> Unit,
     walletId: WalletId,
 ) {
-    val internalPrefs = LocalInternalPrefs.current!!
+    val internalPrefs = LocalInternalPrefs.current
+    if (internalPrefs == null) {
+        DefaultScreenLayout {
+            DefaultScreenHeader(onBackClick = onBackClick, title = stringResource(id = R.string.displayseed_title))
+            ProgressView(text = stringResource(id = R.string.displayseed_loading_prefs))
+        }
+    } else {
+        DisplaySeedViewContent(onBackClick, walletId, internalPrefs)
+    }
+}
+
+@Composable
+fun DisplaySeedViewContent(
+    onBackClick: () -> Unit,
+    walletId: WalletId,
+    internalPrefs: InternalPrefs,
+) {
     val scope = rememberCoroutineScope()
 
     val isBackupDone by internalPrefs.isManualSeedBackupDone.collectAsState(initial = null)
