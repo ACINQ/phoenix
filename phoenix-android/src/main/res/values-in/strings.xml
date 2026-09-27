@@ -1001,4 +1001,15 @@
     <string name="wallet_edit_secret_description">Dompet tidak akan terlihat di layar pemilihan. Untuk mengakses dompet, Anda harus memasukkan PIN kuncinya.</string>
 		<string name="wallet_edit_pick_avatar">Pilih avatar</string>
 
+    <string name="feerate_slider_dialog_input_label">Feerate dalam sat/vbyte</string>
+    <string name="feerate_slider_dialog_input_placeholder">Masukkan feerate…</string>
+    <string name="feerate_slider_dialog_title">Input feerate manual</string>
+    <string name="send_balance_use_all">Gunakan semua saldo</string>
+    <string name="troubleshooting_diagnostics_copy_button">Salin diagnostik</string>
+    <string name="troubleshooting_diagnostics_error">Terjadi kesalahan saat membuat diagnostik</string>
+    <string name="troubleshooting_diagnostics_export_button">Bagikan diagnostik…</string>
+    <string name="troubleshooting_diagnostics_header">Diagnostik wallet</string>
+    <string name="troubleshooting_diagnostics_share_subject">Diagnostik Aplikasi Phoenix</string>
+    <string name="troubleshooting_diagnostics_share_title">Bagikan diagnostik Phoenix…</string>
+    <string name="troubleshooting_logs_header">Log</string>
 </resources> 
