@@ -90,8 +90,9 @@ struct RecoveryPhraseReveal: View {
 			Spacer(minLength: 0)
 			
 			ViewThatFits(in: .horizontal) {
-				twoColumnLayout()
-				singleColumnLayout()
+				ScreenshotProtected {
+					twoColumnLayout()
+				}
 			}
 			.environment(\.layoutDirection, .leftToRight) // issue #237
 			.padding(.top, 20)
@@ -99,9 +100,6 @@ struct RecoveryPhraseReveal: View {
 			
 			Spacer(minLength: 0)
 			Spacer(minLength: 0)
-			
-			copyButton()
-				.padding(.bottom, 6)
 
 			Text("BIP39 seed with standard BIP84 derivation path")
 				.font(.footnote)
@@ -148,29 +146,6 @@ struct RecoveryPhraseReveal: View {
 	}
 	
 	@ViewBuilder
-	func singleColumnLayout() -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			
-			let vSpacing: CGFloat = 4
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: vSpacing) {
-				ForEach(0..<12, id: \.self) { idx in
-					label_index(idx)
-				}
-			}
-			.padding(.trailing, 2)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: vSpacing) {
-				ForEach(0..<12, id: \.self) { idx in
-					label_mnemonic(idx)
-				}
-			}
-			
-		} // </HStack>
-	}
-	
-	@ViewBuilder
 	func label_index(_ idx: Int) -> some View {
 		Text(verbatim: "#\(idx + 1) ")
 			.font(.headline)
@@ -184,40 +159,6 @@ struct RecoveryPhraseReveal: View {
 			.font(.headline)
 			.lineLimit(1)
 			.fixedSize(horizontal: true, vertical: false)
-	}
-	
-	@ViewBuilder
-	func copyButton() -> some View {
-		
-		HStack(alignment: VerticalAlignment.center, spacing: 0) {
-			Spacer()
-				
-			Button {
-				copyRecoveryPhrase()
-			} label: {
-				Text("Copy").font(.title3)
-			}
-			
-			Spacer()
-		} // </HStack>
-	}
-	
-	func copyRecoveryPhrase() {
-		log.trace(#function)
-		
-		copy(recoveryPhrase.mnemonics)
-	}
-	
-	private func copy(_ string: String) {
-		log.trace(#function)
-		
-		UIPasteboard.general.string = string
-		AppDelegate.get().clearPasteboardOnReturnToApp = true
-		toast.pop(
-			"Pasteboard will be cleared when you return to Phoenix.",
-			colorScheme: colorScheme.opposite,
-			duration: 4.0 // seconds
-		)
 	}
 	
 	func close() {

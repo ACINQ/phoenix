@@ -229,66 +229,69 @@ struct EnterSeedView: View, ViewName {
 				Spacer()
 			}
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				TextField(
-					NSLocalizedString("Enter keywords from your seed", comment: "TextField placeholder"),
-					text: $wordInput
-				)
-				.onChange(of: wordInput) { _ in
-					onInput()
-				}
-				.autocapitalization(.none)
-				.disableAutocorrection(true)
-				.disabled(mnemonics.count == 12)
-				.padding(.trailing, 4)
-				.accessibilitySortPriority(201)
+			ScreenshotProtected {
 				
-				// Clear button (appears when TextField's text is non-empty)
-				if !wordInput.isEmpty {
-					Button {
-						wordInput = ""
-					} label: {
-						Image(systemName: "multiply.circle.fill")
-							.foregroundColor(.secondary)
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					TextField(
+						NSLocalizedString("Enter keywords from your seed", comment: "TextField placeholder"),
+						text: $wordInput
+					)
+					.onChange(of: wordInput) { _ in
+						onInput()
 					}
-					.accessibilityLabel("Clear textfield")
-					.accessibilitySortPriority(200)
+					.autocapitalization(.none)
+					.disableAutocorrection(true)
+					.disabled(mnemonics.count == 12)
+					.padding(.trailing, 4)
+					.accessibilitySortPriority(201)
+
+					// Clear button (appears when TextField's text is non-empty)
+					if !wordInput.isEmpty {
+						Button {
+							wordInput = ""
+						} label: {
+							Image(systemName: "multiply.circle.fill")
+								.foregroundColor(.secondary)
+						}
+						.accessibilityLabel("Clear textfield")
+						.accessibilitySortPriority(200)
+					}
 				}
-			}
-			.padding([.top, .bottom], 8)
-			.padding(.leading, 16)
-			.padding(.trailing, 8)
-			.background(Color.primaryBackground)
-			.cornerRadius(100)
-			.overlay(
-				RoundedRectangle(cornerRadius: 16)
-					.stroke(Color.textFieldBorder, lineWidth: 1.5)
-			)
-			.padding(.top)
-			.id(inputID)
+				.padding([.top, .bottom], 8)
+				.padding(.leading, 16)
+				.padding(.trailing, 8)
+				.background(Color.primaryBackground)
+				.cornerRadius(100)
+				.overlay(
+					RoundedRectangle(cornerRadius: 16)
+						.stroke(Color.textFieldBorder, lineWidth: 1.5)
+				)
+				.padding(.top)
+				.id(inputID)
 
-			// Autocomplete suggestions for mnemonics
-			ScrollView(.horizontal) {
-				LazyHStack {
-					if autocomplete.count < maxAutocompleteCount {
-						ForEach(autocomplete, id: \.self) { word in
+				// Autocomplete suggestions for mnemonics
+				ScrollView(.horizontal) {
+					LazyHStack {
+						if autocomplete.count < maxAutocompleteCount {
+							ForEach(autocomplete, id: \.self) { word in
 
-							Button {
-								selectMnemonic(word)
-							} label: {
-								Text(word)
-									.underline()
-									.foregroundColor(Color.primary)
+								Button {
+									selectMnemonic(word)
+								} label: {
+									Text(word)
+										.underline()
+										.foregroundColor(Color.primary)
+								}
 							}
 						}
 					}
 				}
-			}
-			.frame(height: 32)
+				.frame(height: 32)
 
-			Divider().padding(.bottom)
-			
-			mnemonicsList()
+				Divider().padding(.bottom)
+
+				mnemonicsList()
+			}
 
 			if mvi.model is RestoreWallet.ModelInvalidMnemonics {
 				Text(
@@ -304,7 +307,7 @@ struct EnterSeedView: View, ViewName {
 
 			HStack { // Center button using: HStack {[space, button, space]}
 				Spacer()
-				
+
 				Button {
 					onImportButtonTapped()
 				} label: {
@@ -325,11 +328,11 @@ struct EnterSeedView: View, ViewName {
 						disabledBorderStroke: Color(UIColor.separator)
 					)
 				)
-				
+
 				Spacer()
 			}
 			.padding(.top)
-			
+
 		} // </VStack>
 		.padding(.top, 30)
 		.padding([.leading, .trailing], 20)

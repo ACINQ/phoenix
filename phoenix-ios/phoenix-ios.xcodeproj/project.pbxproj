@@ -21,6 +21,7 @@
 		960318CE2FDAF55E00B0D96A /* SwapInSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960318CD2FDAF54A00B0D96A /* SwapInSigner.swift */; };
 		9663C9C82F3E314700B9052A /* SpendChannelAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9663C9C72F3E314700B9052A /* SpendChannelAddressView.swift */; };
 		96D1C4CE2FDC612000318BA1 /* TextInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D1C4CD2FDC611B00318BA1 /* TextInputField.swift */; };
+		96EAD39F306EA66D0022AA97 /* ScreenshotProtected.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EAD39E306EA6680022AA97 /* ScreenshotProtected.swift */; };
 		C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */; };
 		C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */; };
 		C8D7A84CCF914B08BDB03BE6 /* ManualRestoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A44147508AA19378B739 /* ManualRestoreView.swift */; };
@@ -533,6 +534,7 @@
 		968B38392AC34C260030DBF4 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/liquidity.html; sourceTree = "<group>"; };
 		96D1C4CD2FDC611B00318BA1 /* TextInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputField.swift; sourceTree = "<group>"; };
 		96DB8DAF2AC4A260007D3D54 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = cs; path = cs.lproj/liquidity.html; sourceTree = "<group>"; };
+		96EAD39E306EA6680022AA97 /* ScreenshotProtected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotProtected.swift; sourceTree = "<group>"; };
 		C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrumConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7A209301A31C14A982ECD /* InitializationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitializationView.swift; sourceTree = "<group>"; };
 		C8D7A2327BC90150A3E1493D /* AboutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -966,6 +968,7 @@
 		53BEF0E7A62D4973FCC99476 /* widgets */ = {
 			isa = PBXGroup;
 			children = (
+				96EAD39E306EA6680022AA97 /* ScreenshotProtected.swift */,
 				DCED1C1D2E78A6DD00B506B0 /* WalletEmoji.swift */,
 				DC08A51727FB39530041603B /* AnimatedChevron.swift */,
 				DC6D26E229E76557006A7814 /* AnimatedClock.swift */,
@@ -2350,6 +2353,7 @@
 				DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */,
 				C8D7A84CCF914B08BDB03BE6 /* ManualRestoreView.swift in Sources */,
 				DCCD046327EE04E1007D57A5 /* WalletPaymentExtensions.swift in Sources */,
+				96EAD39F306EA66D0022AA97 /* ScreenshotProtected.swift in Sources */,
 				DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */,
 				53BEFFEBEA9EBE7B27B53AF4 /* PaymentView.swift in Sources */,
 				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
