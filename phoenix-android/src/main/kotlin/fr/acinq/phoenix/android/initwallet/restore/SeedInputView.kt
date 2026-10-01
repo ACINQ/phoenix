@@ -47,6 +47,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -64,6 +66,7 @@ import fr.acinq.phoenix.android.components.TextWithIcon
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.feedback.WarningMessage
 import fr.acinq.phoenix.android.initwallet.InitViewModel
+import fr.acinq.phoenix.android.utils.MarkWindowSecure
 import fr.acinq.phoenix.android.utils.negativeColor
 
 @Composable
@@ -76,7 +79,7 @@ fun SeedInputView(
     val focusManager = LocalFocusManager.current
     var filteredWords by remember { mutableStateOf(emptyList<String>()) }
     val enteredWords = restoreViewModel.mnemonics.filterNot { it.isNullOrBlank() }
-
+    MarkWindowSecure()
     LaunchedEffect(enteredWords) {
         if (enteredWords.size != 12) {
             restoreViewModel.state = RestoreWalletState.SeedInput.Pending
@@ -96,7 +99,7 @@ fun SeedInputView(
     ) {
         Text(text = stringResource(R.string.restore_instructions))
         Column(
-            modifier = Modifier.heightIn(min = 100.dp),
+            modifier = Modifier.heightIn(min = 100.dp).clearAndSetSemantics { contentDescription = "hidden from accessibility services" },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -129,6 +132,7 @@ fun SeedInputView(
         Spacer(modifier = Modifier.height(8.dp))
         WordsTable(
             modifier = Modifier
+                .clearAndSetSemantics { contentDescription = "hidden from accessibility services" }
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
                 .padding(horizontal = 16.dp)

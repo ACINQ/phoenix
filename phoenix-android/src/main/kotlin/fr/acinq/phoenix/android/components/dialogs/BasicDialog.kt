@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.buttons.Button
+import fr.acinq.phoenix.android.utils.MarkDialogSensitive
 
 @Composable
 fun Dialog(
@@ -58,6 +59,7 @@ fun Dialog(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
+        MarkDialogSensitive()
         DialogBody(isScrollable, externalPadding, internalPadding, backgroundColor) {
             // optional title
             title?.run {

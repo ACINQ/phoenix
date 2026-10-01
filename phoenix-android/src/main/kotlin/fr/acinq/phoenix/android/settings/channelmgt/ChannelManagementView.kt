@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.settings.fees
+package fr.acinq.phoenix.android.settings.channelmgt
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.DropdownMenu
@@ -63,7 +63,7 @@ import fr.acinq.phoenix.data.MempoolFeerate
 import kotlinx.coroutines.launch
 
 @Composable
-fun LiquidityPolicyView(
+fun ChannelManagementView(
     business: PhoenixBusiness,
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,

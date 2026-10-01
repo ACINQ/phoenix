@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import fr.acinq.phoenix.android.utils.MarkDialogSensitive
 
 /** Provides a Material3 [ModalBottomSheet] with some presets. Content is contained in a [Column] with [internalPadding]. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +75,7 @@ fun ModalBottomSheet(
         scrimColor = MaterialTheme.colors.onBackground.copy(alpha = scrimAlpha),
         properties = ModalBottomSheetProperties(shouldDismissOnBackPress = dismissOnBack)
     ) {
+        MarkDialogSensitive()
         Column(
             horizontalAlignment = horizontalAlignment,
             modifier = Modifier

@@ -46,8 +46,8 @@ import fr.acinq.phoenix.android.settings.SettingsView
 import fr.acinq.phoenix.android.settings.TorConfigView
 import fr.acinq.phoenix.android.settings.displayseed.DisplaySeedView
 import fr.acinq.phoenix.android.settings.electrum.ElectrumView
-import fr.acinq.phoenix.android.settings.fees.AdvancedIncomingFeePolicy
-import fr.acinq.phoenix.android.settings.fees.LiquidityPolicyView
+import fr.acinq.phoenix.android.settings.channelmgt.AdvancedChannelManagementView
+import fr.acinq.phoenix.android.settings.channelmgt.ChannelManagementView
 
 
 fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel: AppViewModel) {
@@ -150,7 +150,7 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
     }
 
     businessComposable(Screen.BusinessNavGraph.LiquidityPolicy.route, appViewModel, deepLinks = listOf(navDeepLink { uriPattern = "phoenix:liquiditypolicy" })) { _, _, business ->
-        LiquidityPolicyView(
+        ChannelManagementView(
             business = business,
             onBackClick = { navController.popBackStackOrHome() },
             onAdvancedClick = { navController.navigate(Screen.BusinessNavGraph.AdvancedLiquidityPolicy.route) },
@@ -162,7 +162,7 @@ fun NavGraphBuilder.settingsNavGraph(navController: NavController, appViewModel:
     }
 
     businessComposable(Screen.BusinessNavGraph.AdvancedLiquidityPolicy.route, appViewModel) { _, _, business ->
-        AdvancedIncomingFeePolicy(business = business, onBackClick = { navController.popBackStack() })
+        AdvancedChannelManagementView(business = business, onBackClick = { navController.popBackStack() })
     }
 
     businessComposable("${Screen.BusinessNavGraph.Contacts.route}?showAddContactDialog={showAddContactDialog}", appViewModel, arguments = listOf(
