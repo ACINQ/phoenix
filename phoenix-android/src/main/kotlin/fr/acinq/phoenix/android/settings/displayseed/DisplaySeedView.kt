@@ -41,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -216,11 +218,11 @@ private fun SeedDialog(words: List<String>, onDismiss: () -> Unit) {
                 ) {
                     Cell(text = "#${index + 1}", modifier = Modifier.width(24.dp), textStyle = indexStyle)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Cell(text = wordPair.first, modifier = Modifier.width(100.dp), textStyle = wordStyle)
+                    Cell(text = wordPair.first, modifier = Modifier.width(100.dp).clearAndSetSemantics { contentDescription = "hidden from accessibility services" }, textStyle = wordStyle)
                     Spacer(modifier = Modifier.width(8.dp))
                     Cell(text = "#${index + words.size / 2 + 1}", modifier = Modifier.width(24.dp), textStyle = indexStyle)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Cell(text = wordPair.second, modifier = Modifier.width(100.dp), textStyle = wordStyle)
+                    Cell(text = wordPair.second, modifier = Modifier.width(100.dp).clearAndSetSemantics { contentDescription = "hidden from accessibility services" }, textStyle = wordStyle)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
             }

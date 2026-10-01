@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
+import fr.acinq.phoenix.android.utils.MarkDialogSensitive
 
 @Composable
 fun FullScreenDialog(
@@ -33,6 +34,7 @@ fun FullScreenDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
+        MarkDialogSensitive()
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center

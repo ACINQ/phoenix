@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.settings.fees
+package fr.acinq.phoenix.android.settings.channelmgt
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
-fun AdvancedIncomingFeePolicy(
+fun AdvancedChannelManagementView(
     business: PhoenixBusiness,
     onBackClick: () -> Unit
 ) {
