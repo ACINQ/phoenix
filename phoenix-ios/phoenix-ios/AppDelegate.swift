@@ -179,6 +179,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
 	func application(
 		_ application: UIApplication,
+		shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier
+	) -> Bool {
+		// Block third-party keyboards everywhere in the app.
+		extensionPointIdentifier != .keyboard
+	}
+
+	func application(
+		_ application: UIApplication,
 		configurationForConnecting connectingSceneSession: UISceneSession,
 		options: UIScene.ConnectionOptions
 	) -> UISceneConfiguration {

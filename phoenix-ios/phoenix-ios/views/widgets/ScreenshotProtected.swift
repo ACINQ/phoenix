@@ -14,8 +14,8 @@ struct ScreenshotProtected<Content: View>: UIViewRepresentable {
 	func makeUIView(context: Context) -> UITextField {
 		let field = UITextField()
 		field.isSecureTextEntry = true
-		field.isUserInteractionEnabled = false
 		field.isAccessibilityElement = false
+		field.delegate = context.coordinator
 		field.layoutIfNeeded()
 
 		let host = UIHostingController(rootView: content())
@@ -44,5 +44,7 @@ struct ScreenshotProtected<Content: View>: UIViewRepresentable {
 	}
 
 	func makeCoordinator() -> Coordinator { Coordinator() }
-	final class Coordinator { var host: UIHostingController<Content>? }
-}
+	final class Coordinator: NSObject, UITextFieldDelegate {
+		var host: UIHostingController<Content>?
+		func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool { false }
+	}}
