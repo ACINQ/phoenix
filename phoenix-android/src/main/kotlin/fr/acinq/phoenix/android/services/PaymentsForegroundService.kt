@@ -75,13 +75,17 @@ class PaymentsForegroundService : Service() {
         val shouldWeWaitLong: Boolean = when {
 
             walletId != null && businessMap[walletId] != null -> {
-                log.info("active business found for wallet=$walletId, ignoring background message (reason=$reason)")
+                log.info("active business found for wallet=$walletId, reusing it for background message (reason=$reason)")
                 businessMap[walletId]?.business?.let {
                     if (it.connectionsManager.connections.value.peer !is Connection.ESTABLISHED) {
                         it.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
                     }
                 }
-                false
+                // The business may be loaded while the app is in the background (e.g. the UI was closed but the process
+                // is still alive). In that case, the foreground service is the only thing keeping the network available,
+                // so we must give the payment as much time as we would with a fresh headless business: payments that
+                // require on-the-fly funding (splice + htlc) do not complete within a few seconds.
+                true
             }
 
             walletId == null -> {
