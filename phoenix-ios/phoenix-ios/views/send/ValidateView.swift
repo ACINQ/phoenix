@@ -928,6 +928,11 @@ struct ValidateView: View {
 		guard let recipientAmountMsat = parsedAmountMsat() else {
 			return nil
 		}
+        
+        let range = priceRange()
+        if range != nil && recipientAmountMsat >= range!.max.msat {
+            return nil
+        }
 		
 		var preTipMsat: Int64? = nil
 		if let invoice = bolt11Invoice() {
