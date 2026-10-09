@@ -69,7 +69,7 @@ struct Bolt12Sheet: View {
 			
 			Unlike traditional Lightning invoices, it does not expire and can be reused.
 			
-			Share it widely : for donations, tips, or to get paid by your friends.
+			Share it widely: for donations, tips, or to get paid by your friends.
 			
 			🛟 **Who supports Bolt12?**
 			
