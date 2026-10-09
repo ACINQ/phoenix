@@ -1,0 +1,506 @@
+```xml
+<!--
+  ~ Copyright 2023 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ 此文件包含与应用中重要消息相关的字符串资源，应优先翻译。
+  ~ 应尽量保持精简。
+  ~
+  ~ 大多数技术性资源字符串应保留在默认的 `strings.xml` 文件中。
+-->
+<resources>
+
+    <!-- 通用 -->
+
+    <string name="utils_ack">我明白了。</string>
+
+    <!-- 系统通知 -->
+
+    <string name="notif_headless_title_default">Phoenix 正在后台运行</string>
+    <string name="notif_headless_received">收到 %1$s %2$s</string>
+
+    <string name="notif_pending_settlement_title">请启动钱包</string>
+    <string name="notif_pending_settlement_message">有一笔待处理的收款结算。</string>
+
+    <string name="notif_inflight_payment_title">有一笔支付正在处理</string>
+    <string name="notif_inflight_payment_message">启动 Phoenix，以便支付能够在适当的时候完成。</string>
+
+    <string name="notif_missed_title">错过的收款</string>
+    <string name="notif_missed_unavailable">Phoenix 无法在后台启动。</string>
+
+    <string name="notif_rejected_deposit_title">链上存款待处理（+%1$s）</string>
+    <string name="notif_rejected_payment_title">支付被拒绝（+%1$s）</string>
+    <string name="notif_rejected_policy_disabled">自动通道管理已禁用。点按查看详情。</string>
+    <string name="notif_rejected_policy_disabled_timeout">自动通道管理已禁用。此存款将于 %1$s 到期。</string>
+    <string name="notif_rejected_over_absolute">费用为 %1$s，但您设置的最大费用为 %2$s。点按查看详情。</string>
+    <string name="notif_rejected_over_absolute_timeout">费用为 %1$s，但您设置的最大费用为 %2$s。此存款将于 %3$s 到期。</string>
+    <string name="notif_rejected_over_relative">费用为 %1$s，超过收款金额的 %2$s%%。点按查看详情。</string>
+    <string name="notif_rejected_over_relative_timeout">费用为 %1$s，超过收款金额的 %2$s%%。此存款将于 %3$s 到期。</string>
+    <string name="notif_rejected_amount_too_low">支付金额过低。</string>
+    <string name="notif_rejected_generic_error">资金注入期间发生错误。请稍后重试。</string>
+
+    <string name="notif_watcher_revoked_commit_title">请启动 Phoenix</string>
+    <string name="notif_watcher_revoked_commit_message">您的一些通道可能已关闭。</string>
+
+    <!-- 设置列表 -->
+
+    <string name="settings_general_title">通用</string>
+    <string name="settings_fees_title">费用</string>
+    <string name="settings_security_title">隐私与安全</string>
+    <string name="settings_advanced_title">高级</string>
+    <string name="settings_danger_title">危险区域</string>
+
+    <string name="settings_display_prefs">显示</string>
+    <string name="settings_wallet_info">钱包信息</string>
+    <string name="settings_liquidity_policy">通道管理</string>
+    <string name="settings_display_seed">恢复短语</string>
+    <string name="settings_access_control">访问控制</string>
+    <string name="settings_list_channels">支付通道</string>
+    <string name="settings_logs">日志</string>
+    <string name="settings_electrum">Electrum 服务器</string>
+    <string name="settings_reset_wallet">删除钱包</string>
+    <string name="settings_mutual_close">关闭通道</string>
+    <string name="settings_force_close">强制关闭通道</string>
+    <string name="settings_tor">Tor</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_payment_settings">支付选项</string>
+    <string name="settings_payment_history">支付历史</string>
+    <string name="settings_notifications">通知</string>
+    <string name="settings_contacts">联系人</string>
+    <string name="settings_converter">货币转换器</string>
+    <string name="settings_add_liquidity">增加流动性</string>
+
+    <!-- 首页：交换帮助 -->
+
+    <string name="home_swapin_confirming_title">确认中</string>
+    <string name="home_swapin_confirming_desc">等待首次确认后才能交换到闪电网络。</string>
+
+    <string name="home_swapin_ready_title">等待交换</string>
+    <string name="home_swapin_ready_desc_auto">当挖矿费用低于 %1$s 时，将部署到闪电网络。</string>
+    <string name="home_swapin_ready_desc_disabled">将保留在链上，因为自动通道管理已禁用。</string>
+    <string name="home_swapin_ready_desc_generic">将在条件适用时部署到闪电网络。</string>
+    <string name="home_swapin_ready_expiring">注意！一些资金即将到期，将不再有资格进行交换。</string>
+
+    <string name="home_swapin_expired_title">已过期</string>
+    <string name="home_swapin_expired_desc">等待 4 个月后无法再交换。这些资金必须手动使用。</string>
+
+    <string name="home_final_title">最终钱包</string>
+    <string name="home_final_desc">这些资金来自已关闭的闪电通道。必须手动使用。</string>
+    <string name="home_onchain_balance_only">链上余额</string>
+
+    <string name="home_background_restriction_title">后台处理受限</string>
+    <string name="home_background_restriction_body_1">Phoenix 在后台或关闭时可能无法接收付款。</string>
+    <string name="home_background_restriction_body_2">原因如下：</string>
+    <string name="home_background_restriction_powersaver">设备处于省电模式</string>
+    <string name="home_background_restriction_fcm">FCM 通知不可用</string>
+    <string name="home_background_restriction_fcm_details">如果您使用 GrapheneOS 或 CalyxOS，请安装 Google Play 服务以获取 FCM 通知。请查看常见问题解答获取指导。</string>
+
+    <!-- 首页：底部菜单 -->
+
+    <string name="menu_settings">设置</string>
+    <string name="menu_send">发送</string>
+    <string name="menu_receive">接收</string>
+
+    <!-- 初始化钱包 / 自动创建钱包 -->
+
+    <string name="initwallet_create">创建新钱包</string>
+    <string name="initwallet_restore">恢复我的钱包</string>
+
+    <string name="restore_disclaimer_message_1_title">Phoenix 仅支持闪电网络</string>
+    <string name="restore_disclaimer_message_1_body">Phoenix 只会显示已由 Phoenix 管理的资金。由其他应用程序生成的种子关联的资金不会显示在这里（包括链上资金）。</string>
+    <string name="restore_disclaimer_message_2_title">注意不要并行使用同一个种子</string>
+    <string name="restore_disclaimer_message_2_body">请勿在不同设备上同时使用同一个种子。这可能导致两个 Phoenix 实例之间发生冲突，并导致闪电通道关闭。</string>
+
+    <string name="restore_instructions">您钱包的种子是一组 12 个英文单词。在下面的框中依次输入每个单词。</string>
+    <string name="restore_input_label">输入第 %1$s 个单词</string>
+    <string name="restore_input_invalid">这不是一个有效的单词。</string>
+    <string name="restore_seed_valid">此种子有效</string>
+    <string name="restore_seed_valid_details">您现在可以继续并恢复您的钱包</string>
+    <string name="restore_seed_invalid">此种子无效</string>
+    <string name="restore_seed_invalid_details">请确保您按正确顺序输入了正确的单词。</string>
+
+    <string name="restore_payments_button">导入支付历史</string>
+    <string name="restore_payments_button_details">可选。使用此按钮从其他设备恢复支付数据库文件。</string>
+    <string name="restore_payments_success">将恢复支付历史</string>
+    <string name="restore_payments_success_button">使用其他文件</string>
+    <string name="restore_payments_error_header">无法恢复支付</string>
+    <string name="restore_payments_error_button">重试</string>
+    <string name="restore_payments_error_encryption">文件无法解密。请确保您使用的是 Phoenix 数据库文件（不是 CSV），并且该文件与您要恢复的钱包匹配。</string>
+    <string name="restore_payments_error_open">无法打开此文件。请重试。</string>
+    <string name="restore_payments_error_writing">无法将此文件写入应用程序的数据文件夹。请重试。</string>
+    <string name="restore_import_button">恢复钱包</string>
+
+    <!-- 需要升级对话框 -->
+
+    <string name="upgraderequired_title">需要更新</string>
+    <string name="upgraderequired_message">此版本的 Phoenix（v%1$s）与您的钱包不兼容。请更新，或使用兼容版本。</string>
+    <string name="upgraderequired_button">在 Google Play 上更新</string>
+
+    <!-- 接收视图：费用/流动性警告 -->
+
+    <string name="receive_lightning_warning_title_surefail">支付将失败</string>
+    <string name="receive_lightning_warning_title_fee_expected">预计需要链上费用</string>
+    <string name="receive_lightning_warning_hint_show_details">点按了解更多</string>
+
+    <string name="receive_lightning_sheet_dismiss">忽略</string>
+    <string name="receive_lightning_sheet_button_enable">启用自动通道</string>
+    <string name="receive_lightning_sheet_button_configure">配置费用限制</string>
+
+    <string name="receive_lightning_warning_message_fee_expected">为了接收此金额，很可能需要进行一次链上操作。\n\n预计费用约为 %1$s。</string>
+    <string name="receive_lightning_warning_message_fee_expected_unknown">为了接收此金额，很可能需要进行一次链上操作。</string>
+
+    <string name="receive_lightning_warning_message_above_limit">接收此金额预计需要 %1$s 的费用，而该费用超过了您的限额 %2$s。\n\n请在通道管理设置中提高此限额。</string>
+    <string name="receive_lightning_warning_message_above_limit_or_liquidity">接收此金额预计需要 %1$s 的费用，而该费用超过了您的限额 %2$s。\n\n请在通道管理设置中提高此限额，或请求额外的流动性。</string>
+    <string name="receive_lightning_warning_message_above_limit_percent">接收此金额预计需要 %1$s 的费用，而该费用超过了金额的 %2$s%%。\n\n请在通道管理设置中提高此限额。</string>
+    <string name="receive_lightning_warning_message_above_limit_percent_or_liquidity">接收此金额预计需要 %1$s 的费用，而该费用超过了金额的 %2$s%%。\n\n请在通道管理设置中提高此限额，或请求额外的流动性。</string>
+
+    <string name="receive_lightning_warning_fee_policy_disabled_insufficient_liquidity">入站流动性不足以接收此金额，并且您已禁用自动通道管理。</string>
+
+    <!-- 接收：Tor 警告 -->
+
+    <string name="receive_tor_warning_title">Tor 已启用</string>
+    <string name="receive_tor_warning_dialog_content_1">Phoenix 在接收付款时可能会遇到问题。请确保应用保持在前台运行，并且连接稳定。</string>
+
+    <!-- 发送错误 -->
+
+    <string name="send_error_invoice_expired">此发票已过期。</string>
+    <string name="send_error_payment_pending">此支付已在处理中。请等待其完成。</string>
+    <string name="send_error_already_paid">此发票已支付。</string>
+    <string name="send_error_invalid_chain">此支付使用的区块链与您的钱包不同。</string>
+    <string name="send_error_lnurl_invalid">无法处理此 LNURL 链接。请确保其有效。</string>
+    <string name="send_error_lnurl_unsupported">目前不支持此类型的 LNURL。</string>
+    <string name="send_error_invalid_generic">这不是受支持的支付请求。</string>
+    <string name="send_error_bip353_connect">无法检索此地址的数据。您可能遇到连接问题。</string>
+    <string name="send_error_bip353_name_not_found">在“%2$s”上找不到名称“%1$s”。</string>
+    <string name="send_error_bip353_invalid_uri">此地址使用了无效的 Bip21 资源。</string>
+    <string name="send_error_bip353_invalid_offer">此地址使用了无效的 Bolt12 报价。</string>
+    <string name="send_error_bip353_dnssec">此地址托管在不安全的 DNS 上。必须启用 DNSSEC。</string>
+
+    <!-- 验证 -->
+
+    <string name="validation_below_min">至少为 %1$s</string>
+    <string name="validation_above_max">不能超过 %1$s</string>
+
+    <!-- 关闭通道 -->
+
+    <string name="mutualclose_input_label">比特币地址</string>
+    <string name="mutualclose_input_instructions">将所有资金发送到一个比特币地址。所有支付通道将被关闭。</string>
+    <string name="mutualclose_confirm_title">确认关闭</string>
+    <string name="mutualclose_confirm_details">所有资金将发送到：</string>
+    <string name="mutualclose_confirm_fee">预计矿工费：</string>
+    <string name="mutualclose_confirm_fee_unknown">无法估算费用。</string>
+
+    <string name="forceclose_title">强制关闭通道</string>
+    <string name="forceclose_instructions">此屏幕允许您单方面关闭通道。\n\n这不是一个“万能修复”按钮：它作为安全措施存在，<b>只应在极端情况下使用</b>。例如，如果您的对等方（ACINQ）永久消失，导致您无法使用您的资金。在其他所有情况下，<b>如果您在使用 Phoenix 时遇到问题，应联系支持</b>。\n\n强制关闭通道将耗费您的资金（用于支付链上费用），并导致您的资金被锁定数天。\n\n<b>在通道完全关闭之前，请勿卸载应用程序，否则您将损失资金。</b>\n\n<b>如果您不完全理解此功能的作用，请勿使用。</b></string>
+    <string name="forceclose_address_label">资金最终将发送到最终钱包：</string>
+
+    <string name="forceclose_confirm_title">确认强制关闭</string>
+    <string name="forceclose_confirm_details">所有资金将在显著延迟后发送到您的最终钱包。</string>
+    <string name="forceclose_button">强制关闭我的所有通道</string>
+
+    <!-- 应用内通知 -->
+
+    <string name="inappnotif_backup_seed_message">备份您的钱包，防止丢失比特币。</string>
+    <string name="inappnotif_backup_seed_action">备份我的钱包</string>
+
+    <string name="inappnotif_notification_permission_message_short">启用 Android 通知</string>
+    <string name="inappnotif_notification_permission_message">Android 设置中已禁用通知。当支付正在处理时，Phoenix 将无法通知您。</string>
+    <string name="inappnotif_notification_permission_enable">启用</string>
+
+    <string name="inappnotif_swapin_timeout_message">一笔存款即将到期。</string>
+    <string name="inappnotif_swapin_timeout_action">查看详情</string>
+
+    <string name="inappnotif_watchtower_late_message">Phoenix 在后台时通常定期监控区块链，但最近几天无法做到。\n\n请确保 Android 没有阻止 Phoenix，并且它可以连接到 Electrum。</string>
+    <string name="inappnotif_watchtower_late_action">忽略</string>
+
+    <string name="inappnotif_upgrade_message">有可用更新</string>
+    <string name="inappnotif_upgrade_critical_message">有重要更新可用。您应尽快更新 Phoenix。</string>
+    <string name="inappnotif_upgrade_button">在 Google Play 上更新</string>
+
+    <string name="inappnotif_mempool_full_message">链上费用很高。</string>
+    <string name="inappnotif_mempool_full_action">了解 Phoenix 受到的影响</string>
+
+    <string name="inappnotif_tor_disconnected_message">无法访问 Tor 网络。Phoenix 将无法正常工作。</string>
+    <string name="inappnotif_tor_disconnected_action">修复</string>
+
+    <string name="inappnotif_payment_onchain_pending_title">链上资金待处理（+%1$s）</string>
+    <string name="inappnotif_payments_rejection_overview_one">最近有一笔收款被拒绝</string>
+    <string name="inappnotif_payments_rejection_overview_many">最近有 %1$d 笔收款被拒绝</string>
+    <string name="inappnotif_payment_rejected_title">支付被拒绝（+%1$s）</string>
+    <string name="inappnotif_payment_rejected_disabled">自动通道管理已禁用。</string>
+    <string name="inappnotif_payment_rejected_over_absolute">费用为 %1$s，但您设置的最大费用为 %2$s。</string>
+    <string name="inappnotif_payment_rejected_over_relative">费用为 %1$s，超过金额的 %2$s%%。</string>
+    <string name="inappnotif_payment_rejected_tweak_setting">点按进行配置。</string>
+    <string name="inappnotif_payment_rejected_view_wallet">查看详情</string>
+
+    <string name="inappnotif_watchtower_nominal_title">瞭望塔报告</string>
+    <string name="inappnotif_watchtower_nominal_description_one">%1$d 个通道已于 %2$s 成功检查。未发现问题。</string>
+    <string name="inappnotif_watchtower_nominal_description_many">%1$d 个通道已于 %2$s 成功检查。未发现问题。</string>
+    <string name="inappnotif_watchtower_revokedfound_title">瞭望塔警报</string>
+    <string name="inappnotif_watchtower_revokedfound_description">在 %1$s 发现通道的已撤销承诺：%2$s。此通道可能已关闭。</string>
+
+    <!-- 设置：显示种子 -->
+
+    <string name="displayseed_instructions">恢复短语（有时称为种子）是一组 12 个英文单词。如果需要，它可以让您恢复对资金的完全访问权限。\n\n<b>只有您自己拥有此种子。请保持私密。</b>\n\n<b>请勿与任何人分享此种子</b>。\n谨防网络钓鱼。Phoenix 的开发人员绝不会要求您提供种子。\n\n<b>请勿丢失此种子</b>。\n请将其保存在安全的地方（不要在这部手机上）。如果您丢失了种子和手机，您将失去资金。</string>
+    <string name="displayseed_authenticate_button">显示种子</string>
+    <string name="displayseed_dialog_header">请妥善保管此种子。\n请勿分享。</string>
+    <string name="displayseed_backup_notice_header">您尚未备份恢复短语！</string>
+    <string name="displayseed_backup_notice_details">如果您不备份，并且无法访问 Phoenix，您将失去资金！</string>
+    <string name="displayseed_backup_checkbox">我已将恢复短语保存在安全的地方。</string>
+    <string name="displayseed_loss_disclaimer_checkbox">我理解，如果我丢失了手机和恢复短语，我将丢失钱包中的资金。</string>
+
+    <!-- 支付详情 -->
+
+    <string name="paymentdetails_funding_fees_label">矿工费</string>
+    <string name="paymentdetails_funding_fees_desc">支付给比特币网络矿工以处理链上交易的费用。</string>
+    <string name="paymentdetails_service_fees_label">服务费</string>
+    <string name="paymentdetails_service_fees_desc">为创建新支付通道而支付的费用。并非总是需要。</string>
+
+    <string name="paymentdetails_liquidity_purchase_label">流动性</string>
+    <string name="paymentdetails_liquidity_service_fee_label">服务费</string>
+    <string name="paymentdetails_liquidity_service_fee_help">为流动性服务支付的费用。</string>
+    <string name="paymentdetails_liquidity_miner_fee_label">矿工费</string>
+    <string name="paymentdetails_liquidity_miner_fee_help">支付给比特币网络矿工以处理链上交易的费用。</string>
+    <string name="paymentdetails_liquidity_caused_by_label">起因</string>
+    <string name="paymentdetails_liquidity_caused_by_help">接收一笔付款需要此流动性。</string>
+    <string name="paymentdetails_liquidity_caused_by_help_link">查看如何优化</string>
+
+    <!-- lnurl -->
+
+    <string name="lnurl_auth_instructions">您可以匿名登录并授权操作：</string>
+    <string name="lnurl_withdraw_header">您可以从\n<b>%1$s</b> 兑换资金。</string>
+    <string name="lnurl_withdraw_success">提款请求已发送至 <b>%1$s</b>。\n\n他们发送资金可能需要一些时间。在此期间，请保持应用在线。</string>
+
+    <!-- Tor -->
+
+    <string name="tor_dialog_enable_title_1">启用 Tor</string>
+    <string name="tor_dialog_enable_details_1">这需要安装第三方 Tor 代理 VPN 应用，例如 Orbot。</string>
+    <string name="tor_dialog_enable_details_2">Tor 可以改善隐私，但可能导致性能问题和错过支付。</string>
+    <string name="tor_dialog_disable_title">禁用 Tor</string>
+    <string name="tor_dialog_disable_details_1">如果您禁用此选项，您的 IP 地址可能会暴露给各种服务提供商。</string>
+    <string name="tor_dialog_disable_details_2">您确定要继续吗？</string>
+    <string name="tor_dialog_processing">正在处理更改…</string>
+
+    <string name="tor_disconnected_dialog_title">无法访问 Tor 网络</string>
+    <string name="tor_disconnected_dialog_action">修复</string>
+    <string name="tor_disconnected_dialog_details_1">Phoenix 需要访问 Tor 才能正常工作。</string>
+    <string name="tor_disconnected_dialog_details_2">请确保您的 Tor 代理 VPN 应用正在运行，并且已连接到 Tor。</string>
+    <string name="tor_disconnected_dialog_details_3">如果您没有 Tor VPN 应用，请安装一个。我们推荐 Orbot。</string>
+    <string name="tor_disconnected_dialog_open_settings">打开 Tor 设置</string>
+    <string name="tor_disconnected_dialog_open_orbot_page">打开 Orbot 页面</string>
+
+    <!-- 关于 -->
+
+    <string name="about_general_content">Phoenix 是一款使用闪电网络发送和接收支付的比特币钱包。\n\n它是一款免费的开源软件，由 <a href="https://phoenix.acinq.co">ACINQ</a> 根据 <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 许可证</a> 开发。</string>
+    <string name="about_seed_title">保护您的密钥</string>
+    <string name="about_seed_content">此钱包是自我托管的：<b>您独自保管钱包的 12 个单词的种子密钥</b>。\n\n此密钥可让您访问您的资金。请勿向任何人透露，并谨防网络钓鱼。</string>
+    <string name="about_rates_title">汇率</string>
+    <string name="about_rates_content">比特币/法币汇率从多个第三方 API 获取：\n\n- Blockchain.info\n- Coinbase.com\n- Bluelytics.com.ar\n- Yadio.io\n\n这些汇率可能不准确。在发送支付前，请务必核对实际比特币金额。</string>
+
+    <!-- 介绍屏幕 -->
+
+    <string name="intro_welcome_title">欢迎！</string>
+    <string name="intro_welcome_sub1">使用 Phoenix，发送和接收比特币既简单又安全。</string>
+    <string name="intro_welcome_next_button">下一步</string>
+
+    <string name="intro_channels_title">比特币加速器</string>
+    <string name="intro_channels_sub1">Phoenix 使用支付通道让比特币变得快速且私密。</string>
+    <string name="intro_channels_next_button">下一步</string>
+
+    <string name="intro_selfcustody_title">您的密钥，您的比特币</string>
+    <string name="intro_selfcustody_sub1">Phoenix 是自我托管的。由您掌控。</string>
+    <string name="intro_selfcustody_sub2">您可以随时使用您的秘密密钥恢复钱包。请妥善保管！</string>
+    <string name="intro_selfcustody_next_button">开始使用</string>
+
+    <!-- 钱包信息 -->
+
+    <string name="walletinfo_onchain_swapin">交换入钱包</string>
+    <string name="walletinfo_onchain_swapin_help">交换入钱包管理存入 Phoenix 的链上资金。\n\n根据您的通道管理设置，它会在可能时自动将这些资金交换到闪电网络。</string>
+    <string name="walletinfo_onchain_swapin_help_faq_link">了解其工作原理</string>
+    <string name="walletinfo_onchain_swapin_policy_view">点按进行配置</string>
+    <string name="walletinfo_onchain_swapin_empty">没有正在进行的交换。</string>
+
+    <string name="walletinfo_onchain_swapin_policy_auto_details">如果支付给矿工的费用<b>低于 %1$s</b>（可配置），链上资金将自动交换到闪电网络。</string>
+    <string name="walletinfo_onchain_swapin_policy_auto_details_timeout"><b>%1$d 个月后</b>未交换的资金可在链上恢复。</string>
+    <string name="walletinfo_onchain_swapin_policy_disabled_details">自动通道管理<b>已禁用</b>。不会进行交换，资金将保留在链上。</string>
+
+    <string name="walletinfo_onchain_swapin_last_attempt">一次交换尝试失败于 %1$s</string>
+    <string name="walletinfo_onchain_swapin_last_attempt_disabled">通道管理已禁用。</string>
+    <string name="walletinfo_onchain_swapin_timeout_1day">此交换将在一天后到期！</string>
+    <string name="walletinfo_onchain_swapin_timeout">此交换将在 %1$s 天后到期。</string>
+
+    <string name="walletinfo_onchain_swapin_locked_title">已超时</string>
+    <string name="walletinfo_onchain_swapin_locked_description">这些资金将从 %1$s 天后可用。</string>
+
+    <string name="walletinfo_onchain_swapin_refund_title">已取消的资金</string>
+    <string name="walletinfo_onchain_swapin_refund_description">这些资金未及时交换。点按以使用。</string>
+
+    <string name="walletinfo_onchain_final_about">最终钱包是当您的闪电通道关闭或出现问题时资金被发送到的地方。通常应为空。</string>
+
+    <!-- 设置：通道创建的流动性策略 -->
+
+    <string name="liquiditypolicy_instructions">收款有时需要链上交易。并非总是如此，仅在需要时发生。</string>
+    <string name="liquiditypolicy_fees_estimation">目前费用估计在 <b>%1$s</b>（约 %2$s）左右。</string>
+    <string name="liquiditypolicy_disable_label">自动通道管理</string>
+    <string name="liquiditypolicy_disable_desc">需要链上操作的收款将被拒绝。</string>
+
+    <string name="liquiditypolicy_fees_base_label">最大费用金额</string>
+    <string name="liquiditypolicy_fees_base_help">费用超过该值的支付将被拒绝。</string>
+    <string name="liquiditypolicy_fees_base_too_low">此值过低。</string>
+    <string name="liquiditypolicy_fees_base_below_estimation">低于预期费用。某些支付可能被拒绝。</string>
+
+    <string name="liquiditypolicy_advanced_menu">高级选项</string>
+    <string name="liquiditypolicy_advanced_disable">通道管理已禁用。可以在通道管理设置屏幕中启用。</string>
+    <string name="liquiditypolicy_advanced_disclaimer_header">注意！</string>
+    <string name="liquiditypolicy_advanced_disclaimer_message">此屏幕面向高级用户。除非您了解这些设置的目的，否则请勿更改。</string>
+
+    <string name="liquiditypolicy_advanced_verifications_title">额外验证</string>
+    <string name="liquiditypolicy_advanced_fees_prop_label">百分比检查</string>
+    <string name="liquiditypolicy_advanced_fees_prop_help">检查费用相对于收款金额的比例。此选项对于小额支付的健全性检查很有用。</string>
+    <string name="liquiditypolicy_advanced_overrides_title">策略覆盖</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_label">为闪电网络跳过绝对费用检查</string>
+    <string name="liquiditypolicy_advanced_pay_to_open_help">启用后，传入的闪电支付将忽略绝对最大费用限制。仅应用百分比检查。\n\n注意：如果比特币内存池费率很高，需要链上操作的传入闪电支付可能会很昂贵。</string>
+    <string name="liquiditypolicy_save_button">保存策略</string>
+    <string name="liquiditypolicy_request_button">请求入站流动性</string>
+
+    <string name="liquiditypolicy_help">
+      Phoenix 允许您在比特币区块链（L1）和比特币闪电层（L2）上接收付款。
+      \n\n
+      - 区块链层（L1）较慢，通常费用高得多（需要矿工费）
+      \n
+      - 闪电层（L2）快得多，通常便宜得多（尤其是小额支付）
+      \n\n
+      当您在 L1 上收到付款时，Phoenix 会自动将资金转移到 L2，<b>前提是</b>矿工费符合您配置的费用策略。
+      \n\n
+      您在 L2 上收到的付款可以即时且零费用地接收。但是，偶尔也需要 L1 操作来管理 L2 支付通道。这可以自动完成，<b>前提是</b>矿工费符合您配置的费用策略。
+    </string>
+
+    <!-- 设置：流动性请求 -->
+
+    <string name="liquidityads_no_channels_header">还没有通道！</string>
+    <string name="liquidityads_no_channels_details">您需要先在钱包中存入资金才能使用此功能。</string>
+    <string name="liquidityads_header">提前规划您的流动性</string>
+    <string name="liquidityads_instructions">入站流动性让您避免未来通过闪电网络收款时的链上交易费用。\n\n现在请求更多流动性，以后可以节省费用。</string>
+    <string name="liquidityads_faq_link">更多信息</string>
+    <string name="liquidityads_current_liquidity">当前流动性</string>
+
+    <string name="liquidityads_amount_label">请求流动性</string>
+    <string name="liquidityads_estimate_button">估算流动性成本</string>
+    <string name="liquidityads_estimating_spinner">正在估算成本…</string>
+    <string name="liquidityads_estimate_details_miner_fees">矿工费</string>
+    <string name="liquidityads_estimate_details_miner_fees_help">为底层链上交易贡献的挖矿费用。</string>
+    <string name="liquidityads_estimate_details_service_fees">服务费</string>
+    <string name="liquidityads_estimate_details_service_fees_help">此费用支付给提供流动性的服务。</string>
+    <string name="liquidityads_estimate_details_duration">持续时间</string>
+    <string name="liquidityads_estimate_details_duration_value">1 年</string>
+    <string name="liquidityads_estimate_details_duration_help">当您接收资金时，流动性将被消耗并成为您的余额。一年后，剩余的未使用流动性将被服务收回。</string>
+    <string name="liquidityads_estimate_above_25">总费用超过所请求流动性金额的 25%。</string>
+    <string name="liquidityads_over_balance">总费用超过您的余额。</string>
+
+    <string name="liquidityads_review_button">审核</string>
+    <string name="liquidityads_disclaimer_body1">您正在请求一笔<b>初始</b>流动性金额。流动性并非恒定不变：当您通过闪电网络接收资金时，流动性将被消耗并成为您的余额。</string>
+    <string name="liquidityads_disclaimer_body2">一年后，剩余的未使用流动性将被服务收回。</string>
+
+    <string name="liquidityads_request_button">接受</string>
+    <string name="liquidityads_requesting_spinner">正在处理拼接…</string>
+
+    <string name="liquidityads_success">流动性添加成功！</string>
+    <string name="liquidityads_success_amount">添加的金额：%1$s</string>
+
+    <string name="liquidityads_error_header">流动性请求失败</string>
+    <string name="liquidityads_error_channels_unavailable">通道不可用。请稍后重试。</string>
+    <string name="liquidityads_error_invalid_funding_amount">请求的金额无效。</string>
+
+    <!-- 支付行 -->
+
+    <string name="paymentline_outgoing_unconfirmed">未确认 - 点按加速</string>
+
+    <!-- CPFP -->
+
+    <string name="cpfp_title">加速我的交易（CPFP）。</string>
+    <string name="cpfp_instructions">您可以增加未确认交易的有效费用，以激励比特币矿工优先处理它们。</string>
+    <string name="cpfp_splice_error_actual_below_user">此费率低于您的未确认交易已使用的费率。请使用更高的费率。</string>
+
+    <!-- 闪电支付错误 -->
+
+    <string name="outgoing_failuremessage_channel_closing">通道正在关闭。</string>
+    <string name="outgoing_failuremessage_channel_splicing">通道正在处理拼接。请稍后重试。</string>
+    <string name="outgoing_failuremessage_not_enough_fee">费用不足。</string>
+    <string name="outgoing_failuremessage_not_enough_balance">此支付超过您的余额。</string>
+    <string name="outgoing_failuremessage_too_big">支付金额过大 - 请尝试拆分为多笔。</string>
+    <string name="outgoing_failuremessage_too_small">支付金额过小。</string>
+    <string name="outgoing_failuremessage_expiry_too_big">此支付的到期时间太远。</string>
+    <string name="outgoing_failuremessage_rejected_by_recipient">收款人拒绝了支付。此特定发票可能已经支付过。</string>
+    <string name="outgoing_failuremessage_recipient_offline">收款人离线。</string>
+    <string name="outgoing_failuremessage_not_enough_liquidity">无法将支付中继给收款人（可能是入站流动性不足）。</string>
+    <string name="outgoing_failuremessage_temporary_failure">支付路由中的某个节点发生错误。如果重试，支付可能会成功。</string>
+    <string name="outgoing_failuremessage_too_many_pending">您有太多待处理的支付。请在这些支付结算后再试。</string>
+
+    <string name="outgoing_failuremessage_invalid_id">支付 ID 无效。请重试。</string>
+    <string name="outgoing_failuremessage_alreadypaid">此发票已支付。</string>
+    <string name="outgoing_failuremessage_not_connected">您的通道尚未连接。请等待稳定连接后重试。</string>
+    <string name="outgoing_failuremessage_channel_opening">您的通道仍在开启过程中。请稍后重试。</string>
+    <string name="outgoing_failuremessage_unsupported_features">此发票使用不支持的功能。请确保您使用的是最新版本的 Phoenix。</string>
+    <string name="outgoing_failuremessage_invalid_amount">支付金额无效。</string>
+    <string name="outgoing_failuremessage_no_available_channels">无法通过您现有的通道发送此支付。</string>
+    <string name="outgoing_failuremessage_noroutefound">收款人不可达，或没有足够的入站流动性。</string>
+    <string name="outgoing_failuremessage_unknown">发生未知错误，支付失败。</string>
+    <string name="outgoing_failuremessage_restarted">支付处理过程中钱包被重启。</string>
+
+    <!-- 拼接输出：低费率免责声明 -->
+
+    <string name="spliceout_low_feerate_dialog_title">费率过低！</string>
+    <string name="spliceout_low_feerate_dialog_body1">费率不足的交易可能会拖延数天或数周而无法确认。</string>
+    <string name="spliceout_low_feerate_dialog_body2">选择费率是您的责任。一旦发送，此交易无法取消，只能通过更高费用来加速。</string>
+    <string name="spliceout_low_feerate_dialog_body3">您确定要继续吗？</string>
+
+    <!-- 拼接输出：容量免责声明 -->
+
+    <string name="spliceout_capacity_disclaimer_title">通道大小受到影响</string>
+    <string name="spliceout_capacity_disclaimer_body1">发送到链上的资金取自通道中您的一侧，从而将通道大小减少相同金额。您的入站流动性保持不变。</string>
+    <string name="spliceout_capacity_disclaimer_checkbox">不再显示此消息。</string>
+
+    <!-- 使用交换入退款 -->
+
+    <string name="swapinrefund_title">使用已取消的交换入</string>
+    <string name="swapinrefund_none_available_label">尚无已取消的交换入。</string>
+    <string name="swapinrefund_available_label">可用：<b>%1$s</b>（%2$s）</string>
+    <string name="swapinrefund_instructions_1">使用此屏幕来使用未能及时交换的链上存款。这不会影响您的闪电通道。</string>
+    <string name="swapinrefund_instructions_2">请确保目标地址有效，并使用合理的费率。</string>
+    <string name="swapinrefund_estimate_button">估算费用</string>
+    <string name="swapinrefund_estimating">正在估算费用…</string>
+    <string name="swapinrefund_send_button">广播</string>
+    <string name="swapinrefund_sending">正在广播…</string>
+    <string name="swapinrefund_failed">交易错误。</string>
+    <string name="swapinrefund_failed_address">此地址无效。</string>
+    <string name="swapinrefund_failed_cannot_create">无法创建退款交易。</string>
+    <string name="swapinrefund_success">交易已发布。</string>
+    <string name="swapinrefund_success_details">您可以在下面找到该交易。它不会出现在您的支付历史中，如果需要，请立即复制其 ID。</string>
+
+    <!-- 最终钱包退款 -->
+
+    <string name="finalwallet_refund_title">使用最终钱包中的资金</string>
+    <string name="finalwallet_refund_available_none">无可用资金</string>
+    <string name="finalwallet_refund_available">可用金额</string>
+    <string name="finalwallet_refund_instructions">使用此屏幕来使用最终钱包中的资金。这些资金来自过去已关闭的通道。这不会影响您现有的闪电通道。</string>
+
+    <!-- 实验性功能 -->
+
+    <string name="bip353_subtitle">这是您的 Bolt12 支付请求的人类可读地址。</string>
+    <string name="bip353_subtitle2">想要更美观的地址？使用第三方服务，或自行托管地址！</string>
+
+</resources>
+```
