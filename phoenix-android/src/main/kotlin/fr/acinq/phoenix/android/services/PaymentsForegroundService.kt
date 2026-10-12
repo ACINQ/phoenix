@@ -54,19 +54,18 @@ class PaymentsForegroundService : Service() {
 
     private val shutdownHandler = Handler(Looper.getMainLooper())
     private val shutdownRunnable: Runnable = Runnable {
-        log.info("reached scheduled shutdown while headless")
+        log.info("reached scheduled service shutdown")
         stopForeground(STOP_FOREGROUND_REMOVE)
         serviceScope.launch {
-            BusinessManager.stopAllHeadlessBusinesses()
             stopSelf()
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
 
         val reason = intent?.getStringExtra(EXTRA_REASON)
+        log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId, reason=$reason ]")
         val walletId = intent?.getStringExtra(EXTRA_NODE_ID_HASH)?.let { WalletId(it) }
 
         val businessMap = BusinessManager.businessFlow.value
@@ -74,29 +73,29 @@ class PaymentsForegroundService : Service() {
         // the notification for the foreground service depends on whether the business is started or not.
         val shouldWeWaitLong: Boolean = when {
 
-            walletId != null && businessMap[walletId] != null -> {
-                log.info("active business found for wallet=$walletId, ignoring background message (reason=$reason)")
+            walletId == null -> {
+                log.info("no wallet_id provided, aborting early")
+                false
+            }
+
+            businessMap[walletId] != null -> {
+                log.info("active business found for wallet=$walletId")
                 businessMap[walletId]?.business?.let {
                     if (it.connectionsManager.connections.value.peer !is Connection.ESTABLISHED) {
                         it.appConnectionsDaemon?.forceReconnect(AppConnectionsDaemon.ControlTarget.Peer)
                     }
                 }
-                false
-            }
-
-            walletId == null -> {
-                log.info("no wallet_id provided, ignoring background message (reason=$reason)")
-                false
+                true
             }
 
             else -> {
                 when (val result = SeedManager.loadAndDecrypt(applicationContext)) {
                     is DecryptSeedResult.Failure.SeedFileNotFound -> {
-                        log.info("seed not found, ignoring background message (reason=$reason)")
+                        log.info("seed not found, aborting early")
                         false
                     }
                     is DecryptSeedResult.Failure -> {
-                        log.info("unable to read seed, ignoring background message (reason=$reason)")
+                        log.info("unable to read seed, aborting early")
                         serviceScope.launch {
                             val walletMetadataMap = (application as PhoenixApplication).globalPrefs.getAvailableWalletsMeta.first()
                             val metadata = walletMetadataMap.getByWalletIdOrDefault(walletId)
@@ -112,7 +111,7 @@ class PaymentsForegroundService : Service() {
                         val userWallets = result.userWalletsMap
                         val wallet = userWallets[walletId]
                         if (wallet == null) {
-                            log.info("seed not found for node_id=$walletId, ignoring background message (reason=$reason)")
+                            log.info("seed not found for node_id=$walletId, aborting early")
                             false
                         } else {
                             serviceScope.launch(Dispatchers.Default) {
@@ -136,9 +135,10 @@ class PaymentsForegroundService : Service() {
         val notif = SystemNotificationHelper.notifyRunningHeadless(applicationContext)
         startForeground(notif)
 
-        // service will automatically shutdown -- delay is short if the message is ignored
+        // service will automatically shutdown after a delay -- delay is short if the message is ignored
+        // no more than 3 minutes, as this service is registered as a `shortService` which allows max 3min
         shutdownHandler.removeCallbacksAndMessages(null)
-        shutdownHandler.postDelayed(shutdownRunnable, if (shouldWeWaitLong) 2.minutes.inWholeMilliseconds else 5.seconds.inWholeMilliseconds)
+        shutdownHandler.postDelayed(shutdownRunnable, if (shouldWeWaitLong) 90.seconds.inWholeMilliseconds else 10.seconds.inWholeMilliseconds)
 
         return START_NOT_STICKY
     }
