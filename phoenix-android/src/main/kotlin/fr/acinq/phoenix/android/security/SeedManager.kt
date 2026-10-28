@@ -30,9 +30,9 @@ import java.io.File
 import java.security.KeyStoreException
 
 sealed class DecryptSeedResult {
+    /** @param userWalletsMap empty if there is no seed file yet, or if it contains no wallets. */
     data class Success(val userWalletsMap: Map<WalletId, UserWallet>): DecryptSeedResult()
     sealed class Failure: DecryptSeedResult() {
-        data object SeedFileNotFound: Failure()
         data object SerializationError: Failure()
         data class KeyStoreFailure(val cause: KeyStoreException): Failure()
         data class DecryptionError(val cause: Exception): Failure()
@@ -105,33 +105,33 @@ object SeedManager {
                     }
                 }
 
-                return when {
-                    seedMap.isEmpty() -> DecryptSeedResult.Failure.SeedFileNotFound
-                    else -> {
-                        seedMap.map { (walletId, words) ->
-                            val seed = MnemonicCode.toSeed(words, "").toByteVector()
-                            val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
-                            val nodeId = keyManager.nodeKeys.nodeKey.publicKey
-                            walletId to UserWallet(walletId, nodeId.toHex(), words)
-                        }.toMap().let {
-                            DecryptSeedResult.Success(it)
-                        }
-                    }
+                if (seedMap.isEmpty()) {
+                    log.debug("seed file contains no wallets")
+                }
+                seedMap.map { (walletId, words) ->
+                    val seed = MnemonicCode.toSeed(words, "").toByteVector()
+                    val keyManager = LocalKeyManager(seed, NodeParamsManager.chain, NodeParamsManager.remoteSwapInXpub)
+                    val nodeId = keyManager.nodeKeys.nodeKey.publicKey
+                    walletId to UserWallet(walletId, nodeId.toHex(), words)
+                }.toMap().let {
+                    DecryptSeedResult.Success(it)
                 }
             }
 
-            null -> DecryptSeedResult.Failure.SeedFileNotFound
+            null -> {
+                log.debug("no seed file found")
+                DecryptSeedResult.Success(emptyMap())
+            }
         }
     }
 
     /**
      * Wrapper method for [loadAndDecrypt].
-     * Returns an empty map if the seed file does not exist yet.
+     * Returns an empty map if the seed file does not exist yet, or contains no wallets.
      * Returns null if there was a problem when loading or decrypting the seed file.
      */
     suspend fun loadAndDecryptOrNull(context: Context): Map<WalletId, UserWallet>? = when (val res = loadAndDecrypt(context)) {
         is DecryptSeedResult.Success -> res.userWalletsMap
-        is DecryptSeedResult.Failure.SeedFileNotFound -> emptyMap()
         is DecryptSeedResult.Failure -> null
     }
 
@@ -158,28 +158,24 @@ object SeedManager {
         }
     }
 
+    @Synchronized
     fun writeSeedToDisk(context: Context, seed: EncryptedSeed.V2.MultipleSeed, overwrite: Boolean = false) = writeSeedToDir(getDatadir(context), seed, overwrite)
 
+    /**
+     * Writes the seed file atomically: the seed file will contain either its previous content or the new one, even if the
+     * process dies during the write. If the data cannot be written or checked, an exception is thrown and the existing
+     * seed file is left untouched.
+     */
     private fun writeSeedToDir(dir: File, seed: EncryptedSeed.V2.MultipleSeed, overwrite: Boolean) {
-        // 1 - create dir
         if (!dir.exists()) {
             dir.mkdirs()
         }
-
-        // 2 - encrypt and write in a temporary file
-        val temp = File(dir, "temporary_seed.dat")
-        temp.writeBytes(seed.serialize())
-
-        // 3 - decrypt temp file and check validity; if correct, move temp file to final file
-        val checkSeed = loadSeedFromDir(dir, temp.name) as EncryptedSeed.V2.MultipleSeed
-        if (!checkSeed.ciphertext.contentEquals(seed.ciphertext)) {
-            log.warn("seed check do not match!")
-//            throw WriteErrorCheckDontMatch
+        val seedFile = File(dir, SEED_FILE)
+        if (!overwrite && seedFile.exists()) {
+            throw FileAlreadyExistsException(seedFile)
         }
-        temp.copyTo(File(dir, SEED_FILE), overwrite)
-        temp.delete()
+        writeFileAtomically(target = seedFile, bytes = seed.serialize())
     }
 
-    object WriteErrorCheckDontMatch : RuntimeException("failed to write the seed to disk: temporary file do not match")
     class UnreadableSeed(msg: String) : RuntimeException(msg)
 }

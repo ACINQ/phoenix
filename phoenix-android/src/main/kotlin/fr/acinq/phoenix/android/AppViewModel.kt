@@ -42,9 +42,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -145,7 +143,7 @@ class AppViewModel(
     }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     init {
-        listAvailableWallets(onDone = {})
+        refreshAppWalletsList(onWalletsFound = {})
     }
 
     fun setActiveWallet(walletId: WalletId, business: PhoenixBusiness) {
@@ -156,7 +154,7 @@ class AppViewModel(
         scheduleAutoLock()
     }
 
-    fun listAvailableWallets(onDone: () -> Unit) {
+    fun refreshAppWalletsList(onWalletsFound: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when initialising startup-view: ", e)
             listWalletState.value = ListWalletState.Error.Generic(e)
@@ -183,11 +181,6 @@ class AppViewModel(
                     listWalletState.value = ListWalletState.Error.Generic(null)
                 }
 
-                is DecryptSeedResult.Failure.SeedFileNotFound -> {
-                    listWalletState.value = ListWalletState.Success
-                    _availableWallets.value = emptyMap()
-                }
-
                 is DecryptSeedResult.Success -> {
                     val metadataMap = application.globalPrefs.getAvailableWalletsMeta.first()
                     result.userWalletsMap.forEach { (walletId, _) ->
@@ -197,8 +190,10 @@ class AppViewModel(
                     }
                     _availableWallets.value = result.userWalletsMap
                     listWalletState.value = ListWalletState.Success
-                    viewModelScope.launch(Dispatchers.Main) {
-                        onDone()
+                    if (result.userWalletsMap.isNotEmpty()) {
+                        viewModelScope.launch(Dispatchers.Main) {
+                            onWalletsFound()
+                        }
                     }
                 }
             }

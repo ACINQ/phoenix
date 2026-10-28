@@ -116,19 +116,19 @@ object PinManager {
     fun writeLockPinMapToDisk(context: Context, pinMap: Map<WalletId, String>) {
         val encryptedPin = EncryptedPinLock.encrypt(pinMap)
         val datadir = getDataDir(context)
-        val temp = File(datadir, "temporary_pin.dat")
-        temp.writeBytes(encryptedPin.serialize(EncryptedPinLock.MULTIPLE_WALLET_VERSION))
-        temp.copyTo(File(datadir, LOCK_PIN_FILE_NAME), overwrite = true)
-        temp.delete()
+        writeFileAtomically(
+            target = File(datadir, LOCK_PIN_FILE_NAME),
+            bytes = encryptedPin.serialize(EncryptedPinLock.MULTIPLE_WALLET_VERSION),
+        )
     }
 
     fun writeSpendingPinMapToDisk(context: Context, pinMap: Map<WalletId, String>) {
         val encryptedPin = EncryptedPinSpending.encrypt(pinMap)
         val datadir = getDataDir(context)
-        val temp = File(datadir, "temporary_pin.dat")
-        temp.writeBytes(encryptedPin.serialize(EncryptedPinSpending.MULTIPLE_WALLET_VERSION))
-        temp.copyTo(File(datadir, SPENDING_PIN_FILE_NAME), overwrite = true)
-        temp.delete()
+        writeFileAtomically(
+            target = File(datadir, SPENDING_PIN_FILE_NAME),
+            bytes = encryptedPin.serialize(EncryptedPinSpending.MULTIPLE_WALLET_VERSION),
+        )
     }
 
     fun migrateSingleWalletPinCode(context: Context, walletId: WalletId) {

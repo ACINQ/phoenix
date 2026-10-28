@@ -83,6 +83,11 @@ class ResetWalletViewModel(val application: PhoenixApplication, val walletId: Wa
                 }
                 is DecryptSeedResult.Success -> seedFileResult.userWalletsMap
             }
+            if (walletId !in userWallets) {
+                log.error("wallet=$walletId not found in seed file, aborting reset")
+                state.value = ResetWalletStep.Result.Failure.SeedFileAccess
+                return@launch
+            }
 
             delay(250)
 
