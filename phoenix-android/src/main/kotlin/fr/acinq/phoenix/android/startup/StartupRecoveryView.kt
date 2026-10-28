@@ -36,6 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,6 +55,7 @@ import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.utils.MarkWindowSecure
 import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
@@ -65,6 +68,9 @@ fun StartupRecoveryView(
 ) {
     val vm = viewModel<StartupRecoveryViewModel>(factory = StartupRecoveryViewModel.Factory(application = application))
     val state = vm.state.value
+
+    // this screen displays the recovery phrase: prevent screen captures (screenshots, recordings, recent apps thumbnail)
+    MarkWindowSecure()
 
     var inputValue by remember { mutableStateOf("") }
     val inputWords: List<String> = remember(inputValue) { inputValue.split("\\s+".toRegex()) }
@@ -125,7 +131,10 @@ fun StartupRecoveryView(
                 maxLines = 3,
                 singleLine = false,
                 enabled = state is StartupRecoveryState.Init,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    // the recovery phrase must not be exposed to accessibility services
+                    .clearAndSetSemantics { contentDescription = "hidden from accessibility services" },
             )
         }
 
