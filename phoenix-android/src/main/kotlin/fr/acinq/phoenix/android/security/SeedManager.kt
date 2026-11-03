@@ -58,20 +58,9 @@ object SeedManager {
         val encryptedSeed = try {
             loadEncryptedSeedFromDisk(context)
         } catch (e: Exception) {
-            return when {
-                KeystoreHelper.isTransientFailure(e) -> {
-                    log.error("transient keystore error when reading seed file: ", e)
-                    DecryptSeedResult.Failure.TransientKeyStoreFailure(e)
-                }
-                KeystoreHelper.isKeystoreException(e) -> {
-                    log.error("keystore error when reading seed file: ", e)
-                    DecryptSeedResult.Failure.KeyStoreFailure(e)
-                }
-                else -> {
-                    log.error("could not read seed file: ", e)
-                    DecryptSeedResult.Failure.DecryptionError(e)
-                }
-            }
+            // reading and parsing the file does not use the keystore: decryption happens below
+            log.error("could not read seed file: ", e)
+            return DecryptSeedResult.Failure.SeedFileUnreadable
         }
 
         return when (encryptedSeed) {
