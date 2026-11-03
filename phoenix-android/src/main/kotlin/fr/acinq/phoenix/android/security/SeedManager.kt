@@ -27,7 +27,6 @@ import fr.acinq.phoenix.managers.NodeParamsManager
 import kotlinx.serialization.SerializationException
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.security.KeyStoreException
 
 sealed class DecryptSeedResult {
     /** @param userWalletsMap empty if there is no seed file yet, or if it contains no wallets. */
@@ -109,7 +108,7 @@ object SeedManager {
                             log.error("failed to decrypt [V2.MultipleSeed] (transient): ", e)
                             DecryptSeedResult.Failure.TransientKeyStoreFailure(e)
                         }
-                        e is KeyStoreException -> {
+                        KeystoreHelper.isKeystoreException(e) -> {
                             log.error("failed to decrypt [V2.MultipleSeed]: ", e)
                             DecryptSeedResult.Failure.KeyStoreFailure(e)
                         }

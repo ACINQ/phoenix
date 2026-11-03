@@ -97,8 +97,15 @@ object KeystoreHelper {
         return hasTransientKeystoreCause(e)
     }
 
-    /** Returns true if the exception is generic java or android keystore failure (latter only on Android 13+). */
+    /**
+     * Returns true if the exception, or one of its causes, is a java or android keystore failure (the latter only on Android
+     * 13+). Cipher operations usually wrap the keystore failure in another exception, so the causes must be checked too.
+     */
     fun isKeystoreException(e: Throwable): Boolean {
+        return generateSequence(e) { it.cause }.any { isKeystoreExceptionType(it) }
+    }
+
+    private fun isKeystoreExceptionType(e: Throwable): Boolean {
         return when {
             e is java.security.KeyStoreException -> true
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && e is android.security.KeyStoreException -> true
