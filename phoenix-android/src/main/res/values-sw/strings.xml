@@ -79,7 +79,7 @@
     <string name="startup_recovery_input_label_error">Si zaidi ya maneno 12!</string>
     <string name="startup_recovery_invalid">"Mbegu hii si sahihi"</string>
 
-    <string name="startup_recovery_import_button">Leta mbegu</string>
+    <string name="startup_recovery_check_button">Leta mbegu</string>
     <string name="startup_recovery_reset_button">Jaribu tena</string>
     <string name="startup_recovery_checking">Inakagua mbegu…</string>
 

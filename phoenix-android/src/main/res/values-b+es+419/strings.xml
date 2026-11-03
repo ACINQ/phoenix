@@ -72,7 +72,7 @@
     <string name="startup_recovery_input_label_error">¡No más de 12 palabras!</string>
     <string name="startup_recovery_invalid">Esta semilla no es válida</string>
 
-    <string name="startup_recovery_import_button">Importar semilla</string>
+    <string name="startup_recovery_check_button">Importar semilla</string>
     <string name="startup_recovery_reset_button">Inténtelo de nuevo</string>
     <string name="startup_recovery_checking">Comprobando la semilla…</string>
 

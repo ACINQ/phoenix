@@ -91,7 +91,7 @@
     <string name="startup_recovery_input_label_error">Tidak lebih dari 12 kata!</string>
     <string name="startup_recovery_invalid">Benih ini tidak valid</string>
 
-    <string name="startup_recovery_import_button">Benih impor</string>
+    <string name="startup_recovery_check_button">Benih impor</string>
     <string name="startup_recovery_reset_button">Coba lagi</string>
     <string name="startup_recovery_checking">Memeriksa benih…</string>
 

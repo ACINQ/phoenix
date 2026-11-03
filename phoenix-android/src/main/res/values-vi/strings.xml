@@ -69,7 +69,7 @@
     <string name="startup_recovery_input_label_error">Không quá 12 từ!</string>
     <string name="startup_recovery_invalid">Hạt giống này không hợp lệ</string>
 
-    <string name="startup_recovery_import_button">Nhập hạt giống</string>
+    <string name="startup_recovery_check_button">Nhập hạt giống</string>
     <string name="startup_recovery_reset_button">Thử lại</string>
     <string name="startup_recovery_checking">Đang kiểm tra hạt giống…</string>
 

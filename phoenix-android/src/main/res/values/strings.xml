@@ -78,6 +78,7 @@
     <string name="startup_error_start_business">Could not start the wallet</string>
     <string name="startup_error_generic">Unable to read wallet data.</string>
     <string name="startup_error_try_again">Try again</string>
+    <string name="startup_error_transient">This error may be temporary. Try rebooting your device.</string>
     <string name="startup_error_serialisation">Unhandled file serialisation</string>
     <string name="startup_error_decryption_general">Decryption failure:\n%1$s</string>
     <string name="startup_error_decryption_keystore" translatable="false">Android keystore failure:\n%1$s</string>
@@ -86,19 +87,24 @@
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Wallet recovery</string>
-    <string name="startup_recovery_instructions">This screen lets you manually recover a single wallet by entering its 12-words recovery phrase.\n\nWords must be entered in the correct order, and separated with a single space.</string>
+    <string name="startup_recovery_instructions_1">Failing to load a wallet usually comes from failures in the Android system keystore. Those may be temporary and might be fixed by a system update or by rebooting the device.</string>
+    <string name="startup_recovery_instructions_2">If this does not help, enter the 12-words recovery phrase of your wallet below. Only this wallet will be recovered. If you had other wallets, they will have to be restored later.</string>
     <string name="startup_recovery_input_label">Enter word #%1$d</string>
     <string name="startup_recovery_input_label_error">No more than 12 words!</string>
     <string name="startup_recovery_invalid">This seed is not valid</string>
 
-    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_check_button">Check seed…</string>
+    <string name="startup_recovery_confirm_dialog_title">Confirm wallet recovery</string>
+    <string name="startup_recovery_confirm_dialog_body">Only this wallet will be recovered. If you had other wallets in Phoenix, they will be removed. You will have to import them again using their recovery phrase.</string>
     <string name="startup_recovery_reset_button">Try again</string>
-    <string name="startup_recovery_checking">Checking seed…</string>
+    <string name="startup_recovery_checking">Processing…</string>
 
     <string name="startup_recovery_error_default">An error occurred.</string>
-    <string name="startup_recovery_error_incorrect_seed">This seed does not match any existing wallet data.</string>
+    <string name="startup_recovery_error_incorrect_seed">This seed does not match existing wallet data.</string>
     <string name="startup_recovery_error_keystore_error" translatable="false">Failed to perform keystore operations.</string>
-    <string name="startup_recovery_success_match">Recovering wallet…</string>
+    <string name="startup_recovery_success_match">Wallet imported</string>
+    <string name="startup_recovery_confirm_reset_header">Any other wallets will be removed from Phoenix.</string>
+    <string name="startup_recovery_confirm_reset_button">Remove other wallets and recover</string>
 
     <!-- Payment line -->
 

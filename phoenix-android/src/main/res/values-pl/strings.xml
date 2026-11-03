@@ -79,7 +79,7 @@
     <string name="startup_recovery_input_label_error">Nie więcej niż 12 słów!</string>
     <string name="startup_recovery_invalid">Ten seed jest nieprawidłowy</string>
 
-    <string name="startup_recovery_import_button">Importuj seed</string>
+    <string name="startup_recovery_check_button">Importuj seed</string>
     <string name="startup_recovery_reset_button">Spróbuj ponownie</string>
     <string name="startup_recovery_checking">Sprawdzanie seeda…</string>
 

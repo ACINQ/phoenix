@@ -91,7 +91,7 @@
     <string name="startup_recovery_input_label_error">12단어를 초과할 수 없습니다!</string>
     <string name="startup_recovery_invalid">유효하지 않은 시드입니다</string>
 
-    <string name="startup_recovery_import_button">시드 가져오기</string>
+    <string name="startup_recovery_check_button">시드 가져오기</string>
     <string name="startup_recovery_reset_button">다시 시도</string>
     <string name="startup_recovery_checking">시드 확인 중…</string>
 

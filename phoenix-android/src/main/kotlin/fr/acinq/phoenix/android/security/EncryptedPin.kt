@@ -36,7 +36,7 @@ abstract class EncryptedPin {
         abstract val iv: ByteArray
         abstract val ciphertext: ByteArray
 
-        fun decrypt(): ByteArray = KeystoreHelper.getDecryptionCipher(KeystoreHelper.KEY_FOR_PINCODE_V1, iv).doFinal(ciphertext)
+        fun decrypt(): ByteArray = KeystoreHelper.getDecryptionCipher(KeystoreHelper.KEY_NO_AUTH, iv).doFinal(ciphertext)
 
         fun serialize(version: Int): ByteArray {
             if (iv.size != IV_LENGTH) {
@@ -129,6 +129,13 @@ object PinManager {
             target = File(datadir, SPENDING_PIN_FILE_NAME),
             bytes = encryptedPin.serialize(EncryptedPinSpending.MULTIPLE_WALLET_VERSION),
         )
+    }
+
+    /** Deletes the lock pin and spending pin files, for all wallets. */
+    fun deletePinFiles(context: Context) {
+        val datadir = getDataDir(context)
+        File(datadir, LOCK_PIN_FILE_NAME).delete()
+        File(datadir, SPENDING_PIN_FILE_NAME).delete()
     }
 
     fun migrateSingleWalletPinCode(context: Context, walletId: WalletId) {

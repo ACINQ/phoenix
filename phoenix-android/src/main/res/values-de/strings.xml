@@ -66,7 +66,7 @@
     <string name="startup_recovery_input_label_error">Maximal 12 Wörter!</string>
     <string name="startup_recovery_invalid">Dieser Seed ist ungültig</string>
 
-    <string name="startup_recovery_import_button">Seed importieren</string>
+    <string name="startup_recovery_check_button">Seed importieren</string>
     <string name="startup_recovery_reset_button">Erneut versuchen</string>
     <string name="startup_recovery_checking">Seed wird überprüft…</string>
 

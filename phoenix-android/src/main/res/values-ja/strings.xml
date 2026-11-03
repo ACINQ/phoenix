@@ -79,7 +79,7 @@
     <string name="startup_recovery_input_label_error">12 単語以内で入力してください！</string>
     <string name="startup_recovery_invalid">このシードは無効です</string>
 
-    <string name="startup_recovery_import_button">シードをインポート</string>
+    <string name="startup_recovery_check_button">シードをインポート</string>
     <string name="startup_recovery_reset_button">もう一度お試しください</string>
     <string name="startup_recovery_checking">シードを確認中…</string>
 

@@ -60,7 +60,7 @@ sealed class ListWalletState {
 
         sealed class DecryptionError : Error() {
             data class GeneralException(val cause: Throwable): DecryptionError()
-            data class KeystoreFailure(val cause: Throwable): DecryptionError()
+            data class KeystoreFailure(val cause: Throwable, val isTransient: Boolean): DecryptionError()
         }
     }
 }
@@ -168,9 +168,13 @@ class AppViewModel(
                     log.error("cannot decrypt seed file: ", result.cause)
                     listWalletState.value = ListWalletState.Error.DecryptionError.GeneralException(result.cause)
                 }
+                is DecryptSeedResult.Failure.TransientKeyStoreFailure -> {
+                    log.error("key store transient failure: ", result.cause)
+                    listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause, isTransient = true)
+                }
                 is DecryptSeedResult.Failure.KeyStoreFailure -> {
                     log.error("key store failure: ", result.cause)
-                    listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause)
+                    listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause, isTransient = false)
                 }
                 is DecryptSeedResult.Failure.SeedFileUnreadable -> {
                     log.error("aborting, unreadable seed file")
@@ -179,6 +183,10 @@ class AppViewModel(
                 is DecryptSeedResult.Failure.SeedInvalid -> {
                     log.error("aborting, seed is invalid")
                     listWalletState.value = ListWalletState.Error.Generic(null)
+                }
+                is DecryptSeedResult.Failure.PinMigrationFailed -> {
+                    log.error("aborting, pin codes could not be migrated: ", result.cause)
+                    listWalletState.value = ListWalletState.Error.Generic(result.cause)
                 }
 
                 is DecryptSeedResult.Success -> {

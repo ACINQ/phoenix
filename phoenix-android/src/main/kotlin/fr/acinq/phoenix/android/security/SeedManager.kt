@@ -34,10 +34,13 @@ sealed class DecryptSeedResult {
     data class Success(val userWalletsMap: Map<WalletId, UserWallet>): DecryptSeedResult()
     sealed class Failure: DecryptSeedResult() {
         data object SerializationError: Failure()
-        data class KeyStoreFailure(val cause: KeyStoreException): Failure()
+        data class TransientKeyStoreFailure(val cause: Exception): Failure()
+        data class KeyStoreFailure(val cause: Exception): Failure()
         data class DecryptionError(val cause: Exception): Failure()
         data object SeedFileUnreadable: Failure()
         data object SeedInvalid: Failure()
+        /** The legacy single seed was decrypted, but its pin codes could not be migrated to the multi-wallet format. */
+        data class PinMigrationFailed(val cause: Exception): Failure()
     }
 }
 
@@ -55,8 +58,20 @@ object SeedManager {
         val encryptedSeed = try {
             loadEncryptedSeedFromDisk(context)
         } catch (e: Exception) {
-            log.error("could not read seed file: ", e)
-            return DecryptSeedResult.Failure.SeedFileUnreadable
+            return when {
+                KeystoreHelper.isTransientFailure(e) -> {
+                    log.error("transient keystore error when reading seed file: ", e)
+                    DecryptSeedResult.Failure.TransientKeyStoreFailure(e)
+                }
+                KeystoreHelper.isKeystoreException(e) -> {
+                    log.error("keystore error when reading seed file: ", e)
+                    DecryptSeedResult.Failure.KeyStoreFailure(e)
+                }
+                else -> {
+                    log.error("could not read seed file: ", e)
+                    DecryptSeedResult.Failure.DecryptionError(e)
+                }
+            }
         }
 
         return when (encryptedSeed) {
@@ -66,8 +81,9 @@ object SeedManager {
                     encryptedSeed.decrypt()
                 } catch (e: Exception) {
                     log.error("failed to decrypt [V2.SingleSeed]: ", e)
-                    return when (e) {
-                        is KeyStoreException -> DecryptSeedResult.Failure.KeyStoreFailure(e)
+                    return when {
+                        KeystoreHelper.isTransientFailure(e) -> DecryptSeedResult.Failure.TransientKeyStoreFailure(e)
+                        KeystoreHelper.isKeystoreException(e) -> DecryptSeedResult.Failure.KeyStoreFailure(e)
                         else -> DecryptSeedResult.Failure.DecryptionError(e)
                     }
                 }
@@ -79,7 +95,13 @@ object SeedManager {
                 val walletId = WalletId(nodeId)
 
                 DataStoreManager.migratePrefsForWallet(context, walletId)
-                PinManager.migrateSingleWalletPinCode(context, walletId)
+                try {
+                    PinManager.migrateSingleWalletPinCode(context, walletId)
+                } catch (e: Exception) {
+                    // the wallet must not be loaded with legacy pin files, which the pin checks cannot read
+                    log.error("failed to migrate pin codes for wallet=$walletId: ", e)
+                    return DecryptSeedResult.Failure.PinMigrationFailed(e)
+                }
 
                 DecryptSeedResult.Success(userWalletsMap = mapOf(walletId to UserWallet(walletId, nodeId.toHex(), words)))
             }
@@ -89,12 +111,16 @@ object SeedManager {
                 val seedMap = try {
                     encryptedSeed.decryptAndGetSeedMap()
                 } catch (e: Exception) {
-                    return when (e) {
-                        is SerializationException, is IllegalArgumentException -> {
+                    return when {
+                        e is SerializationException || e is IllegalArgumentException -> {
                             log.error("failed to decrypt [V2.MultipleSeed]: ${e.javaClass.simpleName}")
                             DecryptSeedResult.Failure.SerializationError
                         }
-                        is KeyStoreException -> {
+                        KeystoreHelper.isTransientFailure(e) -> {
+                            log.error("failed to decrypt [V2.MultipleSeed] (transient): ", e)
+                            DecryptSeedResult.Failure.TransientKeyStoreFailure(e)
+                        }
+                        e is KeyStoreException -> {
                             log.error("failed to decrypt [V2.MultipleSeed]: ", e)
                             DecryptSeedResult.Failure.KeyStoreFailure(e)
                         }

@@ -216,7 +216,14 @@ fun StartupView(
                 }
             }
             is ListWalletState.Error -> {
-                ListWalletsError(state = listWalletState, onManualRecoveryClick = onManualRecoveryClick)
+                ListWalletsError(
+                    state = listWalletState,
+                    onTryAgainClick = {
+                        appViewModel.listWalletState.value = ListWalletState.Init
+                        appViewModel.refreshAppWalletsList(onWalletsFound = {})
+                    },
+                    onManualRecoveryClick = onManualRecoveryClick,
+                )
             }
         }
     }
@@ -271,7 +278,7 @@ private fun StartBusinessError(error: StartupViewState.Error, onTryAgainClick: (
 }
 
 @Composable
-private fun ListWalletsError(state: ListWalletState.Error, onManualRecoveryClick: () -> Unit) {
+private fun ListWalletsError(state: ListWalletState.Error, onTryAgainClick: () -> Unit, onManualRecoveryClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         ErrorMessage(
             header = stringResource(id = R.string.startup_error_generic),
@@ -290,6 +297,18 @@ private fun ListWalletsError(state: ListWalletState.Error, onManualRecoveryClick
         )
 
         HSeparator(width = 50.dp)
+        Spacer(modifier = Modifier.height(16.dp))
+        if (state is ListWalletState.Error.DecryptionError.KeystoreFailure && state.isTransient) {
+            // the error may be transient (e.g. the keystore was temporarily unavailable): offer to retry before the manual recovery
+            // the try again button is displayed in any case
+            Text(text = stringResource(R.string.startup_error_transient))
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+        BorderButton(
+            text = stringResource(id = R.string.startup_error_try_again),
+            icon = R.drawable.ic_reset,
+            onClick = onTryAgainClick
+        )
         Spacer(modifier = Modifier.height(16.dp))
         BorderButton(
             text = stringResource(id = R.string.startup_error_recovery_button),

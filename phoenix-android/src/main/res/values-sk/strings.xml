@@ -68,7 +68,7 @@
     <string name="startup_recovery_input_label_error">Nie viac ako 12 slov!</string>
     <string name="startup_recovery_invalid">Toto seed nie je platné</string>
 
-    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_check_button">Import seed</string>
     <string name="startup_recovery_reset_button">Skúste to znova</string>
     <string name="startup_recovery_checking">Kontrola seed…</string>
 

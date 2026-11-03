@@ -71,7 +71,7 @@
     <string name="startup_recovery_input_label_error">No máximo 12 palavras!</string>
     <string name="startup_recovery_invalid">Esta semente não é válida</string>
 
-    <string name="startup_recovery_import_button">Importar semente</string>
+    <string name="startup_recovery_check_button">Importar semente</string>
     <string name="startup_recovery_reset_button">Tentar novamente</string>
     <string name="startup_recovery_checking">Verificando a semente…</string>
 

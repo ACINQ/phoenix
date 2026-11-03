@@ -79,7 +79,7 @@
     <string name="startup_recovery_input_label_error">Не більше 12 слів!</string>
     <string name="startup_recovery_invalid">Цей seed недійсний</string>
 
-    <string name="startup_recovery_import_button">Імпортувати seed</string>
+    <string name="startup_recovery_check_button">Імпортувати seed</string>
     <string name="startup_recovery_reset_button">Спробувати ще раз</string>
     <string name="startup_recovery_checking">Перевірка seed…</string>
 
