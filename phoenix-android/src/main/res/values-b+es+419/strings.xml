@@ -61,24 +61,28 @@
     <string name="startup_error_start_business">No se pudo iniciar la billetera</string>
     <string name="startup_error_generic">No se pudieron leer los datos de la billetera.</string>
     <string name="startup_error_try_again">Inténtalo de nuevo</string>
+    <string name="startup_error_transient">Este error puede ser temporal. Intente reiniciar su dispositivo.</string>
     <string name="startup_error_decryption_general">Error de descifrado:\n%1$s</string>
     <string name="startup_error_recovery_button">Introduce la frase de recuperación</string>
 
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Recuperación de billetera</string>
-    <string name="startup_recovery_instructions">Esta pantalla le permite recuperar manualmente una sola billetera ingresando su frase de recuperación de 12 palabras.\n\nLas palabras deben ingresarse en el orden correcto y separadas por un solo espacio.</string>
+    <string name="startup_recovery_instructions_1">Los fallos al cargar una billetera suelen deberse a errores en el almacén de claves (keystore) del sistema Android. Pueden ser temporales y resolverse con una actualización del sistema o reiniciando el dispositivo.</string>
+    <string name="startup_recovery_instructions_2">Si esto no ayuda, ingrese a continuación la frase de recuperación de 12 palabras de su billetera. Solo se recuperará esta billetera. Si tenía otras billeteras, deberá restaurarlas más tarde.</string>
     <string name="startup_recovery_input_label">Ingrese la palabra #%1$d</string>
     <string name="startup_recovery_input_label_error">¡No más de 12 palabras!</string>
     <string name="startup_recovery_invalid">Esta semilla no es válida</string>
 
-    <string name="startup_recovery_check_button">Importar semilla</string>
+    <string name="startup_recovery_check_button">Verificar semilla…</string>
+    <string name="startup_recovery_confirm_dialog_title">Confirmar la recuperación de la billetera</string>
+    <string name="startup_recovery_confirm_dialog_body">Solo se recuperará esta billetera. Si tenía otras billeteras en Phoenix, se eliminarán. Deberá importarlas de nuevo con su frase de recuperación.</string>
     <string name="startup_recovery_reset_button">Inténtelo de nuevo</string>
-    <string name="startup_recovery_checking">Comprobando la semilla…</string>
+    <string name="startup_recovery_checking">Procesando…</string>
 
     <string name="startup_recovery_error_default">Error.</string>
     <string name="startup_recovery_error_incorrect_seed">Esta semilla no coincide con ningún dato de la billetera existente.</string>
-    <string name="startup_recovery_success_match">Recuperando la billetera…</string>
+    <string name="startup_recovery_success_match">Billetera importada</string>
 
     <!-- Payment line -->
 

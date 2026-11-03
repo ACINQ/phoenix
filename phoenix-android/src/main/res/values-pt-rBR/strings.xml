@@ -60,24 +60,28 @@
     <string name="startup_error_start_business">Não foi possível iniciar a carteira</string>
     <string name="startup_error_generic">Não foi possível ler os dados da carteira.</string>
     <string name="startup_error_try_again">Tentar novamente</string>
+    <string name="startup_error_transient">Este erro pode ser temporário. Tente reiniciar o seu dispositivo.</string>
     <string name="startup_error_decryption_general">Falha na descriptografia:\n%1$s</string>
     <string name="startup_error_recovery_button">Digite a frase de recuperação</string>
 
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Recuperação de carteira</string>
-    <string name="startup_recovery_instructions">Esta tela permite recuperar manualmente uma única carteira inserindo sua frase de recuperação de 12 palavras.\n\nAs palavras devem ser inseridas na ordem correta e separadas por um único espaço.</string>
+    <string name="startup_recovery_instructions_1">Falhas ao carregar uma carteira geralmente vêm de erros no keystore do sistema Android. Elas podem ser temporárias e ser corrigidas por uma atualização do sistema ou reiniciando o dispositivo.</string>
+    <string name="startup_recovery_instructions_2">Se isso não ajudar, insira abaixo a frase de recuperação de 12 palavras da sua carteira. Somente esta carteira será recuperada. Se você tinha outras carteiras, elas terão que ser restauradas mais tarde.</string>
     <string name="startup_recovery_input_label">Digite a palavra #%1$d</string>
     <string name="startup_recovery_input_label_error">No máximo 12 palavras!</string>
     <string name="startup_recovery_invalid">Esta semente não é válida</string>
 
-    <string name="startup_recovery_check_button">Importar semente</string>
+    <string name="startup_recovery_check_button">Verificar semente…</string>
+    <string name="startup_recovery_confirm_dialog_title">Confirmar recuperação da carteira</string>
+    <string name="startup_recovery_confirm_dialog_body">Somente esta carteira será recuperada. Se você tinha outras carteiras no Phoenix, elas serão removidas. Você terá que importá-las novamente usando a frase de recuperação de cada uma.</string>
     <string name="startup_recovery_reset_button">Tentar novamente</string>
-    <string name="startup_recovery_checking">Verificando a semente…</string>
+    <string name="startup_recovery_checking">Processando…</string>
 
     <string name="startup_recovery_error_default">Ocorreu um erro.</string>
     <string name="startup_recovery_error_incorrect_seed">Esta semente não corresponde a nenhum dado de carteira existente.</string>
-    <string name="startup_recovery_success_match">Recuperando a carteira…</string>
+    <string name="startup_recovery_success_match">Carteira importada</string>
 
     <!-- Payment line -->
 

@@ -78,6 +78,7 @@
     <string name="startup_error_start_business">Dompet tidak dapat diaktifkan</string>
     <string name="startup_error_generic">Tidak dapat membaca data dompet.</string>
     <string name="startup_error_try_again">Coba lagi</string>
+    <string name="startup_error_transient">Kesalahan ini mungkin bersifat sementara. Coba mulai ulang perangkat Anda.</string>
     <string name="startup_error_serialisation">Serialisasi berkas yang tidak ditangani</string>
     <string name="startup_error_decryption_general">Dekripsi gagal:\n%1$s</string>
     <string name="startup_error_decryption_keystore" translatable="false">Kegagalan keystore Android:\n%1$s</string>
@@ -86,19 +87,22 @@
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Pemulihan dompet</string>
-    <string name="startup_recovery_instructions">Layar ini memungkinkan Anda memulihkan satu dompet secara manual dengan memasukkan frasa pemulihan 12 kata.\n\nKata-kata harus dimasukkan dalam urutan yang benar, dan dipisahkan dengan satu spasi.</string>
+    <string name="startup_recovery_instructions_1">Kegagalan memuat dompet biasanya disebabkan oleh kesalahan pada keystore sistem Android. Kesalahan ini mungkin bersifat sementara dan dapat diperbaiki dengan pembaruan sistem atau dengan memulai ulang perangkat.</string>
+    <string name="startup_recovery_instructions_2">Jika ini tidak membantu, masukkan frasa pemulihan 12 kata dompet Anda di bawah. Hanya dompet ini yang akan dipulihkan. Jika Anda memiliki dompet lain, dompet tersebut harus dipulihkan nanti.</string>
     <string name="startup_recovery_input_label">Masukkan kata #%1$d</string>
     <string name="startup_recovery_input_label_error">Tidak lebih dari 12 kata!</string>
     <string name="startup_recovery_invalid">Benih ini tidak valid</string>
 
-    <string name="startup_recovery_check_button">Benih impor</string>
+    <string name="startup_recovery_check_button">Periksa benih…</string>
+    <string name="startup_recovery_confirm_dialog_title">Konfirmasi pemulihan dompet</string>
+    <string name="startup_recovery_confirm_dialog_body">Hanya dompet ini yang akan dipulihkan. Jika Anda memiliki dompet lain di Phoenix, dompet tersebut akan dihapus. Anda harus mengimpornya kembali menggunakan frasa pemulihan masing-masing.</string>
     <string name="startup_recovery_reset_button">Coba lagi</string>
-    <string name="startup_recovery_checking">Memeriksa benih…</string>
+    <string name="startup_recovery_checking">Memproses…</string>
 
     <string name="startup_recovery_error_default">Terjadi kesalahan.</string>
     <string name="startup_recovery_error_incorrect_seed">Seed ini tidak cocok dengan data dompet yang sudah ada.</string>
     <string name="startup_recovery_error_keystore_error" translatable="false">Operasi penyimpanan kunci gagal dilakukan.</string>
-    <string name="startup_recovery_success_match">Memulihkan dompet…</string>
+    <string name="startup_recovery_success_match">Dompet diimpor</string>
 
     <!-- Payment line -->
 

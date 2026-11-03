@@ -57,24 +57,28 @@
     <string name="startup_error_start_business">Nepodarilo sa spustiť peňaženku</string>
     <string name="startup_error_generic">Nepodarilo sa prečítať údaje peňaženky.</string>
     <string name="startup_error_try_again">Skúste to znova</string>
+    <string name="startup_error_transient">Táto chyba môže byť dočasná. Skúste reštartovať zariadenie.</string>
     <string name="startup_error_decryption_general">Zlyhanie dešifrovania:\n%1$s</string>
     <string name="startup_error_recovery_button">Manuálne obnovenie</string>
 
     <!-- Obnova peňaženky pri spustení -->
 
     <string name="startup_recovery_title">Obnova peňaženky</string>
-    <string name="startup_recovery_instructions">Táto obrazovka vám umožňuje manuálne obnoviť jednu peňaženku zadaním jej 12-slovnej frázy na obnovenie.\n\nSlová musia byť zadané v správnom poradí a oddelené jednou medzerou.</string>
+    <string name="startup_recovery_instructions_1">Zlyhanie pri načítaní peňaženky zvyčajne spôsobujú chyby v úložisku kľúčov (keystore) systému Android. Môžu byť dočasné a môže ich vyriešiť aktualizácia systému alebo reštart zariadenia.</string>
+    <string name="startup_recovery_instructions_2">Ak to nepomôže, zadajte nižšie 12-slovnú frázu na obnovenie vašej peňaženky. Obnovená bude iba táto peňaženka. Ak ste mali iné peňaženky, bude potrebné ich obnoviť neskôr.</string>
     <string name="startup_recovery_input_label">Zadajte slovo č. %1$d</string>
     <string name="startup_recovery_input_label_error">Nie viac ako 12 slov!</string>
     <string name="startup_recovery_invalid">Toto seed nie je platné</string>
 
-    <string name="startup_recovery_check_button">Import seed</string>
+    <string name="startup_recovery_check_button">Skontrolovať seed…</string>
+    <string name="startup_recovery_confirm_dialog_title">Potvrdiť obnovu peňaženky</string>
+    <string name="startup_recovery_confirm_dialog_body">Obnovená bude iba táto peňaženka. Ak ste mali vo Phoenixe iné peňaženky, budú odstránené. Budete ich musieť znova importovať pomocou ich fráz na obnovenie.</string>
     <string name="startup_recovery_reset_button">Skúste to znova</string>
-    <string name="startup_recovery_checking">Kontrola seed…</string>
+    <string name="startup_recovery_checking">Spracováva sa…</string>
 
     <string name="startup_recovery_error_default">Vyskytla sa chyba.</string>
     <string name="startup_recovery_error_incorrect_seed">Toto seed sa nezhoduje so žiadnymi existujúcimi údajmi peňaženky.</string>
-    <string name="startup_recovery_success_match">Obnovuje sa peňaženka…</string>
+    <string name="startup_recovery_success_match">Peňaženka importovaná</string>
 
     <!-- Payment line -->
 

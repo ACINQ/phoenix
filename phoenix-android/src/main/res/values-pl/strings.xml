@@ -67,6 +67,7 @@
     <string name="startup_error_start_business">Nie można uruchomić portfela</string>
     <string name="startup_error_generic">Nie można odczytać danych portfela.</string>
     <string name="startup_error_try_again">Spróbuj ponownie</string>
+    <string name="startup_error_transient">Ten błąd może być tymczasowy. Proszę spróbować ponownie uruchomić urządzenie.</string>
     <string name="startup_error_serialisation">Nieobsługiwana serializacja pliku</string>
     <string name="startup_error_decryption_general">Błąd odszyfrowywania:\n%1$s</string>
     <string name="startup_error_recovery_button">Odzyskiwanie ręczne</string>
@@ -74,18 +75,21 @@
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Odzyskiwanie portfela</string>
-    <string name="startup_recovery_instructions">Ten ekran umożliwia ręczne odzyskanie pojedynczego portfela przez wprowadzenie jego 12-słowej frazy odzyskiwania.\n\nSłowa należy wprowadzić we właściwej kolejności, rozdzielone pojedynczą spacją.</string>
+    <string name="startup_recovery_instructions_1">Problemy z wczytaniem portfela wynikają zazwyczaj z błędów magazynu kluczy (keystore) systemu Android. Mogą być tymczasowe i zostać rozwiązane przez aktualizację systemu lub ponowne uruchomienie urządzenia.</string>
+    <string name="startup_recovery_instructions_2">Jeśli to nie pomoże, proszę wprowadzić poniżej 12-słową frazę odzyskiwania portfela. Odzyskany zostanie tylko ten portfel. Inne portfele, jeśli istniały, trzeba będzie przywrócić później.</string>
     <string name="startup_recovery_input_label">Proszę wprowadzić słowo nr %1$d</string>
     <string name="startup_recovery_input_label_error">Nie więcej niż 12 słów!</string>
     <string name="startup_recovery_invalid">Ten seed jest nieprawidłowy</string>
 
-    <string name="startup_recovery_check_button">Importuj seed</string>
+    <string name="startup_recovery_check_button">Sprawdź seed…</string>
+    <string name="startup_recovery_confirm_dialog_title">Potwierdź odzyskanie portfela</string>
+    <string name="startup_recovery_confirm_dialog_body">Odzyskany zostanie tylko ten portfel. Inne portfele w Phoenix, jeśli istniały, zostaną usunięte. Trzeba będzie zaimportować je ponownie przy użyciu ich fraz odzyskiwania.</string>
     <string name="startup_recovery_reset_button">Spróbuj ponownie</string>
-    <string name="startup_recovery_checking">Sprawdzanie seeda…</string>
+    <string name="startup_recovery_checking">Przetwarzanie…</string>
 
     <string name="startup_recovery_error_default">Wystąpił błąd.</string>
     <string name="startup_recovery_error_incorrect_seed">Ten seed nie odpowiada żadnym istniejącym danym portfela.</string>
-    <string name="startup_recovery_success_match">Odzyskiwanie portfela…</string>
+    <string name="startup_recovery_success_match">Portfel zaimportowany</string>
 
     <!-- Payment line -->
 
