@@ -137,10 +137,8 @@ class StartupRecoveryViewModel(
      * Pin access settings for this wallet are reset to default. Other wallets and their preferences are deleted.
      */
     private suspend fun resetSeedFileForRecovery(walletId: WalletId, words: List<String>, onRecoveryDone: (WalletId) -> Unit) {
+        // First delete the key. Writing the seed to file should be done last, once everything is clean, in case a crash happen in between
         KeystoreHelper.deleteKey(KeystoreHelper.KEY_NO_AUTH)
-        log.info("replacing seed file with wallet=$walletId using a new encryption key")
-        val encrypted = EncryptedSeed.V2.encrypt(mapOf(walletId to words))
-        SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
 
         log.info("resetting pin settings for wallet=$walletId")
         val context = application.applicationContext
@@ -155,6 +153,10 @@ class StartupRecoveryViewModel(
         otherWallets.forEach { DataStoreManager.deleteWalletPrefs(context, it) }
         log.info("deleting all pin files")
         PinManager.deletePinFiles(context)
+
+        log.info("replacing seed file with wallet=$walletId using a new encryption key")
+        val encrypted = EncryptedSeed.V2.encrypt(mapOf(walletId to words))
+        SeedManager.writeSeedToDisk(context, encrypted, overwrite = true)
         log.info("finished resetting seed and prefs following recovery of wallet=$walletId")
         finishRecovery(walletId, onRecoveryDone)
     }
