@@ -20,7 +20,6 @@ android {
     defaultConfig {
         applicationId = "fr.acinq.phoenix.testnet"
         minSdk = 26
-        targetSdk = 36
         versionCode = 120
         versionName = gitCommitHash()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -36,6 +35,7 @@ android {
             resValue("string", "CHAIN", chain)
             buildConfigField("String", "CHAIN", chain)
             isMinifyEnabled = true
+            isShrinkResources = true
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
