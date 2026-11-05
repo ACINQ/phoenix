@@ -42,9 +42,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -62,7 +60,7 @@ sealed class ListWalletState {
 
         sealed class DecryptionError : Error() {
             data class GeneralException(val cause: Throwable): DecryptionError()
-            data class KeystoreFailure(val cause: Throwable): DecryptionError()
+            data class KeystoreFailure(val cause: Throwable, val isTransient: Boolean): DecryptionError()
         }
     }
 }
@@ -145,7 +143,7 @@ class AppViewModel(
     }.stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = emptyMap())
 
     init {
-        listAvailableWallets(onDone = {})
+        refreshAppWalletsList(onWalletsFound = {})
     }
 
     fun setActiveWallet(walletId: WalletId, business: PhoenixBusiness) {
@@ -156,7 +154,7 @@ class AppViewModel(
         scheduleAutoLock()
     }
 
-    fun listAvailableWallets(onDone: () -> Unit) {
+    fun refreshAppWalletsList(onWalletsFound: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("error when initialising startup-view: ", e)
             listWalletState.value = ListWalletState.Error.Generic(e)
@@ -170,9 +168,13 @@ class AppViewModel(
                     log.error("cannot decrypt seed file: ", result.cause)
                     listWalletState.value = ListWalletState.Error.DecryptionError.GeneralException(result.cause)
                 }
+                is DecryptSeedResult.Failure.TransientKeyStoreFailure -> {
+                    log.error("key store transient failure: ", result.cause)
+                    listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause, isTransient = true)
+                }
                 is DecryptSeedResult.Failure.KeyStoreFailure -> {
                     log.error("key store failure: ", result.cause)
-                    listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause)
+                    listWalletState.value = ListWalletState.Error.DecryptionError.KeystoreFailure(result.cause, isTransient = false)
                 }
                 is DecryptSeedResult.Failure.SeedFileUnreadable -> {
                     log.error("aborting, unreadable seed file")
@@ -182,10 +184,9 @@ class AppViewModel(
                     log.error("aborting, seed is invalid")
                     listWalletState.value = ListWalletState.Error.Generic(null)
                 }
-
-                is DecryptSeedResult.Failure.SeedFileNotFound -> {
-                    listWalletState.value = ListWalletState.Success
-                    _availableWallets.value = emptyMap()
+                is DecryptSeedResult.Failure.PinMigrationFailed -> {
+                    log.error("aborting, pin codes could not be migrated: ", result.cause)
+                    listWalletState.value = ListWalletState.Error.Generic(result.cause)
                 }
 
                 is DecryptSeedResult.Success -> {
@@ -197,8 +198,10 @@ class AppViewModel(
                     }
                     _availableWallets.value = result.userWalletsMap
                     listWalletState.value = ListWalletState.Success
-                    viewModelScope.launch(Dispatchers.Main) {
-                        onDone()
+                    if (result.userWalletsMap.isNotEmpty()) {
+                        viewModelScope.launch(Dispatchers.Main) {
+                            onWalletsFound()
+                        }
                     }
                 }
             }

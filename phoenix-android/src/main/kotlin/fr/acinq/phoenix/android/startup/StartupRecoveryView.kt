@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -36,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,13 +49,16 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.WalletId
 import fr.acinq.phoenix.android.application
+import fr.acinq.phoenix.android.components.ProgressView
 import fr.acinq.phoenix.android.components.buttons.BorderButton
 import fr.acinq.phoenix.android.components.layouts.Card
 import fr.acinq.phoenix.android.components.buttons.FilledButton
+import fr.acinq.phoenix.android.components.dialogs.ConfirmDialog
 import fr.acinq.phoenix.android.components.feedback.ErrorMessage
 import fr.acinq.phoenix.android.components.feedback.SuccessMessage
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.layouts.DefaultScreenLayout
+import fr.acinq.phoenix.android.utils.MarkWindowSecure
 import fr.acinq.phoenix.android.utils.errorOutlinedTextFieldColors
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.outlinedTextFieldColors
@@ -66,8 +72,11 @@ fun StartupRecoveryView(
     val vm = viewModel<StartupRecoveryViewModel>(factory = StartupRecoveryViewModel.Factory(application = application))
     val state = vm.state.value
 
+    // this screen displays the recovery phrase: prevent screen captures (screenshots, recordings, recent apps thumbnail)
+    MarkWindowSecure()
+
     var inputValue by remember { mutableStateOf("") }
-    val inputWords: List<String> = remember(inputValue) { inputValue.split("\\s+".toRegex()) }
+    val inputWords: List<String> = remember(inputValue) { inputValue.trim().split("\\s+".toRegex()) }
     val isSeedValid: Boolean? = remember(inputValue) {
         if (inputWords.size < 12) {
             null
@@ -75,7 +84,7 @@ fun StartupRecoveryView(
             try {
                 MnemonicCode.validate(inputWords.joinToString(" "))
                 true
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 false
             }
         }
@@ -86,16 +95,18 @@ fun StartupRecoveryView(
 
         Card(
             internalPadding = PaddingValues(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
-            Text(text = stringResource(id = R.string.startup_recovery_instructions))
+            Text(text = stringResource(R.string.startup_recovery_instructions_1))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = stringResource(R.string.startup_recovery_instructions_2))
             Spacer(modifier = Modifier.height(24.dp))
             OutlinedTextField(
                 value = inputValue,
                 onValueChange = { inputValue = it },
                 trailingIcon = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (inputValue.isNotBlank()) {
+                        if (state is StartupRecoveryState.Init && inputValue.isNotBlank()) {
                             FilledButton(
                                 onClick = { inputValue = "" },
                                 icon = R.drawable.ic_cross,
@@ -125,7 +136,10 @@ fun StartupRecoveryView(
                 maxLines = 3,
                 singleLine = false,
                 enabled = state is StartupRecoveryState.Init,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    // the recovery phrase must not be exposed to accessibility services
+                    .clearAndSetSemantics { contentDescription = "hidden from accessibility services" },
             )
         }
 
@@ -144,15 +158,27 @@ fun StartupRecoveryView(
                         Spacer(Modifier.height(16.dp))
                     }
                     FilledButton(
-                        text = stringResource(id = R.string.startup_recovery_import_button),
-                        icon = R.drawable.ic_check,
+                        text = stringResource(id = R.string.startup_recovery_check_button),
+                        icon = R.drawable.ic_arrow_next,
                         enabled = isSeedValid == true,
                         modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
                         onClick = { vm.recoverSeed(inputWords, onRecoveryDone = onRecoveryDone) }
                     )
                 }
                 is StartupRecoveryState.CheckingSeed -> {
-                    Text(text = stringResource(id = R.string.startup_recovery_checking))
+                    ProgressView(text = stringResource(id = R.string.startup_recovery_checking))
+                }
+                is StartupRecoveryState.ConfirmReset -> {
+                    ConfirmDialog(
+                        onConfirm = { vm.recoverSeed(inputWords, confirmReset = true, onRecoveryDone = onRecoveryDone) },
+                        onDismiss = { vm.state.value = StartupRecoveryState.Init },
+                        title = stringResource(R.string.startup_recovery_confirm_dialog_title)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.startup_recovery_confirm_dialog_body)
+                        )
+                    }
                 }
                 is StartupRecoveryState.Error -> {
                     ErrorMessage(
@@ -170,7 +196,7 @@ fun StartupRecoveryView(
                         onClick = { vm.state.value = StartupRecoveryState.Init }
                     )
                 }
-                is StartupRecoveryState.Success.MatchingData -> {
+                is StartupRecoveryState.Success -> {
                     SuccessMessage(header = stringResource(id = R.string.startup_recovery_success_match))
                 }
             }

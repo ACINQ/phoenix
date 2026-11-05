@@ -67,6 +67,7 @@
     <string name="startup_error_start_business">ウォレットを起動できません</string>
     <string name="startup_error_generic">ウォレットデータを読み取れません。</string>
     <string name="startup_error_try_again">もう一度お試しください</string>
+    <string name="startup_error_transient">このエラーは一時的なものである可能性があります。デバイスを再起動してみてください。</string>
     <string name="startup_error_serialisation">未対応のファイルシリアライゼーションです</string>
     <string name="startup_error_decryption_general">復号エラー：\n%1$s</string>
     <string name="startup_error_recovery_button">手動で復元</string>
@@ -74,18 +75,21 @@
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">ウォレットの復元</string>
-    <string name="startup_recovery_instructions">この画面では、12 単語のリカバリーフレーズを入力して、個別のウォレットを手動で復元できます。\n\n単語は正しい順序で、半角スペース 1 つで区切って入力してください。</string>
+    <string name="startup_recovery_instructions_1">ウォレットを読み込めない原因は、通常 Android システムのキーストアの不具合です。一時的なものである場合があり、システムアップデートやデバイスの再起動で解決することがあります。</string>
+    <string name="startup_recovery_instructions_2">それでも解決しない場合は、下にウォレットの 12 単語のリカバリーフレーズを入力してください。復元されるのはこのウォレットのみです。他のウォレットがあった場合は、後で復元する必要があります。</string>
     <string name="startup_recovery_input_label">単語 #%1$d を入力してください</string>
     <string name="startup_recovery_input_label_error">12 単語以内で入力してください！</string>
     <string name="startup_recovery_invalid">このシードは無効です</string>
 
-    <string name="startup_recovery_import_button">シードをインポート</string>
+    <string name="startup_recovery_check_button">シードを確認…</string>
+    <string name="startup_recovery_confirm_dialog_title">ウォレットの復元を確認</string>
+    <string name="startup_recovery_confirm_dialog_body">復元されるのはこのウォレットのみです。Phoenix に他のウォレットがあった場合、それらは削除されます。それぞれのリカバリーフレーズを使って、もう一度インポートする必要があります。</string>
     <string name="startup_recovery_reset_button">もう一度お試しください</string>
-    <string name="startup_recovery_checking">シードを確認中…</string>
+    <string name="startup_recovery_checking">処理中…</string>
 
     <string name="startup_recovery_error_default">エラーが発生しました。</string>
     <string name="startup_recovery_error_incorrect_seed">このシードは、既存のウォレットデータと一致しません。</string>
-    <string name="startup_recovery_success_match">ウォレットを復元中…</string>
+    <string name="startup_recovery_success_match">ウォレットをインポートしました</string>
 
     <!-- Payment line -->
 

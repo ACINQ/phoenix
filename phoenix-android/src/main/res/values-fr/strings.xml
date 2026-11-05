@@ -67,6 +67,7 @@
     <string name="startup_error_start_business">Le wallet n\'a pas pu démarrer</string>
     <string name="startup_error_generic">Échec de la lecture des données du wallet</string>
     <string name="startup_error_try_again">Réessayer</string>
+    <string name="startup_error_transient">Cette erreur est peut-être temporaire. Essayez de redémarrer votre appareil.</string>
     <string name="startup_error_serialisation">Sérialisation de fichier non gérée</string>
     <string name="startup_error_decryption_general">Erreur de déchiffrement :\n%1$s</string>
     <string name="startup_error_recovery_button">Restaurer manuellement</string>
@@ -74,18 +75,21 @@
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Restauration du wallet</string>
-    <string name="startup_recovery_instructions">Cet écran vous permet de restaurer un wallet en saissant sa clé de 12 mots.\n\nLes mots de la clé doivent être entrés dans le bon ordre, et séparés par un seul espace.</string>
+    <string name="startup_recovery_instructions_1">Les échecs de chargement d\'un wallet viennent généralement d\'erreurs du keystore du système Android. Elles peuvent être temporaires et corrigées par une mise à jour du système ou un redémarrage de l\'appareil.</string>
+    <string name="startup_recovery_instructions_2">Si cela ne suffit pas, saisissez ci-dessous la phrase de récupération de 12 mots de votre wallet. Seul ce wallet sera restauré. Si vous aviez d\'autres wallets, il faudra les restaurer plus tard.</string>
     <string name="startup_recovery_input_label">Saisir le mot #%1$d</string>
     <string name="startup_recovery_input_label_error">Pas plus de 12 mots !</string>
     <string name="startup_recovery_invalid">Cette seed n\'est pas valide</string>
 
-    <string name="startup_recovery_import_button">Import seed</string>
+    <string name="startup_recovery_check_button">Vérifier la seed…</string>
+    <string name="startup_recovery_confirm_dialog_title">Confirmer la restauration du wallet</string>
+    <string name="startup_recovery_confirm_dialog_body">Seul ce wallet sera restauré. Si vous aviez d\'autres wallets dans Phoenix, ils seront supprimés. Vous devrez les importer à nouveau avec leur phrase de récupération.</string>
     <string name="startup_recovery_reset_button">Réessayer</string>
-    <string name="startup_recovery_checking">Vérification de la seed…</string>
+    <string name="startup_recovery_checking">Traitement en cours…</string>
 
     <string name="startup_recovery_error_default">Une erreur est survenue.</string>
     <string name="startup_recovery_error_incorrect_seed">La clé saisie ne correspond pas à un wallet existant.</string>
-    <string name="startup_recovery_success_match">Restauration du wallet…</string>
+    <string name="startup_recovery_success_match">Wallet importé</string>
 
     <!-- Payment line -->
 

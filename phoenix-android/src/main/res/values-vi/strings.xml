@@ -58,24 +58,28 @@
     <string name="startup_error_start_business">Không thể khởi động ví</string>
     <string name="startup_error_generic">Không thể đọc dữ liệu ví.</string>
     <string name="startup_error_try_again">Thử lại</string>
+    <string name="startup_error_transient">Lỗi này có thể chỉ là tạm thời. Hãy thử khởi động lại thiết bị.</string>
     <string name="startup_error_decryption_general">Giải mã lỗi:\n%1$s</string>
     <string name="startup_error_recovery_button">Khôi phục thủ công</string>
 
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Khôi phục ví</string>
-    <string name="startup_recovery_instructions">Màn hình này cho phép bạn khôi phục thủ công một ví bằng cách nhập cụm từ khôi phục 12 từ của ví đó.\n\nCác từ phải được nhập theo đúng thứ tự và cách nhau một khoảng trắng.</string>
+    <string name="startup_recovery_instructions_1">Việc không tải được ví thường do lỗi trong kho khóa (keystore) của hệ thống Android. Các lỗi này có thể chỉ là tạm thời và có thể được khắc phục bằng bản cập nhật hệ thống hoặc khởi động lại thiết bị.</string>
+    <string name="startup_recovery_instructions_2">Nếu cách này không hiệu quả, hãy nhập cụm từ khôi phục 12 từ của ví bên dưới. Chỉ ví này được khôi phục. Nếu bạn có các ví khác, bạn sẽ cần khôi phục chúng sau.</string>
     <string name="startup_recovery_input_label">Nhập từ #%1$d</string>
     <string name="startup_recovery_input_label_error">Không quá 12 từ!</string>
     <string name="startup_recovery_invalid">Hạt giống này không hợp lệ</string>
 
-    <string name="startup_recovery_import_button">Nhập hạt giống</string>
+    <string name="startup_recovery_check_button">Kiểm tra hạt giống…</string>
+    <string name="startup_recovery_confirm_dialog_title">Xác nhận khôi phục ví</string>
+    <string name="startup_recovery_confirm_dialog_body">Chỉ ví này được khôi phục. Nếu bạn có các ví khác trong Phoenix, chúng sẽ bị xóa. Bạn sẽ cần nhập lại chúng bằng cụm từ khôi phục của từng ví.</string>
     <string name="startup_recovery_reset_button">Thử lại</string>
-    <string name="startup_recovery_checking">Đang kiểm tra hạt giống…</string>
+    <string name="startup_recovery_checking">Đang xử lý…</string>
 
     <string name="startup_recovery_error_default">Đã xảy ra lỗi.</string>
     <string name="startup_recovery_error_incorrect_seed">Hạt giống này không khớp với bất kỳ dữ liệu ví nào hiện có.</string>
-    <string name="startup_recovery_success_match">Đang khôi phục ví…</string>
+    <string name="startup_recovery_success_match">Đã nhập ví</string>
 
     <!-- Payment line -->
 

@@ -25,8 +25,11 @@ import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.crypto.LocalKeyManager
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.WalletId
+import fr.acinq.phoenix.android.security.DecryptSeedResult
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeystoreHelper
+import fr.acinq.phoenix.android.security.PinManager
+import fr.acinq.phoenix.android.utils.datastore.DataStoreManager
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.managers.NodeParamsManager
 import fr.acinq.phoenix.managers.nodeIdHash
@@ -34,6 +37,7 @@ import fr.acinq.phoenix.utils.extensions.phoenixName
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
@@ -41,9 +45,8 @@ import org.slf4j.LoggerFactory
 sealed class StartupRecoveryState {
     data object Init: StartupRecoveryState()
     data object CheckingSeed: StartupRecoveryState()
-    sealed class Success: StartupRecoveryState() {
-        data object MatchingData: Success()
-    }
+    data object ConfirmReset: StartupRecoveryState()
+    data object Success: StartupRecoveryState()
     sealed class Error: StartupRecoveryState() {
         data class Other(val cause: Throwable): Error()
         data object SeedDoesNotMatch: Error()
@@ -59,10 +62,17 @@ class StartupRecoveryViewModel(
     val state = mutableStateOf<StartupRecoveryState>(StartupRecoveryState.Init)
 
     /**
-     * This method checks if the provided mnemonics matches a channel file in the local files.
-     * If so, the key in the keystore is updated and the seed is written to disk.
+     * Checks that the provided mnemonics match a channels database on this device, then recovers that wallet.
+     *
+     * If the seed file can actually be loaded, the restored wallet is added to it, and nothing else changes.
+     *
+     * Otherwise, the seed file is reset to contain only that recovered wallet, and other wallets are deleted. Since this
+     * is a destructive operation, the user must confirm. If the user had setup PIN codes for the restored wallet, they
+     * are removed.
+     *
+     * @param confirmReset true if the user confirms resetting the existing seed file.
      */
-    fun recoverSeed(words: List<String>, onRecoveryDone: (WalletId) -> Unit) {
+    fun recoverSeed(words: List<String>, confirmReset: Boolean = false, onRecoveryDone: (WalletId) -> Unit) {
         if (state.value is StartupRecoveryState.CheckingSeed) return
         state.value = StartupRecoveryState.CheckingSeed
 
@@ -75,24 +85,87 @@ class StartupRecoveryViewModel(
             val nodeIdHash = localKeyManager.nodeIdHash()
 
             val channelsDbFile = application.applicationContext.getDatabasePath("channels-${NodeParamsManager.chain.phoenixName}-$nodeIdHash.sqlite")
-            if (channelsDbFile.exists()) {
-                state.value = StartupRecoveryState.Success.MatchingData
-                try {
-                    KeystoreHelper.checkEncryptionCipherOrReset(KeystoreHelper.KEY_NO_AUTH)
-                } catch (e: Exception) {
-                    state.value = StartupRecoveryState.Error.SeedDoesNotMatch
-                    return@launch
-                }
-                val walletId = WalletId(nodeIdHash)
-                val encrypted = EncryptedSeed.V2.encrypt(mapOf(walletId to words))
-                SeedManager.writeSeedToDisk(application.applicationContext, encrypted, overwrite = true)
-                delay(1000)
-                viewModelScope.launch(Dispatchers.Main) {
-                    onRecoveryDone(walletId)
-                }
-            } else {
+            if (!channelsDbFile.exists()) {
                 state.value = StartupRecoveryState.Error.SeedDoesNotMatch
+                return@launch
             }
+
+            val walletId = WalletId(nodeIdHash)
+            // trying to read the seed file a few times just in case we could avoid a reset
+            when (val result = loadSeedFileWithRetries()) {
+                is DecryptSeedResult.Success -> {
+                    addToSeedFile(result, walletId, words)
+                    finishRecovery(walletId, onRecoveryDone)
+                }
+                is DecryptSeedResult.Failure -> {
+                    log.info("seed file still cannot be loaded ($result)")
+                    if (confirmReset) {
+                        log.info("user confirmed reset to recover wallet=$walletId")
+                        resetSeedFileForRecovery(walletId, words, onRecoveryDone)
+                    } else {
+                        log.info("prompting the user for confirmation")
+                        state.value = StartupRecoveryState.ConfirmReset
+                    }
+                }
+            }
+        }
+    }
+
+    /** Loads the seed file, retrying a few times. The seed file must not be replaced because of a transient keystore failure. */
+    private suspend fun loadSeedFileWithRetries(): DecryptSeedResult {
+        var result = SeedManager.loadAndDecrypt(application.applicationContext)
+        repeat(2) {
+            if (result is DecryptSeedResult.Success) return result
+            delay(1000) // should not be too long, as we are blocking the recovery operation
+            result = SeedManager.loadAndDecrypt(application.applicationContext)
+        }
+        return result
+    }
+
+    private fun addToSeedFile(existing: DecryptSeedResult.Success, walletId: WalletId, words: List<String>) {
+        if (existing.userWalletsMap.containsKey(walletId)) {
+            log.info("seed file can be loaded and already contains wallet=$walletId, nothing to write")
+        } else {
+            log.info("seed file can be loaded, adding wallet=$walletId to it")
+            val seedMap = existing.userWalletsMap.mapValues { it.value.words } + (walletId to words)
+            SeedManager.writeSeedToDisk(application.applicationContext, EncryptedSeed.V2.encrypt(seedMap), overwrite = true)
+        }
+    }
+
+    /**
+     * Deletes the current encryption key and replaces the seed file with one that contains only the recovered wallet.
+     * Pin access settings for this wallet are reset to default. Other wallets and their preferences are deleted.
+     */
+    private suspend fun resetSeedFileForRecovery(walletId: WalletId, words: List<String>, onRecoveryDone: (WalletId) -> Unit) {
+        // First delete the key. Writing the seed to file should be done last, once everything is clean, in case a crash happen in between
+        KeystoreHelper.deleteKey(KeystoreHelper.KEY_NO_AUTH)
+
+        log.info("resetting pin settings for wallet=$walletId")
+        val context = application.applicationContext
+        DataStoreManager.loadUserPrefsForWallet(context, walletId).run {
+            saveIsScreenLockPinEnabled(false)
+            saveLockPinCodeSuccess()
+            saveIsSpendLockPinEnabled(false)
+            saveSpendingPinCodeSuccess()
+        }
+        log.info("deleting prefs for other known wallets")
+        val otherWallets = application.globalPrefs.getAvailableWalletsMeta.first().keys - walletId
+        otherWallets.forEach { DataStoreManager.deleteWalletPrefs(context, it) }
+        log.info("deleting all pin files")
+        PinManager.deletePinFiles(context)
+
+        log.info("replacing seed file with wallet=$walletId using a new encryption key")
+        val encrypted = EncryptedSeed.V2.encrypt(mapOf(walletId to words))
+        SeedManager.writeSeedToDisk(context, encrypted, overwrite = true)
+        log.info("finished resetting seed and prefs following recovery of wallet=$walletId")
+        finishRecovery(walletId, onRecoveryDone)
+    }
+
+    private suspend fun finishRecovery(walletId: WalletId, onRecoveryDone: (WalletId) -> Unit) {
+        state.value = StartupRecoveryState.Success
+        delay(1500)
+        viewModelScope.launch(Dispatchers.Main) {
+            onRecoveryDone(walletId)
         }
     }
 

@@ -90,10 +90,6 @@ class PaymentsForegroundService : Service() {
 
             else -> {
                 when (val result = SeedManager.loadAndDecrypt(applicationContext)) {
-                    is DecryptSeedResult.Failure.SeedFileNotFound -> {
-                        log.info("seed not found, aborting early")
-                        false
-                    }
                     is DecryptSeedResult.Failure -> {
                         log.info("unable to read seed, aborting early")
                         serviceScope.launch {

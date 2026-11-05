@@ -91,7 +91,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
         StartupRecoveryView(
             onBackClick = { navController.popBackStack() },
             onRecoveryDone = { walletId ->
-                appViewModel.listAvailableWallets(onDone = {
+                appViewModel.refreshAppWalletsList(onWalletsFound = {
                     appViewModel.switchToWallet(walletId)
                     navController.navigate(Screen.Startup.route)
                 })
@@ -116,7 +116,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
             CreateWalletView(
                 navController = navController,
                 onWalletCreationDone = { walletId ->
-                    appViewModel.listAvailableWallets(onDone = {
+                    appViewModel.refreshAppWalletsList(onWalletsFound = {
                         appViewModel.switchToWallet(walletId)
                         navController.navigate(Screen.Startup.route)
                     }
@@ -128,7 +128,7 @@ fun NavGraphBuilder.baseNavGraph(navController: NavController, appViewModel: App
             RestoreWalletView(
                 navController=  navController,
                 onRestoreDone = { walletId ->
-                    appViewModel.listAvailableWallets(onDone = {
+                    appViewModel.refreshAppWalletsList(onWalletsFound = {
                         appViewModel.switchToWallet(walletId)
                         navController.navigate(Screen.Startup.route)
                     }

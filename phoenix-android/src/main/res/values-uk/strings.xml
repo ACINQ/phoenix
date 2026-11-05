@@ -67,6 +67,7 @@
     <string name="startup_error_start_business">Не вдалося запустити гаманець</string>
     <string name="startup_error_generic">Не вдалося прочитати дані гаманця.</string>
     <string name="startup_error_try_again">Спробувати ще раз</string>
+    <string name="startup_error_transient">Ця помилка може бути тимчасовою. Спробуйте перезавантажити пристрій.</string>
     <string name="startup_error_serialisation">Необроблена серіалізація файлу</string>
     <string name="startup_error_decryption_general">Помилка розшифрування:\n%1$s</string>
     <string name="startup_error_recovery_button">Ручне відновлення</string>
@@ -74,18 +75,21 @@
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">Відновлення гаманця</string>
-    <string name="startup_recovery_instructions">Цей екран дозволяє вручну відновити окремий гаманець, ввівши його фразу відновлення з 12 слів.\n\nСлова потрібно вводити в правильному порядку, розділяючи одним пробілом.</string>
+    <string name="startup_recovery_instructions_1">Збої під час завантаження гаманця зазвичай спричинені помилками системного сховища ключів (keystore) Android. Вони можуть бути тимчасовими й усуватися оновленням системи або перезавантаженням пристрою.</string>
+    <string name="startup_recovery_instructions_2">Якщо це не допоможе, введіть нижче фразу відновлення вашого гаманця з 12 слів. Буде відновлено лише цей гаманець. Якщо у вас були інші гаманці, їх доведеться відновити пізніше.</string>
     <string name="startup_recovery_input_label">Введіть слово #%1$d</string>
     <string name="startup_recovery_input_label_error">Не більше 12 слів!</string>
     <string name="startup_recovery_invalid">Цей seed недійсний</string>
 
-    <string name="startup_recovery_import_button">Імпортувати seed</string>
+    <string name="startup_recovery_check_button">Перевірити seed…</string>
+    <string name="startup_recovery_confirm_dialog_title">Підтвердити відновлення гаманця</string>
+    <string name="startup_recovery_confirm_dialog_body">Буде відновлено лише цей гаманець. Якщо у Phoenix були інші гаманці, їх буде видалено. Вам доведеться імпортувати їх знову за допомогою їхніх фраз відновлення.</string>
     <string name="startup_recovery_reset_button">Спробувати ще раз</string>
-    <string name="startup_recovery_checking">Перевірка seed…</string>
+    <string name="startup_recovery_checking">Обробка…</string>
 
     <string name="startup_recovery_error_default">Сталася помилка.</string>
     <string name="startup_recovery_error_incorrect_seed">Цей seed не відповідає жодним наявним даним гаманця.</string>
-    <string name="startup_recovery_success_match">Відновлення гаманця…</string>
+    <string name="startup_recovery_success_match">Гаманець імпортовано</string>
 
     <!-- Payment line -->
 

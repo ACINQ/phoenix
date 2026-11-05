@@ -53,7 +53,7 @@ sealed class EncryptedPinSpending: EncryptedPin.KeystoreEncrypted() {
             val json = Json.encodeToString(
                 pinMap.map { (id, pin) -> id.nodeIdHash to pin }.toMap()
             )
-            val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_FOR_PINCODE_V1)
+            val cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_NO_AUTH)
             MultipleWallet(cipher.iv, cipher.doFinal(json.encodeToByteArray()))
         }
 

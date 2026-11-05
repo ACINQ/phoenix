@@ -78,6 +78,7 @@
     <string name="startup_error_start_business">지갑 시작 실패</string>
     <string name="startup_error_generic">지갑 데이터를 읽을 수 없습니다.</string>
     <string name="startup_error_try_again">다시 시도</string>
+    <string name="startup_error_transient">일시적인 오류일 수 있습니다. 기기를 재부팅해 보세요.</string>
     <string name="startup_error_serialisation">지원되지 않는 파일 직렬화 형식입니다.</string>
     <string name="startup_error_decryption_general">복호화 실패:\n%1$s</string>
     <string name="startup_error_decryption_keystore" translatable="false">Android keystore failure:\n%1$s</string>
@@ -86,19 +87,22 @@
     <!-- Startup wallet recovery -->
 
     <string name="startup_recovery_title">지갑 복구</string>
-    <string name="startup_recovery_instructions">이 화면에서는 12단어 복구 문구를 입력해 지갑 하나를 수동으로 복구할 수 있습니다.\n\n단어는 올바른 순서로, 공백 하나로 구분해 입력해야 합니다.</string>
+    <string name="startup_recovery_instructions_1">지갑을 불러오지 못하는 문제는 대개 Android 시스템 키스토어의 오류 때문입니다. 일시적인 오류일 수 있으며, 시스템 업데이트나 기기 재부팅으로 해결될 수 있습니다.</string>
+    <string name="startup_recovery_instructions_2">그래도 해결되지 않으면 아래에 지갑의 12단어 복구 문구를 입력하세요. 이 지갑만 복구됩니다. 다른 지갑이 있었다면 나중에 따로 복구해야 합니다.</string>
     <string name="startup_recovery_input_label">%1$d번째 단어 입력</string>
     <string name="startup_recovery_input_label_error">12단어를 초과할 수 없습니다!</string>
     <string name="startup_recovery_invalid">유효하지 않은 시드입니다</string>
 
-    <string name="startup_recovery_import_button">시드 가져오기</string>
+    <string name="startup_recovery_check_button">시드 확인…</string>
+    <string name="startup_recovery_confirm_dialog_title">지갑 복구 확인</string>
+    <string name="startup_recovery_confirm_dialog_body">이 지갑만 복구됩니다. Phoenix에 다른 지갑이 있었다면 삭제됩니다. 각 지갑의 복구 문구로 다시 가져와야 합니다.</string>
     <string name="startup_recovery_reset_button">다시 시도</string>
-    <string name="startup_recovery_checking">시드 확인 중…</string>
+    <string name="startup_recovery_checking">처리 중…</string>
 
     <string name="startup_recovery_error_default">오류가 발생했습니다.</string>
     <string name="startup_recovery_error_incorrect_seed">이 시드와 일치하는 지갑 데이터가 없습니다.</string>
     <string name="startup_recovery_error_keystore_error" translatable="false">Failed to perform keystore operations.</string>
-    <string name="startup_recovery_success_match">지갑 복구 중…</string>
+    <string name="startup_recovery_success_match">지갑을 가져왔습니다</string>
 
     <!-- Payment line -->
 
