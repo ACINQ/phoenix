@@ -129,5 +129,9 @@ class NfcReader: NSObject, NFCNDEFReaderSessionDelegate {
 			finishWithSuccess(message)
 		}
 	}
-
+	
+	/* Note: When this delegate function exists, it seems to break functionality on iOS 16.
+	func readerSession(_ session: NFCNDEFReaderSession, didDetect tags: [any NFCNDEFTag]) {
+	}
+	*/
 }
